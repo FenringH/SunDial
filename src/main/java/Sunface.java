@@ -31,6 +31,12 @@ public class Sunface extends Application {
         GregorianCalendar currentCalendar = new GregorianCalendar();
         Date currentTime = new Date();
 
+        Suntime suntime = new Suntime.Builder()
+                .julianDayNumber(2458352.019444d)
+                .observerLongitude(45.7830997d)
+                .observerLatitude(15.9788553d)
+                .build();
+
         // Earth map
         SVGPath pathOfEarth = new SVGPath();
         pathOfEarth.setContent(Path_Of_Earth);
@@ -45,12 +51,25 @@ public class Sunface extends Application {
         textCurrentTime.setText("Current Time: " + currentTime.toString() +
                 "\nCurrent day of year: " + currentCalendar.get(Calendar.DAY_OF_YEAR));
 
+        // Text 2
+        Text textCalc = new Text();
+        textCalc.setFont(Font_Of_Info);
+        textCalc.setX(50);
+        textCalc.setY(150);
+        textCalc.setText("Calc Results: " +
+                "\nSidereal: " + suntime.getSiderealTime() +
+                "\nSunrise: " + suntime.getSunriseJulianDay() +
+                "\nSunset: " + suntime.getSunsetJulianDay()
+        );
+
+
         // Root node group
         Group rootNode = new Group();
 
         ObservableList rootNodeChildren = rootNode.getChildren();
         rootNodeChildren.add(pathOfEarth);
         rootNodeChildren.add(textCurrentTime);
+        rootNodeChildren.add(textCalc);
 
         // And scene...
         Scene testScene = new Scene(rootNode, 600,300);
