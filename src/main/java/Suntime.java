@@ -3,28 +3,19 @@ import static java.lang.Math.*;
 public class Suntime {
 
     // constants
-    private static double DEFAULT_LONGITUDE = 45.7830997d;
-    private static double DEFAULT_LATITUDE = 15.9788553d;
-    private static double J2000 = 2451545.0d;
+    private static double DEFAULT_LONGITUDE = 15.9788553d;  // East
+    private static double DEFAULT_LATITUDE = 45.7830997d;   // North
+    private static double J2000 = 2451545.0d;               // UTC 01.01.2000. 12:00
 
     // inputs
     private double julianDayNumber;
     private double observerLongitude;
     private double observerLatitude;
 
-    // intermediaries
-    private double meanAnomaly;
-    private double equationOfCenter;
-    private double eclipticLongitude;
-    private double rightAscension;
-    private double declinationOfTheSun;
-    private double siderealTime;
-    private double hourAngle;
-    private double solarTransit;
-
     // outputs
-    private double sunsetJulianDay;
-    private double sunriseJulianDay;
+    private double siderealTime;
+    private double sunriseJulianDate;
+    private double sunsetJulianDate;
 
     // Constructors - Builder
     private Suntime(Builder builder) {
@@ -81,85 +72,94 @@ public class Suntime {
     }
 
     // calculation methods
-    private void calcMeanAnomaly() {
-        double J = this.julianDayNumber;
-        double M = (-3.59d + 0.98560d * (J - J2000)) % 360;
-        this.meanAnomaly = M;
+    private double calcMeanAnomaly(double J) {
+        return (357.5291d + 0.98560028d * (J - J2000)) % 360;
     }
 
-    private void calcEquationOfCenter() {
-        double M = this.meanAnomaly;
-        double C = 1.9148d * sin(toRadians(M))
-                + 0.0200d * sin(toRadians(2 * M))
-                + 0.0003d * sin(toRadians(3 * M));
-        this.equationOfCenter = C;
+    private double calcEquationOfCenter(double M) {
+        return 1.9148d * sin(toRadians(M)) + 0.0200d * sin(toRadians(2 * M)) + 0.0003d * sin(toRadians(3 * M));
     }
 
-    private void calcEclipticLongitude() {
-        double M = this.meanAnomaly;
-        double C = this.equationOfCenter;
-        double lambda = (M + 102.9373d + C + 180.0d) % 360;
-        this.eclipticLongitude = lambda;
+    private double calcEclipticalLongitude(double M, double C) {
+        return (M + 102.9373d + C + 180.0d) % 360;
     }
 
-    private void calcRightAscension() {
-        double lambda = this.eclipticLongitude;
-        double alpha = toDegrees( atan2( sin(toRadians(lambda)) * cos(toRadians(23.4393d)), cos(toRadians(lambda)) ) );
-        this.rightAscension = alpha;
+    private double calcRightAscension(double lambda) {
+        return toDegrees( atan2( sin(toRadians(lambda)) * cos(toRadians(23.4393d)), cos(toRadians(lambda)) ) );
     }
 
-    private void calcDeclinationOfTheSun() {
-        double lambda = this.eclipticLongitude;
-        double delta = toDegrees( asin( sin(toRadians(lambda)) * sin(toRadians(23.4393d)) ) );
-        this.declinationOfTheSun = delta;
+    private double calcDeclinationOfTheSun(double lambda) {
+        return toDegrees( asin( sin(toRadians(lambda)) * sin(toRadians(23.4393d)) ) );
     }
 
-    private void calcSiderealTime() {
-        double J = this.julianDayNumber;
-        double Lw = this.observerLongitude;
-        double theta = (280.1470d + 360.9856235d * (J - J2000) - Lw) % 360;
-        this.siderealTime = theta;
+    private double calcSiderealTime(double J, double Lw) {
+        return (280.1470d + 360.9856235d * (J - J2000) - Lw) % 360;
     }
 
-    private void calcSolarTransit() {
-        double J = this.julianDayNumber;
-        double Lw = this.observerLongitude;
-        double M = this.meanAnomaly;
-        double lambda = this.eclipticLongitude;
-        double n = J - J2000 + 0.0009d;
-        double Jstar = n - Lw / 360d;
-        double Jtransit = J2000 + Jstar + 0.0053d * sin(toRadians(M)) - 0.0068d * sin(toRadians(2*lambda));
-        this.solarTransit = Jtransit;
+    private double calcHourAngle(double alpha, double theta) {
+        return theta - alpha;
     }
 
-    private void calcHourAngle() {
-        double delta = this.declinationOfTheSun;
-        double phi = this.observerLatitude;
-        double H = toDegrees( acos(
-                    (sin(toRadians(-0.83d)) - sin(toRadians(phi)) * sin(toRadians(delta)) ) /
-                    (cos(toRadians(phi)) * cos(toRadians(delta)) )
-                ) );
-        this.hourAngle = H;
+    private double calcSolarTransit(double J, double Lw, double M, double lambda) {
+
+        double nx = J - J2000 - 0.0009d - Lw / 360d;
+        double n = (double) round(nx);
+        double Jx = J + (n - nx);
+
+        return Jx + 0.0053d * sin(toRadians(M)) - 0.0068d * sin(toRadians(2*lambda));
     }
 
-    private void calcSunriseSunsetJulianDay() {
-        double Jtransit = this.solarTransit;
-        double H = this.hourAngle;
-        this.sunriseJulianDay = Jtransit - (H / 360d);
-        this.sunsetJulianDay = Jtransit + (H / 360d);
+    private double calcLocalHourAngle(double delta, double phi) {
+        return toDegrees( acos(
+                (sin(toRadians(-0.83d)) - sin(toRadians(phi)) * sin(toRadians(delta)) ) /
+                        (cos(toRadians(phi)) * cos(toRadians(delta)) )
+            ) );
+    }
+
+    private double calcSunriseJulianDate(double Jtransit, double Ht) {
+        return Jtransit - (Ht / 360d);
+    }
+
+    private double calcSunsetJulianDate(double Jtransit, double Ht) {
+        return Jtransit + (Ht / 360d);
     }
 
     // public methods
     public boolean init() {
-        this.calcMeanAnomaly();
-        this.calcEquationOfCenter();
-        this.calcEclipticLongitude();
-        this.calcRightAscension();
-        this.calcDeclinationOfTheSun();
-        this.calcSiderealTime();
-        this.calcSolarTransit();
-        this.calcHourAngle();
-        this.calcSunriseSunsetJulianDay();
+
+        double J = this.julianDayNumber;
+        double Lw = -1d * this.observerLongitude;
+        double phi = this.observerLatitude;
+
+        double M        = this.calcMeanAnomaly(J);
+        double C        = this.calcEquationOfCenter(M);
+        double lambda   = this.calcEclipticalLongitude(M, C);
+        double alpha    = this.calcRightAscension(lambda);
+        double delta    = this.calcDeclinationOfTheSun(lambda);
+        double theta    = this.calcSiderealTime(J, Lw);
+        double H        = this.calcHourAngle(alpha, theta);
+        double Jtransit = this.calcSolarTransit(J, Lw, M, lambda);
+        double Ht       = this.calcLocalHourAngle(delta, phi);
+
+        double Jrise = this.calcSunriseJulianDate(Jtransit, Ht);
+        J = Jrise;
+        M        = this.calcMeanAnomaly(J);
+        C        = this.calcEquationOfCenter(M);
+        lambda   = this.calcEclipticalLongitude(M, C);
+        alpha    = this.calcRightAscension(lambda);
+        delta    = this.calcDeclinationOfTheSun(lambda);
+        theta    = this.calcSiderealTime(J, Lw);
+        H        = this.calcHourAngle(alpha, theta);
+        Jtransit = this.calcSolarTransit(J, Lw, M, lambda);
+        Ht       = this.calcLocalHourAngle(delta, phi);
+        Jrise = this.calcSunriseJulianDate(Jtransit, Ht);
+
+        double sunsetJDate = this.calcSunsetJulianDate(Jtransit, Ht);
+
+        this.siderealTime = theta;
+        this.sunriseJulianDate = Jrise;
+        this.sunsetJulianDate = sunsetJDate;
+
         return true;
     }
 
@@ -168,11 +168,11 @@ public class Suntime {
     }
 
     public double getSunriseJulianDay() {
-        return this.sunriseJulianDay;
+        return this.sunriseJulianDate;
     }
 
     public double getSunsetJulianDay() {
-        return this.sunsetJulianDay;
+        return this.sunsetJulianDate;
     }
 
     // set methods

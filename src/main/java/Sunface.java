@@ -32,9 +32,12 @@ public class Sunface extends Application {
         Date currentTime = new Date();
 
         Suntime suntime = new Suntime.Builder()
-                .julianDayNumber(2458352.019444d)
-                .observerLongitude(45.7830997d)
-                .observerLatitude(15.9788553d)
+//                .julianDayNumber(2458353.0d)
+//                .observerLongitude(15.9816d)
+//                .observerLatitude(45.7827d)
+                .julianDayNumber(2453097.0d)
+                .observerLongitude(5.0d)
+                .observerLatitude(52.0d)
                 .build();
 
         // Earth map
