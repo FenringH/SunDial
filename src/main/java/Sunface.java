@@ -35,7 +35,7 @@ public class Sunface extends Application {
 //                .julianDayNumber(2458353.0d)
 //                .observerLongitude(15.9816d)
 //                .observerLatitude(45.7827d)
-                .julianDayNumber(2453097.0d)
+                .julianDate(2453097.0d)
                 .observerLongitude(5.0d)
                 .observerLatitude(52.0d)
                 .build();
