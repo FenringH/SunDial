@@ -31,14 +31,22 @@ public class Sunface extends Application {
         GregorianCalendar currentCalendar = new GregorianCalendar();
         Date currentTime = new Date();
 
+        GregorianCalendar dayNine = new GregorianCalendar();
+//        dayNine.set(2004, Calendar.APRIL, 1);
+        dayNine.set(2018, Calendar.AUGUST, 24);
+        double dayNineDayNumber = Suntime.getJulianDayNumber(dayNine);
+
         Suntime suntime = new Suntime.Builder()
-//                .julianDayNumber(2458353.0d)
-//                .observerLongitude(15.9816d)
-//                .observerLatitude(45.7827d)
-                .julianDate(2453097.0d)
-                .observerLongitude(5.0d)
-                .observerLatitude(52.0d)
+//                .julianDayNumber(2453097.3d)
+                .julianDayNumber(dayNineDayNumber)
+                .observerLongitude(15.9816d)
+                .observerLatitude(45.7827d)
+//                .observerLongitude(5.0d)
+//                .observerLatitude(52.0d)
                 .build();
+
+        double sunriseJulianDate = suntime.getSunriseJulianDate();
+        double sunsetJulianDate = suntime.getSunsetJulianDate();
 
         // Earth map
         SVGPath pathOfEarth = new SVGPath();
@@ -51,8 +59,9 @@ public class Sunface extends Application {
         textCurrentTime.setFont(Font_Of_Info);
         textCurrentTime.setX(50);
         textCurrentTime.setY(50);
-        textCurrentTime.setText("Current Time: " + currentTime.toString() +
-                "\nCurrent day of year: " + currentCalendar.get(Calendar.DAY_OF_YEAR));
+        textCurrentTime.setText("Day[9]: " + dayNine.getTime().toString() +
+                "\nDay[9] day of the year: " + dayNine.get(Calendar.DAY_OF_YEAR) +
+                "\nDay[9] Julian Day Number: " + dayNineDayNumber);
 
         // Text 2
         Text textCalc = new Text();
@@ -61,8 +70,10 @@ public class Sunface extends Application {
         textCalc.setY(150);
         textCalc.setText("Calc Results: " +
                 "\nSidereal: " + suntime.getSiderealTime() +
-                "\nSunrise: " + suntime.getSunriseJulianDay() +
-                "\nSunset: " + suntime.getSunsetJulianDay()
+                "\nSunrise Julian Date: " + sunriseJulianDate +
+                "\nSunrise Gregorian: " + Suntime.getCalendarDate(sunriseJulianDate, currentCalendar.getTimeZone()).getTime().toString() +
+                "\nSunset Julian Date: " + sunsetJulianDate +
+                "\nSunset Gregorian: " + Suntime.getCalendarDate(sunsetJulianDate, currentCalendar.getTimeZone()).getTime().toString()
         );
 
 
@@ -70,7 +81,7 @@ public class Sunface extends Application {
         Group rootNode = new Group();
 
         ObservableList rootNodeChildren = rootNode.getChildren();
-        rootNodeChildren.add(pathOfEarth);
+//        rootNodeChildren.add(pathOfEarth);
         rootNodeChildren.add(textCurrentTime);
         rootNodeChildren.add(textCalc);
 
