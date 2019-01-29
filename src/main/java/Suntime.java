@@ -10,6 +10,8 @@ public class Suntime {
     private static double DEFAULT_LONGITUDE = 15.9788553d;  // East
     private static double DEFAULT_LATITUDE = 45.7830997d;   // North
     private static double J2000 = 2451545.0d;               // UTC 01.01.2000. 12:00
+    private static long DEFAULT_PRECISION = 10000;          // Refine calculation until deviation is less than 1/10000
+    private static long MAX_ITERATIONS = 100;               // when using precision don't iterate more than this many times
 
     // inputs
     private double julianDate;
@@ -31,12 +33,14 @@ public class Suntime {
     private double siderealTime;
     private double sunriseJulianDate;
     private double sunsetJulianDate;
+    private long precision;
 
     // Constructors - Builder
     private Suntime(Builder builder) {
         this.julianDate = builder.julianDayNumber;
         this.observerLongitude = builder.observerLongitude;
         this.observerLatitude = builder.observerLatitude;
+        this.precision = builder.precision;
         this.init();
     }
 
@@ -59,11 +63,13 @@ public class Suntime {
         private double julianDayNumber;
         private double observerLongitude;
         private double observerLatitude;
+        private long precision;
 
         public Builder() {
             this.julianDayNumber = J2000;
             this.observerLongitude = DEFAULT_LONGITUDE;
             this.observerLatitude = DEFAULT_LATITUDE;
+            this.precision = DEFAULT_PRECISION;
         }
 
         public Builder julianDayNumber(double julianDayNumber) {
@@ -81,12 +87,35 @@ public class Suntime {
             return this;
         }
 
+        public Builder precision(long precision) {
+            this.precision = precision;
+            return this;
+        }
+
         public Suntime build() {
             return new Suntime(this);
         }
     }
 
     // Utilities
+    public static double convertFractionToSeconds(double fraction) {
+        return fraction * (24 * 60 * 60);
+    }
+
+    public static String printSecondsToTime(double seconds) {
+
+        double precisionDays = seconds / (24 * 60 * 60);
+        int days = (int) floor(precisionDays);
+        double precisionHours = (precisionDays - days) * 24;
+        int hours = (int) floor(precisionHours);
+        double precisionMins = (precisionHours - hours) * 60;
+        int mins = (int) floor(precisionMins);
+        double precisionSecs = (precisionMins - mins) * 60;
+        int secs = (int) floor(precisionSecs);
+
+        return days + "d " + hours + "h " + mins + "m " + secs + "s";
+    }
+
     public static double getJulianDayNumber(GregorianCalendar calendar) {
 
         int j = calendar.get(Calendar.YEAR);
@@ -196,7 +225,8 @@ public class Suntime {
         double newMeanAnomaly, newEquationOfCenter, newEclipticalLongitude,
                 newDeclinationOfTheSun, newLocalHourAngle, newSolarTransit, newJulianDate = 0d;
 
-        while(abs(JDcorrection * 10000) > 1) {
+        for (int i = 0; i < MAX_ITERATIONS || abs(JDcorrection * this.precision) > 1; i++) {
+//        while(abs(JDcorrection * this.precision) > 1) {
             newMeanAnomaly = this.calcMeanAnomaly(estimateJulianDate);
             newEquationOfCenter = this.calcEquationOfCenter(newMeanAnomaly);
             newEclipticalLongitude = this.calcEclipticalLongitude(newMeanAnomaly, newEquationOfCenter);
@@ -221,7 +251,8 @@ public class Suntime {
         double newMeanAnomaly, newEquationOfCenter, newEclipticalLongitude,
                 newDeclinationOfTheSun, newLocalHourAngle, newSolarTransit, newJulianDate = 0d;
 
-        while(abs(JDcorrection * 10000) > 1) {
+        for (int i = 0; i < MAX_ITERATIONS || abs(JDcorrection * this.precision) > 1; i++) {
+//        while(abs(JDcorrection * this.precision) > 1) {
             newMeanAnomaly = this.calcMeanAnomaly(estimateJulianDate);
             newEquationOfCenter = this.calcEquationOfCenter(newMeanAnomaly);
             newEclipticalLongitude = this.calcEclipticalLongitude(newMeanAnomaly, newEquationOfCenter);
@@ -263,6 +294,8 @@ public class Suntime {
     public double getSunsetJulianDate() {
         return calcSunsetJulianDate(this.solarTransit, this.localHourAngle);
     }
+
+    public double getHighnoonJulianDate() { return this.solarTransit; }
 
     // set methods
     public void setObserverTime(double julianDate) {
