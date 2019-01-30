@@ -7,9 +7,9 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import sun.security.provider.Sun;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class Sunface extends Application {
@@ -28,42 +28,28 @@ public class Sunface extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        GregorianCalendar currentCalendar = new GregorianCalendar();
-
-        GregorianCalendar dayNine = new GregorianCalendar();
-        double dayNineDayNumber = Suntime.getJulianDayNumber(dayNine);
+        GregorianCalendar currentLocalTime = new GregorianCalendar();
 
         Suntime suntime = new Suntime.Builder()
-//                .julianDayNumber(2453097.3d)
-//                .observerLongitude(5.0d)
-//                .observerLatitude(52.0d)
-                .julianDayNumber(dayNineDayNumber)
+//                .julianDayNumber(2453097)
+                .localTime(currentLocalTime)
                 .observerLongitude(15.9816d)
                 .observerLatitude(45.7827d)
                 .build();
 
+        long julianDayNumber = suntime.getJulianDayNumber();
+        double julianDate = suntime.getJulianDate();
+        double sunTime = suntime.getSunTime();
         double sunriseJulianDate = suntime.getSunriseJulianDate();
         double sunsetJulianDate = suntime.getSunsetJulianDate();
-        double highnoonJulianDate = suntime.getHighnoonJulianDate();
+        double highNoonJulianDate = suntime.getHighnoonJulianDate();
 
         double dayLength = sunsetJulianDate - sunriseJulianDate;
 
-        GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, currentCalendar.getTimeZone());
-        GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, currentCalendar.getTimeZone());
-        GregorianCalendar highnoonDate = Suntime.getCalendarDate(highnoonJulianDate, currentCalendar.getTimeZone());
-
-        GregorianCalendar fakeNoon = new GregorianCalendar();
-        fakeNoon.set(
-            currentCalendar.get(Calendar.YEAR),
-            currentCalendar.get(Calendar.MONTH),
-            currentCalendar.get(Calendar.DAY_OF_MONTH),
-            12, 0, 0
-        );
-
-        long timeOffset = fakeNoon.getTimeInMillis() - highnoonDate.getTimeInMillis();
-
-        GregorianCalendar sunTime = new GregorianCalendar();
-        sunTime.setTimeInMillis(currentCalendar.getTimeInMillis() + timeOffset);
+        GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, currentLocalTime.getTimeZone());
+        GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, currentLocalTime.getTimeZone());
+        GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, currentLocalTime.getTimeZone());
+        GregorianCalendar sunTimeDate = Suntime.getCalendarDate(sunTime, currentLocalTime.getTimeZone());
 
         // Earth map
         SVGPath pathOfEarth = new SVGPath();
@@ -77,9 +63,12 @@ public class Sunface extends Application {
         textCurrentTime.setX(50);
         textCurrentTime.setY(50);
         textCurrentTime.setText(
-                  "Day[9] date              : " + dayNine.getTime().toString() +
-                "\nDay[9] day of the year   : " + dayNine.get(Calendar.DAY_OF_YEAR) +
-                "\nDay[9] Julian Day Number : " + dayNineDayNumber);
+                    "Day[9] date              : " + currentLocalTime.getTime().toString()
+                + "\nDay[9] day of the year   : " + currentLocalTime.get(Calendar.DAY_OF_YEAR)
+                + "\nDay[9] Julian Date       : " + julianDate
+                + "\nDay[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, currentLocalTime.getTimeZone()).getTime().toString()
+                + "\nDay[9] Julian Day Number : " + julianDayNumber
+        );
 
         // Text 2
         Text textCalc = new Text();
@@ -87,14 +76,13 @@ public class Sunface extends Application {
         textCalc.setX(50);
         textCalc.setY(150);
         textCalc.setText(
-                  "Calc Results: "
-                + "\nSun Time   : " + sunTime.getTime().toString()
-                + "\nHigh Noon  : " + highnoonDate.getTime().toString()
+                    "Calc Results: "
+                + "\nSun Time   : " + sunTimeDate.getTime().toString()
+                + "\nHigh Noon  : " + highNoonDate.getTime().toString()
                 + "\nSunrise    : " + sunriseDate.getTime().toString()
                 + "\nSunset     : " + sunsetDate.getTime().toString()
                 + "\nDay Length : " + Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength))
         );
-
 
         // Root node group
         Group rootNode = new Group();
