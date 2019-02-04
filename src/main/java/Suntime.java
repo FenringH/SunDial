@@ -1,5 +1,6 @@
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import static java.lang.Math.*;
@@ -14,13 +15,13 @@ public class Suntime {
     private static long MAX_ITERATIONS = 100;               // when using precision don't iterate more than this many times
 
     // inputs
-    private GregorianCalendar currentLocalTime;
+    private GregorianCalendar localTime;
     private double julianDate;
     private double observerLongitude;
     private double observerLatitude;
+    private long precision;
 
     // intermediaries
-    private GregorianCalendar localTime;
     private long julianDayNumber;
     private double meanAnomaly;
     private double equationOfCenter;
@@ -30,12 +31,11 @@ public class Suntime {
     private double hourAngle;
     private double solarTransit;
     private double localHourAngle;
+    private double siderealTime;
 
     // outputs
-    private double siderealTime;
-    private double sunriseJulianDate;
-    private double sunsetJulianDate;
-    private long precision;
+    private HashMap<Long, Double> sunriseCache = new HashMap<Long, Double>();
+    private HashMap<Long, Double> sunsetCache = new HashMap<Long, Double>();
 
     // Constructors - Builder
     private Suntime(Builder builder) {
@@ -81,7 +81,7 @@ public class Suntime {
         public Builder localTime(GregorianCalendar localTime) {
             this.localTime = localTime;
             this.julianDate = Suntime.getJulianDate(localTime);
-            this.julianDayNumber = Suntime.getJulianDayNumber(localTime);;
+            this.julianDayNumber = Suntime.getJulianDayNumber(localTime);
             return this;
         }
 
@@ -339,7 +339,7 @@ public class Suntime {
         return estimateJulianDate;
     }
 
-    // get methods
+    // Get methods
     public double getSiderealTime() {
         return this.siderealTime;
     }
@@ -381,9 +381,20 @@ public class Suntime {
     }
 
     // set methods
+    public void setObserverTime(GregorianCalendar localTime) {
+        if(this.localTime != localTime) {
+            this.localTime = localTime;
+            this.julianDate = Suntime.getJulianDate(localTime);
+            this.julianDayNumber = Suntime.getJulianDayNumber(localTime);
+            init();
+        }
+    }
+
     public void setObserverTime(double julianDate) {
         if(this.julianDate != julianDate) {
             this.julianDate = julianDate;
+            this.localTime = Suntime.getCalendarDate(julianDate, this.localTime.getTimeZone());
+            this.julianDayNumber = Suntime.getJulianDayNumber(this.localTime);
             init();
         }
     }
