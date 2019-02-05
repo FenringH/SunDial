@@ -14,6 +14,9 @@ public class Suntime {
     private static long DEFAULT_PRECISION = 10000;          // Refine calculation until deviation is less than 1/10000
     private static long MAX_ITERATIONS = 100;               // when using precision don't iterate more than this many times
 
+    private static int SUNRIZE_HORIZON = -1;
+    private static int SUNSET_HORIZON = 1;
+
     // inputs
     private GregorianCalendar localTime;
     private double julianDate;
@@ -290,33 +293,16 @@ public class Suntime {
     }
 
     private double calcSunriseJulianDate(double solarTransit, double localHourAngle) {
-
-        double estimateJulianDate = solarTransit - (localHourAngle / 360d);
-
-        double JDcorrection = 1d;
-        double newMeanAnomaly, newEquationOfCenter, newEclipticalLongitude,
-                newDeclinationOfTheSun, newLocalHourAngle, newSolarTransit, newJulianDate = 0d;
-
-        for (int i = 0; i < MAX_ITERATIONS && abs(JDcorrection * this.precision) > 1; i++) {
-            newMeanAnomaly = this.calcMeanAnomaly(estimateJulianDate);
-            newEquationOfCenter = this.calcEquationOfCenter(newMeanAnomaly);
-            newEclipticalLongitude = this.calcEclipticalLongitude(newMeanAnomaly, newEquationOfCenter);
-            newDeclinationOfTheSun = this.calcDeclinationOfTheSun(newEclipticalLongitude);
-            newLocalHourAngle = this.calcLocalHourAngle(newDeclinationOfTheSun, this.observerLatitude);
-            newSolarTransit = this.calcSolarTransit(estimateJulianDate, this.observerLongitude, newMeanAnomaly, newEclipticalLongitude);
-
-            newJulianDate = newSolarTransit - (newLocalHourAngle / 360d);
-
-            JDcorrection = newJulianDate - estimateJulianDate;
-            estimateJulianDate = newJulianDate;
-        }
-
-        return estimateJulianDate;
+        return calcHorizonJulianDate(solarTransit, localHourAngle, SUNRIZE_HORIZON);
     }
 
     private double calcSunsetJulianDate(double solarTransit, double localHourAngle) {
+        return calcHorizonJulianDate(solarTransit, localHourAngle, SUNSET_HORIZON);
+    }
 
-        double estimateJulianDate = solarTransit + (localHourAngle / 360d);
+    private double calcHorizonJulianDate(double solarTransit, double localHourAngle, int horizonFactor) {
+
+        double estimateJulianDate = solarTransit + horizonFactor * (localHourAngle / 360d);
 
         double JDcorrection = 1d;
         double newMeanAnomaly, newEquationOfCenter, newEclipticalLongitude,
@@ -330,7 +316,7 @@ public class Suntime {
             newLocalHourAngle = this.calcLocalHourAngle(newDeclinationOfTheSun, this.observerLatitude);
             newSolarTransit = this.calcSolarTransit(estimateJulianDate, this.observerLongitude, newMeanAnomaly, newEclipticalLongitude);
 
-            newJulianDate = newSolarTransit + (newLocalHourAngle / 360d);
+            newJulianDate = newSolarTransit + horizonFactor * (newLocalHourAngle / 360d);
 
             JDcorrection = newJulianDate - estimateJulianDate;
             estimateJulianDate = newJulianDate;
@@ -382,12 +368,8 @@ public class Suntime {
 
     // set methods
     public void setObserverTime(GregorianCalendar localTime) {
-        if(this.localTime != localTime) {
-            this.localTime = localTime;
-            this.julianDate = Suntime.getJulianDate(localTime);
-            this.julianDayNumber = Suntime.getJulianDayNumber(localTime);
-            init();
-        }
+        double newJulianDate = Suntime.getJulianDate(localTime);
+        setObserverTime(newJulianDate);
     }
 
     public void setObserverTime(double julianDate) {

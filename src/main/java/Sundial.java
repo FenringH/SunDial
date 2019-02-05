@@ -192,7 +192,7 @@ public class Sundial {
         dialCircleFrame.setStroke(Color_Of_Darkness);
 
         dialCircleCenterDot = new Circle(dialCenterX, dialCenterY, 5);
-        dialCircleCenterDot.setFill(Color_Of_Darkness);
+        dialCircleCenterDot.setFill(Color_Of_LocalTime);
         dialCircleCenterDot.setStroke(Color_Of_Void);
 
         sunTimeDial = new Line(dialCenterX, 50, dialCenterX, 0);
