@@ -10,12 +10,13 @@ public class Suntime {
     // constants
     private static double DEFAULT_LONGITUDE = 15.9788553d;  // East
     private static double DEFAULT_LATITUDE = 45.7830997d;   // North
-    private static long J2000 = 2451545;                    // UTC 01.01.2000. 12:00
-    private static long DEFAULT_PRECISION = 10000;          // Refine calculation until deviation is less than 1/10000
-    private static long MAX_ITERATIONS = 100;               // when using precision don't iterate more than this many times
 
-    private static int SUNRIZE_HORIZON = -1;
-    private static int SUNSET_HORIZON = 1;
+    private final static long J2000 = 2451545;                    // UTC 01.01.2000. 12:00
+    private final static long DEFAULT_PRECISION = 10000;          // Refine calculation until deviation is less than 1/10000
+    private final static long MAX_ITERATIONS = 100;               // when using precision don't iterate more than this many times
+
+    private final static int SUNRISE_HORIZON = -1;
+    private final static int SUNSET_HORIZON = 1;
 
     // inputs
     private GregorianCalendar localTime;
@@ -82,6 +83,7 @@ public class Suntime {
         }
 
         public Builder localTime(GregorianCalendar localTime) {
+            if (localTime == null) { return this; }
             this.localTime = localTime;
             this.julianDate = Suntime.getJulianDate(localTime);
             this.julianDayNumber = Suntime.getJulianDayNumber(localTime);
@@ -293,7 +295,7 @@ public class Suntime {
     }
 
     private double calcSunriseJulianDate(double solarTransit, double localHourAngle) {
-        return calcHorizonJulianDate(solarTransit, localHourAngle, SUNRIZE_HORIZON);
+        return calcHorizonJulianDate(solarTransit, localHourAngle, SUNRISE_HORIZON);
     }
 
     private double calcSunsetJulianDate(double solarTransit, double localHourAngle) {
@@ -302,6 +304,18 @@ public class Suntime {
 
     private double calcHorizonJulianDate(double solarTransit, double localHourAngle, int horizonFactor) {
 
+        if (horizonFactor != SUNRISE_HORIZON && horizonFactor != SUNSET_HORIZON) { return 0; }
+
+        // check cache
+        if(horizonFactor == SUNRISE_HORIZON) {
+            Double cachedSunrise = sunriseCache.get(this.julianDayNumber);
+            if (cachedSunrise != null) { return cachedSunrise; }
+        } else {
+            Double cachedSunset = sunsetCache.get(this.julianDayNumber);
+            if (cachedSunset != null) { return cachedSunset; }
+        }
+
+        // iterate for better precision
         double estimateJulianDate = solarTransit + horizonFactor * (localHourAngle / 360d);
 
         double JDcorrection = 1d;
@@ -320,6 +334,13 @@ public class Suntime {
 
             JDcorrection = newJulianDate - estimateJulianDate;
             estimateJulianDate = newJulianDate;
+        }
+
+        // cache result
+        if(horizonFactor == SUNRISE_HORIZON) {
+            this.sunriseCache.put(this.julianDayNumber, estimateJulianDate);
+        } else {
+            this.sunsetCache.put(this.julianDayNumber, estimateJulianDate);
         }
 
         return estimateJulianDate;
