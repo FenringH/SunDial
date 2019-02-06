@@ -21,7 +21,6 @@ public class Sundial {
 
     private static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
 
-    private final String INNER_GLOW = "-fx-effect: innershadow(three-pass-box, #ffa040, 10.0, 0.5, 0, 0);";
     private final double MATRIX_SEPARATOR_OFFSET = -1.0d;
 
     private final double dialWidth         = 200;
@@ -36,6 +35,8 @@ public class Sundial {
     private final Color Color_Of_Darkness  = new Color(0.00, 0.00, 0.00, 1.00);
     private final Color Color_Of_TextBack  = new Color(0.90, 0.90, 0.50, 1.00);
     private final Color Color_Of_Void      = new Color(0.00, 0.00, 0.00, 0.00);
+
+    private final Color Color_Of_Nominal   = new Color(0.00, 0.65, 1.00, 0.35);
     private final Color Color_Of_Warning   = new Color(1.00, 0.65, 0.00, 0.35);
 
     private final Color Color_Of_DaySky    = new Color(0.50, 0.75, 1.00, 1.00);
@@ -54,8 +55,20 @@ public class Sundial {
             false,
             CycleMethod.NO_CYCLE,
             new Stop(0.75, Color_Of_Void),
-            new Stop(1, Color_Of_Warning)
+            new Stop(1.00, Color_Of_Warning)
     );
+
+    private final RadialGradient Nominal_Glow = new RadialGradient(
+            0, 0,
+            dialCenterX, dialCenterY, 100,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.75, Color_Of_Void),
+            new Stop(1.00, Color_Of_Nominal)
+    );
+
+    private final String MATRIX_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(32,128,255,1.0), 4.0, 0.5, 0, 0);";
+    private final String MATRIX_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba(16, 32,64,1.0), 4.0, 0.5, 0, 0);";
 
     private final Font Font_Of_Info = new Font("Lucida Console", 14);
     private final Font Font_Of_Dial = new Font("Lucida Console", 8);
@@ -215,7 +228,7 @@ public class Sundial {
         dialCircleBackground.setStroke(Color_Of_Void);
 
         dialCircleFrame = new Circle(dialCenterX, dialCenterY, 100);
-        dialCircleFrame.setFill(Color_Of_Void);
+        dialCircleFrame.setFill(Nominal_Glow);
         dialCircleFrame.setStroke(Color_Of_Darkness);
 
         dialCircleCenterDot = new Circle(dialCenterX, dialCenterY, 5);
@@ -299,6 +312,19 @@ public class Sundial {
         matrixTime.setScaleY(1.0d);
         matrixTime.setLayoutX(dialCenterX - matrixTime.getLayoutBounds().getWidth() / 2);
         matrixTime.setLayoutY(dialCenterY * 1.3d - matrixTime.getLayoutBounds().getHeight() / 2);
+
+        setMatrixYearGlow(false);
+        setMatrixMonthGlow(false);
+        setMatrixDayGlow(false);
+        setMatrixHourGlow(false);
+        setMatrixMinuteGlow(false);
+        setMatrixSecondGlow(false);
+        setMatrixWeekGlow(false);
+
+        matrixSeparatorDayToMonth.setStyle(MATRIX_SHADOW);
+        matrixSeparatorHourToMinute.setStyle(MATRIX_SHADOW);
+        matrixSeparatorMinuteToYear.setStyle(MATRIX_SHADOW);
+        matrixSeparatorMonthToYear.setStyle(MATRIX_SHADOW);
 
         // Add layers
         dialsGroup = new Group();
@@ -407,12 +433,67 @@ public class Sundial {
         dialTextDate.setText(localTimeText);
     }
 
-    public void setWarning(boolean warning) {
+    public void setDialFrameWarning(boolean warning) {
         if (warning) {
             dialCircleFrame.setFill(Warning_Glow);
         } else {
-            dialCircleFrame.setFill(Color_Of_Void);
+            dialCircleFrame.setFill(Nominal_Glow);
         }
     }
 
+    public void setMatrixYearGlow(boolean glow) {
+        if (glow) {
+            matrixYear.setStyle(MATRIX_GLOW);
+        } else {
+            matrixYear.setStyle(MATRIX_SHADOW);
+        }
+    }
+
+    public void setMatrixMonthGlow(boolean glow) {
+        if (glow) {
+            matrixMonth.setStyle(MATRIX_GLOW);
+        } else {
+            matrixMonth.setStyle(MATRIX_SHADOW);
+        }
+    }
+
+    public void setMatrixDayGlow(boolean glow) {
+        if (glow) {
+            matrixDay.setStyle(MATRIX_GLOW);
+        } else {
+            matrixDay.setStyle(MATRIX_SHADOW);
+        }
+    }
+
+    public void setMatrixHourGlow(boolean glow) {
+        if (glow) {
+            matrixHour.setStyle(MATRIX_GLOW);
+        } else {
+            matrixHour.setStyle(MATRIX_SHADOW);
+        }
+    }
+
+    public void setMatrixMinuteGlow(boolean glow) {
+        if (glow) {
+            matrixMinute.setStyle(MATRIX_GLOW);
+        } else {
+            matrixMinute.setStyle(MATRIX_SHADOW);
+        }
+    }
+
+    public void setMatrixSecondGlow(boolean glow) {
+        if (glow) {
+            matrixSecond.setStyle(MATRIX_GLOW);
+        } else {
+            matrixSecond.setStyle(MATRIX_SHADOW);
+        }
+    }
+
+    public void setMatrixWeekGlow(boolean glow) {
+        if (glow) {
+            matrixWeek.setStyle(MATRIX_GLOW);
+        } else {
+            matrixWeek.setStyle(MATRIX_SHADOW);
+        }
+    }
 }

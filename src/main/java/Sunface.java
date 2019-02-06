@@ -4,7 +4,6 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -33,8 +32,6 @@ public class Sunface extends Application {
     private final Color Color_Of_Window = new Color(0.65, 0.85, 0.85, 1.00);
     private final Font Font_Of_Info = new Font("Lucida Console", 14);
     private final DecimalFormat julianDateFormat = new DecimalFormat("###,###,###.00000000");
-
-    private final String MATRIX_GLOW = "-fx-effect: dropshadow(three-pass-box, #2080ff, 4.0, 0.7, 0, 0);";
 
     private int fpsSetting = (int) floor(1000 / DEFAULT_FPS);
 
@@ -101,32 +98,32 @@ public class Sunface extends Application {
         dialsGroup.setOnMouseClicked(event -> resetTime(suntime, sundial));
 
         sundial.getMatrixYear().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_YEAR, event));
-        sundial.getMatrixYear().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_YEAR));
-        sundial.getMatrixYear().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_YEAR));
+        sundial.getMatrixYear().setOnMouseEntered(event -> sundial.setMatrixYearGlow(true));
+        sundial.getMatrixYear().setOnMouseExited(event -> sundial.setMatrixYearGlow(false));
 
         sundial.getMatrixMonth().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MONTH, event));
-        sundial.getMatrixMonth().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_MONTH));
-        sundial.getMatrixMonth().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_MONTH));
+        sundial.getMatrixMonth().setOnMouseEntered(event -> sundial.setMatrixMonthGlow(true));
+        sundial.getMatrixMonth().setOnMouseExited(event -> sundial.setMatrixMonthGlow(false));
 
         sundial.getMatrixDay().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_DAY, event));
-        sundial.getMatrixDay().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_DAY));
-        sundial.getMatrixDay().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_DAY));
+        sundial.getMatrixDay().setOnMouseEntered(event -> sundial.setMatrixDayGlow(true));
+        sundial.getMatrixDay().setOnMouseExited(event -> sundial.setMatrixDayGlow(false));
 
         sundial.getMatrixHour().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_HOUR, event));
-        sundial.getMatrixHour().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_HOUR));
-        sundial.getMatrixHour().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_HOUR));
+        sundial.getMatrixHour().setOnMouseEntered(event -> sundial.setMatrixHourGlow(true));
+        sundial.getMatrixHour().setOnMouseExited(event -> sundial.setMatrixHourGlow(false));
 
         sundial.getMatrixMinute().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MINUTE, event));
-        sundial.getMatrixMinute().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_MINUTE));
-        sundial.getMatrixMinute().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_MINUTE));
+        sundial.getMatrixMinute().setOnMouseEntered(event -> sundial.setMatrixMinuteGlow(true));
+        sundial.getMatrixMinute().setOnMouseExited(event -> sundial.setMatrixMinuteGlow(false));
 
         sundial.getMatrixSecond().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_SECOND, event));
-        sundial.getMatrixSecond().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_SECOND));
-        sundial.getMatrixSecond().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_SECOND));
+        sundial.getMatrixSecond().setOnMouseEntered(event -> sundial.setMatrixSecondGlow(true));
+        sundial.getMatrixSecond().setOnMouseExited(event -> sundial.setMatrixSecondGlow(false));
 
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
-        sundial.getMatrixWeek().setOnMouseEntered(event -> addGlow(sundial, OFFSET_BY_WEEK));
-        sundial.getMatrixWeek().setOnMouseExited(event -> removeGlow(sundial, OFFSET_BY_WEEK));
+        sundial.getMatrixWeek().setOnMouseEntered(event -> sundial.setMatrixWeekGlow(true));
+        sundial.getMatrixWeek().setOnMouseExited(event -> sundial.setMatrixWeekGlow(false));
 
         // Playtime
         KeyFrame keyframeClockTick = new KeyFrame(
@@ -142,34 +139,8 @@ public class Sunface extends Application {
     // Methods
     private void resetTime(Suntime suntime, Sundial sundial) {
         timeOffset = 0;
-        sundial.setWarning(false);
+        sundial.setDialFrameWarning(false);
         initCurrentTime(suntime, sundial);
-    }
-
-    private void addGlow(Sundial sundial, int offset) {
-        switch (offset) {
-            case OFFSET_BY_YEAR   : sundial.getMatrixYear().setStyle(MATRIX_GLOW); break;
-            case OFFSET_BY_MONTH  : sundial.getMatrixMonth().setStyle(MATRIX_GLOW); break;
-            case OFFSET_BY_DAY    : sundial.getMatrixDay().setStyle(MATRIX_GLOW); break;
-            case OFFSET_BY_HOUR   : sundial.getMatrixHour().setStyle(MATRIX_GLOW); break;
-            case OFFSET_BY_MINUTE : sundial.getMatrixMinute().setStyle(MATRIX_GLOW); break;
-            case OFFSET_BY_SECOND : sundial.getMatrixSecond().setStyle(MATRIX_GLOW); break;
-            case OFFSET_BY_WEEK   : sundial.getMatrixWeek().setStyle(MATRIX_GLOW); break;
-            default: {}
-        }
-    }
-
-    private void removeGlow(Sundial sundial, int offset) {
-        switch (offset) {
-            case OFFSET_BY_YEAR   : sundial.getMatrixYear().setStyle(""); break;
-            case OFFSET_BY_MONTH  : sundial.getMatrixMonth().setStyle(""); break;
-            case OFFSET_BY_DAY    : sundial.getMatrixDay().setStyle(""); break;
-            case OFFSET_BY_HOUR   : sundial.getMatrixHour().setStyle(""); break;
-            case OFFSET_BY_MINUTE : sundial.getMatrixMinute().setStyle(""); break;
-            case OFFSET_BY_SECOND : sundial.getMatrixSecond().setStyle(""); break;
-            case OFFSET_BY_WEEK   : sundial.getMatrixWeek().setStyle(""); break;
-            default: {}
-        }
     }
 
     private void offsetTime(Suntime suntime, Sundial sundial, int offset, ScrollEvent event) {
@@ -212,7 +183,7 @@ public class Sunface extends Application {
         timeOffset += currentLocalTime.getTimeInMillis() - offsetCalendar.getTimeInMillis();
         timeOffset += offsetWeek * (7 * 24 * 60 * 60 * 1000);
 
-        if (timeOffset != 0) { sundial.setWarning(true); }
+        if (timeOffset != 0) { sundial.setDialFrameWarning(true); }
 
         initCurrentTime(suntime, sundial);
     }
