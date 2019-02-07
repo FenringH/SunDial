@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import sun.security.provider.Sun;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -76,6 +77,7 @@ public class Sunface extends Application {
                 .build();
 
         Sundial sundial = new Sundial.Builder()
+                .nightCompression(1.5d)
                 .build();
 
         initCurrentTime(suntime, sundial);
@@ -97,33 +99,14 @@ public class Sunface extends Application {
 
         dialsGroup.setOnMouseClicked(event -> resetTime(suntime, sundial));
 
+        sundial.getDialCircleCenterDot().setOnScroll(event -> changeNightCompression(suntime, sundial, event));
         sundial.getMatrixYear().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_YEAR, event));
-        sundial.getMatrixYear().setOnMouseEntered(event -> sundial.setMatrixYearGlow(true));
-        sundial.getMatrixYear().setOnMouseExited(event -> sundial.setMatrixYearGlow(false));
-
         sundial.getMatrixMonth().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MONTH, event));
-        sundial.getMatrixMonth().setOnMouseEntered(event -> sundial.setMatrixMonthGlow(true));
-        sundial.getMatrixMonth().setOnMouseExited(event -> sundial.setMatrixMonthGlow(false));
-
         sundial.getMatrixDay().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_DAY, event));
-        sundial.getMatrixDay().setOnMouseEntered(event -> sundial.setMatrixDayGlow(true));
-        sundial.getMatrixDay().setOnMouseExited(event -> sundial.setMatrixDayGlow(false));
-
         sundial.getMatrixHour().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_HOUR, event));
-        sundial.getMatrixHour().setOnMouseEntered(event -> sundial.setMatrixHourGlow(true));
-        sundial.getMatrixHour().setOnMouseExited(event -> sundial.setMatrixHourGlow(false));
-
         sundial.getMatrixMinute().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MINUTE, event));
-        sundial.getMatrixMinute().setOnMouseEntered(event -> sundial.setMatrixMinuteGlow(true));
-        sundial.getMatrixMinute().setOnMouseExited(event -> sundial.setMatrixMinuteGlow(false));
-
         sundial.getMatrixSecond().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_SECOND, event));
-        sundial.getMatrixSecond().setOnMouseEntered(event -> sundial.setMatrixSecondGlow(true));
-        sundial.getMatrixSecond().setOnMouseExited(event -> sundial.setMatrixSecondGlow(false));
-
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
-        sundial.getMatrixWeek().setOnMouseEntered(event -> sundial.setMatrixWeekGlow(true));
-        sundial.getMatrixWeek().setOnMouseExited(event -> sundial.setMatrixWeekGlow(false));
 
         // Playtime
         KeyFrame keyframeClockTick = new KeyFrame(
@@ -137,6 +120,18 @@ public class Sunface extends Application {
     }
 
     // Methods
+    private void changeNightCompression(Suntime suntime, Sundial sundial, ScrollEvent event) {
+
+        double offsetFactor = 0;
+
+        if (event.getDeltaY() < 0) { offsetFactor = -0.1; }
+        else if (event.getDeltaY() > 0) { offsetFactor = 0.1; }
+
+        sundial.changeNightCompression(offsetFactor);
+
+        initCurrentTime(suntime, sundial);
+    }
+
     private void resetTime(Suntime suntime, Sundial sundial) {
         timeOffset = 0;
         sundial.setDialFrameWarning(false);
@@ -224,11 +219,8 @@ public class Sunface extends Application {
 
         GregorianCalendar sunTimeDate = Suntime.getCalendarDate(sunTime, offsetLocalTime.getTimeZone());
 
-        double localTimeDialAngle = getAngle(offsetLocalTime);
-        double sunTimeDialAngle = getAngle(sunTimeDate);
-
-        sundial.setSunTimeDialAngle(sunTimeDialAngle);
-        sundial.setLocalTimeDialAngle(localTimeDialAngle);
+        sundial.setSunTime(sunTimeDate);
+        sundial.setLocalTime(offsetLocalTime);
 
         sundial.setLocalTimeText(offsetLocalTime.getTime().toString());
 
@@ -282,12 +274,8 @@ public class Sunface extends Application {
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, offsetLocalTime.getTimeZone());
 
-            double highNoonDialAngle = getAngle(highNoonDate);
-            double sunriseDialAngle = getAngle(sunriseDate);
-            double sunsetDialAngle = getAngle(sunsetDate);
-
-            sundial.setHighNoonDialAngle(highNoonDialAngle);
-            sundial.setHorizonDialAngle(sunriseDialAngle, sunsetDialAngle);
+            sundial.setHighNoon(highNoonDate);
+            sundial.setHorizon(sunriseDate, sunsetDate);
 
             String calculatedInformation =
                     "High Noon  : " + highNoonDate.getTime().toString()
@@ -300,15 +288,4 @@ public class Sunface extends Application {
         }
     }
 
-    // Utility
-    private double getAngle(GregorianCalendar calendar) {
-
-        if(calendar == null) { return 0; }
-
-        double hour = (double) calendar.get(Calendar.HOUR_OF_DAY);
-        double minute = (double) calendar.get(Calendar.MINUTE);
-        double second = (double) calendar.get(Calendar.SECOND);
-
-        return (hour / 24d + minute / (24d * 60d) + second / (24d * 60d * 60d)) * 360d - 180d;
-    }
 }
