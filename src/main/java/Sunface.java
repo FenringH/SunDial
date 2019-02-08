@@ -2,13 +2,19 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import sun.security.provider.Sun;
 
@@ -20,28 +26,36 @@ import static java.lang.Math.floor;
 
 public class Sunface extends Application {
 
-    private final double DEFAULT_FPS = 30.0;
+    private static final double DEFAULT_FPS = 30.0;
 
-    private final int OFFSET_BY_YEAR = Calendar.YEAR;
-    private final int OFFSET_BY_MONTH = Calendar.MONTH;
-    private final int OFFSET_BY_DAY = Calendar.DAY_OF_MONTH;
-    private final int OFFSET_BY_HOUR = Calendar.HOUR_OF_DAY;
-    private final int OFFSET_BY_MINUTE = Calendar.MINUTE;
-    private final int OFFSET_BY_SECOND = Calendar.SECOND;
-    private final int OFFSET_BY_WEEK = Calendar.WEEK_OF_YEAR;
+    private static final int OFFSET_BY_YEAR = Calendar.YEAR;
+    private static final int OFFSET_BY_MONTH = Calendar.MONTH;
+    private static final int OFFSET_BY_DAY = Calendar.DAY_OF_MONTH;
+    private static final int OFFSET_BY_HOUR = Calendar.HOUR_OF_DAY;
+    private static final int OFFSET_BY_MINUTE = Calendar.MINUTE;
+    private static final int OFFSET_BY_SECOND = Calendar.SECOND;
+    private static final int OFFSET_BY_WEEK = Calendar.WEEK_OF_YEAR;
 
-    private final Color Color_Of_Window = new Color(0.65, 0.85, 0.85, 1.00);
-    private final Font Font_Of_Info = new Font("Lucida Console", 14);
-    private final DecimalFormat julianDateFormat = new DecimalFormat("###,###,###.00000000");
+    public static final String BUTTON_SHADOW  = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0),  5.0, 0.50, 0, 0);";
+    public static final String BUTTON_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5),  5.0, 0.50, 0, 0);";
+
+    private static final Color Color_Of_Window = new Color(0.65, 0.85, 0.85, 1.00);
+    private static final Font Font_Of_Info = new Font("Lucida Console", 14);
+    private static final DecimalFormat julianDateFormat = new DecimalFormat("###,###,###.00000000");
 
     private int fpsSetting = (int) floor(1000 / DEFAULT_FPS);
 
     private GregorianCalendar currentLocalTime;
     private long timeOffset;
 
+    private double deltaX;
+    private double deltaY;
+
     private Text startupInfoText;
     private Text sunTimeInfoText;
     private Text calculatedInfoText;
+
+    private Circle controlCircleClose;
 
     public static void main(String[] args) {
         launch(args);
@@ -65,6 +79,18 @@ public class Sunface extends Application {
         calculatedInfoText.setLayoutX(5d);
         calculatedInfoText.setLayoutY(540d);
 
+        // Controls
+        controlCircleClose = new Circle(10, 10,5);
+        controlCircleClose.setFill(Color.RED);
+        controlCircleClose.setStyle(BUTTON_SHADOW);
+
+        controlCircleClose.setOnMouseEntered(event -> controlCircleClose.setStyle(BUTTON_GLOW));
+        controlCircleClose.setOnMouseExited(event -> controlCircleClose.setStyle(BUTTON_SHADOW));
+        controlCircleClose.setOnMousePressed(event -> controlCircleClose.setFill(Color.ORANGE));
+        controlCircleClose.setOnMouseReleased(event -> controlCircleClose.setFill(Color.RED));
+        controlCircleClose.setOnMouseClicked(event -> System.exit(0));
+
+
         // Initialize objects
         currentLocalTime = new GregorianCalendar();
         timeOffset = 0;
@@ -77,7 +103,7 @@ public class Sunface extends Application {
                 .build();
 
         Sundial sundial = new Sundial.Builder()
-                .nightCompression(1.5d)
+                .nightCompression(0)
                 .build();
 
         initCurrentTime(suntime, sundial);
@@ -85,21 +111,26 @@ public class Sunface extends Application {
         // FX Scene
         Group rootNode = new Group();
         Group dialsGroup = sundial.getDialsGroup();
-        rootNode.getChildren().addAll(startupInfoText, sunTimeInfoText, calculatedInfoText, dialsGroup);
+        rootNode.getChildren().add(dialsGroup);
+        rootNode.getChildren().add(controlCircleClose);
 
-        Scene mainScene = new Scene(rootNode, 600,600);
-        mainScene.setFill(Color_Of_Window);
+        Scene mainScene = new Scene(rootNode, dialsGroup.getLayoutBounds().getWidth() * 2, dialsGroup.getLayoutBounds().getHeight() * 2);
+        mainScene.setFill(Color.TRANSPARENT);
 
         primaryStage.setTitle("SunDial");
         primaryStage.setScene(mainScene);
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.show();
 
-        dialsGroup.setLayoutX(mainScene.getWidth() / 2 - dialsGroup.getLayoutBounds().getWidth() / 2);
-        dialsGroup.setLayoutY(mainScene.getHeight() / 2 - dialsGroup.getLayoutBounds().getHeight() / 2);
+        dialsGroup.setLayoutX((dialsGroup.getLayoutBounds().getWidth() + Sundial.MARGIN_X) / 2);
+        dialsGroup.setLayoutY((dialsGroup.getLayoutBounds().getWidth() + Sundial.MARGIN_Y) / 2);
 
-        dialsGroup.setOnMouseClicked(event -> resetTime(suntime, sundial));
+        sundial.getDialMarginBox().setOnMouseEntered(event -> sundial.getDialMarginBox().setStroke(Sundial.Color_Of_Warning));
+        sundial.getDialMarginBox().setOnMouseExited(event -> sundial.getDialMarginBox().setStroke(Sundial.Color_Of_Void));
+        sundial.getDialMarginBox().setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
+        sundial.getDialMarginBox().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
-        sundial.getDialCircleCenterDot().setOnScroll(event -> changeNightCompression(suntime, sundial, event));
+        sundial.getDialCircleFrame().setOnMouseClicked(event -> resetTime(suntime, sundial));
         sundial.getMatrixYear().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_YEAR, event));
         sundial.getMatrixMonth().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MONTH, event));
         sundial.getMatrixDay().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_DAY, event));
@@ -120,18 +151,6 @@ public class Sunface extends Application {
     }
 
     // Methods
-    private void changeNightCompression(Suntime suntime, Sundial sundial, ScrollEvent event) {
-
-        double offsetFactor = 0;
-
-        if (event.getDeltaY() < 0) { offsetFactor = -0.1; }
-        else if (event.getDeltaY() > 0) { offsetFactor = 0.1; }
-
-        sundial.changeNightCompression(offsetFactor);
-
-        initCurrentTime(suntime, sundial);
-    }
-
     private void resetTime(Suntime suntime, Sundial sundial) {
         timeOffset = 0;
         sundial.setDialFrameWarning(false);
@@ -183,6 +202,7 @@ public class Sunface extends Application {
         initCurrentTime(suntime, sundial);
     }
 
+    // Methods
     private void initCurrentTime(Suntime suntime, Sundial sundial) {
         updateCurrentTime(suntime, sundial, true);
     }
@@ -286,6 +306,48 @@ public class Sunface extends Application {
 
             calculatedInfoText.setText(calculatedInformation);
         }
+    }
+
+    public void recordWindowPosition(Stage stage, MouseEvent mouseEvent) {
+        deltaX = stage.getX() - mouseEvent.getScreenX();
+        deltaY = stage.getY() - mouseEvent.getScreenY();
+    }
+
+    public void changeWindowPosition(Stage primaryStage, MouseEvent mouseEvent) {
+
+        double winSizeX = primaryStage.getWidth();
+        double winSizeY = primaryStage.getHeight();
+
+        double mouseScreenX = mouseEvent.getScreenX();
+        double mouseScreenY = mouseEvent.getScreenY();
+
+        double positionX = mouseScreenX + deltaX;
+        double positionY = mouseScreenY + deltaY;
+
+        double centerPositionX = positionX + (winSizeX / 2.0);
+        double centerPositionY = positionY + (winSizeY / 2.0);
+        Rectangle2D recCenterOfPointer = new Rectangle2D(centerPositionX, centerPositionY, 0, 0);
+
+        Rectangle2D currentScreen = Screen.getScreensForRectangle(recCenterOfPointer).get(0).getVisualBounds();
+        double currentScreenMinX = currentScreen.getMinX();
+        double currentScreenMaxX = currentScreen.getMaxX();
+        double currentScreenMinY = currentScreen.getMinY();
+        double currentScreenMaxY = currentScreen.getMaxY();
+
+        double newPositionX = positionX;
+        double newPositionY = positionY;
+
+        if (positionX < currentScreenMinX)
+            newPositionX = currentScreenMinX;
+        if (positionX > (currentScreenMaxX - winSizeX))
+            newPositionX = currentScreenMaxX - winSizeX;
+        if (positionY < currentScreenMinY)
+            newPositionY = currentScreenMinY;
+        if (positionY > (currentScreenMaxY - winSizeY))
+            newPositionY = currentScreenMaxY - winSizeY;
+
+        primaryStage.setX(newPositionX);
+        primaryStage.setY(newPositionY);
     }
 
 }
