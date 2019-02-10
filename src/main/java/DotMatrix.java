@@ -11,30 +11,30 @@ import javafx.scene.shape.Rectangle;
  */
 public class DotMatrix extends Group {
 
-    final private int MAX_CHARS = 10;
-    final private int MATRIX_COLUMNS = 5;
-    final private int MATRIX_ROWS = 7;
-    final private double DOT_SIZE = 0.85;
+    final static private int MAX_CHARS = 10;
+    final static private int MATRIX_COLUMNS = 5;
+    final static private int MATRIX_ROWS = 7;
+    final static private double DOT_SIZE = 0.85;
 
-    final private Color PAINT_TRANSPARENT = new Color(0, 0, 0, 0);
+    final static private Color PAINT_TRANSPARENT = new Color(0, 0, 0, 0);
 
-    final private long bitMask = 0b10000_00000_00000_00000_00000_00000_00000L;
+    final static private long bitMask = 0b10000_00000_00000_00000_00000_00000_00000L;
 
-    final private long MATRIX_0 =           0b01110_10001_10001_10101_10001_10001_01110L;
-    final private long MATRIX_1 =           0b00010_00010_00010_00010_01010_00110_00010L;
-    final private long MATRIX_2 =           0b11111_10000_01000_00110_00001_10001_01110L;
-    final private long MATRIX_3 =           0b01110_10001_00001_00110_00001_10001_01110L;
-    final private long MATRIX_4 =           0b00010_00010_11111_10010_01010_00110_00010L;
-    final private long MATRIX_5 =           0b01110_10001_00001_11110_10000_10000_11111L;
-    final private long MATRIX_6 =           0b01110_10001_10001_11110_10000_10001_01110L;
-    final private long MATRIX_7 =           0b10000_10000_01000_00100_00010_00001_11111L;
-    final private long MATRIX_8 =           0b01110_10001_10001_01110_10001_10001_01110L;
-    final private long MATRIX_9 =           0b01110_10001_00001_01111_10001_10001_01110L;
-    final private long MATRIX_SPACE =       0b00000_00000_00000_00000_00000_00000_00000L;
-    final private long MATRIX_DASH =        0b00000_00000_00000_11111_00000_00000_00000L;
-    final private long MATRIX_COLON =       0b00000_00100_00000_00000_00100_00000_00000L;
-    final private long MATRIX_DOT =         0b00100_00000_00000_00000_00000_00000_00000L;
-    final private long MATRIX_UNKNOWN =     0b00100_01010_10101_01010_10101_01010_00100L;
+    final private static long MATRIX_0 =           0b01110_10001_10001_10101_10001_10001_01110L;
+    final private static long MATRIX_1 =           0b00010_00010_00010_00010_01010_00110_00010L;
+    final private static long MATRIX_2 =           0b11111_10000_01000_00110_00001_10001_01110L;
+    final private static long MATRIX_3 =           0b01110_10001_00001_00110_00001_10001_01110L;
+    final private static long MATRIX_4 =           0b00010_00010_11111_10010_01010_00110_00010L;
+    final private static long MATRIX_5 =           0b01110_10001_00001_11110_10000_10000_11111L;
+    final private static long MATRIX_6 =           0b01110_10001_10001_11110_10000_10001_01110L;
+    final private static long MATRIX_7 =           0b10000_10000_01000_00100_00010_00001_11111L;
+    final private static long MATRIX_8 =           0b01110_10001_10001_01110_10001_10001_01110L;
+    final private static long MATRIX_9 =           0b01110_10001_00001_01111_10001_10001_01110L;
+    final private static long MATRIX_SPACE =       0b00000_00000_00000_00000_00000_00000_00000L;
+    final private static long MATRIX_DASH =        0b00000_00000_00000_11111_00000_00000_00000L;
+    final private static long MATRIX_COLON =       0b00000_00100_00000_00000_00100_00000_00000L;
+    final private static long MATRIX_DOT =         0b00100_00000_00000_00000_00000_00000_00000L;
+    final private static long MATRIX_UNKNOWN =     0b00100_01010_10101_01010_10101_01010_00100L;
 
     private Circle[][][] dots = new Circle[MAX_CHARS][MATRIX_ROWS][MATRIX_COLUMNS];
 

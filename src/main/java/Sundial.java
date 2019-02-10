@@ -258,7 +258,7 @@ public class Sundial {
         dialMarginBox.setTranslateX(-1 * MARGIN_X / 2);
         dialMarginBox.setTranslateY(-1 * MARGIN_Y / 2);
         dialMarginBox.setFill(Color_Of_Void);
-        dialMarginBox.setStroke(Color_Of_Void);
+        dialMarginBox.setStroke(Color_Of_SunTime);
         dialMarginBox.setStrokeWidth(2d);
         dialMarginBox.setOpacity(1);
 
@@ -267,7 +267,7 @@ public class Sundial {
         dialMarginFillBox.setTranslateY(-1 * MARGIN_Y / 2);
         dialMarginFillBox.setFill(Color_Of_DaySky);
         dialMarginFillBox.setStroke(Color_Of_Void);
-        dialMarginFillBox.setOpacity(0.25d);
+        dialMarginFillBox.setOpacity(0.20d);
 
         dialMarginCircle = new Circle(CENTER_X, CENTER_Y, (DIAL_WIDTH + MARGIN_X) / 2);
         dialMarginCircle.setFill(Color_Of_DaySky);
@@ -393,17 +393,17 @@ public class Sundial {
 
         Group matrixDate = new Group();
         matrixDate.getChildren().addAll(matrixDay, matrixSeparatorDayToMonth, matrixMonth, matrixSeparatorMonthToYear, matrixYear);
-        matrixDate.setScaleX(1.0d);
-        matrixDate.setScaleY(1.0d);
+        matrixDate.setScaleX(0.75d);
+        matrixDate.setScaleY(0.75d);
         matrixDate.setLayoutX(CENTER_X - matrixDate.getLayoutBounds().getWidth() / 2);
-        matrixDate.setLayoutY(CENTER_Y * 1.5d - matrixDate.getLayoutBounds().getHeight() / 2);
+        matrixDate.setLayoutY(CENTER_Y * 1.25d - matrixDate.getLayoutBounds().getHeight() / 2);
 
 
         matrixWeek = new DotMatrix("00", Color_Of_LocalTime);
-        matrixWeek.setScaleX(0.5d);
-        matrixWeek.setScaleY(0.5d);
-        matrixWeek.setLayoutX(matrixDate.getLayoutBounds().getWidth() + matrixDate.getLayoutX() + MATRIX_SEPARATOR_OFFSET);
-        matrixWeek.setLayoutY(matrixDate.getLayoutY());
+        matrixWeek.setScaleX(0.75d);
+        matrixWeek.setScaleY(0.75d);
+        matrixWeek.setLayoutX(CENTER_X - matrixWeek.getLayoutBounds().getWidth() / 2);
+        matrixWeek.setLayoutY(CENTER_Y * 1.40d - matrixWeek.getLayoutBounds().getHeight() / 2);
 
 
         matrixHour = new DotMatrix("00", Color_Of_LocalTime);
@@ -412,20 +412,20 @@ public class Sundial {
         matrixSeparatorHourToMinute.setTranslateX(matrixHour.getLayoutBounds().getWidth() + MATRIX_SEPARATOR_OFFSET);
 
         matrixMinute = new DotMatrix("00", Color_Of_LocalTime);
-        matrixMinute.setTranslateX(matrixSeparatorHourToMinute.getLayoutBounds().getWidth() + matrixSeparatorHourToMinute.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
+        matrixMinute.setTranslateX(matrixSeparatorHourToMinute.getLayoutBounds().getWidth() + matrixSeparatorHourToMinute.getTranslateX()/* + MATRIX_SEPARATOR_OFFSET*/);
 
-        DotMatrix matrixSeparatorMinuteToYear = new DotMatrix(":", Color_Of_LocalTime);
-        matrixSeparatorMinuteToYear.setTranslateX(matrixMinute.getLayoutBounds().getWidth() + matrixMinute.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
+        DotMatrix matrixSeparatorMinuteToSecond = new DotMatrix(":", Color_Of_LocalTime);
+        matrixSeparatorMinuteToSecond.setTranslateX(matrixMinute.getLayoutBounds().getWidth() + matrixMinute.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
 
         matrixSecond = new DotMatrix("00", Color_Of_LocalTime);
-        matrixSecond.setTranslateX(matrixSeparatorMinuteToYear.getLayoutBounds().getWidth() + matrixSeparatorMinuteToYear.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
+        matrixSecond.setTranslateX(matrixSeparatorMinuteToSecond.getLayoutBounds().getWidth() + matrixSeparatorMinuteToSecond.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
 
         Group matrixTime = new Group();
-        matrixTime.getChildren().addAll(matrixHour, matrixSeparatorHourToMinute,  matrixMinute, matrixSeparatorMinuteToYear, matrixSecond);
-        matrixTime.setScaleX(1.0d);
-        matrixTime.setScaleY(1.0d);
+        matrixTime.getChildren().addAll(matrixHour, /*matrixSeparatorHourToMinute,*/  matrixMinute/*, matrixSeparatorMinuteToSecond, matrixSecond*/);
+        matrixTime.setScaleX(1.75d);
+        matrixTime.setScaleY(1.75d);
         matrixTime.setLayoutX(CENTER_X - matrixTime.getLayoutBounds().getWidth() / 2);
-        matrixTime.setLayoutY(CENTER_Y * 1.3d - matrixTime.getLayoutBounds().getHeight() / 2);
+        matrixTime.setLayoutY(CENTER_Y * 1.0d - matrixTime.getLayoutBounds().getHeight() / 2);
 
         setMatrixGlow(matrixYear, MATRIX_SHADOW);
         setMatrixGlow(matrixMonth, MATRIX_SHADOW);
@@ -437,7 +437,7 @@ public class Sundial {
 
         matrixSeparatorDayToMonth.setStyle(MATRIX_SHADOW);
         matrixSeparatorHourToMinute.setStyle(MATRIX_SHADOW);
-        matrixSeparatorMinuteToYear.setStyle(MATRIX_SHADOW);
+        matrixSeparatorMinuteToSecond.setStyle(MATRIX_SHADOW);
         matrixSeparatorMonthToYear.setStyle(MATRIX_SHADOW);
 
 
@@ -446,9 +446,6 @@ public class Sundial {
         dialCircleCenterDot.setOnMouseClicked(event -> resetNightCompression());
         dialCircleCenterDot.setOnMouseEntered(event -> dialCircleCenterDot.setStyle(MATRIX_GLOW));
         dialCircleCenterDot.setOnMouseExited(event -> dialCircleCenterDot.setStyle(""));
-
-        dialMarginFillBox.setOnMouseEntered(event -> dialMarginBox.setStroke(Color_Of_Warning));
-        dialMarginFillBox.setOnMouseExited(event -> dialMarginBox.setStroke(Color_Of_Void));
 
         matrixYear.setOnMouseEntered(event -> setMatrixGlow(matrixYear, MATRIX_GLOW));
         matrixYear.setOnMouseExited(event -> setMatrixGlow(matrixYear, MATRIX_SHADOW));
@@ -476,7 +473,7 @@ public class Sundial {
         dialsGroup = new Group();
 
         dialsGroup.getChildren().add(dialMarginFillBox);
-        dialsGroup.getChildren().add(dialMarginBox);
+//        dialsGroup.getChildren().add(dialMarginBox);
         dialsGroup.getChildren().add(dialMarginCircle);
 //        dialsGroup.getChildren().add(dialBox);
         dialsGroup.getChildren().add(dialCircleBackground);
@@ -490,9 +487,12 @@ public class Sundial {
         for(int i = 0; i < MAX_MARKER; i++) {
 
             double lineLength = 5;
+            double strokeWidth = 0.5;
+            double opacity = 0.5;
+
             if (i % 2 == 0) { lineLength = 7.5; }
-            if (i % 4 == 0) { lineLength = 10; }
-            if (i % 24 == 0) { lineLength = 90; }
+            if (i % 4 == 0) { lineLength = 10;  opacity = 1; }
+            if (i % 24 == 0) { lineLength = 90; strokeWidth = 0.65;  }
             if (i % 48 == 0) { lineLength = 20; }
 
             Group markerGroup = new Group();
@@ -502,7 +502,8 @@ public class Sundial {
 
             Line hourMarkerLine = new Line(CENTER_X, lineLength, CENTER_X, 0);
             hourMarkerLine.setStroke(Color_Of_Darkness);
-            hourMarkerLine.setStrokeWidth( 1 / ((SCALE_X + SCALE_Y) / 2) );
+            hourMarkerLine.setStrokeWidth(strokeWidth);
+            hourMarkerLine.setOpacity(opacity);
 //            hourMarkerLine.getTransforms().add(markerRotate);
             markerGroup.getChildren().add(hourMarkerLine);
 
@@ -510,12 +511,12 @@ public class Sundial {
 
                 DotMatrix matrixHourMarker = new DotMatrix("" + ((12 + i / 4) % 24), Color_Of_Darkness);
                 matrixHourMarker.setTranslateX(CENTER_X - matrixHourMarker.getLayoutBounds().getWidth() / 2);
-                matrixHourMarker.setTranslateY(CENTER_Y - matrixHourMarker.getLayoutBounds().getHeight() / 2 - 106);
+                matrixHourMarker.setTranslateY(CENTER_Y - matrixHourMarker.getLayoutBounds().getHeight() / 2 - 107);
 
                 double rotationAdjust = i * -3.75d;
                 matrixHourMarker.setRotate(rotationAdjust);
-                matrixHourMarker.setScaleX(0.4d);
-                matrixHourMarker.setScaleY(0.4d);
+                matrixHourMarker.setScaleX(0.5d);
+                matrixHourMarker.setScaleY(0.5d);
                 markerGroup.getChildren().add(matrixHourMarker);
 
                 hourMarkerList.add(matrixHourMarker);
@@ -665,8 +666,8 @@ public class Sundial {
         return dialMarginCircle;
     }
 
-    public Rectangle getDialMarginBox() {
-        return dialMarginBox;
+    public Rectangle getDialMarginFillBox() {
+        return dialMarginFillBox;
     }
 
     // Setters

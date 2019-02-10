@@ -80,12 +80,12 @@ public class Sunface extends Application {
         calculatedInfoText.setLayoutY(540d);
 
         // Controls
-        controlCircleClose = new Circle(10, 10,5);
+        controlCircleClose = new Circle(0, 0,7.5);
         controlCircleClose.setFill(Color.RED);
-        controlCircleClose.setStyle(BUTTON_SHADOW);
+//        controlCircleClose.setStyle(BUTTON_SHADOW);
 
         controlCircleClose.setOnMouseEntered(event -> controlCircleClose.setStyle(BUTTON_GLOW));
-        controlCircleClose.setOnMouseExited(event -> controlCircleClose.setStyle(BUTTON_SHADOW));
+        controlCircleClose.setOnMouseExited(event -> controlCircleClose.setStyle(""));
         controlCircleClose.setOnMousePressed(event -> controlCircleClose.setFill(Color.ORANGE));
         controlCircleClose.setOnMouseReleased(event -> controlCircleClose.setFill(Color.RED));
         controlCircleClose.setOnMouseClicked(event -> System.exit(0));
@@ -125,10 +125,16 @@ public class Sunface extends Application {
         dialsGroup.setLayoutX((dialsGroup.getLayoutBounds().getWidth() + Sundial.MARGIN_X) / 2);
         dialsGroup.setLayoutY((dialsGroup.getLayoutBounds().getWidth() + Sundial.MARGIN_Y) / 2);
 
-        sundial.getDialMarginBox().setOnMouseEntered(event -> sundial.getDialMarginBox().setStroke(Sundial.Color_Of_Warning));
-        sundial.getDialMarginBox().setOnMouseExited(event -> sundial.getDialMarginBox().setStroke(Sundial.Color_Of_Void));
-        sundial.getDialMarginBox().setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
-        sundial.getDialMarginBox().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
+        sundial.getDialMarginFillBox().setOnMouseEntered(event -> {
+            sundial.getDialMarginFillBox().setFill(Sundial.Color_Of_SunTime);
+            mainScene.setCursor(Cursor.OPEN_HAND);
+        });
+        sundial.getDialMarginFillBox().setOnMouseExited(event -> {
+            sundial.getDialMarginFillBox().setFill(Sundial.Color_Of_DaySky);
+            mainScene.setCursor(Cursor.DEFAULT);
+        });
+        sundial.getDialMarginFillBox().setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
+        sundial.getDialMarginFillBox().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
         sundial.getDialCircleFrame().setOnMouseClicked(event -> resetTime(suntime, sundial));
         sundial.getMatrixYear().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_YEAR, event));
@@ -138,6 +144,10 @@ public class Sunface extends Application {
         sundial.getMatrixMinute().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MINUTE, event));
         sundial.getMatrixSecond().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_SECOND, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
+
+        controlCircleClose.setCenterX(mainScene.getWidth() - controlCircleClose.getRadius() * 2);
+        controlCircleClose.setCenterY(controlCircleClose.getRadius() * 2);
+
 
         // Playtime
         KeyFrame keyframeClockTick = new KeyFrame(
