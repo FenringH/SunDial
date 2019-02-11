@@ -115,6 +115,7 @@ public class Sundial {
     private Rectangle dialBox;
     private Rectangle dialMarginBox;
     private Rectangle dialMarginFillBox;
+    private Rectangle dialMarginFillBoxie;
     private Circle dialMarginCircle;
 
     private Rotate centerRotate;
@@ -268,7 +269,14 @@ public class Sundial {
         dialMarginFillBox.setTranslateY(-1 * MARGIN_Y / 2);
         dialMarginFillBox.setFill(Color_Of_DaySky);
         dialMarginFillBox.setStroke(Color_Of_Void);
-        dialMarginFillBox.setOpacity(0.20d);
+        dialMarginFillBox.setOpacity(0.05d);
+
+        dialMarginFillBoxie = new Rectangle((DIAL_WIDTH + MARGIN_X) / 2, (DIAL_HEIGHT + MARGIN_Y) / 2);
+        dialMarginFillBoxie.setTranslateX(DIAL_WIDTH / 2);
+        dialMarginFillBoxie.setTranslateY(DIAL_HEIGHT / 2);
+        dialMarginFillBoxie.setFill(Color_Of_DaySky);
+        dialMarginFillBoxie.setStroke(Color_Of_Void);
+        dialMarginFillBoxie.setOpacity(0.20d);
 
         dialMarginCircle = new Circle(CENTER_X, CENTER_Y, (DIAL_WIDTH + MARGIN_X) / 2);
         dialMarginCircle.setFill(Color_Of_DaySky);
@@ -474,6 +482,7 @@ public class Sundial {
         dialsGroup = new Group();
 
         dialsGroup.getChildren().add(dialMarginFillBox);
+        dialsGroup.getChildren().add(dialMarginFillBoxie);
 //        dialsGroup.getChildren().add(dialMarginBox);
         dialsGroup.getChildren().add(dialMarginCircle);
 //        dialsGroup.getChildren().add(dialBox);
@@ -669,6 +678,10 @@ public class Sundial {
 
     public Rectangle getDialMarginFillBox() {
         return dialMarginFillBox;
+    }
+
+    public Rectangle getDialMarginFillBoxie() {
+        return dialMarginFillBoxie;
     }
 
     // Setters
