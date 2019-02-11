@@ -25,17 +25,18 @@ public class Sundial {
     private static final double DEFAULT_sunsetDialAngle       = 30;
     private static final double DEFAULT_localTimeDialAngle    = -5000;
 
-    private static final double DEFAULT_nightCompression      = 0;
-    private static final double MAX_nightCompression          = 45;
-    private static final double MIN_nightCompression          = -45;
-
-    private static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
-
     private static final double MATRIX_SEPARATOR_OFFSET = -1.0d;
     private static final int MAX_MARKER = 96;
 
-    private static final double DIAL_WIDTH = 200;
-    private static final double DIAL_HEIGHT = 200;
+    private static final double DEFAULT_nightCompression      = 0;
+    private static final double MAX_nightCompression          = 45;
+    private static final double MIN_nightCompression          = -45;
+    private static final double STEP_nightCompression         = 360d / MAX_MARKER;
+
+    private static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
+
+    public static final double DIAL_WIDTH = 200;
+    public static final double DIAL_HEIGHT = 200;
     public static final double MARGIN_X = 30;
     public static final double MARGIN_Y = 30;
     private static final double SCALE_X = 2.0;
@@ -578,8 +579,8 @@ public class Sundial {
 
         double offsetFactor = 0;
 
-        if (event.getDeltaY() < 0) { offsetFactor = 5; }
-        else if (event.getDeltaY() > 0) { offsetFactor = -5; }
+        if (event.getDeltaY() < 0) { offsetFactor = STEP_nightCompression; }
+        else if (event.getDeltaY() > 0) { offsetFactor = -1 * STEP_nightCompression; }
 
         this.nightCompression += offsetFactor;
 
