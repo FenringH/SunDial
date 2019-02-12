@@ -11,11 +11,12 @@ import javafx.scene.shape.Rectangle;
  */
 public class DotMatrix extends Group {
 
-    final static private int MAX_CHARS = 10;
+    final static private int MAX_CHARS = 20;
     final static private int MATRIX_COLUMNS = 5;
     final static private int MATRIX_ROWS = 7;
     final static private double DOT_SIZE = 0.85;
 
+    final static private Color DEFAULT_DOT_PAINT = new Color(1, 1, 1, 1);
     final static private Color PAINT_TRANSPARENT = new Color(0, 0, 0, 0);
 
     final static private long bitMask = 0b10000_00000_00000_00000_00000_00000_00000L;
@@ -30,19 +31,35 @@ public class DotMatrix extends Group {
     final private static long MATRIX_7 =           0b10000_10000_01000_00100_00010_00001_11111L;
     final private static long MATRIX_8 =           0b01110_10001_10001_01110_10001_10001_01110L;
     final private static long MATRIX_9 =           0b01110_10001_00001_01111_10001_10001_01110L;
+    final private static long MATRIX_h =           0b10001_10001_10001_11110_10000_10000_10000L;
+    final private static long MATRIX_m =           0b10101_10101_10101_10101_11010_00000_00000L;
+    final private static long MATRIX_s =           0b11110_00001_01110_10000_01111_00000_00000L;
     final private static long MATRIX_SPACE =       0b00000_00000_00000_00000_00000_00000_00000L;
     final private static long MATRIX_DASH =        0b00000_00000_00000_11111_00000_00000_00000L;
+    final private static long MATRIX_PLUS =        0b00000_00100_00100_11111_00100_00100_00000L;
     final private static long MATRIX_COLON =       0b00000_00100_00000_00000_00100_00000_00000L;
     final private static long MATRIX_DOT =         0b00100_00000_00000_00000_00000_00000_00000L;
     final private static long MATRIX_UNKNOWN =     0b00100_01010_10101_01010_10101_01010_00100L;
 
-    private Circle[][][] dots = new Circle[MAX_CHARS][MATRIX_ROWS][MATRIX_COLUMNS];
-
-    Group stringGroup;
+    private Circle[][][] dots;
+    private String string;
+    private Group stringGroup;
 
     public DotMatrix(String string, Paint dotPaint) {
+
         super();
-        getChildren().add(getStringGroup(string, dotPaint));
+
+        stringGroup = new Group();
+
+        if (string == null || string.isEmpty()) {
+            this.string = "##";
+        } else {
+            this.string = string;
+        }
+
+        if (dotPaint == null) { dotPaint = DEFAULT_DOT_PAINT; }
+
+        getChildren().add(getStringGroup(this.string, dotPaint));
     }
 
     private Group getCharGroup(int charIndex, char c, Paint dotPaint) {
@@ -71,9 +88,10 @@ public class DotMatrix extends Group {
 
     private Group getStringGroup(String string, Paint dotPaint) {
 
-        stringGroup = new Group();
-
         int stringSize = string.length();
+        if (stringSize > MAX_CHARS) { string = string.substring(0, MAX_CHARS - 1); }
+
+        dots = new Circle[stringSize][MATRIX_ROWS][MATRIX_COLUMNS];
 
         for (int index = 0; index < stringSize; index++) {
             char regularChar = string.charAt(index);
@@ -97,8 +115,9 @@ public class DotMatrix extends Group {
 
         if (s == null) { return; }
 
-        int stringSize = s.length();
+        if (s.length() > this.string.length()) { s = s.substring(0, this.string.length() - 1); }
 
+        int stringSize = s.length();
         for (int index = 0; index < stringSize; index++) {
 
             char regularChar = s.charAt(index);
@@ -116,8 +135,12 @@ public class DotMatrix extends Group {
                 case '7': charCode = MATRIX_7; break;
                 case '8': charCode = MATRIX_8; break;
                 case '9': charCode = MATRIX_9; break;
+                case 'h': charCode = MATRIX_h; break;
+                case 'm': charCode = MATRIX_m; break;
+                case 's': charCode = MATRIX_s; break;
                 case ' ': charCode = MATRIX_SPACE; break;
                 case '-': charCode = MATRIX_DASH; break;
+                case '+': charCode = MATRIX_PLUS; break;
                 case ':': charCode = MATRIX_COLON; break;
                 case '.': charCode = MATRIX_DOT; break;
                 default : charCode = MATRIX_UNKNOWN; break;

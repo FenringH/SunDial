@@ -8,8 +8,13 @@ import static java.lang.Math.*;
 public class Suntime {
 
     // constants
-    private static double DEFAULT_LONGITUDE = 15.9788553d;  // East
-    private static double DEFAULT_LATITUDE = 45.7830997d;   // North
+    public static double DEFAULT_LONGITUDE = 15.9788553d;  // East
+    public static double DEFAULT_LATITUDE = 45.7830997d;   // North
+
+    public static double MIN_LONGITUDE = -180d;
+    public static double MAX_LONGITUDE = 180d;
+    public static double MIN_LATITUDE = -90d;
+    public static double MAX_LATITUDE = 90d;
 
     private final static long J2000 = 2451545;                    // UTC 01.01.2000. 12:00
     private final static long DEFAULT_PRECISION = 10000;          // Refine calculation until deviation is less than 1/10000
@@ -306,6 +311,7 @@ public class Suntime {
 
         if (horizonFactor != SUNRISE_HORIZON && horizonFactor != SUNSET_HORIZON) { return 0; }
 
+/*
         // check cache
         if(horizonFactor == SUNRISE_HORIZON) {
             Double cachedSunrise = sunriseCache.get(this.julianDayNumber);
@@ -314,6 +320,7 @@ public class Suntime {
             Double cachedSunset = sunsetCache.get(this.julianDayNumber);
             if (cachedSunset != null) { return cachedSunset; }
         }
+*/
 
         // iterate for better precision
         double estimateJulianDate = solarTransit + horizonFactor * (localHourAngle / 360d);
@@ -336,12 +343,14 @@ public class Suntime {
             estimateJulianDate = newJulianDate;
         }
 
+/*
         // cache result
         if(horizonFactor == SUNRISE_HORIZON) {
             this.sunriseCache.put(this.julianDayNumber, estimateJulianDate);
         } else {
             this.sunsetCache.put(this.julianDayNumber, estimateJulianDate);
         }
+*/
 
         return estimateJulianDate;
     }
