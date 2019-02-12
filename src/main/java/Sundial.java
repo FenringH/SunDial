@@ -35,27 +35,54 @@ public class Sundial {
 
     private static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
 
-    public static final double DIAL_WIDTH = 200;
-    public static final double DIAL_HEIGHT = 200;
-    public static final double MARGIN_X = 30;
-    public static final double MARGIN_Y = 30;
-    private static final double SCALE_X = 2.0;
-    private static final double SCALE_Y = 2.0;
+    public static final double DIAL_WIDTH = 430.0d;
+    public static final double DIAL_HEIGHT = 430.0d;
+    public static final double MARGIN_X = 25.0d;
+    public static final double MARGIN_Y = 25.0d;
+    private static final double SCALE_X = 1.0d;
+    private static final double SCALE_Y = 1.0d;
     private static final double CENTER_X = DIAL_WIDTH / 2;
     private static final double CENTER_Y = DIAL_HEIGHT / 2;
+
+    private static final double DOT_RADIUS = 10.0d;
+    private static final double SUNTIME_DIAL_LENGTH = 100.0d;
+    private static final double HIGHNOON_DIAL_LENGTH = 50.0d;
+    private static final double SUNRISE_DIAL_LENGTH = DIAL_HEIGHT / 2;
+    private static final double SUNSET_DIAL_LENGTH = DIAL_HEIGHT / 2;
+    private static final double LOCALTIME_DIAL_LENGTH = DIAL_HEIGHT / 2 + 20;
+    private static final double MARKER_DIAL_LENGTH = 10.0d;
+
+    private static final double SUNTIME_STROKE_WIDTH = 2.00d;
+    private static final double HIGHNOON_STROKE_WIDTH = 2.00d;
+    private static final double LOCALTIME_STROKE_WIDTH = 2.00d;
+    private static final double SUNRISE_STROKE_WIDTH = 1.00d;
+    private static final double SUNSET_STROKE_WIDTH = 1.00d;
+    private static final double MARKER_STROKE_WIDTH = 1.00d;
+
+    private static final double MATRIX_MARKER_OFFSET = 5.0d;
+    private static final double MATRIX_HORIZON_OFFSET = 77.0d;
+    private static final double MATRIX_TIME_OFFSET = 0.0d;
+    private static final double MATRIX_DATE_OFFSET = 45.0d;
+    private static final double MATRIX_WEEK_OFFSET = 75.0d;
+
+    private static final double MATRIX_TIME_SCALE = 3.5d;
+    private static final double MATRIX_DATE_SCALE = 1.5d;
+    private static final double MATRIX_WEEK_SCALE = 1.5d;
+    private static final double MATRIX_HORIZON_SCALE = 0.75d;
 
     public static final Color Color_Of_Window    = new Color(0.65, 0.85, 0.85, 1.00);
     public static final Color Color_Of_Earth     = new Color(0.85, 0.85, 0.65, 1.00);
     public static final Color Color_Of_Darkness  = new Color(0.00, 0.00, 0.00, 1.00);
     public static final Color Color_Of_TextBack  = new Color(0.90, 0.90, 0.50, 1.00);
     public static final Color Color_Of_Void      = new Color(0.00, 0.00, 0.00, 0.00);
+    public static final Color Color_Of_AlmostVoid= new Color(0.00, 0.00, 0.00, 0.10);
 
     public static final Color Color_Of_Nominal   = new Color(0.00, 0.65, 1.00, 0.35);
     public static final Color Color_Of_Warning   = new Color(1.00, 0.65, 0.00, 0.35);
 
     public static final Color Color_Of_DaySky    = new Color(0.50, 0.75, 1.00, 1.00);
     public static final Color Color_Of_NightSky  = new Color(0.50, 0.35, 1.00, 1.00);
-    public static final Color Color_Of_Midnight  = new Color(0.00, 0.00, 0.00, 0.35);
+    public static final Color Color_Of_Midnight  = new Color(0.00, 0.00, 0.00, 0.30);
 
     public static final Color Color_Of_SunTime   = new Color(1.00, 0.50, 0.00, 1.00);
     public static final Color Color_Of_HighNoon  = new Color(1.00, 1.00, 0.00, 1.00);
@@ -68,11 +95,11 @@ public class Sundial {
     public static final String MATRIX_GLOW2  = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
     public static final String MATRIX_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String MATRIX_BLOCK  = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String HORIZON_GLOW  = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 10.0, 0.85, 0, 0);";
+    public static final String HORIZON_GLOW  = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
 
     private static final RadialGradient Warning_Glow = new RadialGradient(
             0, 0,
-            CENTER_X, CENTER_Y, 100,
+            CENTER_X, CENTER_Y, CENTER_Y,
             false,
             CycleMethod.NO_CYCLE,
             new Stop(0.75, Color_Of_Void),
@@ -81,7 +108,7 @@ public class Sundial {
 
     private static final RadialGradient Nominal_Glow = new RadialGradient(
             0, 0,
-            CENTER_X, CENTER_Y, 100,
+            CENTER_X, CENTER_Y, CENTER_Y,
             false,
             CycleMethod.NO_CYCLE,
             new Stop(0.75, Color_Of_Void),
@@ -256,75 +283,81 @@ public class Sundial {
         pathOfEarth.setFill(Color_Of_Earth);
 
         // Dials in a box
-        dialMarginBox = new Rectangle(DIAL_WIDTH + MARGIN_X, DIAL_HEIGHT + MARGIN_Y);
-        dialMarginBox.setTranslateX(-1 * MARGIN_X / 2);
-        dialMarginBox.setTranslateY(-1 * MARGIN_Y / 2);
+        dialMarginBox = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
+        dialMarginBox.setTranslateX(0);
+        dialMarginBox.setTranslateY(0);
         dialMarginBox.setFill(Color_Of_Void);
         dialMarginBox.setStroke(Color_Of_SunTime);
-        dialMarginBox.setStrokeWidth(2d);
+        dialMarginBox.setStrokeWidth(2.0d);
         dialMarginBox.setOpacity(1);
 
-        dialMarginFillBox = new Rectangle(DIAL_WIDTH + MARGIN_X, DIAL_HEIGHT + MARGIN_Y);
-        dialMarginFillBox.setTranslateX(-1 * MARGIN_X / 2);
-        dialMarginFillBox.setTranslateY(-1 * MARGIN_Y / 2);
+        dialMarginFillBox = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
+        dialMarginFillBox.setTranslateX(0);
+        dialMarginFillBox.setTranslateY(0);
         dialMarginFillBox.setFill(Color_Of_DaySky);
         dialMarginFillBox.setStroke(Color_Of_Void);
-        dialMarginFillBox.setOpacity(0.05d);
+        dialMarginFillBox.setOpacity(0.001d);
 
-        dialMarginFillBoxie = new Rectangle((DIAL_WIDTH + MARGIN_X) / 2, (DIAL_HEIGHT + MARGIN_Y) / 2);
+        dialMarginFillBoxie = new Rectangle(DIAL_WIDTH / 2, DIAL_HEIGHT / 2);
         dialMarginFillBoxie.setTranslateX(DIAL_WIDTH / 2);
         dialMarginFillBoxie.setTranslateY(DIAL_HEIGHT / 2);
-        dialMarginFillBoxie.setFill(Color_Of_DaySky);
+        dialMarginFillBoxie.setFill(Color_Of_AlmostVoid);
         dialMarginFillBoxie.setStroke(Color_Of_Void);
         dialMarginFillBoxie.setOpacity(0.20d);
 
-        dialMarginCircle = new Circle(CENTER_X, CENTER_Y, (DIAL_WIDTH + MARGIN_X) / 2);
+        dialMarginCircle = new Circle(CENTER_X, CENTER_Y, DIAL_WIDTH / 2);
         dialMarginCircle.setFill(Color_Of_DaySky);
         dialMarginCircle.setStroke(Color_Of_Void);
-        dialMarginCircle.setOpacity(0.5d);
+        dialMarginCircle.setOpacity(0.50d);
 
         dialBox = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
         dialBox.setFill(Color_Of_Void);
         dialBox.setStroke(Color_Of_Darkness);
-        dialBox.setStrokeWidth(0.3d);
-        dialBox.setOpacity(0);
+        dialBox.setStrokeWidth(0.30d);
+        dialBox.setOpacity(0.00d);
 
-        dialArcNight = new Arc(CENTER_X, CENTER_Y, DIAL_WIDTH / 2, DIAL_HEIGHT / 2, 90 - sunsetDialAngle, sunsetDialAngle - sunriseDialAngle);
+        dialArcNight = new Arc(CENTER_X, CENTER_Y, DIAL_WIDTH / 2 - MARGIN_X, DIAL_HEIGHT / 2 - MARGIN_Y, 90 - sunsetDialAngle, sunsetDialAngle - sunriseDialAngle);
         dialArcNight.setType(ArcType.ROUND);
         dialArcNight.setStroke(Color_Of_Void);
         dialArcNight.setFill(Color_Of_NightSky);
 
-        dialArcMidnight = new Arc(CENTER_X, CENTER_Y, DIAL_WIDTH / 2, DIAL_HEIGHT / 2, 0, -180);
+        dialArcMidnight = new Arc(CENTER_X, CENTER_Y, DIAL_WIDTH / 2 - MARGIN_X, DIAL_HEIGHT / 2 - MARGIN_Y, 0, -180);
         dialArcMidnight.setType(ArcType.ROUND);
         dialArcMidnight.setStroke(Color_Of_Void);
         dialArcMidnight.setFill(Color_Of_Midnight);
 
-        dialCircleBackground = new Circle(CENTER_X, CENTER_Y, 100);
+        dialCircleBackground = new Circle(CENTER_X, CENTER_Y, DIAL_WIDTH / 2 - MARGIN_X);
         dialCircleBackground.setFill(Color_Of_DaySky);
         dialCircleBackground.setStroke(Color_Of_Void);
 
-        dialCircleFrame = new Circle(CENTER_X, CENTER_Y, 100);
+        dialCircleFrame = new Circle(CENTER_X, CENTER_Y, DIAL_WIDTH / 2 - MARGIN_X);
         dialCircleFrame.setFill(Nominal_Glow);
         dialCircleFrame.setStroke(Color_Of_Darkness);
 
-        dialCircleCenterDot = new Circle(CENTER_X, CENTER_Y, 5);
+        dialCircleCenterDot = new Circle(CENTER_X, CENTER_Y, DOT_RADIUS);
         dialCircleCenterDot.setFill(Color_Of_LocalTime);
         dialCircleCenterDot.setStroke(Color_Of_Void);
 
-        sunTimeDial = new Line(CENTER_X, 50, CENTER_X, 0);
+        sunTimeDial = new Line(CENTER_X, SUNTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
         sunTimeDial.setStroke(Color_Of_SunTime);
+        sunTimeDial.setStrokeWidth(SUNTIME_STROKE_WIDTH);
         sunTimeDial.getTransforms().add(sunTimeDialRotate);
 
-        highNoonDial = new Line(CENTER_X, 30, CENTER_X, 0);
+        highNoonDial = new Line(CENTER_X, HIGHNOON_DIAL_LENGTH, CENTER_X, MARGIN_Y);
         highNoonDial.setStroke(Color_Of_HighNoon);
+        highNoonDial.setStrokeWidth(HIGHNOON_STROKE_WIDTH);
         highNoonDial.getTransforms().add(highNoonDialRotate);
 
+        localTimeDial = new Line(CENTER_X, LOCALTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
+        localTimeDial.setStroke(Color_Of_LocalTime);
+        localTimeDial.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
+        localTimeDial.getTransforms().add(localTimeDialRotate);
 
         Group sunriseGroup = new Group();
 
-        sunriseDial = new Line(CENTER_X, 100, CENTER_X, 0);
+        sunriseDial = new Line(CENTER_X, SUNRISE_DIAL_LENGTH, CENTER_X, MARGIN_Y);
         sunriseDial.setStroke(Color_Of_Horizon);
-        sunriseDial.setStrokeWidth( 1.4 / ((SCALE_X + SCALE_Y) / 2) );
+        sunriseDial.setStrokeWidth(SUNRISE_STROKE_WIDTH);
 //        sunriseDial.getTransforms().add(sunriseDialRotate);
         sunriseDial.setStyle(HORIZON_GLOW);
 //        sunriseDial.setBlendMode(BlendMode.SCREEN);
@@ -336,11 +369,11 @@ public class Sundial {
                 ;
 
         matrixSunrise = new DotMatrix("00:00:00", Color_Of_Horizon);
-        matrixSunrise.setTranslateX(CENTER_X - matrixSunrise.getLayoutBounds().getWidth() / 2 + 4);
-        matrixSunrise.setTranslateY(CENTER_Y - matrixSunrise.getLayoutBounds().getHeight() / 2 - 70);
+        matrixSunrise.setTranslateX(CENTER_X - matrixSunrise.getLayoutBounds().getWidth() / 2 + matrixSunrise.getLayoutBounds().getHeight() / 2);
+        matrixSunrise.setTranslateY(MATRIX_HORIZON_OFFSET);
         matrixSunrise.setRotate(90d);
-        matrixSunrise.setScaleX(0.35d);
-        matrixSunrise.setScaleY(0.35d);
+        matrixSunrise.setScaleX(MATRIX_HORIZON_SCALE);
+        matrixSunrise.setScaleY(MATRIX_HORIZON_SCALE);
         matrixSunrise.setStyle(MATRIX_GLOW2);
 
         sunriseGroup.getChildren().addAll(sunriseDial, matrixSunrise);
@@ -349,9 +382,9 @@ public class Sundial {
 
         Group sunsetGroup = new Group();
 
-        sunsetDial = new Line(CENTER_X, 100, CENTER_X, 0);
+        sunsetDial = new Line(CENTER_X, SUNSET_DIAL_LENGTH, CENTER_X, MARGIN_Y);
         sunsetDial.setStroke(Color_Of_Horizon);
-        sunsetDial.setStrokeWidth( 1.4 / ((SCALE_X + SCALE_Y) / 2) );
+        sunsetDial.setStrokeWidth(SUNSET_STROKE_WIDTH);
 //        sunsetDial.getTransforms().add(sunsetDialRotate);
         sunsetDial.setStyle(HORIZON_GLOW);
 //        sunsetDial.setBlendMode(BlendMode.SCREEN);
@@ -363,27 +396,23 @@ public class Sundial {
                 ;
 
         matrixSunset = new DotMatrix("00:00:00", Color_Of_Horizon);
-        matrixSunset.setTranslateX(CENTER_X - matrixSunset.getLayoutBounds().getWidth() / 2 - 4);
-        matrixSunset.setTranslateY(CENTER_Y - matrixSunset.getLayoutBounds().getHeight() / 2 - 70);
+        matrixSunset.setTranslateX(CENTER_X - matrixSunset.getLayoutBounds().getWidth() / 2 - matrixSunset.getLayoutBounds().getHeight() / 2);
+        matrixSunset.setTranslateY(MATRIX_HORIZON_OFFSET);
         matrixSunset.setRotate(-90d);
-        matrixSunset.setScaleX(0.35d);
-        matrixSunset.setScaleY(0.35d);
+        matrixSunset.setScaleX(MATRIX_HORIZON_SCALE);
+        matrixSunset.setScaleY(MATRIX_HORIZON_SCALE);
         matrixSunset.setStyle(MATRIX_GLOW2);
 
         sunsetGroup.getChildren().addAll(sunsetDial, matrixSunset);
         sunsetGroup.getTransforms().add(sunsetDialRotate);
 
 
-        localTimeDial = new Line(CENTER_X, 110, CENTER_X, 0);
-        localTimeDial.setStroke(Color_Of_LocalTime);
-        localTimeDial.getTransforms().add(localTimeDialRotate);
-
         dialTextDate = new Text();
         dialTextDate.setText(localTimeText);
         dialTextDate.setFill(Color_Of_LocalTime);
         dialTextDate.setFont(Font_Of_Dial);
         dialTextDate.setLayoutX(CENTER_X - dialTextDate.getLayoutBounds().getWidth() / 2);
-        dialTextDate.setLayoutY(CENTER_Y * 1.5d - dialTextDate.getLayoutBounds().getHeight() / 2);
+        dialTextDate.setLayoutY(CENTER_Y - dialTextDate.getLayoutBounds().getHeight() / 2);
 
 
         matrixDay = new DotMatrix("00", Color_Of_LocalTime);
@@ -402,17 +431,17 @@ public class Sundial {
 
         Group matrixDate = new Group();
         matrixDate.getChildren().addAll(matrixDay, matrixSeparatorDayToMonth, matrixMonth, matrixSeparatorMonthToYear, matrixYear);
-        matrixDate.setScaleX(0.75d);
-        matrixDate.setScaleY(0.75d);
+        matrixDate.setScaleX(MATRIX_DATE_SCALE);
+        matrixDate.setScaleY(MATRIX_DATE_SCALE);
         matrixDate.setLayoutX(CENTER_X - matrixDate.getLayoutBounds().getWidth() / 2);
-        matrixDate.setLayoutY(CENTER_Y * 1.25d - matrixDate.getLayoutBounds().getHeight() / 2);
+        matrixDate.setLayoutY(CENTER_Y - matrixDate.getLayoutBounds().getHeight() / 2 + MATRIX_DATE_OFFSET);
 
 
         matrixWeek = new DotMatrix("00", Color_Of_LocalTime);
-        matrixWeek.setScaleX(0.75d);
-        matrixWeek.setScaleY(0.75d);
+        matrixWeek.setScaleX(MATRIX_WEEK_SCALE);
+        matrixWeek.setScaleY(MATRIX_WEEK_SCALE);
         matrixWeek.setLayoutX(CENTER_X - matrixWeek.getLayoutBounds().getWidth() / 2);
-        matrixWeek.setLayoutY(CENTER_Y * 1.40d - matrixWeek.getLayoutBounds().getHeight() / 2);
+        matrixWeek.setLayoutY(CENTER_Y - matrixWeek.getLayoutBounds().getHeight() / 2 + MATRIX_WEEK_OFFSET);
 
 
         matrixHour = new DotMatrix("00", Color_Of_LocalTime);
@@ -431,10 +460,10 @@ public class Sundial {
 
         Group matrixTime = new Group();
         matrixTime.getChildren().addAll(matrixHour, /*matrixSeparatorHourToMinute,*/  matrixMinute/*, matrixSeparatorMinuteToSecond, matrixSecond*/);
-        matrixTime.setScaleX(1.75d);
-        matrixTime.setScaleY(1.75d);
+        matrixTime.setScaleX(MATRIX_TIME_SCALE);
+        matrixTime.setScaleY(MATRIX_TIME_SCALE);
         matrixTime.setLayoutX(CENTER_X - matrixTime.getLayoutBounds().getWidth() / 2);
-        matrixTime.setLayoutY(CENTER_Y * 1.0d - matrixTime.getLayoutBounds().getHeight() / 2);
+        matrixTime.setLayoutY(CENTER_Y - matrixTime.getLayoutBounds().getHeight() / 2 + MATRIX_TIME_OFFSET);
 
         setMatrixGlow(matrixYear, MATRIX_SHADOW);
         setMatrixGlow(matrixMonth, MATRIX_SHADOW);
@@ -453,7 +482,7 @@ public class Sundial {
         // Add events
         dialCircleCenterDot.setOnScroll(event -> changeNightCompression(event));
         dialCircleCenterDot.setOnMouseClicked(event -> resetNightCompression());
-        dialCircleCenterDot.setOnMouseEntered(event -> dialCircleCenterDot.setStyle(MATRIX_GLOW));
+        dialCircleCenterDot.setOnMouseEntered(event -> dialCircleCenterDot.setStyle(MATRIX_GLOW2));
         dialCircleCenterDot.setOnMouseExited(event -> dialCircleCenterDot.setStyle(""));
 
         matrixYear.setOnMouseEntered(event -> setMatrixGlow(matrixYear, MATRIX_GLOW));
@@ -496,40 +525,40 @@ public class Sundial {
 
         for(int i = 0; i < MAX_MARKER; i++) {
 
-            double lineLength = 5;
-            double strokeWidth = 0.5;
-            double opacity = 0.5;
+            double lineLength = MARKER_DIAL_LENGTH;
+            double strokeWidth = MARKER_STROKE_WIDTH;
+            double opacity = 0.50d;
 
-            if (i % 2 == 0) { lineLength = 7.5; }
-            if (i % 4 == 0) { lineLength = 10;  opacity = 1; }
-            if (i % 24 == 0) { lineLength = 90; strokeWidth = 0.65;  }
-            if (i % 48 == 0) { lineLength = 20; }
+            if (i % 2 == 0) { lineLength = MARKER_DIAL_LENGTH * 1.5d; }
+            if (i % 4 == 0) { lineLength = MARKER_DIAL_LENGTH * 2.0d;  opacity = 1; }
+            if (i % 24 == 0) { lineLength = DIAL_HEIGHT / 2 - 20.0d; strokeWidth *= 1.2d;  }
+            if (i % 48 == 0) { lineLength = MARKER_DIAL_LENGTH * 4.0d; }
 
             Group markerGroup = new Group();
 
             Rotate markerRotate = centerRotate.clone();
             markerRotate.setAngle(getNightCompressionAngle(i * 360d / 96d));
 
-            Line hourMarkerLine = new Line(CENTER_X, lineLength, CENTER_X, 0);
-            hourMarkerLine.setStroke(Color_Of_Darkness);
-            hourMarkerLine.setStrokeWidth(strokeWidth);
-            hourMarkerLine.setOpacity(opacity);
-//            hourMarkerLine.getTransforms().add(markerRotate);
-            markerGroup.getChildren().add(hourMarkerLine);
+            Line markerLine = new Line(CENTER_X, lineLength  + MARGIN_Y, CENTER_X, MARGIN_Y);
+            markerLine.setStroke(Color_Of_Darkness);
+            markerLine.setStrokeWidth(strokeWidth);
+            markerLine.setOpacity(opacity);
+//            markerLine.getTransforms().add(markerRotate);
+            markerGroup.getChildren().add(markerLine);
 
             if (i % 4 == 0) {
 
-                DotMatrix matrixHourMarker = new DotMatrix("" + ((12 + i / 4) % 24), Color_Of_Darkness);
-                matrixHourMarker.setTranslateX(CENTER_X - matrixHourMarker.getLayoutBounds().getWidth() / 2);
-                matrixHourMarker.setTranslateY(CENTER_Y - matrixHourMarker.getLayoutBounds().getHeight() / 2 - 107);
+                DotMatrix markerMatrix = new DotMatrix("" + ((12 + i / 4) % 24), Color_Of_Darkness);
+                markerMatrix.setTranslateX(CENTER_X - markerMatrix.getLayoutBounds().getWidth() / 2);
+                markerMatrix.setTranslateY(MATRIX_MARKER_OFFSET);
 
                 double rotationAdjust = i * -3.75d;
-                matrixHourMarker.setRotate(rotationAdjust);
-                matrixHourMarker.setScaleX(0.5d);
-                matrixHourMarker.setScaleY(0.5d);
-                markerGroup.getChildren().add(matrixHourMarker);
+                markerMatrix.setRotate(rotationAdjust);
+                markerMatrix.setScaleX(1.0d);
+                markerMatrix.setScaleY(1.0d);
+                markerGroup.getChildren().add(markerMatrix);
 
-                hourMarkerList.add(matrixHourMarker);
+                hourMarkerList.add(markerMatrix);
             }
 
             markerGroup.getTransforms().add(markerRotate);

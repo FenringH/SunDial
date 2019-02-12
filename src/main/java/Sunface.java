@@ -95,7 +95,7 @@ public class Sunface extends Application {
 
         // Controls
         Rectangle controlBox = new Rectangle(60, 20);
-        controlBox.setOpacity(0.1d);
+        controlBox.setOpacity(0.0d);
 
         controlCircleClose = new Circle(controlBox.getWidth() - 10, 10,6);
         controlCircleClose.setFill(Color.RED);
@@ -166,7 +166,7 @@ public class Sunface extends Application {
         controlCircleClose.setOnMouseClicked(event -> System.exit(0));
 
         sundial.getDialMarginFillBoxie().setOnMouseEntered(event -> sundial.getDialMarginFillBoxie().setFill(Sundial.Color_Of_SunTime));
-        sundial.getDialMarginFillBoxie().setOnMouseExited(event -> sundial.getDialMarginFillBoxie().setFill(Sundial.Color_Of_DaySky));
+        sundial.getDialMarginFillBoxie().setOnMouseExited(event -> sundial.getDialMarginFillBoxie().setFill(Sundial.Color_Of_AlmostVoid));
         sundial.getDialMarginFillBoxie().setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
         sundial.getDialMarginFillBoxie().setOnMouseDragged(event -> changeWindowSize(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
 
