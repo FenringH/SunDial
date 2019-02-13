@@ -93,6 +93,7 @@ public class Sundial {
 
     public static final Color Color_Of_DaySky    = new Color(0.50, 0.75, 1.00, 1.00);
     public static final Color Color_Of_NightSky  = new Color(0.50, 0.35, 1.00, 1.00);
+//    public static final Color Color_Of_NightSky  = new Color(0.50, 0.35, 1.00, 0.50);
     public static final Color Color_Of_Midnight  = new Color(0.00, 0.00, 0.00, 0.30);
 
     public static final Color Color_Of_SunTime   = new Color(1.00, 0.50, 0.00, 1.00);
@@ -197,6 +198,8 @@ public class Sundial {
     private DotMatrix matrixLongitude;
     private DotMatrix matrixLatitude;
 
+    private Globe globe;
+
 
     // Constructor
     public Sundial(Builder builder) {
@@ -300,6 +303,11 @@ public class Sundial {
         pathOfEarth.setFill(Color_Of_Earth);
 
         // Dials in a box
+        globe = new Globe(CENTER_X - MARGIN_X);
+        globe.setLayoutX(CENTER_X);
+        globe.setLayoutY(CENTER_Y);
+        globe.setVisible(false);
+
         dialMarginBox = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
         dialMarginBox.setTranslateX(0);
         dialMarginBox.setTranslateY(0);
@@ -584,11 +592,12 @@ public class Sundial {
         dialsGroup.getChildren().add(dialMarginCircle);
 //        dialsGroup.getChildren().add(dialBox);
         dialsGroup.getChildren().add(dialCircleBackground);
+        dialsGroup.getChildren().add(globe);
         dialsGroup.getChildren().add(dialArcNight);
         dialsGroup.getChildren().add(dialArcMidnight);
+        dialsGroup.getChildren().add(dialCircleFrame);
         dialsGroup.getChildren().add(dialArcDayLength);
         dialsGroup.getChildren().add(matrixDayLength);
-        dialsGroup.getChildren().add(dialCircleFrame);
 
         dialMarkerRotateList = new ArrayList<>();
         hourMarkerList = new ArrayList<>();
@@ -746,6 +755,14 @@ public class Sundial {
         return dialCircleFrame;
     }
 
+    public Arc getDialArcNight() {
+        return dialArcNight;
+    }
+
+    public Arc getDialArcMidnight() {
+        return dialArcMidnight;
+    }
+
     public DotMatrix getMatrixYear() {
         return matrixYear;
     }
@@ -800,6 +817,10 @@ public class Sundial {
 
     public DotMatrix getMatrixLatitude() {
         return matrixLatitude;
+    }
+
+    public Globe getGlobe() {
+        return globe;
     }
 
     // Setters

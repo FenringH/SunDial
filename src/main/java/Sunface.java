@@ -68,6 +68,8 @@ public class Sunface extends Application {
     private double mouseY;
     private int dX;
     private int dY;
+    private double savedLongitude = longitude;
+    private double savedLatitude = latitude;
 
     private Text startupInfoText;
     private Text sunTimeInfoText;
@@ -128,6 +130,7 @@ public class Sunface extends Application {
 
         Group dialsGroup = new Group();
         dialsGroup.getChildren().add(sundial.getDialsGroup());
+        sundial.getGlobe().rotateGlobe(longitude, latitude);
 
         Group controlsGroup = new Group();
         controlsGroup.getChildren().addAll(controlBox, controlCircleClose);
@@ -158,10 +161,22 @@ public class Sunface extends Application {
         Scale dialsScale = new Scale();
         dialsScale.setPivotX(dialsMinX);
         dialsScale.setPivotY(dialsMinY);
+
         dialsGroup.getTransforms().add(dialsScale);
 
         primaryStage.setTitle("SunDial");
         primaryStage.setScene(mainScene);
+
+
+        // Playtime
+        KeyFrame keyframeClockTick = new KeyFrame(
+                Duration.millis(fpsSetting),
+                event -> updateCurrentTime(suntime, sundial));
+
+        Timeline timeline = new Timeline(keyframeClockTick);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+
 
         // Events
         controlCircleClose.setOnMouseEntered(event -> controlCircleClose.setStyle(BUTTON_GLOW));
@@ -169,6 +184,31 @@ public class Sunface extends Application {
         controlCircleClose.setOnMousePressed(event -> controlCircleClose.setFill(Color.ORANGE));
         controlCircleClose.setOnMouseReleased(event -> controlCircleClose.setFill(Color.RED));
         controlCircleClose.setOnMouseClicked(event -> System.exit(0));
+
+//        globe.setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
+//        globe.setOnMouseDragged(event -> rotateGlobe(suntime, sundial, globe, event));
+
+        sundial.getMatrixLongitude().setOnMousePressed(event -> {
+            timeline.pause();
+            recordGlobePosition(sundial, sundial.getGlobe(), event);
+        });
+        sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, sundial.getGlobe(), event));
+        sundial.getMatrixLongitude().setOnMouseReleased(event -> {
+            releaseGlobePosition(sundial, sundial.getGlobe(), event);
+            timeline.play();
+            initCurrentTime(suntime, sundial);
+        });
+
+        sundial.getMatrixLatitude().setOnMousePressed(event -> {
+            timeline.pause();
+            recordGlobePosition(sundial, sundial.getGlobe(), event);
+        });
+        sundial.getMatrixLatitude().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, sundial.getGlobe(), event));
+        sundial.getMatrixLatitude().setOnMouseReleased(event -> {
+            releaseGlobePosition(sundial, sundial.getGlobe(), event);
+            timeline.play();
+            initCurrentTime(suntime, sundial);
+        });
 
         sundial.getDialResizeBoxie().setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
         sundial.getDialResizeBoxie().setOnMouseDragged(event -> changeWindowSize(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
@@ -201,21 +241,14 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
         sundial.getMatrixWeek().setOnMouseClicked(event -> resetTime(suntime, sundial));
 
-        sundial.getMatrixLongitude().setOnScroll(event -> updateLongitude(suntime, sundial, event));
-        sundial.getMatrixLongitude().setOnMouseClicked(event -> resetLongitude(suntime, sundial));
+//        sundial.getMatrixLongitude().setOnScroll(event -> updateLongitude(suntime, sundial, event));
+//        sundial.getMatrixLongitude().setOnMouseClicked(event -> resetLongitude(suntime, sundial));
+//
+//        sundial.getMatrixLatitude().setOnScroll(event -> updateLatitude(suntime, sundial, event));
+//        sundial.getMatrixLatitude().setOnMouseClicked(event -> resetLatitude(suntime, sundial));
 
-        sundial.getMatrixLatitude().setOnScroll(event -> updateLatitude(suntime, sundial, event));
-        sundial.getMatrixLatitude().setOnMouseClicked(event -> resetLatitude(suntime, sundial));
 
-        // Playtime
-        KeyFrame keyframeClockTick = new KeyFrame(
-                Duration.millis(fpsSetting),
-                event -> updateCurrentTime(suntime, sundial));
-
-        Timeline timeline = new Timeline(keyframeClockTick);
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-
+        // Show stage
         primaryStage.setMinWidth(MIN_WIDTH);
         primaryStage.setMinHeight(MIN_HEIGHT);
         primaryStage.initStyle(StageStyle.TRANSPARENT);
@@ -453,6 +486,54 @@ public class Sunface extends Application {
         if (winPositionX + winSizeX / 2 - mouseX > 0 && winPositionY + winSizeY / 2 - mouseY < 0) { dX = -1; dY = 1; }
         if (winPositionX + winSizeX / 2 - mouseX < 0 && winPositionY + winSizeY / 2 - mouseY < 0) { dX = 1; dY = 1; }
 
+    }
+
+    public void recordGlobePosition(Sundial sundial, Globe globe, MouseEvent event) {
+
+        mouseX = event.getScreenX();
+        mouseY = event.getScreenY();
+
+        savedLongitude = longitude;
+        savedLatitude = latitude;
+
+        sundial.getDialCircleCenterDot().setScaleX(0.2);
+        sundial.getDialCircleCenterDot().setScaleY(0.2);
+
+        sundial.getDialArcMidnight().setOpacity(0.35);
+        sundial.getDialArcNight().setOpacity(0.35);
+
+        globe.setVisible(true);
+    }
+
+    public void releaseGlobePosition(Sundial sundial, Globe globe, MouseEvent event) {
+
+        sundial.getDialCircleCenterDot().setScaleX(1);
+        sundial.getDialCircleCenterDot().setScaleY(1);
+
+        sundial.getDialArcMidnight().setOpacity(1);
+        sundial.getDialArcNight().setOpacity(1);
+
+        globe.setVisible(false);
+    }
+
+    private void rotateGlobe(Suntime suntime, Sundial sundial, Globe globe, MouseEvent event) {
+
+        double mouseScreenX = event.getScreenX();
+        double mouseScreenY = event.getScreenY();
+
+        double deltaLongitude = mouseX - mouseScreenX;
+        double deltaLatitude = mouseY - mouseScreenY;
+
+        longitude = savedLongitude + deltaLongitude / 3;
+        latitude = savedLatitude - deltaLatitude / 3;
+
+        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE; }
+        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE; }
+        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
+        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
+
+        globe.rotateGlobe(longitude, latitude);
+        initCurrentTime(suntime, sundial);
     }
 
     public void resetWindowSize(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
