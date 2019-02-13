@@ -199,6 +199,7 @@ public class Sundial {
     private DotMatrix matrixLatitude;
 
     private Globe globe;
+    private Group coordinatesGroup;
 
 
     // Constructor
@@ -525,16 +526,29 @@ public class Sundial {
         matrixLatitude.setLayoutX(CENTER_X - matrixLatitude.getLayoutBounds().getWidth() / 2);
         matrixLatitude.setLayoutY(CENTER_Y + matrixLatitude.getLayoutBounds().getHeight() + MATRIX_LATITUDE_OFFSET);
 
+        coordinatesGroup = new Group();
+        coordinatesGroup.getChildren().addAll(matrixLongitude, matrixLatitude);
 
-        setMatrixGlow(matrixYear, MATRIX_SHADOW);
-        setMatrixGlow(matrixMonth, MATRIX_SHADOW);
-        setMatrixGlow(matrixDay, MATRIX_SHADOW);
-        setMatrixGlow(matrixHour, MATRIX_SHADOW);
-        setMatrixGlow(matrixMinute, MATRIX_SHADOW);
-        setMatrixGlow(matrixSecond, MATRIX_SHADOW);
-        setMatrixGlow(matrixWeek, MATRIX_SHADOW);
-        setMatrixGlow(matrixLongitude, MATRIX_SHADOW);
-        setMatrixGlow(matrixLatitude, MATRIX_SHADOW);
+        Rectangle coordinatesBackdrop = new Rectangle(
+                coordinatesGroup.getLayoutBounds().getMinX(),
+                coordinatesGroup.getLayoutBounds().getMinY(),
+                coordinatesGroup.getLayoutBounds().getWidth(),
+                coordinatesGroup.getLayoutBounds().getHeight());
+
+        coordinatesBackdrop.setOpacity(0);
+
+        coordinatesGroup.getChildren().add(coordinatesBackdrop);
+
+        setGroupGlow(matrixYear, MATRIX_SHADOW);
+        setGroupGlow(matrixMonth, MATRIX_SHADOW);
+        setGroupGlow(matrixDay, MATRIX_SHADOW);
+        setGroupGlow(matrixHour, MATRIX_SHADOW);
+        setGroupGlow(matrixMinute, MATRIX_SHADOW);
+        setGroupGlow(matrixSecond, MATRIX_SHADOW);
+        setGroupGlow(matrixWeek, MATRIX_SHADOW);
+//        setGroupGlow(matrixLongitude, MATRIX_SHADOW);
+//        setGroupGlow(matrixLatitude, MATRIX_SHADOW);
+        setGroupGlow(coordinatesGroup, MATRIX_SHADOW);
 
         matrixSeparatorDayToMonth.setStyle(MATRIX_SHADOW);
         matrixSeparatorHourToMinute.setStyle(MATRIX_SHADOW);
@@ -554,32 +568,35 @@ public class Sundial {
         dialResetSizeBoxie.setOnMouseEntered(event -> dialResetSizeBoxie.setFill(Sundial.Color_Of_SunTime));
         dialResetSizeBoxie.setOnMouseExited(event -> dialResetSizeBoxie.setFill(Sundial.Color_Of_DaySky));
 
-        matrixYear.setOnMouseEntered(event -> setMatrixGlow(matrixYear, MATRIX_GLOW));
-        matrixYear.setOnMouseExited(event -> setMatrixGlow(matrixYear, MATRIX_SHADOW));
+        matrixYear.setOnMouseEntered(event -> setGroupGlow(matrixYear, MATRIX_GLOW));
+        matrixYear.setOnMouseExited(event -> setGroupGlow(matrixYear, MATRIX_SHADOW));
 
-        matrixMonth.setOnMouseEntered(event -> setMatrixGlow(matrixMonth, MATRIX_GLOW));
-        matrixMonth.setOnMouseExited(event -> setMatrixGlow(matrixMonth, MATRIX_SHADOW));
+        matrixMonth.setOnMouseEntered(event -> setGroupGlow(matrixMonth, MATRIX_GLOW));
+        matrixMonth.setOnMouseExited(event -> setGroupGlow(matrixMonth, MATRIX_SHADOW));
 
-        matrixDay.setOnMouseEntered(event -> setMatrixGlow(matrixDay, MATRIX_GLOW));
-        matrixDay.setOnMouseExited(event -> setMatrixGlow(matrixDay, MATRIX_SHADOW));
+        matrixDay.setOnMouseEntered(event -> setGroupGlow(matrixDay, MATRIX_GLOW));
+        matrixDay.setOnMouseExited(event -> setGroupGlow(matrixDay, MATRIX_SHADOW));
 
-        matrixHour.setOnMouseEntered(event -> setMatrixGlow(matrixHour, MATRIX_GLOW));
-        matrixHour.setOnMouseExited(event -> setMatrixGlow(matrixHour, MATRIX_SHADOW));
+        matrixHour.setOnMouseEntered(event -> setGroupGlow(matrixHour, MATRIX_GLOW));
+        matrixHour.setOnMouseExited(event -> setGroupGlow(matrixHour, MATRIX_SHADOW));
 
-        matrixMinute.setOnMouseEntered(event -> setMatrixGlow(matrixMinute, MATRIX_GLOW));
-        matrixMinute.setOnMouseExited(event -> setMatrixGlow(matrixMinute, MATRIX_SHADOW));
+        matrixMinute.setOnMouseEntered(event -> setGroupGlow(matrixMinute, MATRIX_GLOW));
+        matrixMinute.setOnMouseExited(event -> setGroupGlow(matrixMinute, MATRIX_SHADOW));
 
-        matrixSecond.setOnMouseEntered(event -> setMatrixGlow(matrixSecond, MATRIX_GLOW));
-        matrixSecond.setOnMouseExited(event -> setMatrixGlow(matrixSecond, MATRIX_SHADOW));
+        matrixSecond.setOnMouseEntered(event -> setGroupGlow(matrixSecond, MATRIX_GLOW));
+        matrixSecond.setOnMouseExited(event -> setGroupGlow(matrixSecond, MATRIX_SHADOW));
 
-        matrixWeek.setOnMouseEntered(event -> setMatrixGlow(matrixWeek, MATRIX_GLOW));
-        matrixWeek.setOnMouseExited(event -> setMatrixGlow(matrixWeek, MATRIX_SHADOW));
+        matrixWeek.setOnMouseEntered(event -> setGroupGlow(matrixWeek, MATRIX_GLOW));
+        matrixWeek.setOnMouseExited(event -> setGroupGlow(matrixWeek, MATRIX_SHADOW));
 
-        matrixLongitude.setOnMouseEntered(event -> setMatrixGlow(matrixLongitude, MATRIX_GLOW));
-        matrixLongitude.setOnMouseExited(event -> setMatrixGlow(matrixLongitude, MATRIX_SHADOW));
+//        matrixLongitude.setOnMouseEntered(event -> setGroupGlow(matrixLongitude, MATRIX_GLOW));
+//        matrixLongitude.setOnMouseExited(event -> setGroupGlow(matrixLongitude, MATRIX_SHADOW));
+//
+//        matrixLatitude.setOnMouseEntered(event -> setGroupGlow(matrixLatitude, MATRIX_GLOW));
+//        matrixLatitude.setOnMouseExited(event -> setGroupGlow(matrixLatitude, MATRIX_SHADOW));
 
-        matrixLatitude.setOnMouseEntered(event -> setMatrixGlow(matrixLatitude, MATRIX_GLOW));
-        matrixLatitude.setOnMouseExited(event -> setMatrixGlow(matrixLatitude, MATRIX_SHADOW));
+//        coordinatesGroup.setOnMouseEntered(event -> setGroupGlow(coordinatesGroup, MATRIX_GLOW));
+//        coordinatesGroup.setOnMouseExited(event -> setGroupGlow(coordinatesGroup, MATRIX_SHADOW));
 
 
         // Add layers
@@ -595,9 +612,9 @@ public class Sundial {
         dialsGroup.getChildren().add(globe);
         dialsGroup.getChildren().add(dialArcNight);
         dialsGroup.getChildren().add(dialArcMidnight);
-        dialsGroup.getChildren().add(dialCircleFrame);
         dialsGroup.getChildren().add(dialArcDayLength);
         dialsGroup.getChildren().add(matrixDayLength);
+        dialsGroup.getChildren().add(dialCircleFrame);
 
         dialMarkerRotateList = new ArrayList<>();
         hourMarkerList = new ArrayList<>();
@@ -655,8 +672,9 @@ public class Sundial {
         dialsGroup.getChildren().add(matrixTime);
         dialsGroup.getChildren().add(matrixDate);
         dialsGroup.getChildren().add(matrixWeek);
-        dialsGroup.getChildren().add(matrixLongitude);
-        dialsGroup.getChildren().add(matrixLatitude);
+        dialsGroup.getChildren().add(coordinatesGroup);
+//        dialsGroup.getChildren().add(matrixLongitude);
+//        dialsGroup.getChildren().add(matrixLatitude);
 
 
         // Apply scale
@@ -823,6 +841,10 @@ public class Sundial {
         return globe;
     }
 
+    public Group getCoordinatesGroup() {
+        return coordinatesGroup;
+    }
+
     // Setters
     public void setSunTime(GregorianCalendar sunTime) {
         this.sunTime = sunTime;
@@ -905,9 +927,30 @@ public class Sundial {
         }
     }
 
-    public void setMatrixGlow(DotMatrix matrix, String style) {
-        if (matrix == null || style == null) { return; }
-        matrix.setStyle(style);
+    public void setGroupGlow(Group group, String style) {
+        if (group == null || style == null) { return; }
+        group.setStyle(style);
+    }
+
+    public void setGlobeVisibility(boolean isVisible) {
+
+        if (isVisible) {
+            dialCircleCenterDot.setScaleX(0.2);
+            dialCircleCenterDot.setScaleY(0.2);
+
+            dialArcMidnight.setOpacity(0.35);
+            dialArcNight.setOpacity(0.35);
+
+            globe.setVisible(true);
+        } else {
+            dialCircleCenterDot.setScaleX(1);
+            dialCircleCenterDot.setScaleY(1);
+
+            dialArcMidnight.setOpacity(1);
+            dialArcNight.setOpacity(1);
+
+            globe.setVisible(false);
+        }
     }
 
 }

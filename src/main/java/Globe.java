@@ -12,7 +12,7 @@ import javafx.scene.transform.Rotate;
 
 public class Globe extends Group {
 
-    private static final int SPHERE_DIVISIONS = 360 / 10;
+    private static final int SPHERE_DIVISIONS = 256;
     private static final int NUMBER_OF_PARALLELS = 360 / 10;
     private static final int NUMBER_OF_MERIDIANS = 180 / 10;
 

@@ -188,26 +188,29 @@ public class Sunface extends Application {
 //        globe.setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
 //        globe.setOnMouseDragged(event -> rotateGlobe(suntime, sundial, globe, event));
 
-        sundial.getMatrixLongitude().setOnMousePressed(event -> {
-            timeline.pause();
+        sundial.getCoordinatesGroup().setOnMouseEntered(event -> {
+            sundial.setGroupGlow(sundial.getCoordinatesGroup(), Sundial.MATRIX_GLOW);
+        });
+        sundial.getCoordinatesGroup().setOnMousePressed(event ->  {
             recordGlobePosition(sundial, sundial.getGlobe(), event);
-        });
-        sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, sundial.getGlobe(), event));
-        sundial.getMatrixLongitude().setOnMouseReleased(event -> {
-            releaseGlobePosition(sundial, sundial.getGlobe(), event);
-            timeline.play();
-            initCurrentTime(suntime, sundial);
-        });
-
-        sundial.getMatrixLatitude().setOnMousePressed(event -> {
             timeline.pause();
-            recordGlobePosition(sundial, sundial.getGlobe(), event);
+            sundial.setGlobeVisibility(true);
         });
-        sundial.getMatrixLatitude().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, sundial.getGlobe(), event));
-        sundial.getMatrixLatitude().setOnMouseReleased(event -> {
-            releaseGlobePosition(sundial, sundial.getGlobe(), event);
+        sundial.getCoordinatesGroup().setOnMouseDragged(event -> {
+            sundial.setGroupGlow(sundial.getCoordinatesGroup(), Sundial.MATRIX_GLOW);
+            rotateGlobe(suntime, sundial, sundial.getGlobe(), event);
+        });
+        sundial.getCoordinatesGroup().setOnMouseReleased(event -> {
+            sundial.setGroupGlow(sundial.getCoordinatesGroup(), Sundial.MATRIX_SHADOW);
+            sundial.setGlobeVisibility(false);
             timeline.play();
-            initCurrentTime(suntime, sundial);
+        });
+        sundial.getCoordinatesGroup().setOnMouseExited(event -> {
+            if (event.isPrimaryButtonDown()) {
+                sundial.setGroupGlow(sundial.getCoordinatesGroup(), Sundial.MATRIX_GLOW);
+            } else {
+                sundial.setGroupGlow(sundial.getCoordinatesGroup(), Sundial.MATRIX_SHADOW);
+            }
         });
 
         sundial.getDialResizeBoxie().setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
@@ -495,25 +498,6 @@ public class Sunface extends Application {
 
         savedLongitude = longitude;
         savedLatitude = latitude;
-
-        sundial.getDialCircleCenterDot().setScaleX(0.2);
-        sundial.getDialCircleCenterDot().setScaleY(0.2);
-
-        sundial.getDialArcMidnight().setOpacity(0.35);
-        sundial.getDialArcNight().setOpacity(0.35);
-
-        globe.setVisible(true);
-    }
-
-    public void releaseGlobePosition(Sundial sundial, Globe globe, MouseEvent event) {
-
-        sundial.getDialCircleCenterDot().setScaleX(1);
-        sundial.getDialCircleCenterDot().setScaleY(1);
-
-        sundial.getDialArcMidnight().setOpacity(1);
-        sundial.getDialArcNight().setOpacity(1);
-
-        globe.setVisible(false);
     }
 
     private void rotateGlobe(Suntime suntime, Sundial sundial, Globe globe, MouseEvent event) {
