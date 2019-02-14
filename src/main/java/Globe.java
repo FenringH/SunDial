@@ -23,7 +23,7 @@ public class Globe extends Group {
     public static final Color Color_Of_Light        = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Transparency = new Color(1.00, 1.00, 1.00, 0.50);
 
-    private static final String DIFFUSE_MAP = "maps/patterson-political-v3-big.png";
+    private static final String DIFFUSE_MAP = "maps/earth_diffuse_gall-peters_02.jpg";
 
     private double longitude = 0;
     private double latitude = 0;
@@ -54,10 +54,10 @@ public class Globe extends Group {
 
         Sphere sphere = new Sphere(radius, SPHERE_DIVISIONS);
 //        sphere.setDrawMode(DrawMode.LINE);
-//        sphere.setCullFace(CullFace.BACK);
+//        sphere.setCullFace(CullFace.NONE);
 
         PhongMaterial earthMaterial = new PhongMaterial();
-        Image earthDiffuseMap = new Image(DIFFUSE_MAP, 1003, 617, true, false);
+        Image earthDiffuseMap = new Image(DIFFUSE_MAP, 1003, 639, true, false);
         earthMaterial.setDiffuseMap(earthDiffuseMap);
 //        earthMaterial.setDiffuseColor(Color_Of_Transparency);
         sphere.setMaterial(earthMaterial);

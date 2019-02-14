@@ -3,9 +3,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Scene;
+import javafx.scene.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
@@ -13,7 +11,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -50,8 +50,6 @@ public class Sunface extends Application {
     private static final Font Font_Of_Info = new Font("Lucida Console", 14);
 
     private static final DecimalFormat julianDateFormat = new DecimalFormat("###,###,###.00000000");
-    private static final DecimalFormat longitudeFormat = new DecimalFormat("+000.00;-000.00");
-    private static final DecimalFormat latitudeFormat  = new DecimalFormat("+ 00.00;- 00.00");
 
     private int fpsSetting = (int) floor(1000 / DEFAULT_FPS);
 
@@ -185,8 +183,7 @@ public class Sunface extends Application {
         controlCircleClose.setOnMouseReleased(event -> controlCircleClose.setFill(Color.RED));
         controlCircleClose.setOnMouseClicked(event -> System.exit(0));
 
-//        globe.setOnMousePressed(event -> recordWindowPosition(primaryStage, event));
-//        globe.setOnMouseDragged(event -> rotateGlobe(suntime, sundial, globe, event));
+//        sundial.getCoordinatesGroup().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, timeline));
 
         sundial.getCoordinatesGroup().setOnMouseEntered(event -> {
             sundial.setGroupGlow(sundial.getCoordinatesGroup(), Sundial.MATRIX_GLOW);
@@ -244,12 +241,9 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
         sundial.getMatrixWeek().setOnMouseClicked(event -> resetTime(suntime, sundial));
 
-//        sundial.getMatrixLongitude().setOnScroll(event -> updateLongitude(suntime, sundial, event));
-//        sundial.getMatrixLongitude().setOnMouseClicked(event -> resetLongitude(suntime, sundial));
-//
-//        sundial.getMatrixLatitude().setOnScroll(event -> updateLatitude(suntime, sundial, event));
-//        sundial.getMatrixLatitude().setOnMouseClicked(event -> resetLatitude(suntime, sundial));
-
+        mainScene.setOnMouseMoved(event -> {
+            dialsGroup.setOpacity(1);
+        });
 
         // Show stage
         primaryStage.setMinWidth(MIN_WIDTH);
@@ -260,54 +254,6 @@ public class Sunface extends Application {
     }
 
     // Methods
-    private void resetLongitude(Suntime suntime, Sundial sundial) {
-        longitude = customLongitude;
-        initCurrentTime(suntime, sundial);
-    }
-
-    private void resetLatitude(Suntime suntime, Sundial sundial) {
-        latitude = customLatitude;
-        initCurrentTime(suntime, sundial);
-    }
-
-    private void updateLongitude(Suntime suntime, Sundial sundial, ScrollEvent event) {
-
-        int offsetFactor = 0;
-        double step = 1;
-
-        if (event.isControlDown()) { step = 10d; }
-        if (event.isAltDown()) { step = 0.1d; }
-
-        if (event.getDeltaY() < 0) { offsetFactor = -1; }
-        else if (event.getDeltaY() > 0) { offsetFactor = 1; }
-
-        longitude += offsetFactor * step;
-
-        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE; }
-        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE; }
-
-        initCurrentTime(suntime, sundial);
-    }
-
-    private void updateLatitude(Suntime suntime, Sundial sundial, ScrollEvent event) {
-
-        int offsetFactor = 0;
-        double step = 1;
-
-        if (event.isControlDown()) { step = 10d; }
-        if (event.isAltDown()) { step = 0.1d; }
-
-        if (event.getDeltaY() < 0) { offsetFactor = -1; }
-        else if (event.getDeltaY() > 0) { offsetFactor = 1; }
-
-        latitude += offsetFactor * step;
-
-        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
-        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
-
-        initCurrentTime(suntime, sundial);
-    }
-
     private void resetTime(Suntime suntime, Sundial sundial) {
         timeOffset = 0;
         sundial.setDialFrameWarning(false);
@@ -447,6 +393,7 @@ public class Sunface extends Application {
             double highNoonJulianDate = suntime.getHighnoonJulianDate();
             double sunriseJulianDate = suntime.getSunriseJulianDate();
             double sunsetJulianDate = suntime.getSunsetJulianDate();
+
             double dayLength = sunsetJulianDate - sunriseJulianDate;
 
             GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
@@ -455,9 +402,7 @@ public class Sunface extends Application {
 
             sundial.setHighNoon(highNoonDate);
             sundial.setHorizon(sunriseDate, sunsetDate);
-            sundial.getMatrixDayLength().setString(Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength)).replace(" ", ""));
-            sundial.getMatrixLongitude().setString(longitudeFormat.format(longitude).replace(",", "."));
-            sundial.getMatrixLatitude().setString(latitudeFormat.format(latitude).replace(",", "."));
+            sundial.setCoordinates(longitude, latitude);
 
             String calculatedInformation =
                     "High Noon  : " + highNoonDate.getTime().toString()
@@ -470,7 +415,7 @@ public class Sunface extends Application {
         }
     }
 
-    public void recordWindowPosition(Stage stage, MouseEvent event) {
+    private void recordWindowPosition(Stage stage, MouseEvent event) {
 
         double winPositionX = stage.getX();
         double winPositionY = stage.getY();
@@ -491,7 +436,7 @@ public class Sunface extends Application {
 
     }
 
-    public void recordGlobePosition(Sundial sundial, Globe globe, MouseEvent event) {
+    private void recordGlobePosition(Sundial sundial, Globe globe, MouseEvent event) {
 
         mouseX = event.getScreenX();
         mouseY = event.getScreenY();
@@ -508,8 +453,17 @@ public class Sunface extends Application {
         double deltaLongitude = mouseX - mouseScreenX;
         double deltaLatitude = mouseY - mouseScreenY;
 
-        longitude = savedLongitude + deltaLongitude / 3;
-        latitude = savedLatitude - deltaLatitude / 3;
+        mouseX = mouseScreenX;
+        mouseY = mouseScreenY;
+
+        double precision = 4;
+        if (event.isShiftDown()) { precision = 100; }
+
+        double step = 0.25d;
+        if (event.isShiftDown()) { step = 0.01d; }
+
+        longitude += deltaLongitude / precision;
+        latitude -= deltaLatitude / precision;
 
         if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE; }
         if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE; }
@@ -520,7 +474,7 @@ public class Sunface extends Application {
         initCurrentTime(suntime, sundial);
     }
 
-    public void resetWindowSize(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
+    private void resetWindowSize(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
 
         stage.setWidth(Sundial.DIAL_WIDTH);
         stage.setHeight(Sundial.DIAL_HEIGHT);
@@ -531,7 +485,7 @@ public class Sunface extends Application {
         controlsGroup.setLayoutX(Sundial.DIAL_WIDTH - controlsGroup.getLayoutBounds().getWidth());
     }
 
-    public void changeWindowSize(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
+    private void changeWindowSize(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
 
         double winPositionX = stage.getX();
         double winPositionY = stage.getY();
@@ -609,7 +563,7 @@ public class Sunface extends Application {
 
     }
 
-    public void changeWindowPosition(Stage stage, MouseEvent event) {
+    private void changeWindowPosition(Stage stage, MouseEvent event) {
 
         double winSizeX = stage.getWidth();
         double winSizeY = stage.getHeight();
@@ -647,4 +601,16 @@ public class Sunface extends Application {
         stage.setY(newPositionY);
     }
 
+    private void toggleGlobe(Stage stage, Suntime suntime, Sundial sundial, Timeline timeline) {
+        sundial.toggleGlobe();
+        if (sundial.globeVisible) {
+            timeline.pause();
+            sundial.getDialCircleFrame().setOnMousePressed(event -> recordGlobePosition(sundial, sundial.getGlobe(), event));
+            sundial.getDialCircleFrame().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, sundial.getGlobe(), event));
+        } else {
+            timeline.play();
+            sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(stage, event));
+            sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(stage, event));
+        }
+    }
 }
