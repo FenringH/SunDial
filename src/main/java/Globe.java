@@ -1,3 +1,4 @@
+import javafx.animation.RotateTransition;
 import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
@@ -9,6 +10,7 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
+import javafx.util.Duration;
 
 public class Globe extends Group {
 
