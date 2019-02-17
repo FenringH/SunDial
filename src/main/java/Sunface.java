@@ -54,6 +54,7 @@ public class Sunface extends Application {
     private int fpsSetting = (int) floor(1000 / DEFAULT_FPS);
 
     private GregorianCalendar currentLocalTime;
+    private GregorianCalendar offsetLocalTime;
     private long timeOffset;
     private double longitude = DEFAULT_LONGITUDE;
     private double latitude = DEFAULT_LATITUDE;
@@ -105,15 +106,16 @@ public class Sunface extends Application {
         calculatedInfoText.setLayoutY(540d);
 
         // Controls
-        Rectangle controlBox = new Rectangle(60, 20);
+        Rectangle controlBox = new Rectangle(60, 30);
         controlBox.setOpacity(0.0d);
 
-        controlCircleClose = new Circle(controlBox.getWidth() - 10, 10,6);
+        controlCircleClose = new Circle(controlBox.getWidth() - 15, controlBox.getWidth() / 2,10);
         controlCircleClose.setFill(Color.RED);
 //        controlCircleClose.setStyle(BUTTON_SHADOW);
 
         // Sun objects
         currentLocalTime = new GregorianCalendar();
+        offsetLocalTime = new GregorianCalendar();
         timeOffset = 0;
 
         Suntime suntime = new Suntime.Builder()
@@ -183,9 +185,9 @@ public class Sunface extends Application {
 
 
         // Events
-        controlCircleClose.setOnMouseEntered(event -> controlCircleClose.setStyle(BUTTON_GLOW));
-        controlCircleClose.setOnMouseExited(event -> controlCircleClose.setStyle(""));
-        controlCircleClose.setOnMousePressed(event -> controlCircleClose.setFill(Color.ORANGE));
+        controlCircleClose.setOnMouseEntered(event -> { controlCircleClose.setStyle(BUTTON_GLOW); controlCircleClose.setFill(Color.ORANGE); });
+        controlCircleClose.setOnMouseExited(event -> { controlCircleClose.setStyle(""); controlCircleClose.setFill(Color.RED); });
+        controlCircleClose.setOnMousePressed(event -> controlCircleClose.setFill(Color.YELLOW));
         controlCircleClose.setOnMouseReleased(event -> controlCircleClose.setFill(Color.RED));
         controlCircleClose.setOnMouseClicked(event -> System.exit(0));
 
@@ -255,6 +257,14 @@ public class Sunface extends Application {
     // Methods
     private void resetTime(Suntime suntime, Sundial sundial) {
         timeOffset = 0;
+        offsetLocalTime.set(
+                currentLocalTime.get(Calendar.YEAR),
+                currentLocalTime.get(Calendar.MONTH),
+                currentLocalTime.get(Calendar.DAY_OF_MONTH),
+                currentLocalTime.get(Calendar.HOUR_OF_DAY),
+                currentLocalTime.get(Calendar.MINUTE),
+                currentLocalTime.get(Calendar.SECOND)
+        );
         sundial.setDialFrameWarning(false);
         initCurrentTime(suntime, sundial);
     }
@@ -286,21 +296,19 @@ public class Sunface extends Application {
             default: {}
         }
 
-        GregorianCalendar offsetCalendar = new GregorianCalendar();
-        offsetCalendar.set(
-                currentLocalTime.get(Calendar.YEAR) + offsetYear,
-                currentLocalTime.get(Calendar.MONTH) + offsetMonth,
-                currentLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
-                currentLocalTime.get(Calendar.HOUR_OF_DAY) + offsetHour,
-                currentLocalTime.get(Calendar.MINUTE) + offsetMinute,
-                currentLocalTime.get(Calendar.SECOND) + offsetSecond
+        offsetLocalTime.set(
+                offsetLocalTime.get(Calendar.YEAR) + offsetYear,
+                offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
+                offsetLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
+                offsetLocalTime.get(Calendar.HOUR_OF_DAY) + offsetHour,
+                offsetLocalTime.get(Calendar.MINUTE) + offsetMinute,
+                offsetLocalTime.get(Calendar.SECOND) + offsetSecond
         );
 
-        timeOffset += (currentLocalTime.getTimeInMillis() - offsetCalendar.getTimeInMillis());
-        timeOffset += (offsetWeek * (7 * 24 * 60 * 60 * 1000));
+        offsetLocalTime.setTimeInMillis(offsetLocalTime.getTimeInMillis() + offsetWeek * 7 * 24 * 60 * 60 * 1000);
 
-        if (timeOffset != 0) { sundial.setDialFrameWarning(true); }
-        else { sundial.setDialFrameWarning(false); }
+        if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
+        else { sundial.setDialFrameWarning(true); }
 
         initCurrentTime(suntime, sundial);
     }
@@ -327,12 +335,15 @@ public class Sunface extends Application {
         double stepSize = NORMAL_STEP_SIZE;
         if (event.isSecondaryButtonDown()) { stepSize = FAST_STEP_SIZE; }
 
-        double threshold = abs(deltaMouseY % stepSize) - (stepSize - 2);
-        if (threshold > 1) {
-            if (deltaMouseY > 0) { offsetFactor = 1; }
+        if (deltaMouseY >= stepSize) {
+            offsetFactor = -1;
+            savedMouseY = mouseY;
+        } else if (deltaMouseY <= -1 * stepSize) {
+            offsetFactor = 1;
+            savedMouseY = mouseY;
+        } else {
+            return;
         }
-
-//        offsetFactor = (int) floor(deltaMouseY / stepSize);
 
         switch (offsetType) {
             case OFFSET_BY_YEAR   : offsetYear = offsetFactor; break;
@@ -345,21 +356,19 @@ public class Sunface extends Application {
             default: {}
         }
 
-        GregorianCalendar offsetCalendar = new GregorianCalendar();
-        offsetCalendar.set(
-                currentLocalTime.get(Calendar.YEAR) + offsetYear,
-                currentLocalTime.get(Calendar.MONTH) + offsetMonth,
-                currentLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
-                currentLocalTime.get(Calendar.HOUR_OF_DAY) + offsetHour,
-                currentLocalTime.get(Calendar.MINUTE) + offsetMinute,
-                currentLocalTime.get(Calendar.SECOND) + offsetSecond
+        offsetLocalTime.set(
+                offsetLocalTime.get(Calendar.YEAR) + offsetYear,
+                offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
+                offsetLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
+                offsetLocalTime.get(Calendar.HOUR_OF_DAY) + offsetHour,
+                offsetLocalTime.get(Calendar.MINUTE) + offsetMinute,
+                offsetLocalTime.get(Calendar.SECOND) + offsetSecond
         );
 
-        timeOffset += currentLocalTime.getTimeInMillis() - offsetCalendar.getTimeInMillis();
-        timeOffset += offsetWeek * 7 * 24 * 60 * 60 * 1000;
+        offsetLocalTime.setTimeInMillis(offsetLocalTime.getTimeInMillis() + offsetWeek * 7 * 24 * 60 * 60 * 1000);
 
-        if (timeOffset != 0) { sundial.setDialFrameWarning(true); }
-        else { sundial.setDialFrameWarning(false); }
+        if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
+        else { sundial.setDialFrameWarning(true); }
 
         initCurrentTime(suntime, sundial);
     }
@@ -374,21 +383,17 @@ public class Sunface extends Application {
 
     private void updateCurrentTime(Suntime suntime, Sundial sundial, boolean initialize) {
 
-        if (suntime == null || sundial == null) { return; }
-
         GregorianCalendar newLocalTime = new GregorianCalendar();
 
-        long timeInSeconds = newLocalTime.getTimeInMillis() / 1000;
-        long savedTimeInSeconds = currentLocalTime.getTimeInMillis() / 1000;
+        long newTimeInSeconds = newLocalTime.getTimeInMillis() / 1000;
+        long currentTimeInSeconds = currentLocalTime.getTimeInMillis() / 1000;
 
-//        if (timeInSeconds == savedTimeInSeconds) { return; }
+        if (newTimeInSeconds == currentTimeInSeconds && !initialize) { return; }
 
-        // Update current local time
+        // Update current and offset local time
+        long offsetSeconds = (offsetLocalTime.getTimeInMillis() - currentLocalTime.getTimeInMillis()) / 1000;
         currentLocalTime = newLocalTime;
-
-        // Create offset local time
-        GregorianCalendar offsetLocalTime = new GregorianCalendar();
-        offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + timeOffset);
+        offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + offsetSeconds * 1000);
 
         // Store current Julian Day Number before updating current time
         long oldJulianDayNumber = Suntime.getJulianDayNumber(offsetLocalTime);
@@ -503,8 +508,8 @@ public class Sunface extends Application {
         longitude += deltaLongitude / precision;
         latitude -= deltaLatitude / precision;
 
-        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE; }
-        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE; }
+        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
+        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
