@@ -1,16 +1,10 @@
-import javafx.animation.RotateTransition;
-import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.CullFace;
-import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
-import javafx.util.Duration;
 
 public class Globe extends Group {
 
@@ -25,7 +19,8 @@ public class Globe extends Group {
     public static final Color Color_Of_Light        = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Transparency = new Color(1.00, 1.00, 1.00, 0.50);
 
-    private static final String DIFFUSE_MAP = "maps/earth_diffuse_gall-peters_02.jpg";
+    private static final String DEFAULT_DIFFUSE_MAP = "maps/earth_diffuse_gall-peters_02.jpg";
+    private static final Image DEFAULT_DIFFUSE_IMAGE = new Image(DEFAULT_DIFFUSE_MAP, 1003, 639, true, false);
 
     private double longitude = 0;
     private double latitude = 0;
@@ -36,15 +31,16 @@ public class Globe extends Group {
     private Rotate rotateLatitude;
 
     public Globe(double radius) {
-
-        super();
-
-        this.globe = new Group();
-
-        getChildren().add(getGlobe(radius));
+        this(DEFAULT_DIFFUSE_IMAGE, radius);
     }
 
-    private Group getGlobe(double radius) {
+    public Globe(Image diffuseMap, double radius) {
+        super();
+        this.globe = new Group();
+        getChildren().add(getGlobe(diffuseMap, radius));
+    }
+
+    private Group getGlobe(Image diffuseMap, double radius) {
 
         this.globe = new Group();
 
@@ -59,8 +55,7 @@ public class Globe extends Group {
 //        sphere.setCullFace(CullFace.NONE);
 
         PhongMaterial earthMaterial = new PhongMaterial();
-        Image earthDiffuseMap = new Image(DIFFUSE_MAP, 1003, 639, true, false);
-        earthMaterial.setDiffuseMap(earthDiffuseMap);
+        earthMaterial.setDiffuseMap(diffuseMap);
 //        earthMaterial.setDiffuseColor(Color_Of_Transparency);
         sphere.setMaterial(earthMaterial);
         sphere.getTransforms().add(this.rotateLongitude);
@@ -72,22 +67,6 @@ public class Globe extends Group {
         AmbientLight ambientLight = new AmbientLight(Color_Of_Light);
 
         this.globe.getChildren().addAll(sphereHolder, ambientLight);
-
-/*
-        for (int i = 0; i < NUMBER_OF_PARALLELS; i++) {
-            Circle parallel = new Circle(0, 0, radius);
-            Rotate parallelRotate = new Rotate();
-            parallelRotate.setPivotX(0);
-            parallelRotate.setPivotY(0);
-            parallelRotate.setAxis(Rotate.Y_AXIS);
-            parallel.getTransforms().add(parallelRotate);
-            parallelRotate.setAngle(i * 360 / NUMBER_OF_PARALLELS);
-            parallel.setFill(Color_Of_Void);
-            parallel.setStroke(Color_Of_Light);
-            this.globe.getChildren().add(parallel);
-        }
-*/
-
 
         return globe;
     }
