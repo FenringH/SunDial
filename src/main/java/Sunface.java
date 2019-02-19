@@ -216,8 +216,6 @@ public class Sunface extends Application {
         sundial.getDialResizeBoxie().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getDialResizeBoxie().setOnMouseDragged(event -> resizeWindow(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
 
-        sundial.getDialResetSizeBoxie().setOnMouseClicked(event -> resetWindowSize(primaryStage, dialsGroup, controlsGroup, dialsScale));
-
         sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
         sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
@@ -655,6 +653,9 @@ public class Sunface extends Application {
     }
 
     private void resizeWindow(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
+
+        MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
+        if (mouseButton == null || mouseButton.equals(MouseButton.MIDDLE)) { return; }
 
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();
