@@ -4,9 +4,11 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
+import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -30,6 +32,23 @@ import java.util.GregorianCalendar;
 import static java.lang.Math.*;
 
 public class Sunface extends Application {
+
+    private final static String A_BEGINNING =
+            "A beginning is a very delicate time." +
+            "Know then, that is is the year 10191. The known universe is ruled by the Padishah Emperor Shaddam the Fourth, my father. " +
+            "In this time, the most precious substance in the universe is the spice Melange. " +
+            "The spice extends life. The spice expands consciousness. " +
+            "A product of the Spice, the red Sapho juice, stains the lips of the Mentats but allows them to be human computers, " +
+            "as thinking machines have been outlawed. The spice is vital to space travel. " +
+            "The Spacing Guild and its navigators, who the spice has mutated over 4000 years, use the orange spice gas, " +
+            "which gives them the ability to fold space. That is, travel to any part of the universe without moving. " +
+            "Because the Guild controls all interplanetary travel, they are the highest power in the Universe. " +
+            "The Spice also plays a very secret role in the Bene Gesserit sisterhood, of which I am a part. " +
+            "The sisterhood has been interfering with the marriages, and the children thereof, " +
+            "of the great Houses of the Universe, cleverly intermixing one bloodline with another to form the Kwisatz Haderach, a super being. " +
+            "They plan to control this super being and use his powers for their own selfish purposes. " +
+            "The breeding plan has been carried out in a strict manner for 90 generations. " +
+            "The goal of the super being is in sight.";
 
     private static final double DEFAULT_FPS = 30.0;
     private static final double DEFAULT_LONGITUDE = round(Suntime.DEFAULT_LONGITUDE * 100d) / 100d;
@@ -86,10 +105,14 @@ public class Sunface extends Application {
     private Text startupInfoText;
     private Text sunTimeInfoText;
     private Text calculatedInfoText;
+    private TextArea debugTextArea;
 
     private Circle controlCircleClose;
 
     private Sunchart sunchart;
+
+    private Stage debugWindow;
+    private Stage statsWindow;
 
     private ArrayList<MouseButton> mouseButtonList = new ArrayList<>();
 
@@ -144,7 +167,7 @@ public class Sunface extends Application {
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
 
-        initCurrentTime(suntime, sundial);
+        debugTextArea = new TextArea();
 
         // Scene
         Group rootGroup = new Group();
@@ -190,8 +213,46 @@ public class Sunface extends Application {
 
         dialsGroup.getTransforms().add(dialsScale);
 
+        // Debug window
+        debugTextArea.setMinWidth(600);
+        debugTextArea.setMinHeight(400);
+        debugTextArea.setEditable(false);
+        debugTextArea.setWrapText(true);
+        debugTextArea.setText(A_BEGINNING);
+
+        Group debugGroup = new Group();
+        debugGroup.getChildren().add(debugTextArea);
+
+        Scene debugScene = new Scene(debugGroup, debugGroup.getLayoutBounds().getWidth(), debugGroup.getLayoutBounds().getHeight());
+
+        debugWindow = new Stage();
+        debugWindow.setTitle("Debug window");
+        debugWindow.setScene(debugScene);
+        debugWindow.setWidth(debugScene.getWidth());
+        debugWindow.setHeight(debugScene.getHeight());
+        debugWindow.setX(0);
+        debugWindow.setY(0);
+        debugWindow.setResizable(false);
+        debugWindow.show();
+
+        // Chart window
+        LineChart lineChart = sunchart.getChart();
+        Scene chartScene = new Scene(lineChart, 800, 600);
+
+        statsWindow = new Stage();
+        statsWindow.setTitle("Sunchart");
+        statsWindow.setScene(chartScene);
+        statsWindow.setX(0);
+        statsWindow.setY(0);
+        statsWindow.setWidth(chartScene.getWidth());
+        statsWindow.setHeight(chartScene.getHeight());
+
+        // Primary window
         primaryStage.setTitle("Sunface");
         primaryStage.setScene(mainScene);
+        primaryStage.setMinWidth(MIN_WIDTH);
+        primaryStage.setMinHeight(MIN_HEIGHT);
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
 
 
         // Playtime
@@ -201,7 +262,6 @@ public class Sunface extends Application {
 
         Timeline timeline = new Timeline(keyframeClockTick);
         timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
 
 
         // Events
@@ -264,28 +324,18 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
 
+        sundial.getHorizonGroup().setOnMouseClicked(event -> {
+            if (statsWindow.isShowing()) { statsWindow.close(); }
+            else { statsWindow.show(); }
+        });
+
         primaryStage.setOnHidden(event -> timeline.pause());
         primaryStage.setOnShown(event -> timeline.play());
 
-        // Chart window
-        LineChart lineChart = sunchart.getChart();
-        Scene chartScene = new Scene(lineChart, 800, 600);
-
-        Stage statsWindow = new Stage();
-        statsWindow.setTitle("Sunchart");
-        statsWindow.setScene(chartScene);
-        statsWindow.setX(0);
-        statsWindow.setY(0);
-        statsWindow.setWidth(chartScene.getWidth());
-        statsWindow.setHeight(chartScene.getHeight());
-        statsWindow.show();
-
-        // Show stage
-        primaryStage.setMinWidth(MIN_WIDTH);
-        primaryStage.setMinHeight(MIN_HEIGHT);
-        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        // Showtime
+        initCurrentTime(suntime, sundial);
         primaryStage.show();
-
+        timeline.play();
         recordWindowPosition(primaryStage, dialsGroup, controlsGroup, dialsScale, null);
 
     }
@@ -557,9 +607,32 @@ public class Sunface extends Application {
                 ;
 
             calculatedInfoText.setText(calculatedInformation);
-            sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
-        }
 
+            // update stats
+            if (statsWindow.isShowing()) {
+                sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
+            }
+
+            // debug info
+            if (debugWindow.isShowing()) {
+                double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntime.getDeclinationOfTheSun()));
+                double divisor = cos(toRadians(latitude)) * cos(toRadians(suntime.getDeclinationOfTheSun()));
+
+                String debugText = ""
+                        + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
+                        + "equationOfCenter = " + suntime.getEquationOfCenter() + "\n"
+                        + "eclipticalLongitude = " + suntime.getEclipticalLongitude() + "\n"
+                        + "rightAscension = " + suntime.getRightAscension() + "\n"
+                        + "declinationOfTheSun = " + suntime.getDeclinationOfTheSun() + "\n"
+                        + "siderealTime = " + suntime.getSiderealTime() + "\n"
+                        + "hourAngle = " + suntime.getHourAngle() + "\n"
+                        + "solarTransit = " + suntime.getSolarTransit() + "\n"
+                        + "localHourAngle = " + suntime.getLocalHourAngle() + "\n"
+                        + "localHourAngle dividend = " + dividend + "\n"
+                        + "localHourAngle divisor = " + divisor + "\n" ;
+                debugTextArea.setText(debugText);
+            }
+        }
     }
 
     private void resetGlobePosition(Suntime suntime, Sundial sundial) {
@@ -739,8 +812,18 @@ public class Sunface extends Application {
     private void toggleMaximizeWindow(Stage stage, Scale dialsScale, MouseEvent event) {
 
         double maxWidth, maxHeight;
+        double screenWidth, screenHeight;
+        Rectangle2D currentScreen;
 
         Rectangle2D recCenterOfPointer = new Rectangle2D(stage.getX() + stage.getWidth() / 2, stage.getY() + stage.getHeight() / 2, 0, 0);
+        if (Screen.getScreensForRectangle(recCenterOfPointer).size() > 0) {
+            currentScreen = Screen.getScreensForRectangle(recCenterOfPointer).get(0).getVisualBounds();
+        } else {
+            return;
+        }
+
+        screenWidth = currentScreen.getMaxX() - currentScreen.getMinX();
+        screenHeight = currentScreen.getMaxY() - currentScreen.getMinY();
 
         if (maximizedEh) {
 
@@ -753,29 +836,22 @@ public class Sunface extends Application {
             maximizedEh = false;
 
         } else {
-            if (Screen.getScreensForRectangle(recCenterOfPointer).size() > 0) {
+            savedWindowPositionX = stage.getX();
+            savedWindowPositionY = stage.getY();
 
-                savedWindowPositionX = stage.getX();
-                savedWindowPositionY = stage.getY();
+            savedWindowSizeX = stage.getWidth();
+            savedWindowSizeY = stage.getHeight();
 
-                savedWindowSizeX = stage.getWidth();
-                savedWindowSizeY = stage.getHeight();
+            maxWidth = min(screenWidth, screenHeight);
+            maxHeight = min(screenWidth, screenHeight);
 
-                Rectangle2D currentScreen = Screen.getScreensForRectangle(recCenterOfPointer).get(0).getVisualBounds();
-                maxWidth = currentScreen.getMaxX() - currentScreen.getMinX();
-                maxHeight = currentScreen.getMaxY() - currentScreen.getMinY();
+            stage.setX(currentScreen.getMaxX() - screenWidth / 2 - maxWidth / 2);
+            stage.setY(currentScreen.getMaxY() - screenHeight / 2 - maxHeight / 2);
 
-                if (maxWidth >= maxHeight) { maxWidth = maxHeight; }
-                else { maxHeight = maxWidth;}
+            stage.setWidth(maxWidth);
+            stage.setHeight(maxHeight);
 
-                stage.setX(currentScreen.getMinX());
-                stage.setY(currentScreen.getMinY());
-
-                stage.setWidth(maxWidth);
-                stage.setHeight(maxHeight);
-
-                maximizedEh = true;
-            }
+            maximizedEh = true;
         }
 
         dialsScale.setX(stage.getWidth() / Sundial.DIAL_WIDTH);

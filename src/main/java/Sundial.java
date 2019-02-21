@@ -167,16 +167,18 @@ public class Sundial {
     public static final Color Color_Of_MinimizeFill   = new Color(1.00, 1.00, 0.00, 0.01);
     public static final Color Color_Of_MinimizeStroke = new Color(0.90, 0.90, 0.20, 1.00);
 
-    public static final String MATRIX_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String MATRIX_GLOW2     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String MATRIX_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String MATRIX_SHADOW2   = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String MATRIX_BLOCK     = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String HORIZON_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
-    public static final String LOCALTIME_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
-    public static final String LOCALSECOND_GLOW = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_GLOW = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALTIME_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String MATRIX_GLOW2            = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String MATRIX_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String MATRIX_SHADOW2          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String MATRIX_BLOCK            = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String HORIZON_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
+    public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
+    public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALTIME_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
+
+    public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 4.0, 0.50, 0, 0);";
 
     public static final String CONTROL_RESIZE_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_RESIZE_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
@@ -318,6 +320,7 @@ public class Sundial {
     private Circle tinyGlobeFrame;
     private Circle tinyGlobeDot;
     private Group coordinatesGroup;
+    private Group horizonGroup;
 
     private Group controlThingyResize;
     private Group controlThingyClose;
@@ -807,6 +810,8 @@ public class Sundial {
         sunsetGroup.getChildren().addAll(sunsetDial, matrixSunset);
         sunsetGroup.getTransforms().add(sunsetDialRotate);
 
+        horizonGroup = new Group();
+        horizonGroup.getChildren().addAll(sunriseGroup, sunsetGroup);
 
         dialTextDate = new Text();
         dialTextDate.setText(localTimeText);
@@ -953,8 +958,9 @@ public class Sundial {
         foregroundGroup.getChildren().add(tinyGlobeScene);
         foregroundGroup.getChildren().add(sunTimeDial);
         foregroundGroup.getChildren().add(dialLineHighNoon);
-        foregroundGroup.getChildren().add(sunriseGroup);
-        foregroundGroup.getChildren().add(sunsetGroup);
+//        foregroundGroup.getChildren().add(sunriseGroup);
+//        foregroundGroup.getChildren().add(sunsetGroup);
+        foregroundGroup.getChildren().add(horizonGroup);
         foregroundGroup.getChildren().add(dialLineLocalHour);
         foregroundGroup.getChildren().add(tinyGlobeDot);
         foregroundGroup.getChildren().add(tinyGlobeFrame);
@@ -1016,6 +1022,8 @@ public class Sundial {
         dialCircleFrame.setOnMouseEntered(event -> dialCircleFrame.setCursor(Cursor.MOVE));
         dialCircleFrame.setOnMouseExited(event -> dialCircleFrame.setCursor(Cursor.DEFAULT));
 
+        horizonGroup.setOnMouseEntered(event -> { horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, HORIZON_HOVER_GLOW); });
+        horizonGroup.setOnMouseExited(event -> { horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, ""); });
 
     }
 
@@ -1255,6 +1263,10 @@ public class Sundial {
 
     public Group getControlThingyMinimize() {
         return controlThingyMinimize;
+    }
+
+    public Group getHorizonGroup() {
+        return horizonGroup;
     }
 
     // Setters

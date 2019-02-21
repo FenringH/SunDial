@@ -42,10 +42,6 @@ public class Suntime {
     private double localHourAngle;
     private double siderealTime;
 
-    // outputs
-    private HashMap<Long, Double> sunriseCache = new HashMap<Long, Double>();
-    private HashMap<Long, Double> sunsetCache = new HashMap<Long, Double>();
-
     // Constructors - Builder
     private Suntime(Builder builder) {
         this.localTime = builder.localTime;
@@ -286,10 +282,15 @@ public class Suntime {
     }
 
     private double calcLocalHourAngle(double declinationOfTheSun, double observerLatitude) {
-        return toDegrees( acos(
-                (sin(toRadians(-0.83d)) - sin(toRadians(observerLatitude)) * sin(toRadians(declinationOfTheSun)) ) /
-                        (cos(toRadians(observerLatitude)) * cos(toRadians(declinationOfTheSun)) )
-            ) );
+
+        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(observerLatitude)) * sin(toRadians(declinationOfTheSun));
+        double divisor = cos(toRadians(observerLatitude)) * cos(toRadians(declinationOfTheSun));
+        double division = dividend / divisor;
+
+        if (division <= -1) { return 180.0d; }
+        if (division >= 1) { return 0.0d; }
+
+        return toDegrees(acos(dividend / divisor));
     }
 
     private double calcSolarTransit(double julianDate, double observerLongitude, double meanAnomaly, double eclipticalLongitude) {
@@ -310,17 +311,6 @@ public class Suntime {
     private double calcHorizonJulianDate(double solarTransit, double localHourAngle, int horizonFactor) {
 
         if (horizonFactor != SUNRISE_HORIZON && horizonFactor != SUNSET_HORIZON) { return 0; }
-
-/*
-        // check cache
-        if(horizonFactor == SUNRISE_HORIZON) {
-            Double cachedSunrise = sunriseCache.get(this.julianDayNumber);
-            if (cachedSunrise != null) { return cachedSunrise; }
-        } else {
-            Double cachedSunset = sunsetCache.get(this.julianDayNumber);
-            if (cachedSunset != null) { return cachedSunset; }
-        }
-*/
 
         // iterate for better precision
         double estimateJulianDate = solarTransit + horizonFactor * (localHourAngle / 360d);
@@ -343,19 +333,42 @@ public class Suntime {
             estimateJulianDate = newJulianDate;
         }
 
-/*
-        // cache result
-        if(horizonFactor == SUNRISE_HORIZON) {
-            this.sunriseCache.put(this.julianDayNumber, estimateJulianDate);
-        } else {
-            this.sunsetCache.put(this.julianDayNumber, estimateJulianDate);
-        }
-*/
-
         return estimateJulianDate;
     }
 
-    // Get methods
+    // Getters
+    public double getMeanAnomaly() {
+        return meanAnomaly;
+    }
+
+    public double getEquationOfCenter() {
+        return equationOfCenter;
+    }
+
+    public double getEclipticalLongitude() {
+        return eclipticalLongitude;
+    }
+
+    public double getRightAscension() {
+        return rightAscension;
+    }
+
+    public double getDeclinationOfTheSun() {
+        return declinationOfTheSun;
+    }
+
+    public double getHourAngle() {
+        return hourAngle;
+    }
+
+    public double getSolarTransit() {
+        return solarTransit;
+    }
+
+    public double getLocalHourAngle() {
+        return localHourAngle;
+    }
+
     public double getSiderealTime() {
         return this.siderealTime;
     }
