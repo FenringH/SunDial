@@ -12,7 +12,7 @@ import static java.lang.Math.*;
 public class Sunchart {
 
     private final static int CHART_RESOLUTION = 1;
-    private final static int DAYS_IN_YEAR = 366;
+    private final static int DAYS_IN_YEAR = 365;
 
     private int dataSize = DAYS_IN_YEAR / CHART_RESOLUTION;
 
@@ -56,15 +56,18 @@ public class Sunchart {
         daylengthSeries.setName("Day Length");
 
         for (int i = 0; i < dataSize; i++) {
-            int dateNumber = 1 + i * CHART_RESOLUTION;
-            sunriseSeries.getData().add(new XYChart.Data<>(dateNumber, ""));
-            sunsetSeries.getData().add(new XYChart.Data<>(dateNumber, ""));
-            daylengthSeries.getData().add(new XYChart.Data<>(dateNumber, ""));
+
+            String dateNumber = 1 + i * CHART_RESOLUTION + "";
+
+            sunriseSeries.getData().add(new XYChart.Data<>(dateNumber, 0));
+            sunsetSeries.getData().add(new XYChart.Data<>(dateNumber, 24));
+            daylengthSeries.getData().add(new XYChart.Data<>(dateNumber, 24));
         }
 
         chartTitle = "Suntime @ " + this.longitude + ", " + this.latitude + " in " + calendar.get(Calendar.YEAR) + ".";
 
-        NumberAxis suntimeAxisX = new NumberAxis();
+//        NumberAxis suntimeAxisX = new NumberAxis();
+        CategoryAxis suntimeAxisX = new CategoryAxis();
         suntimeAxisX.setLabel("Day");
         NumberAxis suntimeAxisY = new NumberAxis();
         suntimeAxisY.setLabel("Time");
@@ -81,24 +84,39 @@ public class Sunchart {
 
         for (int i = 0; i < dataSize; i++) {
 
-            calendar.set(Calendar.DAY_OF_YEAR, 1 + i * CHART_RESOLUTION);
+            int dayNumber = 1 + i * CHART_RESOLUTION;
+
+            calendar.set(Calendar.DAY_OF_YEAR, dayNumber);
             suntime.setObserverTime(calendar);
             suntime.setObserverPosition(longitude, latitude);
 
-            double highnoon = Suntime.getCalendarDate(suntime.getJulianDayNumber(), calendar.getTimeZone()).getTimeInMillis() / 1000;
-            double sunrise = Suntime.getCalendarDate(suntime.getSunriseJulianDate(), calendar.getTimeZone()).getTimeInMillis() / 1000 - highnoon;
-            double sunset = Suntime.getCalendarDate(suntime.getSunsetJulianDate(), calendar.getTimeZone()).getTimeInMillis() / 1000 - highnoon;
-            double daylength = sunset - sunrise;
+            double sunrise = suntime.getSunriseJulianDate();
+            double sunset = suntime.getSunsetJulianDate();
+            double daylength = (sunset - sunrise) * 24;
 
-            if (sunrise <= -24 * 60 * 60) { sunrise = -24 * 60 * 60; }
-            if (sunset >= 24 * 60 * 60) { sunset = 24 * 60 * 60; }
-            if (daylength > 24 * 60 * 60) { daylength = 24 * 60 * 60; }
+            GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunrise, calendar.getTimeZone());
+            GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunset, calendar.getTimeZone());
 
-            int dateNumber = 1 + i * CHART_RESOLUTION;
+            double sunriseTime = sunriseDate.get(Calendar.HOUR_OF_DAY) + sunriseDate.get(Calendar.MINUTE) / 60d;
+            double sunsetTime = sunsetDate.get(Calendar.HOUR_OF_DAY) + sunsetDate.get(Calendar.MINUTE) / 60d;
 
-            sunriseSeries.getData().set(i, new XYChart.Data<>(dateNumber, sunrise));
-            sunsetSeries.getData().set(i, new XYChart.Data<>(dateNumber, sunset));
-            daylengthSeries.getData().set(i, new XYChart.Data<>(dateNumber, daylength));
+            if (daylength >= 24) {
+                daylength = 24;
+                sunriseTime = 0;
+                sunsetTime = 0;
+            }
+
+            if (daylength <= 0) {
+                daylength = 0;
+                sunriseTime = 0;
+                sunsetTime = 0;
+            }
+
+            String dayString = (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+
+            sunriseSeries.getData().set(i, new XYChart.Data<>(dayString, sunriseTime));
+            sunsetSeries.getData().set(i, new XYChart.Data<>(dayString, sunsetTime));
+            daylengthSeries.getData().set(i, new XYChart.Data<>(dayString, daylength));
         }
 
     }

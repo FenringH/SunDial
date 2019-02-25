@@ -53,6 +53,7 @@ public class Sundial {
     private static final double SUNRISE_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
     private static final double SUNSET_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
     private static final double LOCALTIME_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
+    private static final double LOCALTIME_DIAL_WIDTH = 14.0d;
     private static final double DAYLENGTH_ARC_RADIUS = 105.0d;
     private static final double DAY_ARC_MARGIN = 10.0d;
     private static final double LOCALMINUTE_WIDTH = 8;
@@ -70,7 +71,7 @@ public class Sundial {
     private static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     private static final double SUNTIME_STROKE_WIDTH = 2.00d;
     private static final double HIGHNOON_STROKE_WIDTH = 2.00d;
-    private static final double LOCALTIME_STROKE_WIDTH = 2.50d;
+    private static final double LOCALTIME_STROKE_WIDTH = 1.50d;
     private static final double SUNRISE_STROKE_WIDTH = 1.00d;
     private static final double SUNSET_STROKE_WIDTH = 1.00d;
     private static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
@@ -292,6 +293,7 @@ public class Sundial {
     private Line sunriseDial;
     private Line sunsetDial;
     private Line dialLineLocalHour;
+    private Group dialLocalHourGroup;
     private Rectangle dialLineLocalMinute;
 
     private ArrayList<Rectangle> dialLocalSecondList;
@@ -685,12 +687,40 @@ public class Sundial {
         dialLineHighNoon.setStrokeWidth(HIGHNOON_STROKE_WIDTH);
         dialLineHighNoon.getTransforms().add(highNoonDialRotate);
 
+/*
         dialLineLocalHour = new Line(CENTER_X, LOCALTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
         dialLineLocalHour.setStroke(Color_Of_LocalTime);
         dialLineLocalHour.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
         dialLineLocalHour.setStyle(LOCALTIME_SHADOW);
         dialLineLocalHour.getTransforms().add(dialRotateLocalHour);
         dialLineLocalHour.setBlendMode(BlendMode.ADD);
+*/
+
+        dialLocalHourGroup = new Group();
+
+        Line dialLocalHourLine = new Line(CENTER_X, LOCALTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
+        dialLocalHourLine.setStroke(Color_Of_LocalTime);
+        dialLocalHourLine.setOpacity(1);
+        dialLocalHourLine.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
+
+        Polygon dialLocalHourPoly = new Polygon(
+                CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                CENTER_X - LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 3/4,
+                CENTER_X - LOCALTIME_STROKE_WIDTH, MARGIN_Y,
+                CENTER_X + LOCALTIME_STROKE_WIDTH, MARGIN_Y,
+                CENTER_X + LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 3/4,
+                CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
+        );
+        dialLocalHourPoly.setFill(Color_Of_LocalTime);
+        dialLocalHourPoly.setStroke(Color_Of_Void);
+        dialLocalHourPoly.setOpacity(0.5);
+
+        dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly, dialLocalHourLine);
+        dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
+        dialLocalHourGroup.setStyle(LOCALTIME_SHADOW);
+        dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
+        dialLocalHourGroup.setMouseTransparent(true);
+
 
         dialLineLocalMinute = new Rectangle(LOCALMINUTE_WIDTH, LOCALMINUTE_HEIGHT);
         dialLineLocalMinute.setArcWidth(LOCALMINUTE_ROUND);
@@ -996,11 +1026,12 @@ public class Sundial {
 //        foregroundGroup.getChildren().add(sunriseGroup);
 //        foregroundGroup.getChildren().add(sunsetGroup);
         foregroundGroup.getChildren().add(horizonGroup);
-        foregroundGroup.getChildren().add(dialLineLocalHour);
-        foregroundGroup.getChildren().add(tinyGlobeDot);
-        foregroundGroup.getChildren().add(tinyGlobeFrame);
+//        foregroundGroup.getChildren().add(dialLineLocalHour);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
         foregroundGroup.getChildren().add(dialCircleCenterDot);
+        foregroundGroup.getChildren().add(dialLocalHourGroup);
+        foregroundGroup.getChildren().add(tinyGlobeDot);
+        foregroundGroup.getChildren().add(tinyGlobeFrame);
         foregroundGroup.getChildren().add(matrixTime);
         foregroundGroup.getChildren().add(matrixDate);
 //        foregroundGroup.getChildren().add(matrixWeek);
