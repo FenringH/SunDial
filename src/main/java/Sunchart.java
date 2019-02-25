@@ -1,10 +1,13 @@
 import javafx.scene.Group;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import static java.lang.Math.*;
 
 public class Sunchart {
 
@@ -53,9 +56,10 @@ public class Sunchart {
         daylengthSeries.setName("Day Length");
 
         for (int i = 0; i < dataSize; i++) {
-            sunriseSeries.getData().add(new XYChart.Data<>(1 + i * CHART_RESOLUTION, 0));
-            sunsetSeries.getData().add(new XYChart.Data<>(1 + i * CHART_RESOLUTION, 0));
-            daylengthSeries.getData().add(new XYChart.Data<>(1 + i * CHART_RESOLUTION, 0));
+            int dateNumber = 1 + i * CHART_RESOLUTION;
+            sunriseSeries.getData().add(new XYChart.Data<>(dateNumber, ""));
+            sunsetSeries.getData().add(new XYChart.Data<>(dateNumber, ""));
+            daylengthSeries.getData().add(new XYChart.Data<>(dateNumber, ""));
         }
 
         chartTitle = "Suntime @ " + this.longitude + ", " + this.latitude + " in " + calendar.get(Calendar.YEAR) + ".";
@@ -81,13 +85,20 @@ public class Sunchart {
             suntime.setObserverTime(calendar);
             suntime.setObserverPosition(longitude, latitude);
 
-            double sunrise = suntime.getSunriseJulianDate() - suntime.getJulianDayNumber();
-            double sunset = suntime.getSunsetJulianDate() - suntime.getJulianDayNumber();
+            double highnoon = Suntime.getCalendarDate(suntime.getJulianDayNumber(), calendar.getTimeZone()).getTimeInMillis() / 1000;
+            double sunrise = Suntime.getCalendarDate(suntime.getSunriseJulianDate(), calendar.getTimeZone()).getTimeInMillis() / 1000 - highnoon;
+            double sunset = Suntime.getCalendarDate(suntime.getSunsetJulianDate(), calendar.getTimeZone()).getTimeInMillis() / 1000 - highnoon;
             double daylength = sunset - sunrise;
 
-            sunriseSeries.getData().set(i, new XYChart.Data<>(1 + i * CHART_RESOLUTION, sunrise));
-            sunsetSeries.getData().set(i, new XYChart.Data<>(1 + i * CHART_RESOLUTION, sunset));
-            daylengthSeries.getData().set(i, new XYChart.Data<>(1 + i * CHART_RESOLUTION, daylength));
+            if (sunrise <= -24 * 60 * 60) { sunrise = -24 * 60 * 60; }
+            if (sunset >= 24 * 60 * 60) { sunset = 24 * 60 * 60; }
+            if (daylength > 24 * 60 * 60) { daylength = 24 * 60 * 60; }
+
+            int dateNumber = 1 + i * CHART_RESOLUTION;
+
+            sunriseSeries.getData().set(i, new XYChart.Data<>(dateNumber, sunrise));
+            sunsetSeries.getData().set(i, new XYChart.Data<>(dateNumber, sunset));
+            daylengthSeries.getData().set(i, new XYChart.Data<>(dateNumber, daylength));
         }
 
     }

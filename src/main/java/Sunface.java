@@ -107,8 +107,6 @@ public class Sunface extends Application {
     private Text calculatedInfoText;
     private TextArea debugTextArea;
 
-    private Circle controlCircleClose;
-
     private Sunchart sunchart;
 
     private Stage debugWindow;
@@ -141,14 +139,6 @@ public class Sunface extends Application {
         calculatedInfoText.setLayoutX(5d);
         calculatedInfoText.setLayoutY(540d);
 
-        // Controls
-        Rectangle controlBox = new Rectangle(60, 30);
-        controlBox.setOpacity(0.0d);
-
-        controlCircleClose = new Circle(controlBox.getWidth() - 15, controlBox.getWidth() / 2,10);
-        controlCircleClose.setFill(Color.RED);
-//        controlCircleClose.setStyle(BUTTON_SHADOW);
-
         // Sun objects
         currentLocalTime = new GregorianCalendar();
         offsetLocalTime = new GregorianCalendar();
@@ -177,9 +167,6 @@ public class Sunface extends Application {
         sundial.getGlobe().rotateGlobe(longitude, latitude);
         sundial.getTinyGlobe().rotateGlobe(longitude, latitude);
 
-        Group controlsGroup = new Group();
-        controlsGroup.getChildren().addAll(controlBox, controlCircleClose);
-
         rootGroup.getChildren().addAll(dialsGroup/*, controlsGroup*/);
 
         double sizeX = rootGroup.getLayoutBounds().getWidth();
@@ -203,9 +190,6 @@ public class Sunface extends Application {
 
         dialsGroup.setLayoutX(dialsLayoutWidth - dialsMaxX);
         dialsGroup.setLayoutY(dialsLayoutHeight - dialsMaxY);
-
-        controlsGroup.setLayoutX(sizeX - controlsGroup.getLayoutBounds().getWidth());
-        controlsGroup.setLayoutY(0);
 
         Scale dialsScale = new Scale();
         dialsScale.setPivotX(dialsMinX);
@@ -233,7 +217,7 @@ public class Sunface extends Application {
         debugWindow.setX(0);
         debugWindow.setY(0);
         debugWindow.setResizable(false);
-        debugWindow.show();
+//        debugWindow.show();
 
         // Chart window
         LineChart lineChart = sunchart.getChart();
@@ -265,12 +249,6 @@ public class Sunface extends Application {
 
 
         // Events
-        controlCircleClose.setOnMouseEntered(event -> { controlCircleClose.setStyle(BUTTON_GLOW); controlCircleClose.setFill(Color.ORANGE); });
-        controlCircleClose.setOnMouseExited(event -> { controlCircleClose.setStyle(""); controlCircleClose.setFill(Color.RED); });
-        controlCircleClose.setOnMousePressed(event -> controlCircleClose.setFill(Color.YELLOW));
-        controlCircleClose.setOnMouseReleased(event -> controlCircleClose.setFill(Color.RED));
-        controlCircleClose.setOnMouseClicked(event -> System.exit(0));
-
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
         sundial.getControlThingyMaximize().setOnMouseClicked(event -> toggleMaximizeWindow(primaryStage, dialsScale, event));
         sundial.getControlThingyMinimize().setOnMouseClicked(event -> minimizeWindow(primaryStage, timeline, event));
@@ -281,16 +259,17 @@ public class Sunface extends Application {
         sundial.getDialCircleCenterDot().setOnScroll(event -> changeNightCompression(suntime, sundial, event));
 
         sundial.getTinyGlobeFrame().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
-        sundial.getTinyGlobeFrame().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, dialsGroup, controlsGroup, dialsScale));
+        sundial.getTinyGlobeFrame().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, dialsGroup, dialsScale));
 
-        sundial.getCoordinatesGroup().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
-        sundial.getCoordinatesGroup().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, dialsGroup, controlsGroup, dialsScale));
-
-        sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
+        sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, dialsScale, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
+        sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, dialsGroup, dialsScale, event));
 
-        sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, controlsGroup, dialsScale, event));
+        sundial.getBackgroundGroup().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, dialsScale, event));
+        sundial.getBackgroundGroup().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getBackgroundGroup().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
+
+        sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, dialsScale, event));
         sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
@@ -336,7 +315,7 @@ public class Sunface extends Application {
         initCurrentTime(suntime, sundial);
         primaryStage.show();
         timeline.play();
-        recordWindowPosition(primaryStage, dialsGroup, controlsGroup, dialsScale, null);
+        recordWindowPosition(primaryStage, dialsGroup, dialsScale, null);
 
     }
 
@@ -677,7 +656,7 @@ public class Sunface extends Application {
         sundial.rotateGlobe(longitude, latitude);
     }
 
-    private void resetWindowSize(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale) {
+    private void resetWindowSize(Stage stage, Group dialsGroup, Scale dialsScale) {
 
         dialsScale.setX(1.0d);
         dialsScale.setY(1.0d);
@@ -685,7 +664,6 @@ public class Sunface extends Application {
         stage.setWidth(dialsGroup.getLayoutBounds().getWidth());
         stage.setHeight(dialsGroup.getLayoutBounds().getHeight());
 
-        controlsGroup.setLayoutX(Sundial.DIAL_WIDTH - controlsGroup.getLayoutBounds().getWidth());
     }
 
     private void recordCalendarPosition(Suntime suntime, Sundial sundial, MouseEvent event) {
@@ -724,14 +702,14 @@ public class Sunface extends Application {
 
     }
 
-    private void recordWindowPosition(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
+    private void recordWindowPosition(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
 
         if (event != null) {
             MouseButton mouseButton = event.getButton();
             mouseButtonList.add(event.getButton());
 
             if (mouseButton.equals(MouseButton.MIDDLE)) {
-                resetWindowSize(stage, dialsGroup, controlsGroup, dialsScale);
+                resetWindowSize(stage, dialsGroup, dialsScale);
                 return;
             }
 
@@ -758,7 +736,7 @@ public class Sunface extends Application {
 
     }
 
-    private void resizeWindow(Stage stage, Group dialsGroup, Group controlsGroup, Scale dialsScale, MouseEvent event) {
+    private void resizeWindow(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
 
         MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
         if (mouseButton == null || mouseButton.equals(MouseButton.MIDDLE)) { return; }
@@ -802,8 +780,6 @@ public class Sunface extends Application {
 
         dialsScale.setX((windowSizeX) / Sundial.DIAL_WIDTH);
         dialsScale.setY((windowSizeY) / Sundial.DIAL_HEIGHT);
-
-        controlsGroup.setLayoutX(windowSizeX - controlsGroup.getLayoutBounds().getWidth());
 
         stage.setWidth(windowSizeX);
         stage.setHeight(windowSizeY);
@@ -900,7 +876,7 @@ public class Sunface extends Application {
         stage.setY(newPositionY);
     }
 
-    private void toggleGlobe(Stage stage, Suntime suntime, Sundial sundial, Group dialsGroup, Group controlsGroup, Scale dialsScale) {
+    private void toggleGlobe(Stage stage, Suntime suntime, Sundial sundial, Group dialsGroup, Scale dialsScale) {
 
         MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
         if (mouseButton == null) { return; }
@@ -921,7 +897,8 @@ public class Sunface extends Application {
 
         } else {
             sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.MOVE));
-            sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(stage, dialsGroup, controlsGroup, dialsScale, event));
+            sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(stage, dialsGroup, dialsScale, event));
+            sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
             sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(stage, event));
 
         }
