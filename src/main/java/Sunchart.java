@@ -64,7 +64,11 @@ public class Sunchart {
             daylengthSeries.getData().add(new XYChart.Data<>(dateNumber, 24));
         }
 
-        chartTitle = "Suntime @ " + this.longitude + ", " + this.latitude + " in " + calendar.get(Calendar.YEAR) + ".";
+        chartTitle = "Suntime @ "
+                + Sundial.formatCoordinateToString(this.longitude, "E", "W")
+                + ", " + Sundial.formatCoordinateToString(this.latitude, "N", "S")
+                + " in " + calendar.get(Calendar.YEAR) + "."
+        ;
 
 //        NumberAxis suntimeAxisX = new NumberAxis();
         CategoryAxis suntimeAxisX = new CategoryAxis();
@@ -126,7 +130,11 @@ public class Sunchart {
         this.latitude = latitude;
         this.year = year;
 
-        this.chartTitle = "Suntime @ " + this.longitude + ", " + this.latitude + " in " + calendar.get(Calendar.YEAR) + ".";
+        this.chartTitle = "Suntime @ "
+                + Sundial.formatCoordinateToString(this.longitude, "E", "W")
+                + ", " + Sundial.formatCoordinateToString(this.latitude, "N", "S")
+                + " in " + calendar.get(Calendar.YEAR) + "."
+        ;
 
         suntimeLineChart.setTitle(this.chartTitle);
 

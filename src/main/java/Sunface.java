@@ -86,6 +86,9 @@ public class Sunface extends Application {
     private double customLongitude = DEFAULT_LONGITUDE;
     private double customLatitude = DEFAULT_LATITUDE;
 
+    private int TYPE_LONGITUDE = 1;
+    private int TYPE_LATITUDE = 2;
+
     private double deltaX;
     private double deltaY;
     private double savedMouseX;
@@ -258,10 +261,20 @@ public class Sunface extends Application {
         sundial.getDialCircleCenterDot().setOnMouseDragged(event -> changeNightCompression(suntime, sundial, event));
         sundial.getDialCircleCenterDot().setOnScroll(event -> changeNightCompression(suntime, sundial, event));
 
-        sundial.getTinyGlobeFrame().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
-        sundial.getTinyGlobeFrame().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, dialsGroup, dialsScale));
+        sundial.getTinyGlobeGroup().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
+        sundial.getTinyGlobeGroup().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, dialsGroup, dialsScale));
 
-        sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, dialsScale, event));
+        sundial.getLongitudeGroup().setOnMousePressed(event -> recordGlobePosition(suntime, sundial, TYPE_LONGITUDE, event));
+        sundial.getLongitudeGroup().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getLongitudeGroup().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, TYPE_LONGITUDE, event));
+        sundial.getLongitudeGroup().setOnScroll(event -> rotateGlobe(suntime, sundial, TYPE_LONGITUDE, event));
+
+        sundial.getLatitudeGroup().setOnMousePressed(event -> recordGlobePosition(suntime, sundial, TYPE_LATITUDE, event));
+        sundial.getLatitudeGroup().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getLatitudeGroup().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, TYPE_LATITUDE, event));
+        sundial.getLatitudeGroup().setOnScroll(event -> rotateGlobe(suntime, sundial, TYPE_LATITUDE, event));
+
+        sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowSize(primaryStage, dialsGroup, dialsScale, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, dialsGroup, dialsScale, event));
 
@@ -302,6 +315,11 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
+
+        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> {
+            if (sundial.animationOnEh) { sundial.animationOnEh = false; }
+            else { sundial.animationOnEh = true; }
+        });
 
         sundial.getHorizonGroup().setOnMouseClicked(event -> {
             if (statsWindow.isShowing()) { statsWindow.close(); }
@@ -608,20 +626,33 @@ public class Sunface extends Application {
                         + "solarTransit = " + suntime.getSolarTransit() + "\n"
                         + "localHourAngle = " + suntime.getLocalHourAngle() + "\n"
                         + "localHourAngle dividend = " + dividend + "\n"
-                        + "localHourAngle divisor = " + divisor + "\n" ;
+                        + "localHourAngle divisor = " + divisor + "\n"
+                        + "longitude = " + longitude + "\n"
+                        + "latitude = " + latitude + "\n"
+                        ;
                 debugTextArea.setText(debugText);
             }
         }
     }
 
-    private void resetGlobePosition(Suntime suntime, Sundial sundial) {
-        longitude = DEFAULT_LONGITUDE;
-        latitude = DEFAULT_LATITUDE;
+    private void resetGlobePosition(Suntime suntime, Sundial sundial, int type) {
+
+        if (type == TYPE_LONGITUDE) { longitude = DEFAULT_LONGITUDE; }
+        else if (type == TYPE_LATITUDE) { latitude = DEFAULT_LATITUDE; }
+        else {
+            longitude = DEFAULT_LONGITUDE;
+            latitude = DEFAULT_LATITUDE;
+        }
         initCurrentTime(suntime, sundial);
         sundial.rotateGlobe(longitude, latitude);
     }
 
-    private void recordGlobePosition(Sundial sundial, MouseEvent event) {
+    private void recordGlobePosition(Suntime suntime, Sundial sundial, int type, MouseEvent event) {
+
+        mouseButtonList.add(event.getButton());
+        if (event.getButton().equals(MouseButton.MIDDLE)) {
+            resetGlobePosition(suntime, sundial, type);
+        }
 
         savedMouseX = event.getScreenX();
         savedMouseY = event.getScreenY();
@@ -631,6 +662,12 @@ public class Sunface extends Application {
     }
 
     private void rotateGlobe(Suntime suntime, Sundial sundial, MouseEvent event) {
+
+        if (!mouseButtonList.isEmpty()) {
+            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
+                return;
+            }
+        }
 
         double mouseScreenX = event.getScreenX();
         double mouseScreenY = event.getScreenY();
@@ -644,8 +681,64 @@ public class Sunface extends Application {
         double precision = 4;
         if (event.isSecondaryButtonDown()) { precision = 100; }
 
-        longitude += deltaLongitude / precision;
-        latitude -= deltaLatitude / precision;
+        longitude += round((deltaLongitude / precision) * 100) / 100d;
+        latitude -= round((deltaLatitude / precision) * 100) / 100d;
+
+        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
+        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
+        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
+        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
+
+        initCurrentTime(suntime, sundial);
+        sundial.rotateGlobe(longitude, latitude);
+    }
+
+    private void rotateGlobe(Suntime suntime, Sundial sundial, int type, MouseEvent event) {
+
+        if (!mouseButtonList.isEmpty()) {
+            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
+                return;
+            }
+        }
+
+        double mouseScreenX = event.getScreenX();
+        double mouseScreenY = event.getScreenY();
+
+        double delta = savedMouseY - mouseScreenY;
+
+        savedMouseX = mouseScreenX;
+        savedMouseY = mouseScreenY;
+
+        double precision = 4;
+        if (event.isSecondaryButtonDown()) { precision = 100; }
+
+        if (type == TYPE_LONGITUDE) { longitude += round((delta / precision) * 100) / 100d; }
+        else { latitude -= round((delta / precision) * 100) / 100d; }
+
+        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
+        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
+        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
+        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
+
+        initCurrentTime(suntime, sundial);
+        sundial.rotateGlobe(longitude, latitude);
+    }
+
+    private void rotateGlobe(Suntime suntime, Sundial sundial, int type, ScrollEvent event) {
+
+        if (!mouseButtonList.isEmpty()) {
+            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
+                return;
+            }
+        }
+
+        double step = 0;
+
+        if (event.getDeltaY() < 0) { step = -0.01; }
+        if (event.getDeltaY() > 0) { step = 0.01; }
+
+        if (type == TYPE_LONGITUDE) { longitude += step; }
+        else { latitude += step; }
 
         if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
         if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
@@ -703,6 +796,32 @@ public class Sunface extends Application {
     }
 
     private void recordWindowPosition(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
+
+        if (event != null) {
+            savedMouseX = event.getScreenX();
+            savedMouseY = event.getScreenY();
+        }
+
+        savedWindowPositionX = stage.getX();
+        savedWindowPositionY = stage.getY();
+
+        savedWindowSizeX = stage.getWidth();
+        savedWindowSizeY = stage.getHeight();
+
+        deltaX = stage.getX() - savedMouseX;
+        deltaY = stage.getY() - savedMouseY;
+
+        offsetX = 0;
+        offsetY = 0;
+
+        if (savedWindowPositionX + savedWindowSizeX / 2 - savedMouseX > 0 && savedWindowPositionY + savedWindowSizeY / 2 - savedMouseY > 0) { dX = -1; dY = -1; }
+        if (savedWindowPositionX + savedWindowSizeX / 2 - savedMouseX < 0 && savedWindowPositionY + savedWindowSizeY / 2 - savedMouseY > 0) { dX = 1; dY = -1; }
+        if (savedWindowPositionX + savedWindowSizeX / 2 - savedMouseX > 0 && savedWindowPositionY + savedWindowSizeY / 2 - savedMouseY < 0) { dX = -1; dY = 1; }
+        if (savedWindowPositionX + savedWindowSizeX / 2 - savedMouseX < 0 && savedWindowPositionY + savedWindowSizeY / 2 - savedMouseY < 0) { dX = 1; dY = 1; }
+
+    }
+
+    private void recordWindowSize(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
 
         if (event != null) {
             MouseButton mouseButton = event.getButton();
@@ -878,21 +997,23 @@ public class Sunface extends Application {
 
     private void toggleGlobe(Stage stage, Suntime suntime, Sundial sundial, Group dialsGroup, Scale dialsScale) {
 
-        MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-        if (mouseButton == null) { return; }
+        if (!mouseButtonList.isEmpty()) {
 
-        mouseButtonList.clear();
+            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
+            mouseButtonList.clear();
 
-        if (mouseButton.equals(MouseButton.MIDDLE)) {
-            resetGlobePosition(suntime, sundial);
-            return;
+            if (mouseButton.equals(MouseButton.MIDDLE)) {
+                resetGlobePosition(suntime, sundial, 0);
+                return;
+            }
         }
 
         sundial.toggleGlobeVisibility();
 
         if (sundial.globeVisibleEh) {
             sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.OPEN_HAND));
-            sundial.getDialCircleFrame().setOnMousePressed(event -> recordGlobePosition(sundial, event));
+            sundial.getDialCircleFrame().setOnMousePressed(event -> recordGlobePosition(suntime, sundial, 0, event));
+            sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
             sundial.getDialCircleFrame().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, event));
 
         } else {

@@ -10,6 +10,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
 import javafx.util.Duration;
 
 import java.text.DecimalFormat;
@@ -54,6 +55,7 @@ public class Sundial {
     private static final double SUNSET_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
     private static final double LOCALTIME_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
     private static final double LOCALTIME_DIAL_WIDTH = 14.0d;
+    private static final double HIGHNOON_DIAL_WIDTH = 14.0d;
     private static final double DAYLENGTH_ARC_RADIUS = 105.0d;
     private static final double DAY_ARC_MARGIN = 10.0d;
     private static final double LOCALMINUTE_WIDTH = 8;
@@ -70,8 +72,8 @@ public class Sundial {
 
     private static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     private static final double SUNTIME_STROKE_WIDTH = 2.00d;
-    private static final double HIGHNOON_STROKE_WIDTH = 2.00d;
-    private static final double LOCALTIME_STROKE_WIDTH = 1.50d;
+    private static final double HIGHNOON_STROKE_WIDTH = 1.00d;
+    private static final double LOCALTIME_STROKE_WIDTH = 1.00d;
     private static final double SUNRISE_STROKE_WIDTH = 1.00d;
     private static final double SUNSET_STROKE_WIDTH = 1.00d;
     private static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
@@ -84,8 +86,8 @@ public class Sundial {
 
     private static final double DAYLENGTH_ARC_OPACITY = 0.65d;
     private static final double MARGIN_CIRCLE_OPACITY = 0.65d;
-    private static final double TINYGLOBE_FRAME_OPACITY = 0.60d;
-    private static final double TINYGLOBE_OPACITY = 0.50d;
+    private static final double TINYGLOBE_DEFAULT_OPACITY = 0.65d;
+    private static final double TINYGLOBE_OFFSET_OPACITY = 0.90d;
     private static final double MARKER_MINUTE_OPACITY = 0.1d;
     private static final double MATRIX_MINUTE_OPACITY = 0.2d;
     private static final double CONTROL_RESIZE_OPACITY = 0.75d;
@@ -100,21 +102,21 @@ public class Sundial {
     private static final double MATRIX_WEEK_OFFSET = 70.0d;
     private static final double MATRIX_LONGITUDE_SLIDE = 0.0d;
     private static final double MATRIX_LATITUDE_SLIDE = 0.0d;
-    private static final double MATRIX_LONGITUDE_OFFSET = 140.0d;
-    private static final double MATRIX_LATITUDE_OFFSET = 160.0d;
+    private static final double MATRIX_LONGITUDE_OFFSET = 120.0d;
+    private static final double MATRIX_LATITUDE_OFFSET = 145.0d;
     private static final double COORDINATES_OFFSET = 70.0d;
     private static final double LOCALHOUR_OFFSET = 105.0d;
     private static final double TINYGLOBE_OFFSET = 100.0d;
-    private static final double TINYGLOBE_SLIDE = -180.0d;
+    private static final double TINYGLOBE_SLIDE = 6.0d;
     private static final double LOCALMINUTE_OFFSET = 50.0d;
     private static final double LOCALSECOND_OFFSET = 50.0d;
     private static final double MATRIX_MINUTE_OFFSET = 70.0d;
-    private static final double CONTROL_RESIZE_OFFSET = 136.0d;
-    private static final double CONTROL_CLOSE_OFFSET = 238.0d;
-    private static final double CONTROL_MAXIMIZE_OFFSET = 238.0d;
-    private static final double CONTROL_MINIMIZE_OFFSET = 238.0d;
+    private static final double CONTROL_RESIZE_OFFSET = 137.0d;
+    private static final double CONTROL_CLOSE_OFFSET = 236.0d;
+    private static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
+    private static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
 
-    private static final double MARKER_HOUR_LENGTH = 10.0d;
+    private static final double MARKER_HOUR_LENGTH = 20.0d;
     private static final double MARKER_MINUTE_LENGTH = 8.0d;
     private static final double MARKER_MINUTE_WIDTH = 8.0d;
     private static final double MARKER_MINUTE_OFFSET = 65.0d;
@@ -124,10 +126,11 @@ public class Sundial {
     private static final double MATRIX_WEEK_SCALE = 1.00d;
     private static final double MATRIX_HORIZON_SCALE = 0.75d;
     private static final double MATRIX_DAYLENGTH_SCALE = 0.75d;
-    private static final double MATRIX_LONGITUDE_SCALE = 1.00d;
-    private static final double MATRIX_LATITUDE_SCALE = 1.00d;
+    private static final double MATRIX_LONGITUDE_SCALE = 1.25d;
+    private static final double MATRIX_LATITUDE_SCALE = 1.25d;
     private static final double MATRIX_HOUR_SCALE = 1.00d;
     private static final double MATRIX_MINUTE_SCALE = 0.75d;
+    private static final double TINYGLOBE_DOWNSCALE = 0.80d;
 
     private static final double CONTROL_CLOSE_ANGLE = 37.0d;
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
@@ -162,13 +165,13 @@ public class Sundial {
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
 
-    public static final Color Color_Of_ResizeFill   = new Color(0.25, 0.50, 1.00, 0.01);
+    public static final Color Color_Of_ResizeFill   = new Color(0.25, 0.50, 1.00, 0.10);
     public static final Color Color_Of_ResizeStroke = new Color(0.50, 0.75, 1.00, 1.00);
-    public static final Color Color_Of_CloseFill    = new Color(1.00, 0.25, 0.25, 0.01);
+    public static final Color Color_Of_CloseFill    = new Color(1.00, 0.25, 0.25, 0.10);
     public static final Color Color_Of_CloseStroke  = new Color(1.00, 0.50, 0.50, 1.00);
-    public static final Color Color_Of_MaximizeFill   = new Color(0.25, 1.00, 0.25, 0.01);
+    public static final Color Color_Of_MaximizeFill   = new Color(0.25, 1.00, 0.25, 0.10);
     public static final Color Color_Of_MaximizeStroke = new Color(0.50, 1.00, 0.50, 1.00);
-    public static final Color Color_Of_MinimizeFill   = new Color(1.00, 1.00, 0.00, 0.01);
+    public static final Color Color_Of_MinimizeFill   = new Color(1.00, 1.00, 0.00, 0.10);
     public static final Color Color_Of_MinimizeStroke = new Color(0.90, 0.90, 0.20, 1.00);
 
     public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
@@ -279,7 +282,7 @@ public class Sundial {
     private Rotate dialRotateLocalSecond;
     private Rotate dialRotateLocalSecondTrail;
     private ArrayList<Rotate> dialMarkerRotateList;
-    private ArrayList<DotMatrix> hourMarkerList;
+    private ArrayList<DotMatrix> hourMarkerMatrixList;
 
     private Arc dialArcNight;
     private Arc dialArcMidnight;
@@ -294,6 +297,7 @@ public class Sundial {
     private Line sunsetDial;
     private Line dialLineLocalHour;
     private Group dialLocalHourGroup;
+    private Group dialHighNoonGroup;
     private Rectangle dialLineLocalMinute;
 
     private ArrayList<Rectangle> dialLocalSecondList;
@@ -319,11 +323,14 @@ public class Sundial {
     private DotMatrix matrixDayLength;
     private DotMatrix matrixLongitude;
     private DotMatrix matrixLatitude;
+    private DotMatrix matrixHighNoon;
 
     private Globe globe;
     private Globe tinyGlobe;
     private Circle tinyGlobeFrame;
     private Circle tinyGlobeDot;
+    private Group tinyGlobeGroup;
+    private Scale tinyGlobeScale;
     private Group coordinatesGroup;
     private Group horizonGroup;
     private Group longitudeGroup;
@@ -336,7 +343,7 @@ public class Sundial {
     private Group backgroundGroup;
 
     public boolean globeVisibleEh = false;
-
+    public boolean animationOnEh = true;
 
     // Constructor
     public Sundial(Builder builder) {
@@ -501,7 +508,7 @@ public class Sundial {
         tinyGlobeFrame.setFill(Color_Of_Void);
         tinyGlobeFrame.setStroke(Color_Of_TinyFrame);
         tinyGlobeFrame.setStrokeWidth(TINYGLOBE_FRAME_STROKE_WIDTH);
-        tinyGlobeFrame.setOpacity(TINYGLOBE_FRAME_OPACITY);
+        tinyGlobeFrame.setOpacity(1);
         tinyGlobeFrame.setStyle(MATRIX_SHADOW);
         tinyGlobeFrame.setVisible(true);
 
@@ -510,12 +517,14 @@ public class Sundial {
         tinyGlobeDot.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
         tinyGlobeDot.setFill(Color_Of_TinyFrame);
         tinyGlobeDot.setStroke(Color_Of_Void);
-        tinyGlobeDot.setOpacity(TINYGLOBE_FRAME_OPACITY);
+        tinyGlobeDot.setOpacity(1);
 
         tinyGlobe = new Globe(TINYGLOBE_IMAGE, TINYGLOBE_RADIUS);
         tinyGlobe.setLayoutX(CENTER_X);
         tinyGlobe.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
         tinyGlobe.setVisible(true);
+
+        tinyGlobeGroup = new Group();
 
         dialMarginBox = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
         dialMarginBox.setTranslateX(0);
@@ -617,24 +626,25 @@ public class Sundial {
         }
 
 
-        Group dialHourMarkers = new Group();
-        dialHourMarkers.setMouseTransparent(true);
+        Group dialHourLineMarkers = new Group();
+        dialHourLineMarkers.setMouseTransparent(true);
+
+        Group dialHourMatrixMarkers = new Group();
+        dialHourMatrixMarkers.setMouseTransparent(true);
 
         dialMarkerRotateList = new ArrayList<>();
-        hourMarkerList = new ArrayList<>();
+        hourMarkerMatrixList = new ArrayList<>();
 
         for(int i = 0; i < MAX_MARKER; i++) {
 
-            double lineLength = MARKER_HOUR_LENGTH;
+            double lineLength = MARKER_HOUR_LENGTH * 0.50d;
             double strokeWidth = MARKER_HOUR_STROKE_WIDTH;
-            double opacity = 0.50d;
+            double opacity = 0.35d;
 
-            if (i % 2 == 0) { lineLength = MARKER_HOUR_LENGTH * 1.5d; }
-            if (i % 4 == 0) { lineLength = MARKER_HOUR_LENGTH * 2.0d;  opacity = 1; }
+            if (i % 2 == 0) { lineLength = MARKER_HOUR_LENGTH * (0.75d); opacity = 0.5d;}
+            if (i % 4 == 0) { lineLength = MARKER_HOUR_LENGTH; opacity = 1.0d; }
 //            if ((i + 24) % 48 == 0) { lineLength = CENTER_X - MARGIN_X - DOT_RADIUS; strokeWidth *= 1.0d;  }
 //            if (i % 48 == 0) { lineLength = MARKER_HOUR_LENGTH * 4.0d; }
-
-            Group markerGroup = new Group();
 
             Rotate markerRotate = centerRotate.clone();
             markerRotate.setAngle(getNightCompressionAngle(i * 360d / 96d));
@@ -643,10 +653,15 @@ public class Sundial {
             markerLine.setStroke(Color_Of_Darkness);
             markerLine.setStrokeWidth(strokeWidth);
             markerLine.setOpacity(opacity);
-//            markerLine.getTransforms().add(markerRotate);
-            markerGroup.getChildren().add(markerLine);
+            markerLine.getTransforms().add(markerRotate);
 
             if (i % 4 == 0) {
+
+                Group matrixMarkerGroup = new Group();
+
+                Line matrixMarkerLine = new Line(CENTER_X, lineLength  + MARGIN_Y, CENTER_X, MARGIN_Y + 1);
+                matrixMarkerLine.setStroke(Color_Of_Darkness);
+                matrixMarkerLine.setVisible(false);
 
                 DotMatrix markerMatrix = new DotMatrix("" + ((12 + i / 4) % 24), Color_Of_LocalTime);
                 markerMatrix.setTranslateX(CENTER_X - markerMatrix.getLayoutBounds().getWidth() / 2);
@@ -657,14 +672,15 @@ public class Sundial {
                 markerMatrix.setRotate(rotationAdjust);
                 markerMatrix.setScaleX(MATRIX_HOUR_SCALE);
                 markerMatrix.setScaleY(MATRIX_HOUR_SCALE);
-                markerGroup.getChildren().add(markerMatrix);
 
-                hourMarkerList.add(markerMatrix);
+                matrixMarkerGroup.getChildren().addAll(matrixMarkerLine, markerMatrix);
+                matrixMarkerGroup.getTransforms().add(markerRotate);
+
+                dialHourMatrixMarkers.getChildren().add(matrixMarkerGroup);
+                hourMarkerMatrixList.add(markerMatrix);
             }
 
-            markerGroup.getTransforms().add(markerRotate);
-
-            dialHourMarkers.getChildren().add(markerGroup);
+            dialHourLineMarkers.getChildren().add(markerLine);
             dialMarkerRotateList.add(markerRotate);
         }
 
@@ -682,38 +698,50 @@ public class Sundial {
         sunTimeDial.setStrokeWidth(SUNTIME_STROKE_WIDTH);
         sunTimeDial.getTransforms().add(sunTimeDialRotate);
 
-        dialLineHighNoon = new Line(CENTER_X, HIGHNOON_DIAL_LENGTH, CENTER_X, MARGIN_Y);
-        dialLineHighNoon.setStroke(Color_Of_HighNoon);
-        dialLineHighNoon.setStrokeWidth(HIGHNOON_STROKE_WIDTH);
-        dialLineHighNoon.getTransforms().add(highNoonDialRotate);
 
-/*
-        dialLineLocalHour = new Line(CENTER_X, LOCALTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
-        dialLineLocalHour.setStroke(Color_Of_LocalTime);
-        dialLineLocalHour.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
-        dialLineLocalHour.setStyle(LOCALTIME_SHADOW);
-        dialLineLocalHour.getTransforms().add(dialRotateLocalHour);
-        dialLineLocalHour.setBlendMode(BlendMode.ADD);
-*/
+        dialHighNoonGroup = new Group();
+
+        Line dialHighNoonLine = new Line(CENTER_X, MARGIN_Y + MARKER_HOUR_LENGTH, CENTER_X, MARGIN_Y / 2);
+        dialHighNoonLine.setStroke(Color_Of_Darkness);
+        dialHighNoonLine.setOpacity(0.5d);
+        dialHighNoonLine.setStrokeWidth(HIGHNOON_STROKE_WIDTH);
+
+        Polygon dialHighNoonPoly = new Polygon(
+                CENTER_X - HIGHNOON_STROKE_WIDTH, MARGIN_Y + MARKER_HOUR_LENGTH,
+                CENTER_X - HIGHNOON_DIAL_WIDTH / 2, MARGIN_Y,
+                CENTER_X, MARGIN_Y / 2,
+                CENTER_X + HIGHNOON_DIAL_WIDTH / 2, MARGIN_Y,
+                CENTER_X + HIGHNOON_STROKE_WIDTH, MARGIN_Y + MARKER_HOUR_LENGTH
+        );
+        dialHighNoonPoly.setFill(Color_Of_HighNoon);
+        dialHighNoonPoly.setStroke(Color_Of_Void);
+        dialHighNoonPoly.setOpacity(1d);
+
+        dialHighNoonGroup.getChildren().addAll(dialHighNoonPoly, dialHighNoonLine);
+        dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
+        dialHighNoonGroup.setStyle(MATRIX_GLOW);
+        dialHighNoonGroup.setBlendMode(BlendMode.SCREEN);
+
 
         dialLocalHourGroup = new Group();
 
         Line dialLocalHourLine = new Line(CENTER_X, LOCALTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
-        dialLocalHourLine.setStroke(Color_Of_LocalTime);
-        dialLocalHourLine.setOpacity(1);
+        dialLocalHourLine.setStroke(Color_Of_Darkness);
+        dialLocalHourLine.setOpacity(0.5);
         dialLocalHourLine.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
 
         Polygon dialLocalHourPoly = new Polygon(
                 CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
-                CENTER_X - LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 3/4,
-                CENTER_X - LOCALTIME_STROKE_WIDTH, MARGIN_Y,
-                CENTER_X + LOCALTIME_STROKE_WIDTH, MARGIN_Y,
-                CENTER_X + LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 3/4,
+                CENTER_X - LOCALTIME_DIAL_WIDTH / 4, MARGIN_Y * 3,
+                CENTER_X - LOCALTIME_DIAL_WIDTH / 2, MARGIN_Y * 2,
+                CENTER_X, MARGIN_Y,
+                CENTER_X + LOCALTIME_DIAL_WIDTH / 2, MARGIN_Y * 2,
+                CENTER_X + LOCALTIME_DIAL_WIDTH / 4, MARGIN_Y * 3,
                 CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
         );
         dialLocalHourPoly.setFill(Color_Of_LocalTime);
         dialLocalHourPoly.setStroke(Color_Of_Void);
-        dialLocalHourPoly.setOpacity(0.5);
+        dialLocalHourPoly.setOpacity(1);
 
         dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly, dialLocalHourLine);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
@@ -956,22 +984,15 @@ public class Sundial {
         latitudeGroup.getChildren().add(latitudeBackdrop);
         latitudeGroup.setVisible(false);
 
-/*
-        coordinatesGroup = new Group();
-        coordinatesGroup.getChildren().addAll(matrixLongitude, matrixLatitude);
 
-        Rectangle coordinatesBackdrop = new Rectangle(
-                coordinatesGroup.getLayoutBounds().getMinX(),
-                coordinatesGroup.getLayoutBounds().getMinY(),
-                coordinatesGroup.getLayoutBounds().getWidth(),
-                coordinatesGroup.getLayoutBounds().getHeight());
-
-        coordinatesBackdrop.setOpacity(0);
-
-        coordinatesGroup.getChildren().add(coordinatesBackdrop);
-        coordinatesGroup.setLayoutY(COORDINATES_OFFSET);
-        coordinatesGroup.setVisible(false);
-*/
+        matrixHighNoon = new DotMatrix("00:00:00", Color_Of_HighNoon);
+        matrixHighNoon.setScaleX(1);
+        matrixHighNoon.setScaleY(1);
+        matrixHighNoon.setLayoutX(CENTER_X - matrixHighNoon.getLayoutBounds().getWidth() / 2);
+        matrixHighNoon.setLayoutY(CENTER_Y - matrixHighNoon.getLayoutBounds().getHeight() * 1.5d - DAYLENGTH_ARC_RADIUS);
+        matrixHighNoon.setStyle(MATRIX_GLOW);
+        matrixHighNoon.setMouseTransparent(true);
+        matrixHighNoon.setVisible(false);
 
 
         setGroupGlow(matrixYear, MATRIX_SHADOW);
@@ -1003,10 +1024,16 @@ public class Sundial {
         globeGroup.getChildren().add(globe);
         SubScene globeScene = new SubScene(globeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
 
-        Group tinyGlobeGroup = new Group();
-        tinyGlobeGroup.getChildren().add(tinyGlobe);
-        SubScene tinyGlobeScene = new SubScene(tinyGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        tinyGlobeScene.setOpacity(TINYGLOBE_OPACITY);
+        Group tinyGlobeSceneGroup = new Group();
+        tinyGlobeSceneGroup.getChildren().add(tinyGlobe);
+        SubScene tinyGlobeScene = new SubScene(tinyGlobeSceneGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        tinyGlobeGroup.getChildren().addAll(tinyGlobeScene, tinyGlobeDot, tinyGlobeFrame);
+        tinyGlobeScale = new Scale();
+        tinyGlobeScale.setPivotX(CENTER_X);
+        tinyGlobeScale.setPivotY(CENTER_Y + TINYGLOBE_OFFSET);
+        tinyGlobeGroup.getTransforms().add(tinyGlobeScale);
+        tinyGlobeGroup.setOpacity(TINYGLOBE_DEFAULT_OPACITY);
 
         Group foregroundGroup = new Group();
         foregroundGroup.getChildren().add(globeScene);
@@ -1019,19 +1046,22 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialArcDayLength);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(dialCircleFrame);
-        foregroundGroup.getChildren().add(dialHourMarkers);
-        foregroundGroup.getChildren().add(tinyGlobeScene);
-        foregroundGroup.getChildren().add(sunTimeDial);
-        foregroundGroup.getChildren().add(dialLineHighNoon);
+        foregroundGroup.getChildren().add(dialHourLineMarkers);
+//        foregroundGroup.getChildren().add(tinyGlobeScene);
+//        foregroundGroup.getChildren().add(sunTimeDial);
+        foregroundGroup.getChildren().add(dialHighNoonGroup);
 //        foregroundGroup.getChildren().add(sunriseGroup);
 //        foregroundGroup.getChildren().add(sunsetGroup);
         foregroundGroup.getChildren().add(horizonGroup);
+        foregroundGroup.getChildren().add(matrixHighNoon);
+        foregroundGroup.getChildren().add(dialHourMatrixMarkers);
 //        foregroundGroup.getChildren().add(dialLineLocalHour);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
         foregroundGroup.getChildren().add(dialCircleCenterDot);
         foregroundGroup.getChildren().add(dialLocalHourGroup);
-        foregroundGroup.getChildren().add(tinyGlobeDot);
-        foregroundGroup.getChildren().add(tinyGlobeFrame);
+//        foregroundGroup.getChildren().add(tinyGlobeDot);
+//        foregroundGroup.getChildren().add(tinyGlobeFrame);
+        foregroundGroup.getChildren().add(tinyGlobeGroup);
         foregroundGroup.getChildren().add(matrixTime);
         foregroundGroup.getChildren().add(matrixDate);
 //        foregroundGroup.getChildren().add(matrixWeek);
@@ -1061,13 +1091,13 @@ public class Sundial {
         controlThingyResize.setOnMouseEntered(event -> { controlThingyResize.setCursor(Cursor.NW_RESIZE); setGroupGlow(controlThingyResize, CONTROL_RESIZE_GLOW); });
         controlThingyResize.setOnMouseExited(event -> { controlThingyResize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyResize, CONTROL_RESIZE_SHADOW); });
 
-        controlThingyClose.setOnMouseEntered(event -> { controlThingyClose.setCursor(Cursor.CROSSHAIR); setGroupGlow(controlThingyClose, CONTROL_CLOSE_GLOW); });
+        controlThingyClose.setOnMouseEntered(event -> { controlThingyClose.setCursor(Cursor.HAND); setGroupGlow(controlThingyClose, CONTROL_CLOSE_GLOW); });
         controlThingyClose.setOnMouseExited(event -> { controlThingyClose.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyClose, CONTROL_CLOSE_SHADOW); });
 
         controlThingyMaximize.setOnMouseEntered(event -> { controlThingyMaximize.setCursor(Cursor.N_RESIZE); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_GLOW); });
         controlThingyMaximize.setOnMouseExited(event -> { controlThingyMaximize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_SHADOW); });
 
-        controlThingyMinimize.setOnMouseEntered(event -> { controlThingyMinimize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_GLOW); });
+        controlThingyMinimize.setOnMouseEntered(event -> { controlThingyMinimize.setCursor(Cursor.WAIT); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_GLOW); });
         controlThingyMinimize.setOnMouseExited(event -> { controlThingyMinimize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_SHADOW); });
 
         matrixYear.setOnMouseEntered(event -> { matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, MATRIX_GLOW); });
@@ -1108,6 +1138,9 @@ public class Sundial {
 
         horizonGroup.setOnMouseEntered(event -> { horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, HORIZON_HOVER_GLOW); });
         horizonGroup.setOnMouseExited(event -> { horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, ""); });
+
+        dialHighNoonGroup.setOnMouseEntered(event -> { matrixHighNoon.setVisible(true); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW2); });
+        dialHighNoonGroup.setOnMouseExited(event -> { matrixHighNoon.setVisible(false); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW); });
 
     }
 
@@ -1181,7 +1214,7 @@ public class Sundial {
         updateDialMarkers();
     }
 
-    private String getShortTime(GregorianCalendar calendar) {
+    public static String getShortTime(GregorianCalendar calendar) {
         String hourString = ("00" + calendar.get(Calendar.HOUR_OF_DAY));
         hourString = hourString.substring(hourString.length() - 2, hourString.length());
         String minuteString = ("00" + calendar.get(Calendar.MINUTE));
@@ -1192,7 +1225,7 @@ public class Sundial {
         return hourString + ":" + minuteString + ":" + secondString;
     }
 
-    private String formatCoordinateToString(double coordinate, String suffixPositive, String suffixNegative) {
+    public static String formatCoordinateToString(double coordinate, String suffixPositive, String suffixNegative) {
 
         DecimalFormat coordinateFormat = new DecimalFormat("#0.00");
 
@@ -1214,7 +1247,7 @@ public class Sundial {
         return result;
     }
 
-    private String getTimeLengthString(double seconds) {
+    public static String getTimeLengthString(double seconds) {
 
         String result = "24h00m00s";
 
@@ -1365,6 +1398,14 @@ public class Sundial {
         return backgroundGroup;
     }
 
+    public Group getTinyGlobeGroup() {
+        return tinyGlobeGroup;
+    }
+
+    public Group getDialHighNoonGroup() {
+        return dialHighNoonGroup;
+    }
+
     // Setters
     public void setSunTime(GregorianCalendar sunTime) {
         this.sunTime = sunTime;
@@ -1374,6 +1415,7 @@ public class Sundial {
     public void setHighNoon(GregorianCalendar highNoon) {
         this.highNoon = highNoon;
         setHighNoonDialAngle(getAngle(this.highNoon));
+        matrixHighNoon.setString(getShortTime(highNoon));
     }
 
     public void setHorizon(GregorianCalendar sunrise, GregorianCalendar sunset) {
@@ -1397,8 +1439,8 @@ public class Sundial {
 
         setDialAngleLocalHour(getAngle(this.localTime));
 
-        updateLEDs(dialLocalSecondList, dialLocalSecondOn, dialLocalSecondTransitionList, localTime.get(Calendar.SECOND), true);
-        updateLEDs(dialLocalMinuteList, dialLocalMinuteOn, dialLocalMinuteTransitionList, localTime.get(Calendar.MINUTE), true);
+        updateLEDs(dialLocalSecondList, dialLocalSecondOn, dialLocalSecondTransitionList, localTime.get(Calendar.SECOND), animationOnEh);
+        updateLEDs(dialLocalMinuteList, dialLocalMinuteOn, dialLocalMinuteTransitionList, localTime.get(Calendar.MINUTE), animationOnEh);
 
     }
 
@@ -1510,7 +1552,7 @@ public class Sundial {
             dialMarkerRotateList.get(i).setAngle(getNightCompressionAngle(i * 360d / 96d));
             if (i % 4 == 0) {
                 double angle = dialMarkerRotateList.get(i).getAngle();
-                hourMarkerList.get(i / 4).setRotate(-1 * angle);
+                hourMarkerMatrixList.get(i / 4).setRotate(-1 * angle);
             }
         }
     }
@@ -1549,21 +1591,16 @@ public class Sundial {
 
             dialCircleBackground.setVisible(false);
             globe.setVisible(true);
-//            tinyGlobe.setVisible(false);
-//            tinyGlobeFrame.setVisible(false);
-//            tinyGlobeDot.setVisible(false);
 
-            double tinyGlobeSlideX = tinyGlobeFrame.getLayoutBounds().getWidth() / 2 - CENTER_X + 5;
-            double tinyGlobeSlideY = CENTER_Y - tinyGlobeFrame.getLayoutBounds().getHeight() / 2 - TINYGLOBE_OFFSET - 5;
+            tinyGlobeScale.setX(TINYGLOBE_DOWNSCALE);
+            tinyGlobeScale.setY(TINYGLOBE_DOWNSCALE);
 
-            tinyGlobeFrame.setTranslateX(tinyGlobeSlideX);
-            tinyGlobeFrame.setTranslateY(tinyGlobeSlideY);
+            double tinyGlobeSlideX = -1 * CENTER_X + TINYGLOBE_RADIUS + TINYGLOBE_SLIDE;
+            double tinyGlobeSlideY = DIAL_HEIGHT - CENTER_Y - TINYGLOBE_OFFSET - TINYGLOBE_RADIUS - TINYGLOBE_SLIDE;
 
-            tinyGlobe.setTranslateX(tinyGlobeSlideX);
-            tinyGlobe.setTranslateY(tinyGlobeSlideY);
-
-            tinyGlobeDot.setTranslateX(tinyGlobeSlideX);
-            tinyGlobeDot.setTranslateY(tinyGlobeSlideY);
+            tinyGlobeGroup.setTranslateX(tinyGlobeSlideX);
+            tinyGlobeGroup.setTranslateY(tinyGlobeSlideY);
+            tinyGlobeGroup.setOpacity(TINYGLOBE_OFFSET_OPACITY);
 
             longitudeGroup.setVisible(true);
             latitudeGroup.setVisible(true);
@@ -1578,21 +1615,16 @@ public class Sundial {
 
             dialCircleBackground.setVisible(true);
             globe.setVisible(false);
-//            tinyGlobe.setVisible(true);
-//            tinyGlobeFrame.setVisible(true);
-//            tinyGlobeDot.setVisible(true);
+
+            tinyGlobeScale.setX(1);
+            tinyGlobeScale.setY(1);
 
             double tinyGlobeSlideX = 0;
             double tinyGlobeSlideY = 0;
 
-            tinyGlobeFrame.setTranslateX(tinyGlobeSlideX);
-            tinyGlobeFrame.setTranslateY(tinyGlobeSlideY);
-
-            tinyGlobe.setTranslateX(tinyGlobeSlideX);
-            tinyGlobe.setTranslateY(tinyGlobeSlideY);
-
-            tinyGlobeDot.setTranslateX(tinyGlobeSlideX);
-            tinyGlobeDot.setTranslateY(tinyGlobeSlideY);
+            tinyGlobeGroup.setTranslateX(tinyGlobeSlideX);
+            tinyGlobeGroup.setTranslateY(tinyGlobeSlideY);
+            tinyGlobeGroup.setOpacity(TINYGLOBE_DEFAULT_OPACITY);
 
             longitudeGroup.setVisible(false);
             latitudeGroup.setVisible(false);
