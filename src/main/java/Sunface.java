@@ -23,11 +23,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.sql.Time;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 import static java.lang.Math.*;
 
@@ -111,9 +110,12 @@ public class Sunface extends Application {
     private TextArea debugTextArea;
 
     private Sunchart sunchart;
+    private Cetustime cetustime;
 
     private Stage debugWindow;
     private Stage statsWindow;
+
+    private HashMap<String, String> cetusData;
 
     private ArrayList<MouseButton> mouseButtonList = new ArrayList<>();
 
@@ -157,6 +159,8 @@ public class Sunface extends Application {
         Sundial sundial = new Sundial.Builder()
                 .nightCompression(0)
                 .build();
+
+        cetustime = new Cetustime();
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
 
@@ -220,7 +224,7 @@ public class Sunface extends Application {
         debugWindow.setX(0);
         debugWindow.setY(0);
         debugWindow.setResizable(false);
-//        debugWindow.show();
+        debugWindow.show();
 
         // Chart window
         LineChart lineChart = sunchart.getChart();
@@ -612,8 +616,23 @@ public class Sunface extends Application {
 
             // debug info
             if (debugWindow.isShowing()) {
+
                 double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntime.getDeclinationOfTheSun()));
                 double divisor = cos(toRadians(latitude)) * cos(toRadians(suntime.getDeclinationOfTheSun()));
+
+                StringBuilder cetusDataString = new StringBuilder();
+                Iterator cetusDataMapIterator = cetustime.getDataMap().keySet().iterator();
+                while (cetusDataMapIterator.hasNext()) {
+                    String key = (String) cetusDataMapIterator.next();
+                    cetusDataString.append(key + " = " + cetustime.getDataMap().get(key) + "\n");
+                }
+
+                String cetusExpiryDate = ""
+                        + cetustime.getCetusExpiry().get(Calendar.HOUR_OF_DAY) + ":"
+                        + cetustime.getCetusExpiry().get(Calendar.MINUTE) + ":"
+                        + cetustime.getCetusExpiry().get(Calendar.SECOND)
+                        + " " + cetustime.getCetusExpiry().getTimeZone().getDisplayName()
+                        ;
 
                 String debugText = ""
                         + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
@@ -629,6 +648,12 @@ public class Sunface extends Application {
                         + "localHourAngle divisor = " + divisor + "\n"
                         + "longitude = " + longitude + "\n"
                         + "latitude = " + latitude + "\n"
+                        + "Cetus okEh = " + cetustime.isOkEh() + "\n"
+                        + "Cetus result = " + cetustime.getResult() + "\n"
+                        + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
+                        + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
+                        + "Cetus expiry string = " + cetusExpiryDate + "\n"
+                        + "Cetus dataMap: \n" + cetusDataString + "\n"
                         ;
                 debugTextArea.setText(debugText);
             }
