@@ -366,10 +366,12 @@ public class Sundial {
     private Group controlThingyMaximize;
     private Group controlThingyMinimize;
     private Group backgroundGroup;
-    private Group cetusGroup;
+    private Group cetusArcGroup;
+    private Group cetusLineGroup;
 
     public boolean globeVisibleEh = false;
     public boolean animationOnEh = true;
+    public boolean cetusTimeVisibleEh = false;
 
     // Constructor
     public Sundial(Builder builder) {
@@ -606,13 +608,12 @@ public class Sundial {
         dialCircleFrame.setStrokeWidth(MARKER_FRAME_STROKE_WIDTH);
 
 
-        cetusGroup = new Group();
         cetusMarkerRotateList = new ArrayList<>();
         cetusMarkerArcList = new ArrayList<>();
         cetusMarkerAngleList = new ArrayList<>();
 
-        Group cetusArcGroup = new Group();
-        Group cetusLineGroup = new Group();
+        cetusArcGroup = new Group();
+        cetusLineGroup = new Group();
 
         Circle cetusArcClippingCircle = new Circle(CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y - CETUS_ARC_LENGTH);
         cetusArcClippingCircle.setFill(Color.WHITE);
@@ -1173,6 +1174,8 @@ public class Sundial {
         SubScene controlsScene = new SubScene(controlsGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
 
         dialsGroup.getChildren().addAll(backgroundScene, foregroundScene, controlsScene);
+
+        setCetusTimeVisibility(cetusTimeVisibleEh);
 
         // Apply scale global scale
         dialsGroup.setScaleX(SCALE_X);
@@ -1812,6 +1815,22 @@ public class Sundial {
     public void rotateGlobe(double longitude, double latitude) {
         globe.rotateGlobe(longitude, latitude);
         tinyGlobe.rotateGlobe(longitude, latitude);
+    }
+
+    public void toggleCetusTime() {
+
+        if(cetusTimeVisibleEh) {
+            cetusTimeVisibleEh = false;
+        } else {
+            cetusTimeVisibleEh = true;
+        }
+
+        setCetusTimeVisibility(cetusTimeVisibleEh);
+    }
+
+    private void setCetusTimeVisibility(boolean visibleEh) {
+        cetusArcGroup.setVisible(visibleEh);
+        cetusLineGroup.setVisible(visibleEh);
     }
 
     private Timeline createTimelineForLED(Rectangle rectangle) {

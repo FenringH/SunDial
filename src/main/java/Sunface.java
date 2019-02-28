@@ -1037,6 +1037,11 @@ public class Sunface extends Application {
             MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
             mouseButtonList.clear();
 
+            if (mouseButton.equals(MouseButton.SECONDARY)) {
+                sundial.toggleCetusTime();
+                return;
+            }
+
             if (mouseButton.equals(MouseButton.MIDDLE)) {
                 resetGlobePosition(suntime, sundial, 0);
                 return;
