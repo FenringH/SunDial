@@ -595,10 +595,12 @@ public class Sunface extends Application {
             GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, offsetLocalTime.getTimeZone());
+            ArrayList<ArrayList<GregorianCalendar>> cetusNightList = cetustime.getNightList(offsetLocalTime);
 
             sundial.setHighNoon(highNoonDate);
             sundial.setHorizon(sunriseDate, sunsetDate);
             sundial.setCoordinates(longitude, latitude);
+            sundial.setCetusTime(cetusNightList, offsetLocalTime.getTimeZone());
 
             String calculatedInformation =
                     "High Noon  : " + highNoonDate.getTime().toString()
@@ -634,6 +636,13 @@ public class Sunface extends Application {
                         + " " + cetustime.getCetusExpiry().getTimeZone().getDisplayName()
                         ;
 
+                StringBuilder cetusNightListString = new StringBuilder();
+                for(int i = 0; i < cetusNightList.size(); i++) {
+                    String nightStart = cetusNightList.get(i).get(0).getTime().toString();
+                    String nightEnd = cetusNightList.get(i).get(1).getTime().toString();
+                    cetusNightListString.append("\nnight " + (i+1) + ": start = " + nightStart + ", end = " + nightEnd);
+                }
+
                 String debugText = ""
                         + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
                         + "equationOfCenter = " + suntime.getEquationOfCenter() + "\n"
@@ -648,6 +657,7 @@ public class Sunface extends Application {
                         + "localHourAngle divisor = " + divisor + "\n"
                         + "longitude = " + longitude + "\n"
                         + "latitude = " + latitude + "\n"
+                        + "Cetus nightList = " + cetusNightListString + "\n"
                         + "Cetus okEh = " + cetustime.isOkEh() + "\n"
                         + "Cetus result = " + cetustime.getResult() + "\n"
                         + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"

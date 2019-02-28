@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,10 +21,11 @@ public class Cetustime {
     private static final String ISDAY_KEY = "isDay";
     private static final String EXPIRY_KEY = "expiry";
 
-    private static final int DAY_LENGTH = 100;
-    private static final int NIGHT_LENGTH = 50;
-    private static final int CYCLE_LENGTH = DAY_LENGTH + NIGHT_LENGTH;
-    private static final int DAY_CYCLES = (int) ceil(24d * 60 / CYCLE_LENGTH);
+    public static final int DAY_LENGTH = 100 * 60 * 1000;              // in ms
+    public static final int NIGHT_LENGTH = 50 * 60 * 1000;             // in ms
+    public static final int CYCLE_LENGTH = DAY_LENGTH + NIGHT_LENGTH;  // in ms
+
+    public static final int CYCLES_PER_DAY = (int) ceil(24d * 60 * 60 * 1000 / CYCLE_LENGTH);
 
     private HashMap<String, String> dataMap;
     private boolean dayEh;
@@ -92,21 +91,36 @@ public class Cetustime {
         GregorianCalendar dateUtc = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         dateUtc.setTimeInMillis(date.getTimeInMillis());
 
-        GregorianCalendar dateStartUtc = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        dateStartUtc.set(
+        GregorianCalendar dateMidnightUtc = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        dateMidnightUtc.set(
                 dateUtc.get(Calendar.YEAR),
                 dateUtc.get(Calendar.MONTH),
                 dateUtc.get(Calendar.DAY_OF_MONTH),
                 0, 0, 0
         );
 
-        long offsetInMillis = expiry.getTimeInMillis() - dateStartUtc.getTimeInMillis();
-        long numberOfcycles = (long) floor(offsetInMillis / (1000d * 60 * CYCLE_LENGTH));
+        long offsetInMillis = expiry.getTimeInMillis() - dateMidnightUtc.getTimeInMillis();
+        long cycleStart = offsetInMillis % CYCLE_LENGTH;
 
-        int direction = (offsetInMillis > 0) ? 1 : -1;
+        if (!dayEh) {
+//            cycleStart += DAY_LENGTH;
+            cycleStart -= NIGHT_LENGTH;
+        }
 
-        for (int i = 0; i < DAY_CYCLES; i++) {
-            long cycleStart = expiry.getTimeInMillis() + (i * CYCLE_LENGTH * numberOfcycles * 1000 * 60);
+        for (int i = 0; i < CYCLES_PER_DAY; i++) {
+
+            ArrayList<GregorianCalendar> cycle = new ArrayList<>();
+
+            GregorianCalendar nightStart = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+            GregorianCalendar nightEnd = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+
+            nightStart.setTimeInMillis((long) round((dateMidnightUtc.getTimeInMillis() + cycleStart + (i * CYCLE_LENGTH)) / 1000d) * 1000);
+            nightEnd.setTimeInMillis((long) round((dateMidnightUtc.getTimeInMillis() + cycleStart + (i * CYCLE_LENGTH + NIGHT_LENGTH)) / 1000d) * 1000);
+
+            cycle.add(nightStart);
+            cycle.add(nightEnd);
+
+            nightList.add(cycle);
         }
 
         return nightList;
@@ -122,13 +136,13 @@ public class Cetustime {
         if (matcher.matches()) {
 
             int year = Integer.parseInt(matcher.group(1));
-            int month = Integer.parseInt(matcher.group(2)) + 1;
+            int month = Integer.parseInt(matcher.group(2));
             int day = Integer.parseInt(matcher.group(3));
             int hour = Integer.parseInt(matcher.group(4));
             int minute = Integer.parseInt(matcher.group(5));
             int second = Integer.parseInt(matcher.group(6));
 
-            calendar.set(year, month, day, hour, minute, second);
+            calendar.set(year, month - 1, day, hour, minute, second);
         }
 
         return calendar;
