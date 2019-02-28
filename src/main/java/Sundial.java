@@ -70,8 +70,8 @@ public class Sundial {
     private static final double CONTROL_CLOSE_RADIUS = 10.0d;
     private static final double CONTROL_MAXIMIZE_RADIUS = 10.0d;
     private static final double CONTROL_MINIMIZE_RADIUS = 10.0d;
-    private static final double CETUS_MARKER_LENGTH = 40.0d;
-    private static final double CETUS_ARC_LENGTH = 20.0d;
+    private static final double CETUS_MARKER_LENGTH = 50.0d;
+    private static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS;
 
     private static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     private static final double SUNTIME_STROKE_WIDTH = 2.00d;
@@ -98,7 +98,7 @@ public class Sundial {
     private static final double CONTROL_CLOSE_OPACITY = 0.75d;
     private static final double CONTROL_MAXIMIZE_OPACITY = 0.75d;
     private static final double CONTROL_MINIMIZE_OPACITY = 0.75d;
-    private static final double CETUS_ARC_OPACITY = 0.65d;
+    private static final double CETUS_ARC_OPACITY = 1.00d;
 
     private static final double MATRIX_MARKER_OFFSET = 6.5d;
     private static final double MATRIX_HORIZON_OFFSET = 77.0d;
@@ -179,8 +179,8 @@ public class Sundial {
     public static final Color Color_Of_MinimizeFill   = new Color(1.00, 1.00, 0.00, 0.10);
     public static final Color Color_Of_MinimizeStroke = new Color(0.90, 0.90, 0.20, 1.00);
 
-    public static final Color Color_Of_CetusMarker = new Color(0.90, 0.60, 1.00, 1.00);
-    public static final Color Color_Of_CetusArc = new Color(0.60, 0.15, 0.70, 1.00);
+    public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
+    public static final Color Color_Of_CetusArc = new Color(0.90, 0.25, 1.00, 1.00);
 
     public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String MATRIX_GLOW2            = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
@@ -204,8 +204,8 @@ public class Sundial {
     public static final String CONTROL_MINIMIZE_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_MINIMIZE_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(224,224, 64, 1.0),  4.0, 0.50, 0, 0);";
 
-    public static final String CETUS_MARKER_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(224, 64,224, 1.0),  6.0, 0.50, 0, 0);";
-    public static final String CETUS_MARKER_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(224,224,224, 1.0),  6.0, 0.50, 0, 0);";
+    public static final String CETUS_MARKER_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64,255, 1.0),  8.0, 0.50, 0, 0);";
+    public static final String CETUS_MARKER_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0),  8.0, 0.50, 0, 0);";
 
     private static final Image GLOBE_IMAGE = new Image("maps/earth_diffuse_gall-peters_02.jpg",
             1003, 639, true, false);
@@ -220,7 +220,7 @@ public class Sundial {
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.75, Color_Of_Void),
+            new Stop(0.90, Color_Of_Void),
             new Stop(1.00, Color_Of_Warning)
     );
 
@@ -250,6 +250,16 @@ public class Sundial {
             new Stop(0.80, Color_Of_Void),
             new Stop(1.00, Color_Of_TinyFrame)
     );
+
+    private static final RadialGradient CETUS_ARC_GRADIENT = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.72, Color_Of_Void),
+            new Stop(0.90, Color_Of_CetusArc)
+    );
+
 
     private static final Font Font_Of_Info = new Font("Lucida Console", 14);
     private static final Font Font_Of_Dial = new Font("Lucida Console", 8);
@@ -601,12 +611,20 @@ public class Sundial {
         cetusMarkerArcList = new ArrayList<>();
         cetusMarkerAngleList = new ArrayList<>();
 
-        Circle cetusArcClippingCircle = new Circle(CENTER_X, CENTER_Y, 100);
-        cetusArcClippingCircle.setFill(Color.WHITE);
-        cetusArcClippingCircle.setStroke(Color_Of_Void);
-
         Group cetusArcGroup = new Group();
         Group cetusLineGroup = new Group();
+
+        Circle cetusArcClippingCircle = new Circle(CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y - CETUS_ARC_LENGTH);
+        cetusArcClippingCircle.setFill(Color.WHITE);
+        cetusArcClippingCircle.setStroke(Color_Of_Void);
+        cetusArcClippingCircle.setMouseTransparent(true);
+
+        Circle cetusArcBackgroundCircle = new Circle(CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y);
+        cetusArcBackgroundCircle.setFill(Color.WHITE);
+        cetusArcBackgroundCircle.setStroke(Color_Of_Void);
+        cetusArcBackgroundCircle.setMouseTransparent(true);
+
+        cetusArcGroup.getChildren().add(cetusArcBackgroundCircle);
 
         for (int i = 0; i < Cetustime.CYCLES_PER_DAY; i++) {
 
@@ -637,13 +655,8 @@ public class Sundial {
             Arc nightArc = new Arc(CENTER_X, CENTER_Y, CENTER_X - MARGIN_X, CENTER_Y - MARGIN_Y, 90 - startAngle, startAngle - endAngle);
             nightArc.setType(ArcType.ROUND);
             nightArc.setStroke(Color_Of_Void);
-            nightArc.setFill(Color_Of_CetusArc);
+            nightArc.setFill(CETUS_ARC_GRADIENT);
             nightArc.setOpacity(CETUS_ARC_OPACITY);
-
-            Shape nightArcCut = Shape.subtract(nightArc, cetusArcClippingCircle);
-            nightArcCut.setStroke(Color_Of_Void);
-            nightArcCut.setFill(Color_Of_CetusArc);
-            nightArcCut.setOpacity(CETUS_ARC_OPACITY);
 
             cetusMarkerAngleList.add(startAngle);
             cetusMarkerAngleList.add(endAngle);
@@ -651,13 +664,17 @@ public class Sundial {
             cetusMarkerRotateList.add(markerLineEndRotate);
             cetusMarkerArcList.add(nightArc);
 
-            cetusArcGroup.getChildren().add(nightArcCut);
+            cetusArcGroup.getChildren().add(nightArc);
             cetusLineGroup.getChildren().addAll(markerLineStart, markerLineEnd);
         }
+
+        cetusArcGroup.getChildren().add(cetusArcClippingCircle);
+        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
 
 
         Group dialMinuteMarkers = new Group();
         dialMinuteMarkers.setBlendMode(BlendMode.COLOR_BURN);
+        dialMinuteMarkers.setMouseTransparent(true);
 
         for(int i = 0; i < 60; i++) {
 
@@ -857,8 +874,8 @@ public class Sundial {
             localSecond.setStroke(Color_Of_Void);
             localSecond.setStyle(LOCALSECOND_GLOW);
             localSecond.setBlendMode(BlendMode.SCREEN);
-//            localSecond.setFill(Color_Of_Void);
             localSecond.setOpacity(0.0);
+            localSecond.setMouseTransparent(true);
 
             Rotate localSecondRotate = new Rotate();
             localSecondRotate.setPivotX(LOCALSECOND_WIDTH / 2);
@@ -878,8 +895,8 @@ public class Sundial {
             localMinute.setStroke(Color_Of_Void);
             localMinute.setStyle(LOCALMINUTE_GLOW);
             localMinute.setBlendMode(BlendMode.SCREEN);
-//            localMinute.setFill(Color_Of_Void);
             localMinute.setOpacity(0.0);
+            localMinute.setMouseTransparent(true);
 
             Rotate localMinuteRotate = new Rotate();
             localMinuteRotate.setPivotX(LOCALMINUTE_WIDTH / 2);
@@ -1117,14 +1134,14 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialArcNight);
         foregroundGroup.getChildren().add(dialArcMidnight);
         foregroundGroup.getChildren().add(dialMinuteMarkers);
-        foregroundGroup.getChildren().addAll(dialLocalSecondList);
-        foregroundGroup.getChildren().addAll(dialLocalMinuteList);
         foregroundGroup.getChildren().add(dialArcDayLength);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(dialCircleFrame);
-        foregroundGroup.getChildren().add(cetusArcGroup);
         foregroundGroup.getChildren().add(dialHourLineMarkers);
+        foregroundGroup.getChildren().add(cetusArcGroup);
         foregroundGroup.getChildren().add(cetusLineGroup);
+        foregroundGroup.getChildren().addAll(dialLocalSecondList);
+        foregroundGroup.getChildren().addAll(dialLocalMinuteList);
 //        foregroundGroup.getChildren().add(tinyGlobeScene);
 //        foregroundGroup.getChildren().add(sunTimeDial);
         foregroundGroup.getChildren().add(dialHighNoonGroup);

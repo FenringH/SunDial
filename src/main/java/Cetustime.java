@@ -100,10 +100,9 @@ public class Cetustime {
         );
 
         long offsetInMillis = expiry.getTimeInMillis() - dateMidnightUtc.getTimeInMillis();
-        long cycleStart = offsetInMillis % CYCLE_LENGTH;
+        long cycleStart = dateMidnightUtc.getTimeInMillis() + (offsetInMillis % CYCLE_LENGTH);
 
         if (!dayEh) {
-//            cycleStart += DAY_LENGTH;
             cycleStart -= NIGHT_LENGTH;
         }
 
@@ -114,8 +113,8 @@ public class Cetustime {
             GregorianCalendar nightStart = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
             GregorianCalendar nightEnd = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 
-            nightStart.setTimeInMillis((long) round((dateMidnightUtc.getTimeInMillis() + cycleStart + (i * CYCLE_LENGTH)) / 1000d) * 1000);
-            nightEnd.setTimeInMillis((long) round((dateMidnightUtc.getTimeInMillis() + cycleStart + (i * CYCLE_LENGTH + NIGHT_LENGTH)) / 1000d) * 1000);
+            nightStart.setTimeInMillis(cycleStart + (i * CYCLE_LENGTH));
+            nightEnd.setTimeInMillis(cycleStart + (i * CYCLE_LENGTH) + NIGHT_LENGTH);
 
             cycle.add(nightStart);
             cycle.add(nightEnd);

@@ -206,7 +206,7 @@ public class Sunface extends Application {
 
         // Debug window
         debugTextArea.setMinWidth(600);
-        debugTextArea.setMinHeight(400);
+        debugTextArea.setMinHeight(800);
         debugTextArea.setEditable(false);
         debugTextArea.setWrapText(true);
         debugTextArea.setText(A_BEGINNING);
@@ -223,7 +223,7 @@ public class Sunface extends Application {
         debugWindow.setHeight(debugScene.getHeight());
         debugWindow.setX(0);
         debugWindow.setY(0);
-        debugWindow.setResizable(false);
+        debugWindow.setResizable(true);
         debugWindow.show();
 
         // Chart window
