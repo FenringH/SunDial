@@ -115,7 +115,7 @@ public class Sunface extends Application {
     private Stage debugWindow;
     private Stage statsWindow;
 
-    private HashMap<String, String> cetusData;
+    private ArrayList<ArrayList<GregorianCalendar>> cetusNightList;
 
     private ArrayList<MouseButton> mouseButtonList = new ArrayList<>();
 
@@ -161,6 +161,7 @@ public class Sunface extends Application {
                 .build();
 
         cetustime = new Cetustime();
+        cetusNightList = cetustime.getNightList(currentLocalTime);
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
 
@@ -224,7 +225,7 @@ public class Sunface extends Application {
         debugWindow.setX(0);
         debugWindow.setY(0);
         debugWindow.setResizable(true);
-        debugWindow.show();
+//        debugWindow.show();
 
         // Chart window
         LineChart lineChart = sunchart.getChart();
@@ -258,7 +259,11 @@ public class Sunface extends Application {
         // Events
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
         sundial.getControlThingyMaximize().setOnMouseClicked(event -> toggleMaximizeWindow(primaryStage, dialsScale, event));
-        sundial.getControlThingyMinimize().setOnMouseClicked(event -> minimizeWindow(primaryStage, timeline, event));
+        sundial.getControlThingyMinimize().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
+        sundial.getControlThingyMinimize().setOnMouseReleased(event -> {
+            minimizeWindow(primaryStage, timeline, event);
+            mouseButtonList.clear();
+        });
 
         sundial.getDialCircleCenterDot().setOnMousePressed(event -> recordNightCompressionPosition(suntime, sundial, event));
         sundial.getDialCircleCenterDot().setOnMouseReleased(event -> mouseButtonList.clear());
@@ -505,6 +510,10 @@ public class Sunface extends Application {
 
     }
 
+    private boolean isNewDay(GregorianCalendar newDate, GregorianCalendar oldDate) {
+        return (newDate.get(Calendar.DAY_OF_YEAR) != oldDate.get(Calendar.DAY_OF_YEAR));
+    }
+
     private void initCurrentTime(Suntime suntime, Sundial sundial) {
         updateCurrentTime(suntime, sundial, true);
     }
@@ -516,6 +525,10 @@ public class Sunface extends Application {
     private void updateCurrentTime(Suntime suntime, Sundial sundial, boolean initialize) {
 
         GregorianCalendar newLocalTime = new GregorianCalendar();
+        GregorianCalendar oldLocalTime = (GregorianCalendar) currentLocalTime.clone();
+
+        // Store current Julian Day Number before updating current time
+        long oldJulianDayNumber = Suntime.getJulianDayNumber(offsetLocalTime);
 
         long newTimeInSeconds = newLocalTime.getTimeInMillis() / 1000;
         long currentTimeInSeconds = currentLocalTime.getTimeInMillis() / 1000;
@@ -526,9 +539,6 @@ public class Sunface extends Application {
         long offsetSeconds = (offsetLocalTime.getTimeInMillis() - currentLocalTime.getTimeInMillis()) / 1000;
         currentLocalTime = newLocalTime;
         offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + offsetSeconds * 1000);
-
-        // Store current Julian Day Number before updating current time
-        long oldJulianDayNumber = Suntime.getJulianDayNumber(offsetLocalTime);
 
         // Update suntime and sundial objects
         suntime.setObserverTime(offsetLocalTime);
@@ -542,6 +552,7 @@ public class Sunface extends Application {
 
         sundial.setSunTime(sunTimeDate);
         sundial.setLocalTime(offsetLocalTime);
+        sundial.updateCetusTimer(cetusNightList);
 
         sundial.setLocalTimeText(offsetLocalTime.getTime().toString());
 
@@ -586,6 +597,11 @@ public class Sunface extends Application {
         // Update daily data only if it's a new day, or initialization event
         if (julianDayNumber != oldJulianDayNumber || initialize) {
 
+            // Update suntime and sundial objects
+            suntime.setObserverTime(offsetLocalTime);
+            suntime.setObserverPosition(longitude, latitude);
+            cetusNightList = cetustime.getNightList(offsetLocalTime);
+
             double highNoonJulianDate = suntime.getHighnoonJulianDate();
             double sunriseJulianDate = suntime.getSunriseJulianDate();
             double sunsetJulianDate = suntime.getSunsetJulianDate();
@@ -595,7 +611,6 @@ public class Sunface extends Application {
             GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, offsetLocalTime.getTimeZone());
-            ArrayList<ArrayList<GregorianCalendar>> cetusNightList = cetustime.getNightList(offsetLocalTime);
 
             sundial.setHighNoon(highNoonDate);
             sundial.setHorizon(sunriseDate, sunsetDate);
@@ -989,6 +1004,21 @@ public class Sunface extends Application {
     }
 
     private void minimizeWindow(Stage stage, Timeline timeline, MouseEvent event) {
+
+        if (!mouseButtonList.isEmpty()) {
+
+            if (mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.SECONDARY)) {
+
+                if (debugWindow.isShowing()) {
+                    debugWindow.close();
+                } else {
+                    debugWindow.show();
+                }
+
+                return;
+            }
+        }
+
         stage.setIconified(true);
     }
 

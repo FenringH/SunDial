@@ -102,16 +102,19 @@ public class Cetustime {
         long offsetInMillis = expiry.getTimeInMillis() - dateMidnightUtc.getTimeInMillis();
         long cycleStart = dateMidnightUtc.getTimeInMillis() + (offsetInMillis % CYCLE_LENGTH);
 
-        if (!dayEh) {
-            cycleStart -= NIGHT_LENGTH;
-        }
+        if (offsetInMillis > 0) { cycleStart -= CYCLE_LENGTH; }
 
-        for (int i = 0; i < CYCLES_PER_DAY; i++) {
+        if (!dayEh) { cycleStart -= NIGHT_LENGTH; }
+
+        for (int i = 0; i <= CYCLES_PER_DAY; i++) {
 
             ArrayList<GregorianCalendar> cycle = new ArrayList<>();
 
-            GregorianCalendar nightStart = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-            GregorianCalendar nightEnd = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+//            GregorianCalendar nightStart = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+//            GregorianCalendar nightEnd = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+
+            GregorianCalendar nightStart = new GregorianCalendar();
+            GregorianCalendar nightEnd = new GregorianCalendar();
 
             nightStart.setTimeInMillis(cycleStart + (i * CYCLE_LENGTH));
             nightEnd.setTimeInMillis(cycleStart + (i * CYCLE_LENGTH) + NIGHT_LENGTH);

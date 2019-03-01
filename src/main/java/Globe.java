@@ -26,6 +26,10 @@ public class Globe extends Group {
     private double latitude = 0;
 
     private Group globe;
+    private Sphere sphere;
+    private PhongMaterial globeMaterial;
+
+    private Image diffuseMap;
 
     private Rotate rotateLongitude;
     private Rotate rotateLatitude;
@@ -37,10 +41,11 @@ public class Globe extends Group {
     public Globe(Image diffuseMap, double radius) {
         super();
         this.globe = new Group();
-        getChildren().add(getGlobe(diffuseMap, radius));
+        this.diffuseMap = diffuseMap;
+        getChildren().add(getGlobe(radius));
     }
 
-    private Group getGlobe(Image diffuseMap, double radius) {
+    private Group getGlobe(double radius) {
 
         this.globe = new Group();
 
@@ -50,14 +55,15 @@ public class Globe extends Group {
         this.rotateLongitude.setAxis(Rotate.Y_AXIS);
         this.rotateLatitude.setAxis(Rotate.X_AXIS);
 
-        Sphere sphere = new Sphere(radius, SPHERE_DIVISIONS);
+        sphere = new Sphere(radius, SPHERE_DIVISIONS);
 //        sphere.setDrawMode(DrawMode.LINE);
 //        sphere.setCullFace(CullFace.NONE);
 
-        PhongMaterial earthMaterial = new PhongMaterial();
-        earthMaterial.setDiffuseMap(diffuseMap);
-//        earthMaterial.setDiffuseColor(Color_Of_Transparency);
-        sphere.setMaterial(earthMaterial);
+        globeMaterial = new PhongMaterial();
+        globeMaterial.setDiffuseMap(diffuseMap);
+//        globeMaterial.setDiffuseColor(Color_Of_Transparency);
+
+        sphere.setMaterial(globeMaterial);
         sphere.getTransforms().add(this.rotateLongitude);
 
         Group sphereHolder = new Group();
@@ -78,5 +84,10 @@ public class Globe extends Group {
 
         this.rotateLongitude.setAngle(this.longitude);
         this.rotateLatitude.setAngle(this.latitude);
+    }
+
+    public void setDiffuseMap(Image map) {
+        diffuseMap = map;
+        globeMaterial.setDiffuseMap(diffuseMap);
     }
 }

@@ -54,7 +54,10 @@ public class Sundial {
     private static final double HIGHNOON_DIAL_LENGTH = 50.0d;
     private static final double SUNRISE_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
     private static final double SUNSET_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
-    private static final double LOCALTIME_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
+    private static final double MARKER_HOUR_LENGTH = 20.0d;
+    private static final double MARKER_MINUTE_LENGTH = 8.0d;
+    private static final double MARKER_MINUTE_WIDTH = 8.0d;
+    private static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS;
     private static final double LOCALTIME_DIAL_WIDTH = 14.0d;
     private static final double HIGHNOON_DIAL_WIDTH = 14.0d;
     private static final double DAYLENGTH_ARC_RADIUS = 105.0d;
@@ -120,11 +123,10 @@ public class Sundial {
     private static final double CONTROL_CLOSE_OFFSET = 236.0d;
     private static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
     private static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
-
-    private static final double MARKER_HOUR_LENGTH = 20.0d;
-    private static final double MARKER_MINUTE_LENGTH = 8.0d;
-    private static final double MARKER_MINUTE_WIDTH = 8.0d;
     private static final double MARKER_MINUTE_OFFSET = 65.0d;
+    private static final double CETUS_TIMER_OFFSET = 160.0d;
+    private static final double CETUS_TIMEREADER_OFFSET = 170.0d;
+    private static final double CETUS_HORIZON_OFFSET = 50.0d;
 
     private static final double MATRIX_TIME_SCALE = 3.50d;
     private static final double MATRIX_DATE_SCALE = 1.50d;
@@ -136,6 +138,9 @@ public class Sundial {
     private static final double MATRIX_HOUR_SCALE = 1.00d;
     private static final double MATRIX_MINUTE_SCALE = 0.75d;
     private static final double TINYGLOBE_DOWNSCALE = 0.80d;
+    private static final double CETUS_TIMER_SCALE = 1.00d;
+    private static final double CETUS_TIMEREADER_SCALE = 0.75d;
+    private static final double CETUS_HORIZON_SCALE = 0.75d;
 
     private static final double CONTROL_CLOSE_ANGLE = 37.0d;
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
@@ -206,6 +211,7 @@ public class Sundial {
 
     public static final String CETUS_MARKER_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64,255, 1.0),  8.0, 0.50, 0, 0);";
     public static final String CETUS_MARKER_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0),  8.0, 0.50, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
     private static final Image GLOBE_IMAGE = new Image("maps/earth_diffuse_gall-peters_02.jpg",
             1003, 639, true, false);
@@ -214,6 +220,8 @@ public class Sundial {
     private static final Image TINYGLOBE_IMAGE = new Image("maps/earth_diffuse_gall-peters_02.jpg",
         1003, 639, true, false);
 
+    private static final Image TINYGLOBE_CETUS_IMAGE = new Image("images/LotusFlower_edit.png",
+            2048, 1264, true, false);
 
     private static final RadialGradient WARNING_RADIAL_GRADIENT = new RadialGradient(
             0, 0,
@@ -260,6 +268,14 @@ public class Sundial {
             new Stop(0.90, Color_Of_CetusArc)
     );
 
+    private static final RadialGradient CETUS_ARC_GRADIENT_HOVER = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.60, Color_Of_Void),
+            new Stop(0.85, Color_Of_CetusArc)
+    );
 
     private static final Font Font_Of_Info = new Font("Lucida Console", 14);
     private static final Font Font_Of_Dial = new Font("Lucida Console", 8);
@@ -349,7 +365,7 @@ public class Sundial {
     private DotMatrix matrixHighNoon;
     private ArrayList<DotMatrix> hourMarkerMatrixList;
     private DotMatrix cetusTimer;
-    private DotMatrix cetusTimeReader;
+    private ArrayList<DotMatrix> cetusTimeMatrixList;
 
     private Globe globe;
     private Globe tinyGlobe;
@@ -611,6 +627,7 @@ public class Sundial {
         cetusMarkerRotateList = new ArrayList<>();
         cetusMarkerArcList = new ArrayList<>();
         cetusMarkerAngleList = new ArrayList<>();
+        cetusTimeMatrixList = new ArrayList<>();
 
         cetusArcGroup = new Group();
         cetusLineGroup = new Group();
@@ -627,7 +644,7 @@ public class Sundial {
 
         cetusArcGroup.getChildren().add(cetusArcBackgroundCircle);
 
-        for (int i = 0; i < Cetustime.CYCLES_PER_DAY; i++) {
+        for (int i = 0; i <= Cetustime.CYCLES_PER_DAY; i++) {
 
             double startAngle = (i * Cetustime.CYCLE_LENGTH * 360d) / (24d * 60 * 60 * 1000);
             double endAngle = ((i * Cetustime.CYCLE_LENGTH + Cetustime.NIGHT_LENGTH) * 360d) / (24d * 60 * 60 * 1000);
@@ -636,22 +653,47 @@ public class Sundial {
             markerLineStart.setStroke(Color_Of_CetusMarker);
             markerLineStart.setStrokeWidth(CETUS_MARKER_WIDTH);
             markerLineStart.setStyle(CETUS_MARKER_SHADOW);
+            markerLineStart.setMouseTransparent(true);
 
             Rotate markerLineStartRotate = centerRotate.clone();
             markerLineStartRotate.setAngle(startAngle);
 
-            markerLineStart.getTransforms().add(markerLineStartRotate);
+            DotMatrix matrixStart = new DotMatrix("00:00", Color_Of_CetusMarker);
+            matrixStart.setScaleX(CETUS_HORIZON_SCALE);
+            matrixStart.setScaleY(CETUS_HORIZON_SCALE);
+            matrixStart.setLayoutX(CENTER_X - matrixStart.getLayoutBounds().getWidth() / 2 - matrixStart.getLayoutBounds().getHeight() / 2);
+            matrixStart.setLayoutY(CETUS_HORIZON_OFFSET);
+            matrixStart.setRotate(90d);
+            matrixStart.setStyle(CETUS_MARKER_SHADOW);
+            matrixStart.setMouseTransparent(true);
+            matrixStart.setVisible(false);
 
+            Group startHorizonGroup = new Group();
+            startHorizonGroup.getChildren().addAll(markerLineStart, matrixStart);
+            startHorizonGroup.getTransforms().add(markerLineStartRotate);
 
             Line markerLineEnd = new Line(CENTER_X, CETUS_MARKER_LENGTH + MARGIN_Y, CENTER_X, MARGIN_Y);
             markerLineEnd.setStroke(Color_Of_CetusMarker);
             markerLineEnd.setStrokeWidth(CETUS_MARKER_WIDTH);
             markerLineEnd.setStyle(CETUS_MARKER_SHADOW);
+            markerLineEnd.setMouseTransparent(true);
+
+            DotMatrix matrixEnd = new DotMatrix("00:00", Color_Of_CetusMarker);
+            matrixEnd.setScaleX(CETUS_HORIZON_SCALE);
+            matrixEnd.setScaleY(CETUS_HORIZON_SCALE);
+            matrixEnd.setTranslateX(CENTER_X - matrixEnd.getLayoutBounds().getWidth() / 2 + matrixEnd.getLayoutBounds().getHeight() / 2);
+            matrixEnd.setTranslateY(CETUS_HORIZON_OFFSET);
+            matrixEnd.setRotate(90d);
+            matrixEnd.setStyle(CETUS_MARKER_SHADOW);
+            matrixEnd.setMouseTransparent(true);
+            matrixEnd.setVisible(false);
 
             Rotate markerLineEndRotate = centerRotate.clone();
             markerLineEndRotate.setAngle(endAngle);
 
-            markerLineEnd.getTransforms().add(markerLineEndRotate);
+            Group endHorizonGroup = new Group();
+            endHorizonGroup.getChildren().addAll(markerLineEnd, matrixEnd);
+            endHorizonGroup.getTransforms().add(markerLineEndRotate);
 
             Arc nightArc = new Arc(CENTER_X, CENTER_Y, CENTER_X - MARGIN_X, CENTER_Y - MARGIN_Y, 90 - startAngle, startAngle - endAngle);
             nightArc.setType(ArcType.ROUND);
@@ -664,13 +706,40 @@ public class Sundial {
             cetusMarkerRotateList.add(markerLineStartRotate);
             cetusMarkerRotateList.add(markerLineEndRotate);
             cetusMarkerArcList.add(nightArc);
+            cetusTimeMatrixList.add(matrixStart);
+            cetusTimeMatrixList.add(matrixEnd);
 
             cetusArcGroup.getChildren().add(nightArc);
-            cetusLineGroup.getChildren().addAll(markerLineStart, markerLineEnd);
+            cetusLineGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
+
+            nightArc.setOnMouseEntered(event -> {
+                matrixStart.setVisible(true);
+                matrixEnd.setVisible(true);
+                markerLineStart.setStartY(CETUS_MARKER_LENGTH * 2);
+                markerLineEnd.setStartY(CETUS_MARKER_LENGTH * 2);
+                nightArc.setFill(CETUS_ARC_GRADIENT_HOVER);
+            });
+
+            nightArc.setOnMouseExited(event -> {
+                matrixStart.setVisible(false);
+                matrixEnd.setVisible(false);
+                markerLineStart.setStartY(CETUS_MARKER_LENGTH + MARGIN_Y);
+                markerLineEnd.setStartY(CETUS_MARKER_LENGTH + MARGIN_Y);
+                nightArc.setFill(CETUS_ARC_GRADIENT);
+            });
         }
 
         cetusArcGroup.getChildren().add(cetusArcClippingCircle);
         cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
+
+
+        cetusTimer = new DotMatrix("0h00m00s", Color_Of_CetusMarker);
+        cetusTimer.setScaleX(CETUS_TIMER_SCALE);
+        cetusTimer.setScaleY(CETUS_TIMER_SCALE);
+        cetusTimer.setLayoutX(CENTER_X - cetusTimer.getLayoutBounds().getWidth() / 2);
+        cetusTimer.setLayoutY(CETUS_TIMER_OFFSET);
+        cetusTimer.setStyle(CETUS_MATRIX_SHADOW);
+        cetusTimer.setVisible(false);
 
 
         Group dialMinuteMarkers = new Group();
@@ -824,6 +893,7 @@ public class Sundial {
         dialLocalHourLine.setOpacity(0.5);
         dialLocalHourLine.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
 
+/*
         Polygon dialLocalHourPoly = new Polygon(
                 CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
                 CENTER_X - LOCALTIME_DIAL_WIDTH / 4, MARGIN_Y * 3,
@@ -831,6 +901,15 @@ public class Sundial {
                 CENTER_X, MARGIN_Y,
                 CENTER_X + LOCALTIME_DIAL_WIDTH / 2, MARGIN_Y * 2,
                 CENTER_X + LOCALTIME_DIAL_WIDTH / 4, MARGIN_Y * 3,
+                CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
+        );
+*/
+        Polygon dialLocalHourPoly = new Polygon(
+                CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                CENTER_X - LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.75,
+                CENTER_X - LOCALTIME_STROKE_WIDTH / 2, MARGIN_Y + MARKER_HOUR_LENGTH / 4,
+                CENTER_X + LOCALTIME_STROKE_WIDTH / 2, MARGIN_Y + MARKER_HOUR_LENGTH / 4,
+                CENTER_X + LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.75,
                 CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
         );
         dialLocalHourPoly.setFill(Color_Of_LocalTime);
@@ -1136,7 +1215,6 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialArcMidnight);
         foregroundGroup.getChildren().add(dialMinuteMarkers);
         foregroundGroup.getChildren().add(dialArcDayLength);
-        foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().add(dialHourLineMarkers);
         foregroundGroup.getChildren().add(cetusArcGroup);
@@ -1149,12 +1227,14 @@ public class Sundial {
 //        foregroundGroup.getChildren().add(sunriseGroup);
 //        foregroundGroup.getChildren().add(sunsetGroup);
         foregroundGroup.getChildren().add(horizonGroup);
-        foregroundGroup.getChildren().add(matrixHighNoon);
         foregroundGroup.getChildren().add(dialHourMatrixMarkers);
 //        foregroundGroup.getChildren().add(dialLineLocalHour);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
         foregroundGroup.getChildren().add(dialCircleCenterDot);
         foregroundGroup.getChildren().add(dialLocalHourGroup);
+        foregroundGroup.getChildren().add(cetusTimer);
+        foregroundGroup.getChildren().add(matrixDayLength);
+        foregroundGroup.getChildren().add(matrixHighNoon);
 //        foregroundGroup.getChildren().add(tinyGlobeDot);
 //        foregroundGroup.getChildren().add(tinyGlobeFrame);
         foregroundGroup.getChildren().add(tinyGlobeGroup);
@@ -1195,7 +1275,7 @@ public class Sundial {
         controlThingyMaximize.setOnMouseEntered(event -> { controlThingyMaximize.setCursor(Cursor.N_RESIZE); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_GLOW); });
         controlThingyMaximize.setOnMouseExited(event -> { controlThingyMaximize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_SHADOW); });
 
-        controlThingyMinimize.setOnMouseEntered(event -> { controlThingyMinimize.setCursor(Cursor.WAIT); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_GLOW); });
+        controlThingyMinimize.setOnMouseEntered(event -> { controlThingyMinimize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_GLOW); });
         controlThingyMinimize.setOnMouseExited(event -> { controlThingyMinimize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_SHADOW); });
 
         matrixYear.setOnMouseEntered(event -> { matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, MATRIX_GLOW); });
@@ -1327,6 +1407,10 @@ public class Sundial {
         return hourString + ":" + minuteString + ":" + secondString;
     }
 
+    public static String getShorterTime(GregorianCalendar calendar) {
+        return getShortTime(calendar).substring(0, 5);
+    }
+
     public static String formatCoordinateToString(double coordinate, String suffixPositive, String suffixNegative) {
 
         DecimalFormat coordinateFormat = new DecimalFormat("#0.00");
@@ -1381,7 +1465,6 @@ public class Sundial {
 
         return result;
     }
-
 
     // Getters
     public Group getDialsGroup() {
@@ -1509,6 +1592,21 @@ public class Sundial {
     }
 
     // Setters
+    public void updateCetusTimer(ArrayList<ArrayList<GregorianCalendar>> nightList) {
+
+        long offsetTime = 0;
+
+        int i = 0;
+        while (offsetTime <= 0 && (i / 2) < nightList.size()) {
+            int nightIndex = i / 2;
+            int nightStep = i % 2;
+            offsetTime = nightList.get(nightIndex).get(nightStep).getTimeInMillis() - localTime.getTimeInMillis();
+            i++;
+        }
+
+        cetusTimer.setString(getTimeLengthString(offsetTime / 1000d).substring(1));
+    }
+
     public void setSunTime(GregorianCalendar sunTime) {
         this.sunTime = sunTime;
         setSunTimeDialAngle(getAbsoluteAngle(this.sunTime));
@@ -1553,16 +1651,23 @@ public class Sundial {
         int cetusMarkerAngleListSize = cetusMarkerAngleList.size();
         int nightListSize = nightList.size();
 
-        GregorianCalendar midnightTime = new GregorianCalendar(timeZone);
-        midnightTime.set(
-                localTime.get(Calendar.YEAR),
-                localTime.get(Calendar.MONTH),
-                localTime.get(Calendar.DAY_OF_MONTH),
-                0, 0, 0
+        GregorianCalendar localTimeUtc = (GregorianCalendar) localTime.clone();
+        localTimeUtc.get(Calendar.HOUR_OF_DAY);
+        localTimeUtc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        localTimeUtc.get(Calendar.HOUR_OF_DAY);
+
+        int currentDay = localTimeUtc.get(Calendar.DAY_OF_YEAR);
+
+        GregorianCalendar currentDayStart = new GregorianCalendar();
+        currentDayStart.set(
+                localTimeUtc.get(Calendar.YEAR),
+                localTimeUtc.get(Calendar.MONTH),
+                localTimeUtc.get(Calendar.DAY_OF_MONTH),
+                0,0,0
         );
 
-        long midnightInMillis = midnightTime.getTimeInMillis();
-        long dayInMillis = 24 * 60 * 60 * 1000;
+        GregorianCalendar currentDayEnd = (GregorianCalendar) currentDayStart.clone();
+        currentDayEnd.set(Calendar.DAY_OF_YEAR, localTimeUtc.get(Calendar.DAY_OF_YEAR) + 1);
 
         for (int i = 0; i < nightListSize; i++) {
 
@@ -1571,23 +1676,40 @@ public class Sundial {
             GregorianCalendar startTime = nightList.get(i).get(0);
             GregorianCalendar endTime = nightList.get(i).get(1);
 
-            startTime.get(Calendar.HOUR_OF_DAY); startTime.setTimeZone(timeZone); startTime.get(Calendar.HOUR_OF_DAY);
-            endTime.get(Calendar.HOUR_OF_DAY); endTime.setTimeZone(timeZone); endTime.get(Calendar.HOUR_OF_DAY);
+            int startTimeDay = startTime.get(Calendar.DAY_OF_YEAR);
+            int endTimeDay = endTime.get(Calendar.DAY_OF_YEAR);
 
-            if (startTime.getTimeInMillis() < midnightInMillis) { startTime.setTimeInMillis(midnightInMillis); }
-            if (startTime.getTimeInMillis() > midnightInMillis + dayInMillis) { startTime.setTimeInMillis(midnightInMillis + dayInMillis); }
+            if (startTimeDay != currentDay) {
+                startTime = currentDayStart;
+                if (endTimeDay != currentDay) {
+                    endTime = currentDayStart;
+                }
+            }
 
-            if (endTime.getTimeInMillis() < midnightInMillis) { endTime.setTimeInMillis(midnightInMillis); }
-            if (endTime.getTimeInMillis() > midnightInMillis + dayInMillis) { endTime.setTimeInMillis(midnightInMillis + dayInMillis); }
+            if (endTimeDay != currentDay) {
+                endTime = currentDayEnd;
+                if (startTimeDay != currentDay) {
+                    startTime = currentDayEnd;
+                }
+            }
 
-            double startAngle = getCleanAngle(startTime);
-            double endAngle = getCleanAngle(endTime);
-
-            if (endAngle < startAngle) { endAngle = startAngle; }
-            if (startAngle > endAngle) { startAngle = endAngle; }
+            double startAngle = getAbsoluteAngle(startTime);
+            double endAngle = getAbsoluteAngle(endTime);
 
             cetusMarkerAngleList.set((i * 2), startAngle);
             cetusMarkerAngleList.set((i * 2) + 1, endAngle);
+
+            DotMatrix matrixStart = cetusTimeMatrixList.get(i * 2);
+            DotMatrix matrixEnd = cetusTimeMatrixList.get((i * 2) + 1);
+
+            matrixStart.setString(getShorterTime(startTime));
+            matrixEnd.setString(getShorterTime(endTime));
+
+            if (startAngle > 0 && startAngle <= 180) { matrixStart.setRotate(270); }
+            else { matrixStart.setRotate(90); }
+
+            if (endAngle > 0 && endAngle <= 180) { matrixEnd.setRotate(270); }
+            else { matrixEnd.setRotate(90); }
         }
 
         updateDialMarkers();
@@ -1713,12 +1835,18 @@ public class Sundial {
 
         int cetusMarkerArcListSize = cetusMarkerArcList.size();
         for  (int i = 0; i < cetusMarkerArcListSize; i++) {
+
             double startAngle = cetusMarkerAngleList.get(i * 2);
             double endAngle = cetusMarkerAngleList.get(i * 2 + 1);
+
             double adjustedStartAngle = getNightCompressionAngle(startAngle);
             double adjustedEndAngle = getNightCompressionAngle(endAngle);
+
+            double length = adjustedStartAngle - adjustedEndAngle;
+            if (length > 0) { length = -1 * ((360 - adjustedStartAngle) + adjustedEndAngle); }
+
             cetusMarkerArcList.get(i).setStartAngle(90 - adjustedStartAngle);
-            cetusMarkerArcList.get(i).setLength(adjustedStartAngle - adjustedEndAngle);
+            cetusMarkerArcList.get(i).setLength(length);
         }
     }
 
@@ -1831,6 +1959,13 @@ public class Sundial {
     private void setCetusTimeVisibility(boolean visibleEh) {
         cetusArcGroup.setVisible(visibleEh);
         cetusLineGroup.setVisible(visibleEh);
+        cetusTimer.setVisible(visibleEh);
+
+        if (visibleEh) {
+            tinyGlobe.setDiffuseMap(TINYGLOBE_CETUS_IMAGE);
+        } else {
+            tinyGlobe.setDiffuseMap(TINYGLOBE_IMAGE);
+        }
     }
 
     private Timeline createTimelineForLED(Rectangle rectangle) {
