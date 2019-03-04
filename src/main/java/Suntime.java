@@ -176,6 +176,7 @@ public class Suntime {
     public static long getJulianDayNumber(GregorianCalendar calendar) {
 
         GregorianCalendar utcTime = convertToUtc(calendar);
+//        GregorianCalendar utcTime = calendar;
 
         int j = utcTime.get(Calendar.YEAR);
         int m = utcTime.get(Calendar.MONTH) + 1;

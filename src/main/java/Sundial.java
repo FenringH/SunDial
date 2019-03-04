@@ -185,7 +185,9 @@ public class Sundial {
     public static final Color Color_Of_MinimizeStroke = new Color(0.90, 0.90, 0.20, 1.00);
 
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
-    public static final Color Color_Of_CetusArc = new Color(0.90, 0.25, 1.00, 1.00);
+    public static final Color Color_Of_CetusArc    = new Color(0.90, 0.25, 1.00, 1.00);
+    public static final Color Color_Of_CetusDay    = new Color(1.00, 0.90, 0.70, 1.00);
+    public static final Color Color_Of_CetusNight  = new Color(0.90, 0.70, 1.00, 1.00);
 
     public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String MATRIX_GLOW2            = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
@@ -211,7 +213,8 @@ public class Sundial {
 
     public static final String CETUS_MARKER_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64,255, 1.0),  8.0, 0.50, 0, 0);";
     public static final String CETUS_MARKER_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0),  8.0, 0.50, 0, 0);";
-    public static final String CETUS_MATRIX_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW_DAY   = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW_NIGHT = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
     private static final Image GLOBE_IMAGE = new Image("maps/earth_diffuse_gall-peters_02.jpg",
             1003, 639, true, false);
@@ -384,6 +387,8 @@ public class Sundial {
     private Group backgroundGroup;
     private Group cetusArcGroup;
     private Group cetusLineGroup;
+    private Group matrixTime;
+    private Group matrixDate;
 
     public boolean globeVisibleEh = false;
     public boolean animationOnEh = true;
@@ -630,19 +635,9 @@ public class Sundial {
         cetusTimeMatrixList = new ArrayList<>();
 
         cetusArcGroup = new Group();
+        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
+
         cetusLineGroup = new Group();
-
-        Circle cetusArcClippingCircle = new Circle(CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y - CETUS_ARC_LENGTH);
-        cetusArcClippingCircle.setFill(Color.WHITE);
-        cetusArcClippingCircle.setStroke(Color_Of_Void);
-        cetusArcClippingCircle.setMouseTransparent(true);
-
-        Circle cetusArcBackgroundCircle = new Circle(CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y);
-        cetusArcBackgroundCircle.setFill(Color.WHITE);
-        cetusArcBackgroundCircle.setStroke(Color_Of_Void);
-        cetusArcBackgroundCircle.setMouseTransparent(true);
-
-        cetusArcGroup.getChildren().add(cetusArcBackgroundCircle);
 
         for (int i = 0; i <= Cetustime.CYCLES_PER_DAY; i++) {
 
@@ -729,16 +724,13 @@ public class Sundial {
             });
         }
 
-        cetusArcGroup.getChildren().add(cetusArcClippingCircle);
-        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
 
-
-        cetusTimer = new DotMatrix("0h00m00s", Color_Of_CetusMarker);
+        cetusTimer = new DotMatrix("0h00m00s", Color_Of_CetusNight);
         cetusTimer.setScaleX(CETUS_TIMER_SCALE);
         cetusTimer.setScaleY(CETUS_TIMER_SCALE);
         cetusTimer.setLayoutX(CENTER_X - cetusTimer.getLayoutBounds().getWidth() / 2);
         cetusTimer.setLayoutY(CETUS_TIMER_OFFSET);
-        cetusTimer.setStyle(CETUS_MATRIX_SHADOW);
+        cetusTimer.setStyle(CETUS_MATRIX_SHADOW_NIGHT);
         cetusTimer.setVisible(false);
 
 
@@ -872,7 +864,8 @@ public class Sundial {
         Polygon dialHighNoonPoly = new Polygon(
                 CENTER_X - HIGHNOON_STROKE_WIDTH, MARGIN_Y + MARKER_HOUR_LENGTH,
                 CENTER_X - HIGHNOON_DIAL_WIDTH / 2, MARGIN_Y,
-                CENTER_X, MARGIN_Y / 2,
+                CENTER_X - HIGHNOON_STROKE_WIDTH, MARGIN_Y / 2,
+                CENTER_X + HIGHNOON_STROKE_WIDTH, MARGIN_Y / 2,
                 CENTER_X + HIGHNOON_DIAL_WIDTH / 2, MARGIN_Y,
                 CENTER_X + HIGHNOON_STROKE_WIDTH, MARGIN_Y + MARKER_HOUR_LENGTH
         );
@@ -893,17 +886,6 @@ public class Sundial {
         dialLocalHourLine.setOpacity(0.5);
         dialLocalHourLine.setStrokeWidth(LOCALTIME_STROKE_WIDTH);
 
-/*
-        Polygon dialLocalHourPoly = new Polygon(
-                CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
-                CENTER_X - LOCALTIME_DIAL_WIDTH / 4, MARGIN_Y * 3,
-                CENTER_X - LOCALTIME_DIAL_WIDTH / 2, MARGIN_Y * 2,
-                CENTER_X, MARGIN_Y,
-                CENTER_X + LOCALTIME_DIAL_WIDTH / 2, MARGIN_Y * 2,
-                CENTER_X + LOCALTIME_DIAL_WIDTH / 4, MARGIN_Y * 3,
-                CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
-        );
-*/
         Polygon dialLocalHourPoly = new Polygon(
                 CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
                 CENTER_X - LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.75,
@@ -1075,7 +1057,7 @@ public class Sundial {
         matrixYear = new DotMatrix("0000", Color_Of_LocalTime);
         matrixYear.setTranslateX(matrixSeparatorMonthToYear.getLayoutBounds().getWidth() + matrixSeparatorMonthToYear.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
 
-        Group matrixDate = new Group();
+        matrixDate = new Group();
         matrixDate.getChildren().addAll(matrixDay, matrixSeparatorDayToMonth, matrixMonth, matrixSeparatorMonthToYear, matrixYear);
         matrixDate.setScaleX(MATRIX_DATE_SCALE);
         matrixDate.setScaleY(MATRIX_DATE_SCALE);
@@ -1104,7 +1086,8 @@ public class Sundial {
         matrixSecond = new DotMatrix("00", Color_Of_LocalTime);
         matrixSecond.setTranslateX(matrixSeparatorMinuteToSecond.getLayoutBounds().getWidth() + matrixSeparatorMinuteToSecond.getTranslateX() + MATRIX_SEPARATOR_OFFSET);
 
-        Group matrixTime = new Group();
+
+        matrixTime = new Group();
         matrixTime.getChildren().addAll(matrixHour, /*matrixSeparatorHourToMinute,*/  matrixMinute/*, matrixSeparatorMinuteToSecond, matrixSecond*/);
         matrixTime.setScaleX(MATRIX_TIME_SCALE);
         matrixTime.setScaleY(MATRIX_TIME_SCALE);
@@ -1117,6 +1100,7 @@ public class Sundial {
         matrixDayLength.setLayoutX(CENTER_X - matrixDayLength.getLayoutBounds().getWidth() / 2);
         matrixDayLength.setLayoutY(CENTER_Y + matrixDayLength.getLayoutBounds().getHeight() - DAYLENGTH_ARC_RADIUS);
         matrixDayLength.setStyle(LOCALTIME_SHADOW);
+        matrixDayLength.setMouseTransparent(true);
 
 
         matrixLongitude = new DotMatrix("000.00E", Color_Of_LocalTime);
@@ -1124,6 +1108,7 @@ public class Sundial {
         matrixLongitude.setScaleY(MATRIX_LONGITUDE_SCALE);
         matrixLongitude.setLayoutX(CENTER_X + MATRIX_LONGITUDE_SLIDE - matrixLongitude.getLayoutBounds().getWidth() / 2);
         matrixLongitude.setLayoutY(CENTER_Y + matrixLongitude.getLayoutBounds().getHeight() + MATRIX_LONGITUDE_OFFSET);
+
 
         longitudeGroup = new Group();
         longitudeGroup.getChildren().add(matrixLongitude);
@@ -1592,7 +1577,9 @@ public class Sundial {
     }
 
     // Setters
-    public void updateCetusTimer(ArrayList<ArrayList<GregorianCalendar>> nightList) {
+    public void updateCetusTimer(Cetustime cetustime) {
+
+        ArrayList<ArrayList<GregorianCalendar>> nightList = cetustime.getNightList(localTime);
 
         long offsetTime = 0;
 
@@ -1605,6 +1592,14 @@ public class Sundial {
         }
 
         cetusTimer.setString(getTimeLengthString(offsetTime / 1000d).substring(1));
+
+        if (i % 2 == 0) {
+            cetusTimer.setStroke(Color_Of_CetusNight);
+            cetusTimer.setStyle(CETUS_MATRIX_SHADOW_NIGHT);
+        } else {
+            cetusTimer.setStroke(Color_Of_CetusDay);
+            cetusTimer.setStyle(CETUS_MATRIX_SHADOW_DAY);
+        }
     }
 
     public void setSunTime(GregorianCalendar sunTime) {
@@ -1644,7 +1639,9 @@ public class Sundial {
 
     }
 
-    public void setCetusTime(ArrayList<ArrayList<GregorianCalendar>> nightList, TimeZone timeZone) {
+    public void setCetusTime(Cetustime cetustime) {
+
+        ArrayList<ArrayList<GregorianCalendar>> nightList = cetustime.getNightList(localTime);
 
         if (nightList == null || nightList.isEmpty()) { return; }
 
@@ -1980,5 +1977,18 @@ public class Sundial {
         timeline.getKeyFrames().add(keyFrame);
 
         return timeline;
+    }
+
+    public void setTimeDisplayOpacity(double opacity) {
+        matrixTime.setOpacity(opacity);
+        matrixDate.setOpacity(opacity);
+        dialLocalHourGroup.setOpacity(opacity);
+        if (opacity < 0.5) {
+            matrixTime.setMouseTransparent(true);
+            matrixDate.setMouseTransparent(true);
+        } else {
+            matrixTime.setMouseTransparent(false);
+            matrixDate.setMouseTransparent(false);
+        }
     }
 }

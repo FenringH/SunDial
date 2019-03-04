@@ -1,20 +1,16 @@
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.application.Application;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
@@ -23,8 +19,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
-import java.io.IOException;
-import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -104,13 +98,15 @@ public class Sunface extends Application {
     private double savedLatitude = latitude;
     private boolean maximizedEh = false;
 
-    private Text startupInfoText;
-    private Text sunTimeInfoText;
-    private Text calculatedInfoText;
     private TextArea debugTextArea;
 
-    private Sunchart sunchart;
+    private Suntime suntime;
+    private Suntime suntimeYesterday;
+    private Suntime suntimeToday;
+    private Suntime suntimeTomorow;
+
     private Cetustime cetustime;
+    private Sunchart sunchart;
 
     private Stage debugWindow;
     private Stage statsWindow;
@@ -128,33 +124,30 @@ public class Sunface extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        // Info text
-        startupInfoText = new Text();
-        startupInfoText.setFont(Font_Of_Info);
-        startupInfoText.setLayoutX(5d);
-        startupInfoText.setLayoutY(20d);
-
-        sunTimeInfoText = new Text();
-        sunTimeInfoText.setFont(Font_Of_Info);
-        sunTimeInfoText.setLayoutX(5d);
-        sunTimeInfoText.setLayoutY(525d);
-
-        calculatedInfoText = new Text();
-        calculatedInfoText.setFont(Font_Of_Info);
-        calculatedInfoText.setLayoutX(5d);
-        calculatedInfoText.setLayoutY(540d);
-
         // Sun objects
         currentLocalTime = new GregorianCalendar();
         offsetLocalTime = new GregorianCalendar();
         timeOffset = 0;
 
-        Suntime suntime = new Suntime.Builder()
-//                .julianDayNumber(2453097)
+        suntimeToday = new Suntime.Builder()
                 .localTime(currentLocalTime)
                 .observerLongitude(longitude)
                 .observerLatitude(latitude)
                 .build();
+
+        suntimeYesterday = new Suntime.Builder()
+                .julianDayNumber(suntimeToday.getJulianDayNumber() - 1)
+                .observerLongitude(longitude)
+                .observerLatitude(latitude)
+                .build();
+
+        suntimeTomorow = new Suntime.Builder()
+                .julianDayNumber(suntimeToday.getJulianDayNumber() + 1)
+                .observerLongitude(longitude)
+                .observerLatitude(latitude)
+                .build();
+
+        suntime = suntimeToday;
 
         Sundial sundial = new Sundial.Builder()
                 .nightCompression(0)
@@ -175,13 +168,12 @@ public class Sunface extends Application {
         sundial.getGlobe().rotateGlobe(longitude, latitude);
         sundial.getTinyGlobe().rotateGlobe(longitude, latitude);
 
-        rootGroup.getChildren().addAll(dialsGroup/*, controlsGroup*/);
+        rootGroup.getChildren().addAll(dialsGroup);
 
         double sizeX = rootGroup.getLayoutBounds().getWidth();
         double sizeY = rootGroup.getLayoutBounds().getHeight();
 
         ParallelCamera sceneCamera = new ParallelCamera();
-//        sceneCamera.setFarClip(2000);
 
         Scene mainScene = new Scene(rootGroup, sizeX, sizeY, true, SceneAntialiasing.DISABLED);
         mainScene.setFill(Color.TRANSPARENT);
@@ -250,7 +242,7 @@ public class Sunface extends Application {
         // Playtime
         KeyFrame keyframeClockTick = new KeyFrame(
                 Duration.millis(fpsSetting),
-                event -> updateCurrentTime(suntime, sundial));
+                event -> updateCurrentTime(sundial));
 
         Timeline timeline = new Timeline(keyframeClockTick);
         timeline.setCycleCount(Animation.INDEFINITE);
@@ -265,23 +257,23 @@ public class Sunface extends Application {
             mouseButtonList.clear();
         });
 
-        sundial.getDialCircleCenterDot().setOnMousePressed(event -> recordNightCompressionPosition(suntime, sundial, event));
+        sundial.getDialCircleCenterDot().setOnMousePressed(event -> recordNightCompressionPosition(sundial, event));
         sundial.getDialCircleCenterDot().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getDialCircleCenterDot().setOnMouseDragged(event -> changeNightCompression(suntime, sundial, event));
-        sundial.getDialCircleCenterDot().setOnScroll(event -> changeNightCompression(suntime, sundial, event));
+        sundial.getDialCircleCenterDot().setOnMouseDragged(event -> changeNightCompression(sundial, event));
+        sundial.getDialCircleCenterDot().setOnScroll(event -> changeNightCompression(sundial, event));
 
         sundial.getTinyGlobeGroup().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
-        sundial.getTinyGlobeGroup().setOnMouseClicked(event -> toggleGlobe(primaryStage, suntime, sundial, dialsGroup, dialsScale));
+        sundial.getTinyGlobeGroup().setOnMouseClicked(event -> toggleGlobe(primaryStage, sundial, dialsGroup, dialsScale));
 
-        sundial.getLongitudeGroup().setOnMousePressed(event -> recordGlobePosition(suntime, sundial, TYPE_LONGITUDE, event));
+        sundial.getLongitudeGroup().setOnMousePressed(event -> recordGlobePosition(sundial, TYPE_LONGITUDE, event));
         sundial.getLongitudeGroup().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getLongitudeGroup().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, TYPE_LONGITUDE, event));
-        sundial.getLongitudeGroup().setOnScroll(event -> rotateGlobe(suntime, sundial, TYPE_LONGITUDE, event));
+        sundial.getLongitudeGroup().setOnMouseDragged(event -> rotateGlobe(sundial, TYPE_LONGITUDE, event));
+        sundial.getLongitudeGroup().setOnScroll(event -> rotateGlobe(sundial, TYPE_LONGITUDE, event));
 
-        sundial.getLatitudeGroup().setOnMousePressed(event -> recordGlobePosition(suntime, sundial, TYPE_LATITUDE, event));
+        sundial.getLatitudeGroup().setOnMousePressed(event -> recordGlobePosition(sundial, TYPE_LATITUDE, event));
         sundial.getLatitudeGroup().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getLatitudeGroup().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, TYPE_LATITUDE, event));
-        sundial.getLatitudeGroup().setOnScroll(event -> rotateGlobe(suntime, sundial, TYPE_LATITUDE, event));
+        sundial.getLatitudeGroup().setOnMouseDragged(event -> rotateGlobe(sundial, TYPE_LATITUDE, event));
+        sundial.getLatitudeGroup().setOnScroll(event -> rotateGlobe(sundial, TYPE_LATITUDE, event));
 
         sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowSize(primaryStage, dialsGroup, dialsScale, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
@@ -295,35 +287,35 @@ public class Sunface extends Application {
         sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
-        sundial.getMatrixYear().setOnMousePressed(event -> recordCalendarPosition(suntime, sundial, event));
+        sundial.getMatrixYear().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
         sundial.getMatrixYear().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixYear().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_YEAR, event));
-        sundial.getMatrixYear().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_YEAR, event));
+        sundial.getMatrixYear().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_YEAR, event));
+        sundial.getMatrixYear().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_YEAR, event));
 
-        sundial.getMatrixMonth().setOnMousePressed(event -> recordCalendarPosition(suntime, sundial, event));
+        sundial.getMatrixMonth().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
         sundial.getMatrixMonth().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixMonth().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_MONTH, event));
-        sundial.getMatrixMonth().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MONTH, event));
+        sundial.getMatrixMonth().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_MONTH, event));
+        sundial.getMatrixMonth().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_MONTH, event));
 
-        sundial.getMatrixDay().setOnMousePressed(event -> recordCalendarPosition(suntime, sundial, event));
+        sundial.getMatrixDay().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
         sundial.getMatrixDay().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixDay().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_DAY, event));
-        sundial.getMatrixDay().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_DAY, event));
+        sundial.getMatrixDay().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_DAY, event));
+        sundial.getMatrixDay().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_DAY, event));
 
-        sundial.getMatrixHour().setOnMousePressed(event -> recordCalendarPosition(suntime, sundial, event));
+        sundial.getMatrixHour().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
         sundial.getMatrixHour().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixHour().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_HOUR, event));
-        sundial.getMatrixHour().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_HOUR, event));
+        sundial.getMatrixHour().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_HOUR, event));
+        sundial.getMatrixHour().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_HOUR, event));
 
-        sundial.getMatrixMinute().setOnMousePressed(event -> recordCalendarPosition(suntime, sundial, event));
+        sundial.getMatrixMinute().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
         sundial.getMatrixMinute().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixMinute().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_MINUTE, event));
-        sundial.getMatrixMinute().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_MINUTE, event));
+        sundial.getMatrixMinute().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_MINUTE, event));
+        sundial.getMatrixMinute().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_MINUTE, event));
 
-        sundial.getMatrixWeek().setOnMousePressed(event -> recordCalendarPosition(suntime, sundial, event));
+        sundial.getMatrixWeek().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
         sundial.getMatrixWeek().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
-        sundial.getMatrixWeek().setOnScroll(event -> offsetTime(suntime, sundial, OFFSET_BY_WEEK, event));
+        sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_WEEK, event));
+        sundial.getMatrixWeek().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_WEEK, event));
 
         sundial.getDialHighNoonGroup().setOnMouseClicked(event -> {
             if (sundial.animationOnEh) { sundial.animationOnEh = false; }
@@ -339,7 +331,7 @@ public class Sunface extends Application {
         primaryStage.setOnShown(event -> timeline.play());
 
         // Showtime
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
         primaryStage.show();
         timeline.play();
         recordWindowPosition(primaryStage, dialsGroup, dialsScale, null);
@@ -347,7 +339,7 @@ public class Sunface extends Application {
     }
 
     // Methods
-    private void resetTime(Suntime suntime, Sundial sundial) {
+    private void resetTime(Sundial sundial) {
         timeOffset = 0;
         offsetLocalTime.set(
                 currentLocalTime.get(Calendar.YEAR),
@@ -358,10 +350,10 @@ public class Sunface extends Application {
                 currentLocalTime.get(Calendar.SECOND)
         );
         sundial.setDialFrameWarning(false);
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
     }
 
-    private void offsetTime(Suntime suntime, Sundial sundial, int offset, ScrollEvent event) {
+    private void offsetTime(Sundial sundial, int offset, ScrollEvent event) {
 
         if (suntime == null || sundial == null || event == null) { return; }
 
@@ -404,12 +396,12 @@ public class Sunface extends Application {
         if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
         else { sundial.setDialFrameWarning(true); }
 
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
     }
 
-    private void offsetTime(Suntime suntime, Sundial sundial, int offsetType, MouseEvent event) {
+    private void offsetTime(Sundial sundial, int offsetType, MouseEvent event) {
 
-        if (suntime == null || sundial == null || event == null) { return; }
+        if (sundial == null || event == null) { return; }
 
         MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
         if (mouseButton == null || mouseButton.equals(MouseButton.MIDDLE)) { return; }
@@ -467,10 +459,10 @@ public class Sunface extends Application {
         if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
         else { sundial.setDialFrameWarning(true); }
 
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
     }
 
-    private void changeNightCompression(Suntime suntime, Sundial sundial, ScrollEvent event) {
+    private void changeNightCompression(Sundial sundial, ScrollEvent event) {
 
         if (suntime == null || sundial == null || event == null) { return; }
 
@@ -482,7 +474,7 @@ public class Sunface extends Application {
 
     }
 
-    private void changeNightCompression(Suntime suntime, Sundial sundial, MouseEvent event) {
+    private void changeNightCompression(Sundial sundial, MouseEvent event) {
 
         if (suntime == null || sundial == null || event == null) { return; }
 
@@ -514,15 +506,15 @@ public class Sunface extends Application {
         return (newDate.get(Calendar.DAY_OF_YEAR) != oldDate.get(Calendar.DAY_OF_YEAR));
     }
 
-    private void initCurrentTime(Suntime suntime, Sundial sundial) {
-        updateCurrentTime(suntime, sundial, true);
+    private void initCurrentTime(Sundial sundial) {
+        updateCurrentTime(sundial, true);
     }
 
-    private void updateCurrentTime(Suntime suntime, Sundial sundial) {
-        updateCurrentTime(suntime, sundial, false);
+    private void updateCurrentTime(Sundial sundial) {
+        updateCurrentTime(sundial, false);
     }
 
-    private void updateCurrentTime(Suntime suntime, Sundial sundial, boolean initialize) {
+    private void updateCurrentTime(Sundial sundial, boolean initialize) {
 
         GregorianCalendar newLocalTime = new GregorianCalendar();
         GregorianCalendar oldLocalTime = (GregorianCalendar) currentLocalTime.clone();
@@ -552,23 +544,9 @@ public class Sunface extends Application {
 
         sundial.setSunTime(sunTimeDate);
         sundial.setLocalTime(offsetLocalTime);
-        sundial.updateCetusTimer(cetusNightList);
+        sundial.updateCetusTimer(cetustime);
 
         sundial.setLocalTimeText(offsetLocalTime.getTime().toString());
-
-        String startupInformation =
-                "Day[9] date              : " + offsetLocalTime.getTime().toString()
-            + "\nDay[9] day of the year   : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR)
-            + "\nDay[9] Julian Date       : " + julianDateFormat.format(julianDate) + " (UTC)"
-            + "\nDay[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString()
-            + "\nDay[9] Julian Day Number : " + julianDayNumber
-            ;
-
-        String sunTimeInformation =
-                    "Sun Time   : " + sunTimeDate.getTime().toString();
-
-        startupInfoText.setText(startupInformation);
-        sunTimeInfoText.setText(sunTimeInformation);
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4, yearString.length());
@@ -615,16 +593,7 @@ public class Sunface extends Application {
             sundial.setHighNoon(highNoonDate);
             sundial.setHorizon(sunriseDate, sunsetDate);
             sundial.setCoordinates(longitude, latitude);
-            sundial.setCetusTime(cetusNightList, offsetLocalTime.getTimeZone());
-
-            String calculatedInformation =
-                    "High Noon  : " + highNoonDate.getTime().toString()
-                + "\nSunrise    : " + sunriseDate.getTime().toString()
-                + "\nSunset     : " + sunsetDate.getTime().toString()
-                + "\nDay Length : " + Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength))
-                ;
-
-            calculatedInfoText.setText(calculatedInformation);
+            sundial.setCetusTime(cetustime);
 
             // update stats
             if (statsWindow.isShowing()) {
@@ -659,6 +628,17 @@ public class Sunface extends Application {
                 }
 
                 String debugText = ""
+                        + "Day[9] date              : " + offsetLocalTime.getTime().toString() + "\n"
+                        + "Day[9] day of the year   : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR) + "\n"
+                        + "Day[9] Julian Date       : " + julianDateFormat.format(julianDate) + " (UTC)" + "\n"
+                        + "Day[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString() + "\n"
+                        + "Day[9] Julian Day Number : " + julianDayNumber + "\n"
+                        + "Sun Time   : " + sunTimeDate.getTime().toString() + "\n"
+                        + "High Noon  : " + highNoonDate.getTime().toString() + "\n"
+                        + "Sunrise    : " + sunriseDate.getTime().toString() + "\n"
+                        + "Sunset     : " + sunsetDate.getTime().toString() + "\n"
+                        + "Day Length : " + Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength)) + "\n"
+                        + "isNewDay = " + isNewDay(newLocalTime, oldLocalTime) + "\n"
                         + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
                         + "equationOfCenter = " + suntime.getEquationOfCenter() + "\n"
                         + "eclipticalLongitude = " + suntime.getEclipticalLongitude() + "\n"
@@ -685,7 +665,7 @@ public class Sunface extends Application {
         }
     }
 
-    private void resetGlobePosition(Suntime suntime, Sundial sundial, int type) {
+    private void resetGlobePosition(Sundial sundial, int type) {
 
         if (type == TYPE_LONGITUDE) { longitude = DEFAULT_LONGITUDE; }
         else if (type == TYPE_LATITUDE) { latitude = DEFAULT_LATITUDE; }
@@ -693,15 +673,15 @@ public class Sunface extends Application {
             longitude = DEFAULT_LONGITUDE;
             latitude = DEFAULT_LATITUDE;
         }
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
         sundial.rotateGlobe(longitude, latitude);
     }
 
-    private void recordGlobePosition(Suntime suntime, Sundial sundial, int type, MouseEvent event) {
+    private void recordGlobePosition(Sundial sundial, int type, MouseEvent event) {
 
         mouseButtonList.add(event.getButton());
         if (event.getButton().equals(MouseButton.MIDDLE)) {
-            resetGlobePosition(suntime, sundial, type);
+            resetGlobePosition(sundial, type);
         }
 
         savedMouseX = event.getScreenX();
@@ -711,7 +691,7 @@ public class Sunface extends Application {
         savedLatitude = latitude;
     }
 
-    private void rotateGlobe(Suntime suntime, Sundial sundial, MouseEvent event) {
+    private void rotateGlobe(Sundial sundial, MouseEvent event) {
 
         if (!mouseButtonList.isEmpty()) {
             if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
@@ -739,11 +719,11 @@ public class Sunface extends Application {
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
         sundial.rotateGlobe(longitude, latitude);
     }
 
-    private void rotateGlobe(Suntime suntime, Sundial sundial, int type, MouseEvent event) {
+    private void rotateGlobe(Sundial sundial, int type, MouseEvent event) {
 
         if (!mouseButtonList.isEmpty()) {
             if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
@@ -770,11 +750,11 @@ public class Sunface extends Application {
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
         sundial.rotateGlobe(longitude, latitude);
     }
 
-    private void rotateGlobe(Suntime suntime, Sundial sundial, int type, ScrollEvent event) {
+    private void rotateGlobe(Sundial sundial, int type, ScrollEvent event) {
 
         if (!mouseButtonList.isEmpty()) {
             if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
@@ -795,7 +775,7 @@ public class Sunface extends Application {
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
-        initCurrentTime(suntime, sundial);
+        initCurrentTime(sundial);
         sundial.rotateGlobe(longitude, latitude);
     }
 
@@ -809,13 +789,13 @@ public class Sunface extends Application {
 
     }
 
-    private void recordCalendarPosition(Suntime suntime, Sundial sundial, MouseEvent event) {
+    private void recordCalendarPosition(Sundial sundial, MouseEvent event) {
 
         MouseButton mouseButton = event.getButton();
         mouseButtonList.add(event.getButton());
 
         if (mouseButton.equals(MouseButton.MIDDLE)) {
-            resetTime(suntime, sundial);
+            resetTime(sundial);
             return;
         }
 
@@ -827,7 +807,7 @@ public class Sunface extends Application {
 
     }
 
-    private void recordNightCompressionPosition(Suntime suntime, Sundial sundial, MouseEvent event) {
+    private void recordNightCompressionPosition(Sundial sundial, MouseEvent event) {
 
         MouseButton mouseButton = event.getButton();
         mouseButtonList.add(event.getButton());
@@ -954,6 +934,7 @@ public class Sunface extends Application {
         stage.setHeight(windowSizeY);
     }
 
+
     private void toggleMaximizeWindow(Stage stage, Scale dialsScale, MouseEvent event) {
 
         double maxWidth, maxHeight;
@@ -1060,7 +1041,7 @@ public class Sunface extends Application {
         stage.setY(newPositionY);
     }
 
-    private void toggleGlobe(Stage stage, Suntime suntime, Sundial sundial, Group dialsGroup, Scale dialsScale) {
+    private void toggleGlobe(Stage stage, Sundial sundial, Group dialsGroup, Scale dialsScale) {
 
         if (!mouseButtonList.isEmpty()) {
 
@@ -1073,7 +1054,7 @@ public class Sunface extends Application {
             }
 
             if (mouseButton.equals(MouseButton.MIDDLE)) {
-                resetGlobePosition(suntime, sundial, 0);
+                resetGlobePosition(sundial, 0);
                 return;
             }
         }
@@ -1082,9 +1063,15 @@ public class Sunface extends Application {
 
         if (sundial.globeVisibleEh) {
             sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.OPEN_HAND));
-            sundial.getDialCircleFrame().setOnMousePressed(event -> recordGlobePosition(suntime, sundial, 0, event));
-            sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
-            sundial.getDialCircleFrame().setOnMouseDragged(event -> rotateGlobe(suntime, sundial, event));
+            sundial.getDialCircleFrame().setOnMousePressed(event -> {
+                if (!event.isMiddleButtonDown()) { sundial.setTimeDisplayOpacity(0.2); }
+                recordGlobePosition(sundial, 0, event);
+            });
+            sundial.getDialCircleFrame().setOnMouseReleased(event ->  {
+                sundial.setTimeDisplayOpacity(1);
+                mouseButtonList.clear();
+            });
+            sundial.getDialCircleFrame().setOnMouseDragged(event -> rotateGlobe(sundial, event));
 
         } else {
             sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.MOVE));
@@ -1094,4 +1081,5 @@ public class Sunface extends Application {
 
         }
     }
+
 }

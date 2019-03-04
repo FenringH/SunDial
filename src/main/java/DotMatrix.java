@@ -48,6 +48,7 @@ public class DotMatrix extends Group {
     private Circle[][][] dots;
     private String string;
     private Group stringGroup;
+    private Paint dotPaint;
 
     public DotMatrix(String string, Paint dotPaint) {
 
@@ -61,9 +62,10 @@ public class DotMatrix extends Group {
             this.string = string;
         }
 
-        if (dotPaint == null) { dotPaint = DEFAULT_DOT_PAINT; }
+        if (dotPaint == null) { this.dotPaint = DEFAULT_DOT_PAINT; }
+        else { this.dotPaint = dotPaint; }
 
-        getChildren().add(getStringGroup(this.string, dotPaint));
+        getChildren().add(getStringGroup(this.string, this.dotPaint));
     }
 
     private Group getCharGroup(int charIndex, char c, Paint dotPaint) {
@@ -168,8 +170,10 @@ public class DotMatrix extends Group {
                     charCode <<= 1;
                 }
             }
-
         }
+    }
 
+    public void setStroke(Paint dotPaint) {
+        this.dotPaint = dotPaint;
     }
 }
