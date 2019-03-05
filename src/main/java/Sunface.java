@@ -1,7 +1,5 @@
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.Cursor;
@@ -12,7 +10,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -73,7 +70,6 @@ public class Sunface extends Application {
 
     private GregorianCalendar currentLocalTime;
     private GregorianCalendar offsetLocalTime;
-    private long timeOffset;
     private double longitude = DEFAULT_LONGITUDE;
     private double latitude = DEFAULT_LATITUDE;
     private double customLongitude = DEFAULT_LONGITUDE;
@@ -105,6 +101,10 @@ public class Sunface extends Application {
     private Suntime suntimeToday;
     private Suntime suntimeTomorow;
 
+    private TimeZone currentTimezone;
+    private TimeZone offsetTimezone;
+    private int timeZoneOffset;
+
     private Cetustime cetustime;
     private Sunchart sunchart;
 
@@ -124,61 +124,46 @@ public class Sunface extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        // Sun objects
+        // Init time
         currentLocalTime = new GregorianCalendar();
         offsetLocalTime = new GregorianCalendar();
-        timeOffset = 0;
 
-        suntimeToday = new Suntime.Builder()
+        currentTimezone = currentLocalTime.getTimeZone();
+        offsetTimezone = offsetLocalTime.getTimeZone();
+
+        timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
+
+        // Create 'sun' objects
+        suntime = new Suntime.Builder()
                 .localTime(currentLocalTime)
                 .observerLongitude(longitude)
                 .observerLatitude(latitude)
                 .build();
 
-        suntimeYesterday = new Suntime.Builder()
-                .julianDayNumber(suntimeToday.getJulianDayNumber() - 1)
-                .observerLongitude(longitude)
-                .observerLatitude(latitude)
-                .build();
-
-        suntimeTomorow = new Suntime.Builder()
-                .julianDayNumber(suntimeToday.getJulianDayNumber() + 1)
-                .observerLongitude(longitude)
-                .observerLatitude(latitude)
-                .build();
-
-        suntime = suntimeToday;
-
         Sundial sundial = new Sundial.Builder()
                 .nightCompression(0)
                 .build();
+
+        sundial.getGlobe().rotateGlobe(longitude, latitude);
+        sundial.getTinyGlobe().rotateGlobe(longitude, latitude);
 
         cetustime = new Cetustime();
         cetusNightList = cetustime.getNightList(currentLocalTime);
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
 
-        debugTextArea = new TextArea();
 
         // Scene
+        Group dialsGroup = sundial.getDialsGroup();
+
         Group rootGroup = new Group();
+        rootGroup.getChildren().add(dialsGroup);
 
-        Group dialsGroup = new Group();
-        dialsGroup.getChildren().add(sundial.getDialsGroup());
-        sundial.getGlobe().rotateGlobe(longitude, latitude);
-        sundial.getTinyGlobe().rotateGlobe(longitude, latitude);
-
-        rootGroup.getChildren().addAll(dialsGroup);
-
-        double sizeX = rootGroup.getLayoutBounds().getWidth();
-        double sizeY = rootGroup.getLayoutBounds().getHeight();
-
-        ParallelCamera sceneCamera = new ParallelCamera();
-
-        Scene mainScene = new Scene(rootGroup, sizeX, sizeY, true, SceneAntialiasing.DISABLED);
+        Scene mainScene = new Scene(rootGroup, rootGroup.getLayoutBounds().getWidth(), rootGroup.getLayoutBounds().getHeight(), true, SceneAntialiasing.DISABLED);
         mainScene.setFill(Color.TRANSPARENT);
-        mainScene.setCamera(sceneCamera);
 
+
+        // Setup dialsGroup scale transform
         double dialsMinX = dialsGroup.getLayoutBounds().getMinX();
         double dialsMinY = dialsGroup.getLayoutBounds().getMinY();
 
@@ -197,7 +182,9 @@ public class Sunface extends Application {
 
         dialsGroup.getTransforms().add(dialsScale);
 
+
         // Debug window
+        debugTextArea = new TextArea();
         debugTextArea.setMinWidth(600);
         debugTextArea.setMinHeight(800);
         debugTextArea.setEditable(false);
@@ -217,7 +204,7 @@ public class Sunface extends Application {
         debugWindow.setX(0);
         debugWindow.setY(0);
         debugWindow.setResizable(true);
-//        debugWindow.show();
+
 
         // Chart window
         LineChart lineChart = sunchart.getChart();
@@ -230,6 +217,7 @@ public class Sunface extends Application {
         statsWindow.setY(0);
         statsWindow.setWidth(chartScene.getWidth());
         statsWindow.setHeight(chartScene.getHeight());
+
 
         // Primary window
         primaryStage.setTitle("Sunface");
@@ -256,6 +244,8 @@ public class Sunface extends Application {
             minimizeWindow(primaryStage, timeline, event);
             mouseButtonList.clear();
         });
+
+        sundial.getMatrixTimeZone().setOnScroll(event -> changeTimeZone(sundial, event));
 
         sundial.getDialCircleCenterDot().setOnMousePressed(event -> recordNightCompressionPosition(sundial, event));
         sundial.getDialCircleCenterDot().setOnMouseReleased(event -> mouseButtonList.clear());
@@ -340,7 +330,6 @@ public class Sunface extends Application {
 
     // Methods
     private void resetTime(Sundial sundial) {
-        timeOffset = 0;
         offsetLocalTime.set(
                 currentLocalTime.get(Calendar.YEAR),
                 currentLocalTime.get(Calendar.MONTH),
@@ -462,6 +451,34 @@ public class Sunface extends Application {
         initCurrentTime(sundial);
     }
 
+    private void changeTimeZone(Sundial sundial, ScrollEvent event) {
+
+        if (suntime == null || sundial == null || event == null) { return; }
+
+        if (!mouseButtonList.isEmpty()) { return; }
+
+        if (event.getDeltaY() < 0) {
+            timeZoneOffset += (60 * 60 * 1000);
+        }
+        else if (event.getDeltaY() > 0) {
+            timeZoneOffset -= (60 * 60 * 1000);
+        }
+        else { return; }
+
+        if (timeZoneOffset > (12 * 60 * 60 * 1000)) {
+            timeZoneOffset = -11 * 60 * 60 * 1000;
+        }
+
+        if (timeZoneOffset <= (-12 * 60 * 60 * 1000)) {
+            timeZoneOffset =  12 * 60 * 60 * 1000;
+        }
+
+        currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
+        offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
+
+        initCurrentTime(sundial);
+    }
+
     private void changeNightCompression(Sundial sundial, ScrollEvent event) {
 
         if (suntime == null || sundial == null || event == null) { return; }
@@ -502,10 +519,6 @@ public class Sunface extends Application {
 
     }
 
-    private boolean isNewDay(GregorianCalendar newDate, GregorianCalendar oldDate) {
-        return (newDate.get(Calendar.DAY_OF_YEAR) != oldDate.get(Calendar.DAY_OF_YEAR));
-    }
-
     private void initCurrentTime(Sundial sundial) {
         updateCurrentTime(sundial, true);
     }
@@ -533,58 +546,49 @@ public class Sunface extends Application {
         offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + offsetSeconds * 1000);
 
         // Update suntime and sundial objects
-        suntime.setObserverTime(offsetLocalTime);
-        suntime.setObserverPosition(longitude, latitude);
+//        suntime.setObserverTime(offsetLocalTime);
+        long timeZoneOffset = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
+        GregorianCalendar timeZonedCalendar = new GregorianCalendar();
+        timeZonedCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis() + timeZoneOffset);
+        suntime.setObserverTime(timeZonedCalendar);
 
-        long julianDayNumber = suntime.getJulianDayNumber();
-        double julianDate = suntime.getJulianDate();
-        double sunTime = suntime.getSunTime();
+        long newJulianDayNumber = suntime.getJulianDayNumber();
 
-        GregorianCalendar sunTimeDate = Suntime.getCalendarDate(sunTime, offsetLocalTime.getTimeZone());
-
-        sundial.setSunTime(sunTimeDate);
         sundial.setLocalTime(offsetLocalTime);
         sundial.updateCetusTimer(cetustime);
 
-        sundial.setLocalTimeText(offsetLocalTime.getTime().toString());
-
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
-        yearString = yearString.substring(yearString.length() - 4, yearString.length());
+        yearString = yearString.substring(yearString.length() - 4);
         String monthString = ("00" + (offsetLocalTime.get(Calendar.MONTH) + 1));
-        monthString = monthString.substring(monthString.length() - 2, monthString.length());
+        monthString = monthString.substring(monthString.length() - 2);
         String dayString = ("00" + offsetLocalTime.get(Calendar.DAY_OF_MONTH));
-        dayString = dayString.substring(dayString.length() - 2, dayString.length());
+        dayString = dayString.substring(dayString.length() - 2);
         String hourString = ("00" + offsetLocalTime.get(Calendar.HOUR_OF_DAY));
-        hourString = hourString.substring(hourString.length() - 2, hourString.length());
+        hourString = hourString.substring(hourString.length() - 2);
         String minuteString = ("00" + offsetLocalTime.get(Calendar.MINUTE));
-        minuteString = minuteString.substring(minuteString.length() - 2, minuteString.length());
+        minuteString = minuteString.substring(minuteString.length() - 2);
         String secondString = ("00" + offsetLocalTime.get(Calendar.SECOND));
-        secondString = secondString.substring(secondString.length() - 2, secondString.length());
+        secondString = secondString.substring(secondString.length() - 2);
         String weekString = ("00" + offsetLocalTime.get(Calendar.WEEK_OF_YEAR));
-        weekString = weekString.substring(weekString.length() - 2, weekString.length());
+        weekString = weekString.substring(weekString.length() - 2);
 
         sundial.getMatrixHour().setString(hourString);
         sundial.getMatrixMinute().setString(minuteString);
         sundial.getMatrixSecond().setString(secondString);
-
         sundial.getMatrixDay().setString(dayString);
         sundial.getMatrixMonth().setString(monthString);
         sundial.getMatrixYear().setString(yearString);
         sundial.getMatrixWeek().setString(weekString);
 
-        // Update daily data only if it's a new day, or initialization event
-        if (julianDayNumber != oldJulianDayNumber || initialize) {
+        // Update daily data only if it's a new day, or forced initialization event
+        if (newJulianDayNumber != oldJulianDayNumber || initialize) {
 
-            // Update suntime and sundial objects
-            suntime.setObserverTime(offsetLocalTime);
             suntime.setObserverPosition(longitude, latitude);
-            cetusNightList = cetustime.getNightList(offsetLocalTime);
+            cetusNightList = cetustime.getNightList(timeZonedCalendar);
 
             double highNoonJulianDate = suntime.getHighnoonJulianDate();
             double sunriseJulianDate = suntime.getSunriseJulianDate();
             double sunsetJulianDate = suntime.getSunsetJulianDate();
-
-            double dayLength = sunsetJulianDate - sunriseJulianDate;
 
             GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
@@ -593,75 +597,19 @@ public class Sunface extends Application {
             sundial.setHighNoon(highNoonDate);
             sundial.setHorizon(sunriseDate, sunsetDate);
             sundial.setCoordinates(longitude, latitude);
-            sundial.setCetusTime(cetustime);
+            sundial.setCetusTime(cetusNightList, timeZonedCalendar);
+            sundial.setTimeZone(offsetLocalTime.getTimeZone());
 
-            // update stats
+            // update chart
             if (statsWindow.isShowing()) {
                 sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
             }
 
-            // debug info
+            // update debug info
             if (debugWindow.isShowing()) {
-
-                double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntime.getDeclinationOfTheSun()));
-                double divisor = cos(toRadians(latitude)) * cos(toRadians(suntime.getDeclinationOfTheSun()));
-
-                StringBuilder cetusDataString = new StringBuilder();
-                Iterator cetusDataMapIterator = cetustime.getDataMap().keySet().iterator();
-                while (cetusDataMapIterator.hasNext()) {
-                    String key = (String) cetusDataMapIterator.next();
-                    cetusDataString.append(key + " = " + cetustime.getDataMap().get(key) + "\n");
-                }
-
-                String cetusExpiryDate = ""
-                        + cetustime.getCetusExpiry().get(Calendar.HOUR_OF_DAY) + ":"
-                        + cetustime.getCetusExpiry().get(Calendar.MINUTE) + ":"
-                        + cetustime.getCetusExpiry().get(Calendar.SECOND)
-                        + " " + cetustime.getCetusExpiry().getTimeZone().getDisplayName()
-                        ;
-
-                StringBuilder cetusNightListString = new StringBuilder();
-                for(int i = 0; i < cetusNightList.size(); i++) {
-                    String nightStart = cetusNightList.get(i).get(0).getTime().toString();
-                    String nightEnd = cetusNightList.get(i).get(1).getTime().toString();
-                    cetusNightListString.append("\nnight " + (i+1) + ": start = " + nightStart + ", end = " + nightEnd);
-                }
-
-                String debugText = ""
-                        + "Day[9] date              : " + offsetLocalTime.getTime().toString() + "\n"
-                        + "Day[9] day of the year   : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR) + "\n"
-                        + "Day[9] Julian Date       : " + julianDateFormat.format(julianDate) + " (UTC)" + "\n"
-                        + "Day[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString() + "\n"
-                        + "Day[9] Julian Day Number : " + julianDayNumber + "\n"
-                        + "Sun Time   : " + sunTimeDate.getTime().toString() + "\n"
-                        + "High Noon  : " + highNoonDate.getTime().toString() + "\n"
-                        + "Sunrise    : " + sunriseDate.getTime().toString() + "\n"
-                        + "Sunset     : " + sunsetDate.getTime().toString() + "\n"
-                        + "Day Length : " + Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength)) + "\n"
-                        + "isNewDay = " + isNewDay(newLocalTime, oldLocalTime) + "\n"
-                        + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
-                        + "equationOfCenter = " + suntime.getEquationOfCenter() + "\n"
-                        + "eclipticalLongitude = " + suntime.getEclipticalLongitude() + "\n"
-                        + "rightAscension = " + suntime.getRightAscension() + "\n"
-                        + "declinationOfTheSun = " + suntime.getDeclinationOfTheSun() + "\n"
-                        + "siderealTime = " + suntime.getSiderealTime() + "\n"
-                        + "hourAngle = " + suntime.getHourAngle() + "\n"
-                        + "solarTransit = " + suntime.getSolarTransit() + "\n"
-                        + "localHourAngle = " + suntime.getLocalHourAngle() + "\n"
-                        + "localHourAngle dividend = " + dividend + "\n"
-                        + "localHourAngle divisor = " + divisor + "\n"
-                        + "longitude = " + longitude + "\n"
-                        + "latitude = " + latitude + "\n"
-                        + "Cetus nightList = " + cetusNightListString + "\n"
-                        + "Cetus okEh = " + cetustime.isOkEh() + "\n"
-                        + "Cetus result = " + cetustime.getResult() + "\n"
-                        + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
-                        + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
-                        + "Cetus expiry string = " + cetusExpiryDate + "\n"
-                        + "Cetus dataMap: \n" + cetusDataString + "\n"
-                        ;
-                debugTextArea.setText(debugText);
+                updateDebugWindow();
             }
+
         }
     }
 
@@ -1082,4 +1030,88 @@ public class Sunface extends Application {
         }
     }
 
+    private void updateDebugWindow() {
+
+        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntime.getDeclinationOfTheSun()));
+        double divisor = cos(toRadians(latitude)) * cos(toRadians(suntime.getDeclinationOfTheSun()));
+
+        double julianDate = suntime.getJulianDate();
+        double julianDayNumber = suntime.getJulianDayNumber();
+        double highNoonJulianDate = suntime.getHighnoonJulianDate();
+        double sunriseJulianDate = suntime.getSunriseJulianDate();
+        double sunsetJulianDate = suntime.getSunsetJulianDate();
+        double dayLength = sunsetJulianDate - sunriseJulianDate;
+
+        GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
+        GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
+        GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, offsetLocalTime.getTimeZone());
+
+        StringBuilder cetusDataString = new StringBuilder();
+
+        Iterator cetusDataMapIterator = cetustime.getDataMap().keySet().iterator();
+        while (cetusDataMapIterator.hasNext()) {
+            String key = (String) cetusDataMapIterator.next();
+            cetusDataString.append(key).append(" = ").append(cetustime.getDataMap().get(key)).append("\n");
+        }
+
+        String cetusExpiryDate = ""
+                + cetustime.getCetusExpiry().get(Calendar.HOUR_OF_DAY) + ":"
+                + cetustime.getCetusExpiry().get(Calendar.MINUTE) + ":"
+                + cetustime.getCetusExpiry().get(Calendar.SECOND)
+                + " " + cetustime.getCetusExpiry().getTimeZone().getDisplayName()
+                ;
+
+        StringBuilder cetusNightListString = new StringBuilder();
+        for(int i = 0; i < cetusNightList.size(); i++) {
+            String nightStart = cetusNightList.get(i).get(0).getTime().toString();
+            String nightEnd = cetusNightList.get(i).get(1).getTime().toString();
+            cetusNightListString.append("\nnight ").append(i+1).append(": start = ").append(nightStart).append(", end = ").append(nightEnd);
+        }
+
+        long timeZoneOffset = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
+
+        String timeZoneNumberString = "00" + abs(timeZoneOffset / (1000 * 60 * 60));
+        timeZoneNumberString = timeZoneNumberString.substring(timeZoneNumberString.length() - 2);
+
+        StringBuilder timeZoneString = new StringBuilder()
+                .append("GMT")
+                .append((timeZoneOffset < 0) ? "-" : "+")
+                .append(timeZoneNumberString)
+                ;
+
+        String debugText = ""
+                + "Day[9] date              : " + offsetLocalTime.getTime().toString() + "\n"
+                + "Day[9] day of the year   : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR) + "\n"
+                + "Day[9] Julian Date       : " + julianDateFormat.format(julianDate) + " (UTC)" + "\n"
+                + "Day[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString() + "\n"
+                + "Day[9] Julian Day Number : " + julianDayNumber + "\n"
+                + "TimeZone String : " + timeZoneString + "\n"
+                + "High Noon  : " + highNoonDate.getTime().toString() + "\n"
+                + "Sunrise    : " + sunriseDate.getTime().toString() + "\n"
+                + "Sunset     : " + sunsetDate.getTime().toString() + "\n"
+                + "Day Length : " + Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength)) + "\n"
+                + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
+                + "equationOfCenter = " + suntime.getEquationOfCenter() + "\n"
+                + "eclipticalLongitude = " + suntime.getEclipticalLongitude() + "\n"
+                + "rightAscension = " + suntime.getRightAscension() + "\n"
+                + "declinationOfTheSun = " + suntime.getDeclinationOfTheSun() + "\n"
+                + "siderealTime = " + suntime.getSiderealTime() + "\n"
+                + "hourAngle = " + suntime.getHourAngle() + "\n"
+                + "solarTransit = " + suntime.getSolarTransit() + "\n"
+                + "localHourAngle = " + suntime.getLocalHourAngle() + "\n"
+                + "localHourAngle dividend = " + dividend + "\n"
+                + "localHourAngle divisor = " + divisor + "\n"
+                + "longitude = " + longitude + "\n"
+                + "latitude = " + latitude + "\n"
+                + "Cetus nightList = " + cetusNightListString + "\n"
+                + "Cetus okEh = " + cetustime.isOkEh() + "\n"
+                + "Cetus result = " + cetustime.getResult() + "\n"
+                + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
+                + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
+                + "Cetus expiry string = " + cetusExpiryDate + "\n"
+                + "Cetus dataMap: \n" + cetusDataString + "\n"
+                ;
+
+        debugTextArea.setText(debugText);
+    }
 }

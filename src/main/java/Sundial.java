@@ -127,6 +127,7 @@ public class Sundial {
     private static final double CETUS_TIMER_OFFSET = 160.0d;
     private static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     private static final double CETUS_HORIZON_OFFSET = 50.0d;
+    private static final double MATRIX_TIMEZONE_OFFSET = 160.0d;
 
     private static final double MATRIX_TIME_SCALE = 3.50d;
     private static final double MATRIX_DATE_SCALE = 1.50d;
@@ -141,6 +142,8 @@ public class Sundial {
     private static final double CETUS_TIMER_SCALE = 1.00d;
     private static final double CETUS_TIMEREADER_SCALE = 0.75d;
     private static final double CETUS_HORIZON_SCALE = 0.75d;
+    private static final double MATRIX_TIMEZONE_SCALE = 1.00d;
+    private static final double MATRIX_HIGHNOON_SCALE = 1.00d;
 
     private static final double CONTROL_CLOSE_ANGLE = 37.0d;
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
@@ -349,10 +352,6 @@ public class Sundial {
     private ArrayList<Timeline> dialLocalSecondTransitionList;
     private ArrayList<Timeline> dialLocalMinuteTransitionList;
 
-    private Text dialTextDate;
-
-    private SVGPath pathOfEarth;
-
     private DotMatrix matrixYear;
     private DotMatrix matrixMonth;
     private DotMatrix matrixDay;
@@ -369,6 +368,7 @@ public class Sundial {
     private ArrayList<DotMatrix> hourMarkerMatrixList;
     private DotMatrix cetusTimer;
     private ArrayList<DotMatrix> cetusTimeMatrixList;
+    private DotMatrix matrixTimeZone;
 
     private Globe globe;
     private Globe tinyGlobe;
@@ -1035,13 +1035,6 @@ public class Sundial {
         horizonGroup = new Group();
         horizonGroup.getChildren().addAll(sunriseGroup, sunsetGroup);
 
-        dialTextDate = new Text();
-        dialTextDate.setText(localTimeText);
-        dialTextDate.setFill(Color_Of_LocalTime);
-        dialTextDate.setFont(Font_Of_Dial);
-        dialTextDate.setLayoutX(CENTER_X - dialTextDate.getLayoutBounds().getWidth() / 2);
-        dialTextDate.setLayoutY(CENTER_Y - dialTextDate.getLayoutBounds().getHeight() / 2);
-
 
         matrixDay = new DotMatrix("00", Color_Of_LocalTime);
 
@@ -1144,13 +1137,22 @@ public class Sundial {
 
 
         matrixHighNoon = new DotMatrix("00:00:00", Color_Of_HighNoon);
-        matrixHighNoon.setScaleX(1);
-        matrixHighNoon.setScaleY(1);
+        matrixHighNoon.setScaleX(MATRIX_HIGHNOON_SCALE);
+        matrixHighNoon.setScaleY(MATRIX_HIGHNOON_SCALE);
         matrixHighNoon.setLayoutX(CENTER_X - matrixHighNoon.getLayoutBounds().getWidth() / 2);
         matrixHighNoon.setLayoutY(CENTER_Y - matrixHighNoon.getLayoutBounds().getHeight() * 1.5d - DAYLENGTH_ARC_RADIUS);
         matrixHighNoon.setStyle(MATRIX_GLOW);
         matrixHighNoon.setMouseTransparent(true);
         matrixHighNoon.setVisible(false);
+
+
+        matrixTimeZone = new DotMatrix("GMT+00", Color_Of_LocalTime);
+        matrixTimeZone.setScaleX(MATRIX_TIMEZONE_SCALE);
+        matrixTimeZone.setScaleY(MATRIX_TIMEZONE_SCALE);
+        matrixTimeZone.setLayoutX(CENTER_X - matrixTimeZone.getLayoutBounds().getWidth() / 2);
+        matrixTimeZone.setLayoutY(MATRIX_TIMEZONE_OFFSET);
+        matrixTimeZone.setStyle(MATRIX_SHADOW);
+        matrixTimeZone.setVisible(false);
 
 
         setGroupGlow(matrixYear, MATRIX_SHADOW);
@@ -1206,27 +1208,19 @@ public class Sundial {
         foregroundGroup.getChildren().add(cetusLineGroup);
         foregroundGroup.getChildren().addAll(dialLocalSecondList);
         foregroundGroup.getChildren().addAll(dialLocalMinuteList);
-//        foregroundGroup.getChildren().add(tinyGlobeScene);
-//        foregroundGroup.getChildren().add(sunTimeDial);
         foregroundGroup.getChildren().add(dialHighNoonGroup);
-//        foregroundGroup.getChildren().add(sunriseGroup);
-//        foregroundGroup.getChildren().add(sunsetGroup);
         foregroundGroup.getChildren().add(horizonGroup);
         foregroundGroup.getChildren().add(dialHourMatrixMarkers);
-//        foregroundGroup.getChildren().add(dialLineLocalHour);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
         foregroundGroup.getChildren().add(dialCircleCenterDot);
         foregroundGroup.getChildren().add(dialLocalHourGroup);
         foregroundGroup.getChildren().add(cetusTimer);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(matrixHighNoon);
-//        foregroundGroup.getChildren().add(tinyGlobeDot);
-//        foregroundGroup.getChildren().add(tinyGlobeFrame);
+        foregroundGroup.getChildren().add(matrixTimeZone);
         foregroundGroup.getChildren().add(tinyGlobeGroup);
         foregroundGroup.getChildren().add(matrixTime);
         foregroundGroup.getChildren().add(matrixDate);
-//        foregroundGroup.getChildren().add(matrixWeek);
-//        foregroundGroup.getChildren().add(coordinatesGroup);
         foregroundGroup.getChildren().add(longitudeGroup);
         foregroundGroup.getChildren().add(latitudeGroup);
         SubScene foregroundScene = new SubScene(foregroundGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
@@ -1281,9 +1275,6 @@ public class Sundial {
         matrixWeek.setOnMouseEntered(event -> { matrixWeek.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixWeek, MATRIX_GLOW); });
         matrixWeek.setOnMouseExited(event -> { matrixWeek.setCursor(Cursor.DEFAULT); setGroupGlow(matrixWeek, MATRIX_SHADOW); });
 
-//        coordinatesGroup.setOnMouseEntered(event -> { coordinatesGroup.setCursor(Cursor.HAND); setGroupGlow(coordinatesGroup, MATRIX_GLOW); });
-//        coordinatesGroup.setOnMouseExited(event -> { coordinatesGroup.setCursor(Cursor.DEFAULT); setGroupGlow(coordinatesGroup, MATRIX_SHADOW); });
-
         longitudeGroup.setOnMouseEntered(event -> { longitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(longitudeGroup, MATRIX_GLOW); });
         longitudeGroup.setOnMouseExited(event -> { longitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(longitudeGroup, MATRIX_SHADOW); });
 
@@ -1304,6 +1295,9 @@ public class Sundial {
 
         dialHighNoonGroup.setOnMouseEntered(event -> { matrixHighNoon.setVisible(true); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW2); });
         dialHighNoonGroup.setOnMouseExited(event -> { matrixHighNoon.setVisible(false); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW); });
+
+        matrixTimeZone.setOnMouseEntered(event -> { matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(MATRIX_GLOW); });
+        matrixTimeZone.setOnMouseExited(event -> { matrixTimeZone.setCursor(Cursor.DEFAULT); matrixTimeZone.setStyle(MATRIX_SHADOW); });
 
     }
 
@@ -1576,6 +1570,10 @@ public class Sundial {
         return dialHighNoonGroup;
     }
 
+    public Group getMatrixTimeZone() {
+        return matrixTimeZone;
+    }
+
     // Setters
     public void updateCetusTimer(Cetustime cetustime) {
 
@@ -1639,16 +1637,14 @@ public class Sundial {
 
     }
 
-    public void setCetusTime(Cetustime cetustime) {
-
-        ArrayList<ArrayList<GregorianCalendar>> nightList = cetustime.getNightList(localTime);
+    public void setCetusTime(ArrayList<ArrayList<GregorianCalendar>> nightList, GregorianCalendar calendar) {
 
         if (nightList == null || nightList.isEmpty()) { return; }
 
         int cetusMarkerAngleListSize = cetusMarkerAngleList.size();
         int nightListSize = nightList.size();
 
-        GregorianCalendar localTimeUtc = (GregorianCalendar) localTime.clone();
+        GregorianCalendar localTimeUtc = (GregorianCalendar) calendar.clone();
         localTimeUtc.get(Calendar.HOUR_OF_DAY);
         localTimeUtc.setTimeZone(TimeZone.getTimeZone("UTC"));
         localTimeUtc.get(Calendar.HOUR_OF_DAY);
@@ -1847,12 +1843,6 @@ public class Sundial {
         }
     }
 
-    public void setLocalTimeText(String localTimeText) {
-        if (localTimeText == null) { return; }
-        this.localTimeText = localTimeText;
-        dialTextDate.setText(localTimeText);
-    }
-
     public void setDialFrameWarning(boolean warning) {
 
         this.warning = warning;
@@ -1894,6 +1884,8 @@ public class Sundial {
 
             longitudeGroup.setVisible(true);
             latitudeGroup.setVisible(true);
+
+            matrixTimeZone.setVisible(true);
         }
         else {
 
@@ -1918,6 +1910,8 @@ public class Sundial {
 
             longitudeGroup.setVisible(false);
             latitudeGroup.setVisible(false);
+
+            matrixTimeZone.setVisible(false);
         }
     }
 
@@ -1990,5 +1984,21 @@ public class Sundial {
             matrixTime.setMouseTransparent(false);
             matrixDate.setMouseTransparent(false);
         }
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+
+        long timeZoneOffset = timeZone.getOffset(localTime.getTimeInMillis());
+
+        String timeZoneNumberString = "00" + abs(timeZoneOffset / (1000 * 60 * 60));
+        timeZoneNumberString = timeZoneNumberString.substring(timeZoneNumberString.length() - 2);
+
+        StringBuilder timeZoneString = new StringBuilder()
+                .append("GMT")
+                .append((timeZoneOffset < 0) ? "-" : "+")
+                .append(timeZoneNumberString)
+                ;
+
+        matrixTimeZone.setString(timeZoneString.toString());
     }
 }

@@ -110,9 +110,6 @@ public class Cetustime {
 
             ArrayList<GregorianCalendar> cycle = new ArrayList<>();
 
-//            GregorianCalendar nightStart = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-//            GregorianCalendar nightEnd = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-
             GregorianCalendar nightStart = new GregorianCalendar();
             GregorianCalendar nightEnd = new GregorianCalendar();
 
