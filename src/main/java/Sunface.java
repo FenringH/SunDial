@@ -18,6 +18,8 @@ import sun.security.provider.Sun;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Math.*;
 
@@ -66,6 +68,8 @@ public class Sunface extends Application {
 
     private static final DecimalFormat julianDateFormat = new DecimalFormat("###,###,###.00000000");
 
+    private static final String GOOGLEMAPS_REGEX = ".*\\/@([\\+\\-0-9]+\\.[0-9]*),([\\+\\-0-9]+\\.[0-9]*),.*";
+
     private int fpsSetting = (int) floor(1000 / DEFAULT_FPS);
 
     private GregorianCalendar currentLocalTime;
@@ -94,6 +98,7 @@ public class Sunface extends Application {
     private boolean maximizedEh = false;
 
     private TextArea debugTextArea;
+    private String debugErrorMessage;
 
     private Suntime suntime;
     private Suntime suntimeYesterday;
@@ -671,7 +676,31 @@ public class Sunface extends Application {
     }
 
     private void rotateGlobe(Sundial sundial, Position type, DragEvent event) {
-        System.out.println("Dragged string: " + event.getDragboard().getString());
+
+        if (type != Position.GOOGLE_MAPS) { return; }
+
+        String string;
+
+        if (event.getDragboard().hasString()) {
+            string = event.getDragboard().getString();
+        } else {
+            return;
+        }
+
+        Pattern pattern = Pattern.compile(GOOGLEMAPS_REGEX);
+        Matcher matcher = pattern.matcher(string);
+
+        if (matcher.matches()) {
+            try {
+                latitude = Double.parseDouble(matcher.group(1));
+                longitude = Double.parseDouble(matcher.group(2));
+            } catch (NumberFormatException e) {
+                debugErrorMessage = "NumberFormatException while parsing string: " + string + "\n" + e.getMessage();
+            }
+        }
+
+        initCurrentTime(sundial);
+        sundial.rotateGlobe(longitude, latitude);
     }
 
     private void rotateGlobe(Sundial sundial, MouseEvent event) {
@@ -1146,6 +1175,10 @@ public class Sunface extends Application {
                 + "Cetus expiry string = " + cetusExpiryDate + "\n"
                 + "Cetus dataMap: \n" + cetusDataString + "\n"
                 ;
+
+        if (debugErrorMessage != null && !debugErrorMessage.isEmpty()) {
+            debugText = debugErrorMessage + "\n" + debugText;
+        }
 
         debugTextArea.setText(debugText);
     }
