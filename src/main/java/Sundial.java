@@ -127,7 +127,7 @@ public class Sundial {
     private static final double CETUS_TIMER_OFFSET = 160.0d;
     private static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     private static final double CETUS_HORIZON_OFFSET = 50.0d;
-    private static final double MATRIX_TIMEZONE_OFFSET = 160.0d;
+    private static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y + 65.0d;
 
     private static final double MATRIX_TIME_SCALE = 3.50d;
     private static final double MATRIX_DATE_SCALE = 1.50d;
@@ -142,7 +142,7 @@ public class Sundial {
     private static final double CETUS_TIMER_SCALE = 1.00d;
     private static final double CETUS_TIMEREADER_SCALE = 0.75d;
     private static final double CETUS_HORIZON_SCALE = 0.75d;
-    private static final double MATRIX_TIMEZONE_SCALE = 1.00d;
+    private static final double MATRIX_TIMEZONE_SCALE = 1.25d;
     private static final double MATRIX_HIGHNOON_SCALE = 1.00d;
 
     private static final double CONTROL_CLOSE_ANGLE = 37.0d;
@@ -345,9 +345,9 @@ public class Sundial {
     private Rectangle dialLineLocalMinute;
     private ArrayList<Arc> cetusMarkerArcList;
 
-    private ArrayList<Rectangle> dialLocalSecondList;
+    private ArrayList<Node> dialLocalSecondList;
     private ArrayList<Boolean> dialLocalSecondOn;
-    private ArrayList<Rectangle> dialLocalMinuteList;
+    private ArrayList<Node> dialLocalMinuteList;
     private ArrayList<Boolean> dialLocalMinuteOn;
     private ArrayList<Timeline> dialLocalSecondTransitionList;
     private ArrayList<Timeline> dialLocalMinuteTransitionList;
@@ -957,20 +957,36 @@ public class Sundial {
             localMinute.setStroke(Color_Of_Void);
             localMinute.setStyle(LOCALMINUTE_GLOW);
             localMinute.setBlendMode(BlendMode.SCREEN);
-            localMinute.setOpacity(0.0);
+//            localMinute.setOpacity(0.0);
             localMinute.setMouseTransparent(true);
 
+            Line lineMinute = new Line(CENTER_X, CENTER_Y - DOT_RADIUS, CENTER_X, LOCALMINUTE_OFFSET);
+            lineMinute.setStrokeWidth(1);
+            lineMinute.setStroke(Color_Of_Minutes);
+            lineMinute.setStyle(LOCALMINUTE_GLOW);
+            lineMinute.setBlendMode(BlendMode.SCREEN);
+//            lineMinute.setOpacity(0.0);
+            lineMinute.setMouseTransparent(true);
+
             Rotate localMinuteRotate = new Rotate();
-            localMinuteRotate.setPivotX(LOCALMINUTE_WIDTH / 2);
-            localMinuteRotate.setPivotY(CENTER_Y - LOCALMINUTE_OFFSET);
+//            localMinuteRotate.setPivotX(LOCALMINUTE_WIDTH / 2);
+//            localMinuteRotate.setPivotY(CENTER_Y - LOCALMINUTE_OFFSET);
+            localMinuteRotate.setPivotX(CENTER_X);
+            localMinuteRotate.setPivotY(CENTER_Y);
             localMinuteRotate.setAngle(i * 6);
 
-            localMinute.getTransforms().add(localMinuteRotate);
+//            localMinute.getTransforms().add(localMinuteRotate);
+//            lineMinute.getTransforms().add(localMinuteRotate);
 
-            Timeline timelineMinute = createTimelineForLED(localMinute);
+            Group minuteGroup = new Group();
+            minuteGroup.getChildren().addAll(localMinute, lineMinute);
+            minuteGroup.setOpacity(0.0);
+            minuteGroup.getTransforms().add(localMinuteRotate);
+
+            Timeline timelineMinute = createTimelineForLED(minuteGroup);
 
             dialLocalSecondList.add(localSecond);
-            dialLocalMinuteList.add(localMinute);
+            dialLocalMinuteList.add(minuteGroup);
 
             dialLocalSecondOn.add(false);
             dialLocalMinuteOn.add(false);
@@ -1708,7 +1724,7 @@ public class Sundial {
         updateDialMarkers();
     }
 
-    private void updateLEDs(ArrayList<Rectangle> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn, boolean animate) {
+    private void updateLEDs(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn, boolean animate) {
 
         for (int i = 0; i < ledList.size(); i++) {
 
@@ -1720,7 +1736,6 @@ public class Sundial {
                     timelineList.get(i).play();
                 } else {
                     ledList.get(i).setOpacity(0.0);
-//                    ledList.get(indexOn).setFill(Color_Of_Void);
                 }
 
                 ledOn.set(i, false);
@@ -1729,7 +1744,6 @@ public class Sundial {
 
         if (animate) { timelineList.get(indexOn).stop(); }
         ledList.get(indexOn).setOpacity(1.0);
-//        ledList.get(indexOn).setFill(Color_Of_Seconds);
         ledOn.set(indexOn, true);
     }
 
@@ -1959,14 +1973,13 @@ public class Sundial {
         }
     }
 
-    private Timeline createTimelineForLED(Rectangle rectangle) {
+    private Timeline createTimelineForLED(Node node) {
 
         Timeline timeline = new Timeline();
         timeline.setCycleCount(1);
         timeline.setRate(1);
         timeline.setAutoReverse(false);
-        KeyValue keyValue = new KeyValue(rectangle.opacityProperty(), 0.0, Interpolator.EASE_IN);
-//        KeyValue keyValue = new KeyValue(rectangle.fillProperty(), Color_Of_Void, Interpolator.EASE_IN);
+        KeyValue keyValue = new KeyValue(node.opacityProperty(), 0.0, Interpolator.EASE_IN);
         KeyFrame keyFrame = new KeyFrame(Duration.millis(LED_COOLDOWN), keyValue);
         timeline.getKeyFrames().add(keyFrame);
 
@@ -1976,13 +1989,16 @@ public class Sundial {
     public void setTimeDisplayOpacity(double opacity) {
         matrixTime.setOpacity(opacity);
         matrixDate.setOpacity(opacity);
+        matrixTimeZone.setOpacity(opacity);
         dialLocalHourGroup.setOpacity(opacity);
         if (opacity < 0.5) {
             matrixTime.setMouseTransparent(true);
             matrixDate.setMouseTransparent(true);
+            matrixTimeZone.setMouseTransparent(true);
         } else {
             matrixTime.setMouseTransparent(false);
             matrixDate.setMouseTransparent(false);
+            matrixTimeZone.setMouseTransparent(false);
         }
     }
 
