@@ -8,7 +8,6 @@ import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.util.Duration;
@@ -39,6 +38,8 @@ public class Sundial {
     private static final double STEP_nightCompression         = 360d / MAX_MARKER;
 
     private static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
+    private static final String DEFAULT_DAY_MAP               = "maps/earth_diffuse_gall-peters_02.jpg";
+    private static final String DEFAULT_NIGHT_MAP             = "maps/earth_night_v1.png";
 
     public static final double DIAL_WIDTH = 440.0d;
     public static final double DIAL_HEIGHT = 440.0d;
@@ -149,7 +150,9 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
     private static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
 
-    private static final int LED_COOLDOWN = 500;
+    private static final int LED_OPACITY_DURATION = 500;
+    private static final int GLOBE_ROTATE_DURATION = 1000;
+
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
     public static final Color Color_Of_Earth      = new Color(0.85, 0.85, 0.65, 1.00);
@@ -219,13 +222,14 @@ public class Sundial {
     public static final String CETUS_MATRIX_SHADOW_DAY   = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
     public static final String CETUS_MATRIX_SHADOW_NIGHT = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
-    private static final Image GLOBE_IMAGE = new Image("maps/earth_diffuse_gall-peters_02.jpg",
+    private static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,
             1003, 639, true, false);
-//    private static final Image TINYGLOBE_IMAGE = new Image("maps/tinyGlobe_diffuse_02.png",
-//            800, 508, true, false);
-    private static final Image TINYGLOBE_IMAGE = new Image("maps/earth_diffuse_gall-peters_02.jpg",
+    private static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,
+            1003, 639, true, false);
+    private static final Image TINYGLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,
         1003, 639, true, false);
-
+    private static final Image TINYGLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,
+            1003, 639, true, false);
     private static final Image TINYGLOBE_CETUS_IMAGE = new Image("images/LotusFlower_edit.png",
             2048, 1264, true, false);
 
@@ -391,8 +395,14 @@ public class Sundial {
     private Group matrixDate;
 
     public boolean globeVisibleEh = false;
-    public boolean animationOnEh = true;
     public boolean cetusTimeVisibleEh = false;
+
+    public boolean ledAnimationOnEh = true;
+    public boolean globeAnimationOnEh = true;
+
+    private int ledOpacityDuration = ledAnimationOnEh ? LED_OPACITY_DURATION : 0;
+    private int globeRotateDuration = ledAnimationOnEh ? GLOBE_ROTATE_DURATION : 0;
+
 
     // Constructor
     public Sundial(Builder builder) {
@@ -546,7 +556,7 @@ public class Sundial {
         controlThingyMinimize.setOpacity(CONTROL_MINIMIZE_OPACITY);
 
         // Dials in a box
-        globe = new Globe(GLOBE_IMAGE,CENTER_X - MARGIN_X);
+        globe = new Globe(GLOBE_DAY_IMAGE, GLOBE_NIGHT_IMAGE, CENTER_X - MARGIN_X);
         globe.setLayoutX(CENTER_X);
         globe.setLayoutY(CENTER_Y);
         globe.setVisible(false);
@@ -568,7 +578,7 @@ public class Sundial {
         tinyGlobeDot.setStroke(Color_Of_Void);
         tinyGlobeDot.setOpacity(1);
 
-        tinyGlobe = new Globe(TINYGLOBE_IMAGE, TINYGLOBE_RADIUS);
+        tinyGlobe = new Globe(TINYGLOBE_DAY_IMAGE, GLOBE_NIGHT_IMAGE, TINYGLOBE_RADIUS);
         tinyGlobe.setLayoutX(CENTER_X);
         tinyGlobe.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
         tinyGlobe.setVisible(true);
@@ -946,7 +956,7 @@ public class Sundial {
 
             localSecond.getTransforms().add(localSecondRotate);
 
-            Timeline timelineSecond = createTimelineForLED(localSecond);
+            Timeline timelineSecond = createTimelineForLED(localSecond, ledOpacityDuration);
 
             Rectangle localMinute = new Rectangle(LOCALMINUTE_WIDTH, LOCALMINUTE_HEIGHT);
             localMinute.setArcWidth(LOCALMINUTE_ROUND);
@@ -983,7 +993,7 @@ public class Sundial {
             minuteGroup.setOpacity(0.0);
             minuteGroup.getTransforms().add(localMinuteRotate);
 
-            Timeline timelineMinute = createTimelineForLED(minuteGroup);
+            Timeline timelineMinute = createTimelineForLED(minuteGroup, ledOpacityDuration);
 
             dialLocalSecondList.add(localSecond);
             dialLocalMinuteList.add(minuteGroup);
@@ -1648,8 +1658,8 @@ public class Sundial {
 
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
 
-        updateLEDs(dialLocalSecondList, dialLocalSecondOn, dialLocalSecondTransitionList, localTime.get(Calendar.SECOND), animationOnEh);
-        updateLEDs(dialLocalMinuteList, dialLocalMinuteOn, dialLocalMinuteTransitionList, localTime.get(Calendar.MINUTE), animationOnEh);
+        updateLEDs(dialLocalSecondList, dialLocalSecondOn, dialLocalSecondTransitionList, localTime.get(Calendar.SECOND), ledAnimationOnEh);
+        updateLEDs(dialLocalMinuteList, dialLocalMinuteOn, dialLocalMinuteTransitionList, localTime.get(Calendar.MINUTE), ledAnimationOnEh);
 
     }
 
@@ -1946,8 +1956,13 @@ public class Sundial {
     }
 
     public void rotateGlobe(double longitude, double latitude) {
-        globe.rotateGlobe(longitude, latitude);
-        tinyGlobe.rotateGlobe(longitude, latitude);
+        globe.rotateGlobe(longitude, latitude, 0);
+        tinyGlobe.rotateGlobe(longitude, latitude, 0);
+    }
+
+    public void rotateGlobeAnimated(double longitude, double latitude) {
+        globe.rotateGlobe(longitude, latitude, globeRotateDuration);
+        tinyGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
     }
 
     public void toggleCetusTime() {
@@ -1967,20 +1982,20 @@ public class Sundial {
         cetusTimer.setVisible(visibleEh);
 
         if (visibleEh) {
-            tinyGlobe.setDiffuseMap(TINYGLOBE_CETUS_IMAGE);
+            tinyGlobe.setDayDiffuseMap(TINYGLOBE_CETUS_IMAGE);
         } else {
-            tinyGlobe.setDiffuseMap(TINYGLOBE_IMAGE);
+            tinyGlobe.setDayDiffuseMap(TINYGLOBE_DAY_IMAGE);
         }
     }
 
-    private Timeline createTimelineForLED(Node node) {
+    private Timeline createTimelineForLED(Node node, int duration) {
 
         Timeline timeline = new Timeline();
         timeline.setCycleCount(1);
         timeline.setRate(1);
         timeline.setAutoReverse(false);
         KeyValue keyValue = new KeyValue(node.opacityProperty(), 0.0, Interpolator.EASE_IN);
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(LED_COOLDOWN), keyValue);
+        KeyFrame keyFrame = new KeyFrame(Duration.millis(LED_OPACITY_DURATION), keyValue);
         timeline.getKeyFrames().add(keyFrame);
 
         return timeline;
@@ -2016,5 +2031,17 @@ public class Sundial {
                 ;
 
         matrixTimeZone.setString(timeZoneString.toString());
+    }
+
+    public void toggleAnimation() {
+
+        ledAnimationOnEh = !ledAnimationOnEh;
+        globeAnimationOnEh = !globeAnimationOnEh;
+
+        if (globeAnimationOnEh) {
+            globeRotateDuration = GLOBE_ROTATE_DURATION;
+        } else {
+            globeRotateDuration = 0;
+        }
     }
 }

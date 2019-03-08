@@ -1,6 +1,5 @@
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.Cursor;
@@ -14,7 +13,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import sun.security.provider.Sun;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -100,10 +98,8 @@ public class Sunface extends Application {
     private TextArea debugTextArea;
     private String debugErrorMessage;
 
-    private Suntime suntime;
-    private Suntime suntimeYesterday;
-    private Suntime suntimeToday;
-    private Suntime suntimeTomorow;
+    private Suntime suntimeLocal;
+    private Suntime suntimeGlobal;
 
     private TimeZone currentTimezone;
     private TimeZone offsetTimezone;
@@ -138,7 +134,13 @@ public class Sunface extends Application {
         timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
 
         // Create 'sun' objects
-        suntime = new Suntime.Builder()
+        suntimeLocal = new Suntime.Builder()
+                .localTime(currentLocalTime)
+                .observerLongitude(longitude)
+                .observerLatitude(latitude)
+                .build();
+
+        suntimeGlobal = new Suntime.Builder()
                 .localTime(currentLocalTime)
                 .observerLongitude(longitude)
                 .observerLatitude(latitude)
@@ -148,8 +150,8 @@ public class Sunface extends Application {
                 .nightCompression(0)
                 .build();
 
-        sundial.getGlobe().rotateGlobe(longitude, latitude);
-        sundial.getTinyGlobe().rotateGlobe(longitude, latitude);
+        sundial.getGlobe().rotateGlobe(longitude, latitude, 0);
+        sundial.getTinyGlobe().rotateGlobe(longitude, latitude, 0);
 
         cetustime = new Cetustime();
         cetusNightList = cetustime.getNightList(currentLocalTime);
@@ -325,10 +327,7 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_WEEK, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_WEEK, event));
 
-        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> {
-            if (sundial.animationOnEh) { sundial.animationOnEh = false; }
-            else { sundial.animationOnEh = true; }
-        });
+        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleAnimation());
 
         sundial.getHorizonGroup().setOnMouseClicked(event -> {
             if (statsWindow.isShowing()) { statsWindow.close(); }
@@ -362,7 +361,7 @@ public class Sunface extends Application {
 
     private void offsetTime(Sundial sundial, int offset, ScrollEvent event) {
 
-        if (suntime == null || sundial == null || event == null) { return; }
+        if (suntimeLocal == null || sundial == null || event == null) { return; }
 
         if (!mouseButtonList.isEmpty()) { return; }
 
@@ -516,7 +515,7 @@ public class Sunface extends Application {
 
     private void changeNightCompression(Sundial sundial, ScrollEvent event) {
 
-        if (suntime == null || sundial == null || event == null) { return; }
+        if (suntimeLocal == null || sundial == null || event == null) { return; }
 
         if (!mouseButtonList.isEmpty()) { return; }
 
@@ -528,7 +527,7 @@ public class Sunface extends Application {
 
     private void changeNightCompression(Sundial sundial, MouseEvent event) {
 
-        if (suntime == null || sundial == null || event == null) { return; }
+        if (suntimeLocal == null || sundial == null || event == null) { return; }
 
         MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
         if (mouseButton == null || mouseButton.equals(MouseButton.MIDDLE)) { return; }
@@ -580,17 +579,25 @@ public class Sunface extends Application {
         currentLocalTime = newLocalTime;
         offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + offsetSeconds * 1000);
 
-        // Update suntime and sundial objects
-//        suntime.setObserverTime(offsetLocalTime);
-        long timeZoneOffset = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
-        GregorianCalendar timeZonedCalendar = new GregorianCalendar();
-        timeZonedCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis() + timeZoneOffset);
-        suntime.setObserverTime(timeZonedCalendar);
+        // Update suntimeLocal and sundial objects
+//        suntimeLocal.setObserverTime(offsetLocalTime);
+        long timeZoneCorrection = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
 
-        long newJulianDayNumber = suntime.getJulianDayNumber();
+        GregorianCalendar timeZonedCalendar = new GregorianCalendar();
+        timeZonedCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis() + timeZoneCorrection);
+
+        GregorianCalendar globalCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        globalCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis());
+
+        suntimeLocal.setObserverTime(timeZonedCalendar);
+        suntimeGlobal.setObserverTime(globalCalendar);
+
+        long newJulianDayNumber = suntimeLocal.getJulianDayNumber();
 
         sundial.setLocalTime(offsetLocalTime);
         sundial.updateCetusTimer(cetustime);
+        sundial.getGlobe().setDayLight(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
+        sundial.getTinyGlobe().setDayLight(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);
@@ -618,12 +625,12 @@ public class Sunface extends Application {
         // Update daily data only if it's a new day, or forced initialization event
         if (newJulianDayNumber != oldJulianDayNumber || initialize) {
 
-            suntime.setObserverPosition(longitude, latitude);
+            suntimeLocal.setObserverPosition(longitude, latitude);
             cetusNightList = cetustime.getNightList(timeZonedCalendar);
 
-            double highNoonJulianDate = suntime.getHighnoonJulianDate();
-            double sunriseJulianDate = suntime.getSunriseJulianDate();
-            double sunsetJulianDate = suntime.getSunsetJulianDate();
+            double highNoonJulianDate = suntimeLocal.getHighnoonJulianDate();
+            double sunriseJulianDate = suntimeLocal.getSunriseJulianDate();
+            double sunsetJulianDate = suntimeLocal.getSunsetJulianDate();
 
             GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
@@ -658,7 +665,7 @@ public class Sunface extends Application {
         }
 
         initCurrentTime(sundial);
-        sundial.rotateGlobe(longitude, latitude);
+        sundial.rotateGlobeAnimated(longitude, latitude);
     }
 
     private void recordGlobePosition(Sundial sundial, Position type, MouseEvent event) {
@@ -700,7 +707,7 @@ public class Sunface extends Application {
         }
 
         initCurrentTime(sundial);
-        sundial.rotateGlobe(longitude, latitude);
+        sundial.rotateGlobeAnimated(longitude, latitude);
     }
 
     private void rotateGlobe(Sundial sundial, MouseEvent event) {
@@ -779,7 +786,7 @@ public class Sunface extends Application {
         if (event.getDeltaY() < 0) { step = -0.01; }
         if (event.getDeltaY() > 0) { step = 0.01; }
 
-        if (type == Position.LATITUDE) { longitude += step; }
+        if (type == Position.LONGITUDE) { longitude += step; }
         else { latitude += step; }
 
         if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
@@ -1096,14 +1103,14 @@ public class Sunface extends Application {
 
     private void updateDebugWindow() {
 
-        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntime.getDeclinationOfTheSun()));
-        double divisor = cos(toRadians(latitude)) * cos(toRadians(suntime.getDeclinationOfTheSun()));
+        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntimeLocal.getDeclinationOfTheSun()));
+        double divisor = cos(toRadians(latitude)) * cos(toRadians(suntimeLocal.getDeclinationOfTheSun()));
 
-        double julianDate = suntime.getJulianDate();
-        double julianDayNumber = suntime.getJulianDayNumber();
-        double highNoonJulianDate = suntime.getHighnoonJulianDate();
-        double sunriseJulianDate = suntime.getSunriseJulianDate();
-        double sunsetJulianDate = suntime.getSunsetJulianDate();
+        double julianDate = suntimeLocal.getJulianDate();
+        double julianDayNumber = suntimeLocal.getJulianDayNumber();
+        double highNoonJulianDate = suntimeLocal.getHighnoonJulianDate();
+        double sunriseJulianDate = suntimeLocal.getSunriseJulianDate();
+        double sunsetJulianDate = suntimeLocal.getSunsetJulianDate();
         double dayLength = sunsetJulianDate - sunriseJulianDate;
 
         GregorianCalendar highNoonDate = Suntime.getCalendarDate(highNoonJulianDate, offsetLocalTime.getTimeZone());
@@ -1154,15 +1161,15 @@ public class Sunface extends Application {
                 + "Sunrise    : " + sunriseDate.getTime().toString() + "\n"
                 + "Sunset     : " + sunsetDate.getTime().toString() + "\n"
                 + "Day Length : " + Suntime.printSecondsToTime(Suntime.convertFractionToSeconds(dayLength)) + "\n"
-                + "meanAnomaly = " + suntime.getMeanAnomaly() + "\n"
-                + "equationOfCenter = " + suntime.getEquationOfCenter() + "\n"
-                + "eclipticalLongitude = " + suntime.getEclipticalLongitude() + "\n"
-                + "rightAscension = " + suntime.getRightAscension() + "\n"
-                + "declinationOfTheSun = " + suntime.getDeclinationOfTheSun() + "\n"
-                + "siderealTime = " + suntime.getSiderealTime() + "\n"
-                + "hourAngle = " + suntime.getHourAngle() + "\n"
-                + "solarTransit = " + suntime.getSolarTransit() + "\n"
-                + "localHourAngle = " + suntime.getLocalHourAngle() + "\n"
+                + "meanAnomaly = " + suntimeLocal.getMeanAnomaly() + "\n"
+                + "equationOfCenter = " + suntimeLocal.getEquationOfCenter() + "\n"
+                + "eclipticalLongitude = " + suntimeLocal.getEclipticalLongitude() + "\n"
+                + "rightAscension = " + suntimeLocal.getRightAscension() + "\n"
+                + "declinationOfTheSun = " + suntimeLocal.getDeclinationOfTheSun() + "\n"
+                + "siderealTime = " + suntimeLocal.getSiderealTime() + "\n"
+                + "hourAngle = " + suntimeLocal.getHourAngle() + "\n"
+                + "solarTransit = " + suntimeLocal.getSolarTransit() + "\n"
+                + "localHourAngle = " + suntimeLocal.getLocalHourAngle() + "\n"
                 + "localHourAngle dividend = " + dividend + "\n"
                 + "localHourAngle divisor = " + divisor + "\n"
                 + "longitude = " + longitude + "\n"
