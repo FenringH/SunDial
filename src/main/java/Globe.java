@@ -3,7 +3,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.scene.*;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -49,6 +48,7 @@ public class Globe extends Group {
 
     private PointLight dayLight;
     private PointLight nightLight;
+    private AmbientLight ambientLight;
 
     private double sunTilt;
     private double sunPhase;
@@ -57,10 +57,10 @@ public class Globe extends Group {
     private Rotate rotateSunPhase;
 
     public Globe(double radius) {
-        this(DEFAULT_DAY_IMAGE, DEFAULT_NIGHT_IMAGE, radius);
+        this(DEFAULT_DAY_IMAGE, radius);
     }
 
-    public Globe(Image dayDiffuseMap, Image nightDiffuseMap, double radius) {
+    public Globe(Image dayDiffuseMap, double radius) {
         super();
         this.globe = new Group();
         this.dayDiffuseMap = dayDiffuseMap;
@@ -86,22 +86,26 @@ public class Globe extends Group {
         this.rotateSunTilt.setAxis(Rotate.X_AXIS);
         this.rotateSunPhase.setAxis(Rotate.Y_AXIS);
 
-
-        // DAY half
         dayLight = new PointLight(Color_Of_Light);
         dayLight.setTranslateZ(-100000);
 
+        nightLight = new PointLight(Color.BLACK);
+        nightLight.setTranslateZ(100000);
+
+        ambientLight = new AmbientLight(Color.BLACK);
+
         Group dayLightGripper = new Group();
-        dayLightGripper.getChildren().add(dayLight);
+        dayLightGripper.getChildren().addAll(dayLight, nightLight, ambientLight);
         dayLightGripper.getTransforms().add(rotateSunPhase);
 
         Group dayLightHolder = new Group();
         dayLightHolder.getChildren().add(dayLightGripper);
         dayLightHolder.getTransforms().add(rotateSunTilt);
 
-        daySphere = new Sphere(radius, SPHERE_DIVISIONS);
         globeMaterial = new PhongMaterial();
         globeMaterial.setDiffuseMap(dayDiffuseMap);
+
+        daySphere = new Sphere(radius, SPHERE_DIVISIONS);
         daySphere.setMaterial(globeMaterial);
 
         Group daySphereGripper = new Group();
@@ -110,40 +114,9 @@ public class Globe extends Group {
 
         Group daySphereHolder = new Group();
         daySphereHolder.getTransforms().add(this.rotateLatitude);
-        daySphereHolder.getChildren().add(daySphereGripper);
+        daySphereHolder.getChildren().addAll(daySphereGripper);
 
-//        SubScene dayScene = new SubScene(daySphereHolder, daySphereHolder.getLayoutBounds().getWidth(), daySphereHolder.getLayoutBounds().getHeight(), true, SceneAntialiasing.BALANCED);
-
-        // NIGHT half
-        nightLight = new PointLight(Color_Of_Light);
-        nightLight.setTranslateZ(100000);
-
-        Group nightLightGripper = new Group();
-        nightLightGripper.getChildren().add(nightLight);
-        nightLightGripper.getTransforms().add(rotateSunPhase);
-
-        Group nightLightHolder = new Group();
-        nightLightHolder.getChildren().add(nightLightGripper);
-        nightLightHolder.getTransforms().add(rotateSunTilt);
-
-        nightSphere = new Sphere(radius, SPHERE_DIVISIONS);
-        globeMaterial = new PhongMaterial();
-        globeMaterial.setDiffuseMap(nightDiffuseMap);
-        nightSphere.setMaterial(globeMaterial);
-
-        Group nightSphereGripper = new Group();
-        nightSphereGripper.getTransforms().add(this.rotateLongitude);
-        nightSphereGripper.getChildren().addAll(nightSphere, nightLightHolder);
-
-        Group nightSphereHolder = new Group();
-        nightSphereHolder.getTransforms().add(this.rotateLatitude);
-        nightSphereHolder.getChildren().add(nightSphereGripper);
-
-//        SubScene nightScene = new SubScene(nightSphereHolder, nightSphereHolder.getLayoutBounds().getWidth(), nightSphereHolder.getLayoutBounds().getHeight(), true, SceneAntialiasing.BALANCED);
-//        nightScene.setBlendMode(BlendMode.ADD);
-
-
-        this.globe.getChildren().addAll(daySphereHolder, nightSphereHolder);
+        this.globe.getChildren().addAll(daySphereHolder);
 
         return globe;
     }
@@ -194,11 +167,24 @@ public class Globe extends Group {
         globeMaterial.setDiffuseMap(dayDiffuseMap);
     }
 
-    public void setDayLight(double phase, double tilt) {
+    public void setDayLightPosition(double phase, double tilt) {
         sunPhase = phase;
         sunTilt = -1 * tilt;
 
         rotateSunPhase.setAngle(sunPhase * 360);
         rotateSunTilt.setAngle(sunTilt);
     }
+
+    public void setDayLightColor(Color dayLightColor) {
+        dayLight.setColor(dayLightColor);
+    }
+
+    public void setNightLightColor(Color nightLightColor) {
+        nightLight.setColor(nightLightColor);
+    }
+
+    public void setAmbientLightColor(Color ambientLightColor) {
+        ambientLight.setColor(ambientLightColor);
+    }
+
 }

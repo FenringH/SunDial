@@ -150,7 +150,8 @@ public class Sunface extends Application {
                 .nightCompression(0)
                 .build();
 
-        sundial.getGlobe().rotateGlobe(longitude, latitude, 0);
+        sundial.getDayGlobe().rotateGlobe(longitude, latitude, 0);
+        sundial.getNightGlobe().rotateGlobe(longitude, latitude, 0);
         sundial.getTinyGlobe().rotateGlobe(longitude, latitude, 0);
 
         cetustime = new Cetustime();
@@ -596,8 +597,9 @@ public class Sunface extends Application {
 
         sundial.setLocalTime(offsetLocalTime);
         sundial.updateCetusTimer(cetustime);
-        sundial.getGlobe().setDayLight(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
-        sundial.getTinyGlobe().setDayLight(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
+        sundial.getDayGlobe().setDayLightPosition(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
+        sundial.getNightGlobe().setDayLightPosition(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
+        sundial.getTinyGlobe().setDayLightPosition(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);
@@ -847,6 +849,7 @@ public class Sunface extends Application {
     private void recordWindowPosition(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
 
         if (event != null) {
+            mouseButtonList.add(event.getButton());
             savedMouseX = event.getScreenX();
             savedMouseY = event.getScreenY();
         }
@@ -906,8 +909,11 @@ public class Sunface extends Application {
 
     private void resizeWindow(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
 
-        MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-        if (mouseButton == null || mouseButton.equals(MouseButton.MIDDLE)) { return; }
+        if (!mouseButtonList.isEmpty()) {
+            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
+                return;
+            }
+        }
 
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();

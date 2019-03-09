@@ -93,7 +93,7 @@ public class Sundial {
     private static final double CETUS_MARKER_WIDTH = 1.00d;
 
     private static final double DAYLENGTH_ARC_OPACITY = 0.65d;
-    private static final double MARGIN_CIRCLE_OPACITY = 0.65d;
+    private static final double MARGIN_CIRCLE_OPACITY = 0.85d;
     private static final double TINYGLOBE_DEFAULT_OPACITY = 0.65d;
     private static final double TINYGLOBE_OFFSET_OPACITY = 0.90d;
     private static final double MARKER_MINUTE_OPACITY = 0.1d;
@@ -191,6 +191,7 @@ public class Sundial {
     public static final Color Color_Of_MinimizeStroke = new Color(0.90, 0.90, 0.20, 1.00);
 
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
+    public static final Color Color_Of_CetusFrame  = new Color(0.85, 0.60, 0.95, 1.00);
     public static final Color Color_Of_CetusArc    = new Color(0.90, 0.25, 1.00, 1.00);
     public static final Color Color_Of_CetusDay    = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusNight  = new Color(0.90, 0.70, 1.00, 1.00);
@@ -222,18 +223,22 @@ public class Sundial {
     public static final String CETUS_MATRIX_SHADOW_DAY   = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
     public static final String CETUS_MATRIX_SHADOW_NIGHT = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
-    private static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,
-            1003, 639, true, false);
-    private static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,
-            1003, 639, true, false);
-    private static final Image TINYGLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,
-        1003, 639, true, false);
-    private static final Image TINYGLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,
-            1003, 639, true, false);
-    private static final Image TINYGLOBE_CETUS_IMAGE = new Image("images/LotusFlower_edit.png",
-            2048, 1264, true, false);
+    private static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
+    private static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
+    private static final Image TINYGLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
+    private static final Image TINYGLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
+    private static final Image TINYGLOBE_CETUS_IMAGE = new Image("images/LotusFlower_edit.png",2048, 1264, true, false);
 
-    private static final RadialGradient WARNING_RADIAL_GRADIENT = new RadialGradient(
+    private static final RadialGradient FRAME_DIAL_NOMINAL = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.75, Color_Of_Void),
+            new Stop(1.00, Color_Of_Nominal)
+    );
+
+    private static final RadialGradient FRAME_DIAL_WARNING = new RadialGradient(
             0, 0,
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
@@ -242,13 +247,22 @@ public class Sundial {
             new Stop(1.00, Color_Of_Warning)
     );
 
-    private static final RadialGradient NOMINAL_RADIAL_GRADIENT = new RadialGradient(
+    private static final RadialGradient FRAME_GLOBE_NOMINAL = new RadialGradient(
             0, 0,
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.75, Color_Of_Void),
+            new Stop(0.95, Color_Of_Void),
             new Stop(1.00, Color_Of_Nominal)
+    );
+
+    private static final RadialGradient FRAME_GLOBE_WARNING = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.95, Color_Of_Void),
+            new Stop(1.00, Color_Of_Warning)
     );
 
     private static final RadialGradient MINUTE_MARKER_GRADIENT = new RadialGradient(
@@ -374,7 +388,8 @@ public class Sundial {
     private ArrayList<DotMatrix> cetusTimeMatrixList;
     private DotMatrix matrixTimeZone;
 
-    private Globe globe;
+    private Globe dayGlobe;
+    private Globe nightGlobe;
     private Globe tinyGlobe;
     private Circle tinyGlobeFrame;
     private Circle tinyGlobeDot;
@@ -555,12 +570,24 @@ public class Sundial {
         controlThingyMinimize.setStyle(CONTROL_MINIMIZE_SHADOW);
         controlThingyMinimize.setOpacity(CONTROL_MINIMIZE_OPACITY);
 
-        // Dials in a box
-        globe = new Globe(GLOBE_DAY_IMAGE, GLOBE_NIGHT_IMAGE, CENTER_X - MARGIN_X);
-        globe.setLayoutX(CENTER_X);
-        globe.setLayoutY(CENTER_Y);
-        globe.setVisible(false);
 
+        // Day globe group
+        dayGlobe = new Globe(GLOBE_DAY_IMAGE, CENTER_X - MARGIN_X);
+        dayGlobe.setLayoutX(CENTER_X);
+        dayGlobe.setLayoutY(CENTER_Y);
+        dayGlobe.setNightLightColor(Color.DARKRED);
+        dayGlobe.setVisible(false);
+
+        // Night globe group
+        nightGlobe = new Globe(GLOBE_NIGHT_IMAGE, CENTER_X - MARGIN_X);
+        nightGlobe.setLayoutX(CENTER_X);
+        nightGlobe.setLayoutY(CENTER_Y);
+//        nightGlobe.setDayLightColor(Color.BLACK);
+        nightGlobe.setAmbientLightColor(Color.WHITE);
+        nightGlobe.setVisible(false);
+
+
+        // Tiny globe group
         tinyGlobeFrame = new Circle(TINYGLOBE_RADIUS);
         tinyGlobeFrame.setLayoutX(CENTER_X);
         tinyGlobeFrame.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
@@ -578,13 +605,28 @@ public class Sundial {
         tinyGlobeDot.setStroke(Color_Of_Void);
         tinyGlobeDot.setOpacity(1);
 
-        tinyGlobe = new Globe(TINYGLOBE_DAY_IMAGE, GLOBE_NIGHT_IMAGE, TINYGLOBE_RADIUS);
+        tinyGlobe = new Globe(GLOBE_DAY_IMAGE, TINYGLOBE_RADIUS);
         tinyGlobe.setLayoutX(CENTER_X);
         tinyGlobe.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
+        tinyGlobe.setNightLightColor(Color.RED);
         tinyGlobe.setVisible(true);
 
         tinyGlobeGroup = new Group();
 
+        Group tinyGlobeSceneGroup = new Group();
+        tinyGlobeSceneGroup.getChildren().add(tinyGlobe);
+        SubScene tinyGlobeScene = new SubScene(tinyGlobeSceneGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        tinyGlobeScale = new Scale();
+        tinyGlobeScale.setPivotX(CENTER_X);
+        tinyGlobeScale.setPivotY(CENTER_Y + TINYGLOBE_OFFSET);
+
+        tinyGlobeGroup.getChildren().addAll(tinyGlobeScene, tinyGlobeDot, tinyGlobeFrame);
+        tinyGlobeGroup.getTransforms().add(tinyGlobeScale);
+        tinyGlobeGroup.setOpacity(TINYGLOBE_DEFAULT_OPACITY);
+
+
+        // Stuff
         dialMarginBox = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
         dialMarginBox.setTranslateX(0);
         dialMarginBox.setTranslateY(0);
@@ -634,7 +676,7 @@ public class Sundial {
         dialCircleBackground.setStyle(MATRIX_SHADOW);
 
         dialCircleFrame = new Circle(CENTER_X, CENTER_Y, DIAL_WIDTH / 2 - MARGIN_X);
-        dialCircleFrame.setFill(NOMINAL_RADIAL_GRADIENT);
+        dialCircleFrame.setFill(FRAME_DIAL_NOMINAL);
         dialCircleFrame.setStroke(Color_Of_Void);
         dialCircleFrame.setStrokeWidth(MARKER_FRAME_STROKE_WIDTH);
 
@@ -1206,23 +1248,18 @@ public class Sundial {
         backgroundGroup.getChildren().add(dialMarginCircle);
         SubScene backgroundScene = new SubScene(backgroundGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
 
-        Group globeGroup = new Group();
-        globeGroup.getChildren().add(globe);
-        SubScene globeScene = new SubScene(globeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        Group dayGlobeGroup = new Group();
+        dayGlobeGroup.getChildren().add(dayGlobe);
+        SubScene dayGlobeScene = new SubScene(dayGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
 
-        Group tinyGlobeSceneGroup = new Group();
-        tinyGlobeSceneGroup.getChildren().add(tinyGlobe);
-        SubScene tinyGlobeScene = new SubScene(tinyGlobeSceneGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-
-        tinyGlobeGroup.getChildren().addAll(tinyGlobeScene, tinyGlobeDot, tinyGlobeFrame);
-        tinyGlobeScale = new Scale();
-        tinyGlobeScale.setPivotX(CENTER_X);
-        tinyGlobeScale.setPivotY(CENTER_Y + TINYGLOBE_OFFSET);
-        tinyGlobeGroup.getTransforms().add(tinyGlobeScale);
-        tinyGlobeGroup.setOpacity(TINYGLOBE_DEFAULT_OPACITY);
+        Group nightGlobeGroup = new Group();
+        nightGlobeGroup.getChildren().add(nightGlobe);
+        SubScene nightGlobeScene = new SubScene(nightGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        nightGlobeScene.setBlendMode(BlendMode.ADD);
 
         Group foregroundGroup = new Group();
-        foregroundGroup.getChildren().add(globeScene);
+        foregroundGroup.getChildren().add(dayGlobeScene);
+        foregroundGroup.getChildren().add(nightGlobeScene);
         foregroundGroup.getChildren().add(dialCircleBackground);
         foregroundGroup.getChildren().add(dialArcNight);
         foregroundGroup.getChildren().add(dialArcMidnight);
@@ -1544,8 +1581,12 @@ public class Sundial {
         return matrixLatitude;
     }
 
-    public Globe getGlobe() {
-        return globe;
+    public Globe getDayGlobe() {
+        return dayGlobe;
+    }
+
+    public Globe getNightGlobe() {
+        return nightGlobe;
     }
 
     public Globe getTinyGlobe() {
@@ -1781,21 +1822,21 @@ public class Sundial {
             matrixSunrise.setVisible(false);
             matrixSunset.setVisible(false);
             dialArcNight.setVisible(false);
-            dialArcDayLength.setVisible(false);
+//            dialArcDayLength.setVisible(false);
         } else if (this.daylength == 0) {
             sunriseDial.setVisible(false);
             sunsetDial.setVisible(false);
             matrixSunrise.setVisible(false);
             matrixSunset.setVisible(false);
             dialArcNight.setVisible(true);
-            dialArcDayLength.setVisible(false);
+//            dialArcDayLength.setVisible(false);
         } else {
             sunriseDial.setVisible(true);
             sunsetDial.setVisible(true);
             matrixSunrise.setVisible(true);
             matrixSunset.setVisible(true);
             dialArcNight.setVisible(true);
-            dialArcDayLength.setVisible(true);
+//            dialArcDayLength.setVisible(true);
         }
 
         sunriseDialRotate.setAngle(this.sunriseDialAngle);
@@ -1872,9 +1913,17 @@ public class Sundial {
         this.warning = warning;
 
         if (this.warning) {
-            dialCircleFrame.setFill(WARNING_RADIAL_GRADIENT);
+            if (globeVisibleEh) {
+                dialCircleFrame.setFill(FRAME_GLOBE_WARNING);
+            } else {
+                dialCircleFrame.setFill(FRAME_DIAL_WARNING);
+            }
         } else {
-            dialCircleFrame.setFill(NOMINAL_RADIAL_GRADIENT);
+            if (globeVisibleEh) {
+                dialCircleFrame.setFill(FRAME_GLOBE_NOMINAL);
+            } else {
+                dialCircleFrame.setFill(FRAME_DIAL_NOMINAL);
+            }
         }
     }
 
@@ -1890,11 +1939,12 @@ public class Sundial {
             dialCircleCenterDot.setFill(Color_Of_Void);
             dialCircleCenterDot.setStroke(Color_Of_LocalTime);
 
-            dialArcNight.setOpacity(0.35);
+            dialArcNight.setOpacity(0);
             dialArcMidnight.setVisible(false);
 
             dialCircleBackground.setVisible(false);
-            globe.setVisible(true);
+            dayGlobe.setVisible(true);
+            nightGlobe.setVisible(true);
 
             tinyGlobeScale.setX(TINYGLOBE_DOWNSCALE);
             tinyGlobeScale.setY(TINYGLOBE_DOWNSCALE);
@@ -1920,7 +1970,8 @@ public class Sundial {
             dialArcMidnight.setVisible(true);
 
             dialCircleBackground.setVisible(true);
-            globe.setVisible(false);
+            dayGlobe.setVisible(false);
+            nightGlobe.setVisible(false);
 
             tinyGlobeScale.setX(1);
             tinyGlobeScale.setY(1);
@@ -1937,6 +1988,8 @@ public class Sundial {
 
             matrixTimeZone.setVisible(false);
         }
+
+        setDialFrameWarning(warning);
     }
 
     public void setCoordinates(double longitude, double latitude) {
@@ -1945,23 +1998,19 @@ public class Sundial {
     }
 
     public void toggleGlobeVisibility() {
-
-        if (globeVisibleEh) {
-            globeVisibleEh = false;
-        } else {
-            globeVisibleEh = true;
-        }
-
+        globeVisibleEh = !globeVisibleEh;
         setGlobeVisibility(globeVisibleEh);
     }
 
     public void rotateGlobe(double longitude, double latitude) {
-        globe.rotateGlobe(longitude, latitude, 0);
+        dayGlobe.rotateGlobe(longitude, latitude, 0);
+        nightGlobe.rotateGlobe(longitude,latitude, 0);
         tinyGlobe.rotateGlobe(longitude, latitude, 0);
     }
 
     public void rotateGlobeAnimated(double longitude, double latitude) {
-        globe.rotateGlobe(longitude, latitude, globeRotateDuration);
+        dayGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
+        nightGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
         tinyGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
     }
 
@@ -1982,9 +2031,9 @@ public class Sundial {
         cetusTimer.setVisible(visibleEh);
 
         if (visibleEh) {
-            tinyGlobe.setDayDiffuseMap(TINYGLOBE_CETUS_IMAGE);
+            tinyGlobeFrame.setStroke(Color_Of_CetusFrame);
         } else {
-            tinyGlobe.setDayDiffuseMap(TINYGLOBE_DAY_IMAGE);
+            tinyGlobeFrame.setStroke(Color_Of_TinyFrame);
         }
     }
 
