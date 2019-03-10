@@ -175,19 +175,24 @@ public class Sunface extends Application {
         // Setup dialsGroup scale transform
         double dialsMinX = dialsGroup.getLayoutBounds().getMinX();
         double dialsMinY = dialsGroup.getLayoutBounds().getMinY();
+        double dialsMinZ = dialsGroup.getLayoutBounds().getMinZ();
 
         double dialsMaxX = dialsGroup.getLayoutBounds().getMaxX();
         double dialsMaxY = dialsGroup.getLayoutBounds().getMaxY();
+        double dialsMaxZ = dialsGroup.getLayoutBounds().getMaxZ();
 
         double dialsLayoutWidth = dialsGroup.getLayoutBounds().getWidth();
         double dialsLayoutHeight = dialsGroup.getLayoutBounds().getHeight();
+        double dialsLayoutDepth = dialsGroup.getLayoutBounds().getDepth();
 
-        dialsGroup.setLayoutX(dialsLayoutWidth - dialsMaxX);
-        dialsGroup.setLayoutY(dialsLayoutHeight - dialsMaxY);
+        dialsGroup.setTranslateX(dialsLayoutWidth - dialsMaxX);
+        dialsGroup.setTranslateY(dialsLayoutHeight - dialsMaxY);
+        dialsGroup.setTranslateZ(dialsLayoutDepth - dialsMaxZ);
 
         Scale dialsScale = new Scale();
         dialsScale.setPivotX(dialsMinX);
         dialsScale.setPivotY(dialsMinY);
+        dialsScale.setPivotZ(dialsMinZ);
 
         dialsGroup.getTransforms().add(dialsScale);
 
@@ -962,6 +967,7 @@ public class Sunface extends Application {
 
         dialsScale.setX((windowSizeX) / Sundial.DIAL_WIDTH);
         dialsScale.setY((windowSizeY) / Sundial.DIAL_HEIGHT);
+        dialsScale.setZ(( windowSizeX > windowSizeY ? windowSizeX : windowSizeY ) / Sundial.DIAL_HEIGHT);
 
         stage.setWidth(windowSizeX);
         stage.setHeight(windowSizeY);
