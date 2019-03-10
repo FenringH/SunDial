@@ -34,11 +34,9 @@ public class Globe extends Group {
 
     private Group globe;
     private Sphere daySphere;
-    private Sphere nightSphere;
     private PhongMaterial globeMaterial;
 
     private Image dayDiffuseMap;
-    private Image nightDiffuseMap;
 
     private Rotate rotateLongitude;
     private Rotate rotateLatitude;
@@ -62,29 +60,28 @@ public class Globe extends Group {
 
     public Globe(Image dayDiffuseMap, double radius) {
         super();
-        this.globe = new Group();
+        globe = new Group();
         this.dayDiffuseMap = dayDiffuseMap;
-        this.nightDiffuseMap = nightDiffuseMap;
-        this.rotateLongitudeTimeline = new Timeline();
-        this.rotateLatitudeTimeline = new Timeline();
+        rotateLongitudeTimeline = new Timeline();
+        rotateLatitudeTimeline = new Timeline();
         getChildren().add(getGlobe(radius));
     }
 
     private Group getGlobe(double radius) {
 
-        this.globe = new Group();
+        globe = new Group();
 
-        this.rotateLongitude = new Rotate();
-        this.rotateLatitude = new Rotate();
+        rotateLongitude = new Rotate();
+        rotateLatitude = new Rotate();
 
-        this.rotateLongitude.setAxis(Rotate.Y_AXIS);
-        this.rotateLatitude.setAxis(Rotate.X_AXIS);
+        rotateLongitude.setAxis(Rotate.Y_AXIS);
+        rotateLatitude.setAxis(Rotate.X_AXIS);
 
-        this.rotateSunTilt = new Rotate();
-        this.rotateSunPhase = new Rotate();
+        rotateSunTilt = new Rotate();
+        rotateSunPhase = new Rotate();
 
-        this.rotateSunTilt.setAxis(Rotate.X_AXIS);
-        this.rotateSunPhase.setAxis(Rotate.Y_AXIS);
+        rotateSunTilt.setAxis(Rotate.X_AXIS);
+        rotateSunPhase.setAxis(Rotate.Y_AXIS);
 
         dayLight = new PointLight(Color_Of_Light);
         dayLight.setTranslateZ(-100000);
@@ -96,11 +93,11 @@ public class Globe extends Group {
 
         Group dayLightGripper = new Group();
         dayLightGripper.getChildren().addAll(dayLight, nightLight, ambientLight);
-        dayLightGripper.getTransforms().add(rotateSunPhase);
+        dayLightGripper.getTransforms().add(rotateSunTilt);
 
         Group dayLightHolder = new Group();
         dayLightHolder.getChildren().add(dayLightGripper);
-        dayLightHolder.getTransforms().add(rotateSunTilt);
+        dayLightHolder.getTransforms().add(rotateSunPhase);
 
         globeMaterial = new PhongMaterial();
         globeMaterial.setDiffuseMap(dayDiffuseMap);
@@ -168,8 +165,9 @@ public class Globe extends Group {
     }
 
     public void setDayLightPosition(double phase, double tilt) {
+
         sunPhase = phase;
-        sunTilt = -1 * tilt;
+        sunTilt = 0d - tilt;
 
         rotateSunPhase.setAngle(sunPhase * 360);
         rotateSunTilt.setAngle(sunTilt);

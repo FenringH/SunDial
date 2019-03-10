@@ -250,6 +250,13 @@ public class Suntime {
         return calendar;
     }
 
+    public double getRealTimeDeclinationOfTheSun(double julianDate) {
+        double meanAnomaly = calcMeanAnomaly(julianDate);
+        double equationOfCenter = calcEquationOfCenter(meanAnomaly);
+        double eclipticalLongitude = calcEclipticalLongitude(meanAnomaly, equationOfCenter);
+        return calcDeclinationOfTheSun(eclipticalLongitude);
+    }
+
     // calculation methods
     private double calcMeanAnomaly(double juliandDate) {
         return (357.5291d + 0.98560028d * (juliandDate - J2000)) % 360;
@@ -284,7 +291,7 @@ public class Suntime {
 
     private double calcLocalHourAngle(double declinationOfTheSun, double observerLatitude) {
 
-        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(observerLatitude)) * sin(toRadians(declinationOfTheSun));
+        double dividend = /*sin(toRadians(-0.83d))*/ - sin(toRadians(observerLatitude)) * sin(toRadians(declinationOfTheSun));
         double divisor = cos(toRadians(observerLatitude)) * cos(toRadians(declinationOfTheSun));
         double division = dividend / divisor;
 

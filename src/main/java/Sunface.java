@@ -152,6 +152,8 @@ public class Sunface extends Application {
 
         sundial.getDayGlobe().rotateGlobe(longitude, latitude, 0);
         sundial.getNightGlobe().rotateGlobe(longitude, latitude, 0);
+        sundial.getDayTerminatorLine().rotateRing(longitude, latitude, 0);
+        sundial.getDayTerminatorGlow().rotateRing(longitude, latitude, 0);
         sundial.getTinyGlobe().rotateGlobe(longitude, latitude, 0);
 
         cetustime = new Cetustime();
@@ -588,7 +590,7 @@ public class Sunface extends Application {
         timeZonedCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis() + timeZoneCorrection);
 
         GregorianCalendar globalCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        globalCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis());
+        globalCalendar.setTimeInMillis(timeZonedCalendar.getTimeInMillis());
 
         suntimeLocal.setObserverTime(timeZonedCalendar);
         suntimeGlobal.setObserverTime(globalCalendar);
@@ -597,9 +599,15 @@ public class Sunface extends Application {
 
         sundial.setLocalTime(offsetLocalTime);
         sundial.updateCetusTimer(cetustime);
-        sundial.getDayGlobe().setDayLightPosition(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
-        sundial.getNightGlobe().setDayLightPosition(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
-        sundial.getTinyGlobe().setDayLightPosition(suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber(), suntimeGlobal.getDeclinationOfTheSun());
+
+        double phase = suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber();
+        double tilt = suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(globalCalendar));
+
+        sundial.getDayGlobe().setDayLightPosition(phase, tilt);
+        sundial.getNightGlobe().setDayLightPosition(phase, tilt);
+        sundial.getTinyGlobe().setDayLightPosition(phase, tilt);
+        sundial.getDayTerminatorLine().setDayLightPosition(phase, tilt);
+        sundial.getDayTerminatorGlow().setDayLightPosition(phase, tilt);
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);

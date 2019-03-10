@@ -1,6 +1,8 @@
 import javafx.animation.*;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -91,6 +93,8 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_STROKE_WIDTH = 3.00d;
     private static final double CONTROL_MINIMIZE_STROKE_WIDTH = 3.00d;
     private static final double CETUS_MARKER_WIDTH = 1.00d;
+    private static final double DAY_TERMINATOR_WIDTH = 1.5d;
+    private static final double DAY_TERMINATOR_GLOW_WIDTH = 25.00d;
 
     private static final double DAYLENGTH_ARC_OPACITY = 0.65d;
     private static final double MARGIN_CIRCLE_OPACITY = 0.85d;
@@ -103,6 +107,7 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_OPACITY = 0.75d;
     private static final double CONTROL_MINIMIZE_OPACITY = 0.75d;
     private static final double CETUS_ARC_OPACITY = 1.00d;
+    private static final double DAY_TERMINATOR_OPACITY = 0.65d;
 
     private static final double MATRIX_MARKER_OFFSET = 6.5d;
     private static final double MATRIX_HORIZON_OFFSET = 77.0d;
@@ -179,6 +184,9 @@ public class Sundial {
     public static final Color Color_Of_LocalTime  = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_TinyFrame  = new Color(1.00, 1.00, 1.00, 1.00);
 
+    public static final Color Color_Of_TerminatorLine = new Color(0.25, 0.50, 1.00, 1.00);
+    public static final Color Color_Of_TerminatorGlow = new Color(0.00, 0.10, 0.90, 1.00);
+
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
 
@@ -209,6 +217,7 @@ public class Sundial {
     public static final String LOCALTIME_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 4.0, 0.50, 0, 0);";
+    public static final String TERMINATOR_LINE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
 
     public static final String CONTROL_RESIZE_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_RESIZE_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
@@ -307,8 +316,8 @@ public class Sundial {
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y + 4,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.850, Color_Of_Void),
-            new Stop(0.950, Color_Of_Nominal),
+            new Stop(0.950, Color_Of_Void),
+//            new Stop(0.950, Color_Of_Nominal),
             new Stop(0.985, Color_Of_Atmosphere),
             new Stop(1.000, Color_Of_Void)
     );
@@ -402,6 +411,8 @@ public class Sundial {
 
     private Globe dayGlobe;
     private Globe nightGlobe;
+    private Ring dayTerminatorLine;
+    private Ring dayTerminatorGlow;
     private Circle globeAtmosphere;
     private Globe tinyGlobe;
     private Circle tinyGlobeFrame;
@@ -599,6 +610,18 @@ public class Sundial {
         nightGlobe.setAmbientLightColor(Color.WHITE);
         nightGlobe.setVisible(false);
 
+        // Day/Night terminator line
+        dayTerminatorLine = new Ring(CENTER_X - MARGIN_X, DAY_TERMINATOR_WIDTH, Color_Of_TerminatorLine);
+        dayTerminatorLine.setLayoutX(CENTER_X);
+        dayTerminatorLine.setLayoutY(CENTER_Y);
+        dayTerminatorLine.setVisible(false);
+
+        dayTerminatorGlow = new Ring(CENTER_X - MARGIN_X, DAY_TERMINATOR_GLOW_WIDTH, Color_Of_TerminatorGlow);
+        dayTerminatorGlow.setLayoutX(CENTER_X);
+        dayTerminatorGlow.setLayoutY(CENTER_Y);
+        dayTerminatorGlow.setVisible(false);
+
+        // Atmosphere effect
         globeAtmosphere = new Circle(CENTER_X, CENTER_Y, CENTER_X - MARGIN_X + 4);
         globeAtmosphere.setFill(GLOBE_ATMOSPHERE);
         globeAtmosphere.setStroke(Color_Of_Void);
@@ -1275,9 +1298,25 @@ public class Sundial {
         SubScene nightGlobeScene = new SubScene(nightGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         nightGlobeScene.setBlendMode(BlendMode.ADD);
 
+        Group dayTerminatorLineGroup = new Group();
+        dayTerminatorLineGroup.getChildren().add(dayTerminatorLine);
+        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLineGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
+        dayTerminatorLineScene.setEffect(new GaussianBlur(DAY_TERMINATOR_WIDTH));
+        dayTerminatorLineScene.setOpacity(DAY_TERMINATOR_OPACITY);
+
+        Group dayTerminatorGlowGroup = new Group();
+        dayTerminatorGlowGroup.getChildren().add(dayTerminatorGlow);
+        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlowGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
+        dayTerminatorGlowScene.setEffect(new GaussianBlur(DAY_TERMINATOR_GLOW_WIDTH));
+        dayTerminatorGlowScene.setOpacity(DAY_TERMINATOR_OPACITY);
+
         Group foregroundGroup = new Group();
         foregroundGroup.getChildren().add(dayGlobeScene);
         foregroundGroup.getChildren().add(nightGlobeScene);
+        foregroundGroup.getChildren().add(dayTerminatorGlowScene);
+        foregroundGroup.getChildren().add(dayTerminatorLineScene);
         foregroundGroup.getChildren().add(globeAtmosphere);
         foregroundGroup.getChildren().add(dialCircleBackground);
         foregroundGroup.getChildren().add(dialArcNight);
@@ -1608,6 +1647,14 @@ public class Sundial {
         return nightGlobe;
     }
 
+    public Ring getDayTerminatorLine() {
+        return dayTerminatorLine;
+    }
+
+    public Ring getDayTerminatorGlow() {
+        return dayTerminatorGlow;
+    }
+
     public Globe getTinyGlobe() {
         return tinyGlobe;
     }
@@ -1841,13 +1888,15 @@ public class Sundial {
             matrixSunrise.setVisible(false);
             matrixSunset.setVisible(false);
             dialArcNight.setVisible(false);
+            dialArcDayLength.setLength(360);
 //            dialArcDayLength.setVisible(false);
-        } else if (this.daylength == 0) {
+        } else if (this.daylength <= 0) {
             sunriseDial.setVisible(false);
             sunsetDial.setVisible(false);
             matrixSunrise.setVisible(false);
             matrixSunset.setVisible(false);
             dialArcNight.setVisible(true);
+            dialArcDayLength.setLength(0);
 //            dialArcDayLength.setVisible(false);
         } else {
             sunriseDial.setVisible(true);
@@ -1856,6 +1905,15 @@ public class Sundial {
             matrixSunset.setVisible(true);
             dialArcNight.setVisible(true);
 //            dialArcDayLength.setVisible(true);
+
+            double dayLengthDeg = (720 + this.sunsetDialAngle - this.sunriseDialAngle) % 360;
+
+            dialArcNight.setStartAngle(90 - this.sunsetDialAngle);
+            dialArcNight.setLength(dayLengthDeg - 360);
+
+            dialArcDayLength.setStartAngle(90 - this.sunriseDialAngle - DAY_ARC_MARGIN);
+            dialArcDayLength.setLength(-1 * (dayLengthDeg - DAY_ARC_MARGIN * 2));
+
         }
 
         sunriseDialRotate.setAngle(this.sunriseDialAngle);
@@ -1876,14 +1934,6 @@ public class Sundial {
             matrixSunset.setTranslateX(CENTER_X - matrixSunset.getLayoutBounds().getWidth() / 2 + matrixSunset.getLayoutBounds().getHeight() / 2);
             matrixSunset.setRotate(90d);
         }
-
-        double dayLengthDeg = (720 + this.sunsetDialAngle - this.sunriseDialAngle) % 360;
-
-        dialArcNight.setStartAngle(90 - this.sunsetDialAngle);
-        dialArcNight.setLength(dayLengthDeg - 360);
-
-        dialArcDayLength.setStartAngle(90 - this.sunriseDialAngle - DAY_ARC_MARGIN);
-        dialArcDayLength.setLength(-1 * (dayLengthDeg - DAY_ARC_MARGIN * 2));
 
         dialArcMidnight.setStartAngle(90 - getNightCompressionAngle(90));
         dialArcMidnight.setLength(-1 * (getNightCompressionAngle(270) - getNightCompressionAngle(90)));
@@ -1933,13 +1983,13 @@ public class Sundial {
 
         if (this.warning) {
             if (globeVisibleEh) {
-                dialCircleFrame.setFill(FRAME_GLOBE_WARNING);
+                dialCircleFrame.setFill(Color_Of_Void);
             } else {
                 dialCircleFrame.setFill(FRAME_DIAL_WARNING);
             }
         } else {
             if (globeVisibleEh) {
-                dialCircleFrame.setFill(FRAME_GLOBE_NOMINAL);
+                dialCircleFrame.setFill(Color_Of_Void);
             } else {
                 dialCircleFrame.setFill(FRAME_DIAL_NOMINAL);
             }
@@ -1964,6 +2014,8 @@ public class Sundial {
             dialCircleBackground.setVisible(false);
             dayGlobe.setVisible(true);
             nightGlobe.setVisible(true);
+            dayTerminatorLine.setVisible(true);
+            dayTerminatorGlow.setVisible(true);
             globeAtmosphere.setVisible(true);
 
             tinyGlobeScale.setX(TINYGLOBE_DOWNSCALE);
@@ -1992,6 +2044,8 @@ public class Sundial {
             dialCircleBackground.setVisible(true);
             dayGlobe.setVisible(false);
             nightGlobe.setVisible(false);
+            dayTerminatorLine.setVisible(false);
+            dayTerminatorGlow.setVisible(false);
             globeAtmosphere.setVisible(false);
 
             tinyGlobeScale.setX(1);
@@ -2026,12 +2080,16 @@ public class Sundial {
     public void rotateGlobe(double longitude, double latitude) {
         dayGlobe.rotateGlobe(longitude, latitude, 0);
         nightGlobe.rotateGlobe(longitude,latitude, 0);
+        dayTerminatorLine.rotateRing(longitude, latitude, 0);
+        dayTerminatorGlow.rotateRing(longitude, latitude, 0);
         tinyGlobe.rotateGlobe(longitude, latitude, 0);
     }
 
     public void rotateGlobeAnimated(double longitude, double latitude) {
         dayGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
         nightGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
+        dayTerminatorLine.rotateRing(longitude, latitude, globeRotateDuration);
+        dayTerminatorGlow.rotateRing(longitude, latitude, globeRotateDuration);
         tinyGlobe.rotateGlobe(longitude, latitude, globeRotateDuration);
     }
 
