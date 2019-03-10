@@ -165,6 +165,7 @@ public class Sundial {
     public static final Color Color_Of_Warning    = new Color(1.00, 0.65, 0.00, 0.35);
 
     public static final Color Color_Of_DaySky     = new Color(0.50, 0.75, 1.00, 1.00);
+    public static final Color Color_Of_Atmosphere = new Color(0.25, 0.50, 0.90, 1.00);
     public static final Color Color_Of_NightSky   = new Color(0.50, 0.35, 1.00, 1.00);
 //    public static final Color Color_Of_NightSky  = new Color(0.50, 0.35, 1.00, 0.50);
     public static final Color Color_Of_Midnight   = new Color(0.00, 0.00, 0.00, 0.20);
@@ -301,6 +302,17 @@ public class Sundial {
             new Stop(0.85, Color_Of_CetusArc)
     );
 
+    private static final RadialGradient GLOBE_ATMOSPHERE = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y + 4,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.850, Color_Of_Void),
+            new Stop(0.950, Color_Of_Nominal),
+            new Stop(0.985, Color_Of_Atmosphere),
+            new Stop(1.000, Color_Of_Void)
+    );
+
     private static final Font Font_Of_Info = new Font("Lucida Console", 14);
     private static final Font Font_Of_Dial = new Font("Lucida Console", 8);
 
@@ -390,6 +402,7 @@ public class Sundial {
 
     private Globe dayGlobe;
     private Globe nightGlobe;
+    private Circle globeAtmosphere;
     private Globe tinyGlobe;
     private Circle tinyGlobeFrame;
     private Circle tinyGlobeDot;
@@ -586,6 +599,11 @@ public class Sundial {
         nightGlobe.setAmbientLightColor(Color.WHITE);
         nightGlobe.setVisible(false);
 
+        globeAtmosphere = new Circle(CENTER_X, CENTER_Y, CENTER_X - MARGIN_X + 4);
+        globeAtmosphere.setFill(GLOBE_ATMOSPHERE);
+        globeAtmosphere.setStroke(Color_Of_Void);
+        globeAtmosphere.setMouseTransparent(true);
+        globeAtmosphere.setVisible(false);
 
         // Tiny globe group
         tinyGlobeFrame = new Circle(TINYGLOBE_RADIUS);
@@ -1260,6 +1278,7 @@ public class Sundial {
         Group foregroundGroup = new Group();
         foregroundGroup.getChildren().add(dayGlobeScene);
         foregroundGroup.getChildren().add(nightGlobeScene);
+        foregroundGroup.getChildren().add(globeAtmosphere);
         foregroundGroup.getChildren().add(dialCircleBackground);
         foregroundGroup.getChildren().add(dialArcNight);
         foregroundGroup.getChildren().add(dialArcMidnight);
@@ -1945,6 +1964,7 @@ public class Sundial {
             dialCircleBackground.setVisible(false);
             dayGlobe.setVisible(true);
             nightGlobe.setVisible(true);
+            globeAtmosphere.setVisible(true);
 
             tinyGlobeScale.setX(TINYGLOBE_DOWNSCALE);
             tinyGlobeScale.setY(TINYGLOBE_DOWNSCALE);
@@ -1972,6 +1992,7 @@ public class Sundial {
             dialCircleBackground.setVisible(true);
             dayGlobe.setVisible(false);
             nightGlobe.setVisible(false);
+            globeAtmosphere.setVisible(false);
 
             tinyGlobeScale.setX(1);
             tinyGlobeScale.setY(1);
