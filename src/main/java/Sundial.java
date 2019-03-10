@@ -418,6 +418,7 @@ public class Sundial {
     private Circle tinyGlobeFrame;
     private Circle tinyGlobeDot;
     private Group tinyGlobeGroup;
+    private Group masterGlobeGroup;
     private Scale tinyGlobeScale;
     private Group coordinatesGroup;
     private Group horizonGroup;
@@ -595,38 +596,56 @@ public class Sundial {
         controlThingyMinimize.setOpacity(CONTROL_MINIMIZE_OPACITY);
 
 
-        // Day globe group
+        // Master globe group
         dayGlobe = new Globe(GLOBE_DAY_IMAGE, CENTER_X - MARGIN_X);
         dayGlobe.setLayoutX(CENTER_X);
         dayGlobe.setLayoutY(CENTER_Y);
         dayGlobe.setNightLightColor(Color.DARKRED);
-        dayGlobe.setVisible(false);
 
-        // Night globe group
         nightGlobe = new Globe(GLOBE_NIGHT_IMAGE, CENTER_X - MARGIN_X);
         nightGlobe.setLayoutX(CENTER_X);
         nightGlobe.setLayoutY(CENTER_Y);
-//        nightGlobe.setDayLightColor(Color.BLACK);
         nightGlobe.setAmbientLightColor(Color.WHITE);
-        nightGlobe.setVisible(false);
 
-        // Day/Night terminator line
         dayTerminatorLine = new Ring(CENTER_X - MARGIN_X, DAY_TERMINATOR_WIDTH, Color_Of_TerminatorLine);
         dayTerminatorLine.setLayoutX(CENTER_X);
         dayTerminatorLine.setLayoutY(CENTER_Y);
-        dayTerminatorLine.setVisible(false);
 
         dayTerminatorGlow = new Ring(CENTER_X - MARGIN_X, DAY_TERMINATOR_GLOW_WIDTH, Color_Of_TerminatorGlow);
         dayTerminatorGlow.setLayoutX(CENTER_X);
         dayTerminatorGlow.setLayoutY(CENTER_Y);
-        dayTerminatorGlow.setVisible(false);
 
-        // Atmosphere effect
+        Group dayGlobeGroup = new Group();
+        dayGlobeGroup.getChildren().add(dayGlobe);
+        SubScene dayGlobeScene = new SubScene(dayGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        Group nightGlobeGroup = new Group();
+        nightGlobeGroup.getChildren().add(nightGlobe);
+        SubScene nightGlobeScene = new SubScene(nightGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        nightGlobeScene.setBlendMode(BlendMode.ADD);
+
+        Group dayTerminatorLineGroup = new Group();
+        dayTerminatorLineGroup.getChildren().add(dayTerminatorLine);
+        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLineGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
+        dayTerminatorLineScene.setEffect(new GaussianBlur(DAY_TERMINATOR_WIDTH));
+        dayTerminatorLineScene.setOpacity(DAY_TERMINATOR_OPACITY);
+
+        Group dayTerminatorGlowGroup = new Group();
+        dayTerminatorGlowGroup.getChildren().add(dayTerminatorGlow);
+        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlowGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
+        dayTerminatorGlowScene.setEffect(new GaussianBlur(DAY_TERMINATOR_GLOW_WIDTH));
+        dayTerminatorGlowScene.setOpacity(DAY_TERMINATOR_OPACITY);
+
         globeAtmosphere = new Circle(CENTER_X, CENTER_Y, CENTER_X - MARGIN_X + 4);
         globeAtmosphere.setFill(GLOBE_ATMOSPHERE);
         globeAtmosphere.setStroke(Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
-        globeAtmosphere.setVisible(false);
+
+        masterGlobeGroup = new Group(dayGlobeScene, nightGlobeScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
+        masterGlobeGroup.setVisible(false);
+
 
         // Tiny globe group
         tinyGlobeFrame = new Circle(TINYGLOBE_RADIUS);
@@ -635,24 +654,21 @@ public class Sundial {
         tinyGlobeFrame.setFill(Color_Of_Void);
         tinyGlobeFrame.setStroke(Color_Of_TinyFrame);
         tinyGlobeFrame.setStrokeWidth(TINYGLOBE_FRAME_STROKE_WIDTH);
-        tinyGlobeFrame.setOpacity(1);
         tinyGlobeFrame.setStyle(MATRIX_SHADOW);
-        tinyGlobeFrame.setVisible(true);
 
         tinyGlobeDot = new Circle(1.0d);
         tinyGlobeDot.setLayoutX(CENTER_X);
         tinyGlobeDot.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
         tinyGlobeDot.setFill(Color_Of_TinyFrame);
         tinyGlobeDot.setStroke(Color_Of_Void);
-        tinyGlobeDot.setOpacity(1);
 
         tinyGlobe = new Globe(GLOBE_DAY_IMAGE, TINYGLOBE_RADIUS);
         tinyGlobe.setLayoutX(CENTER_X);
         tinyGlobe.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
-        tinyGlobe.setNightLightColor(Color.RED);
+        tinyGlobe.setDayLightColor(new Color(0.65, 0.65,0.65, 1.00));
+        tinyGlobe.setNightLightColor(new Color(0.65, 0.00, 0.00, 1.00));
+        tinyGlobe.setAmbientLightColor(new Color(0.35, 0.35,0.35, 1.00));
         tinyGlobe.setVisible(true);
-
-        tinyGlobeGroup = new Group();
 
         Group tinyGlobeSceneGroup = new Group();
         tinyGlobeSceneGroup.getChildren().add(tinyGlobe);
@@ -662,6 +678,7 @@ public class Sundial {
         tinyGlobeScale.setPivotX(CENTER_X);
         tinyGlobeScale.setPivotY(CENTER_Y + TINYGLOBE_OFFSET);
 
+        tinyGlobeGroup = new Group();
         tinyGlobeGroup.getChildren().addAll(tinyGlobeScene, tinyGlobeDot, tinyGlobeFrame);
         tinyGlobeGroup.getTransforms().add(tinyGlobeScale);
         tinyGlobeGroup.setOpacity(TINYGLOBE_DEFAULT_OPACITY);
@@ -1289,35 +1306,8 @@ public class Sundial {
         backgroundGroup.getChildren().add(dialMarginCircle);
         SubScene backgroundScene = new SubScene(backgroundGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
 
-        Group dayGlobeGroup = new Group();
-        dayGlobeGroup.getChildren().add(dayGlobe);
-        SubScene dayGlobeScene = new SubScene(dayGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-
-        Group nightGlobeGroup = new Group();
-        nightGlobeGroup.getChildren().add(nightGlobe);
-        SubScene nightGlobeScene = new SubScene(nightGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        nightGlobeScene.setBlendMode(BlendMode.ADD);
-
-        Group dayTerminatorLineGroup = new Group();
-        dayTerminatorLineGroup.getChildren().add(dayTerminatorLine);
-        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLineGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
-        dayTerminatorLineScene.setEffect(new GaussianBlur(DAY_TERMINATOR_WIDTH));
-        dayTerminatorLineScene.setOpacity(DAY_TERMINATOR_OPACITY);
-
-        Group dayTerminatorGlowGroup = new Group();
-        dayTerminatorGlowGroup.getChildren().add(dayTerminatorGlow);
-        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlowGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
-        dayTerminatorGlowScene.setEffect(new GaussianBlur(DAY_TERMINATOR_GLOW_WIDTH));
-        dayTerminatorGlowScene.setOpacity(DAY_TERMINATOR_OPACITY);
-
         Group foregroundGroup = new Group();
-        foregroundGroup.getChildren().add(dayGlobeScene);
-        foregroundGroup.getChildren().add(nightGlobeScene);
-        foregroundGroup.getChildren().add(dayTerminatorGlowScene);
-        foregroundGroup.getChildren().add(dayTerminatorLineScene);
-        foregroundGroup.getChildren().add(globeAtmosphere);
+        foregroundGroup.getChildren().add(masterGlobeGroup);
         foregroundGroup.getChildren().add(dialCircleBackground);
         foregroundGroup.getChildren().add(dialArcNight);
         foregroundGroup.getChildren().add(dialArcMidnight);
@@ -2012,11 +2002,7 @@ public class Sundial {
             dialArcMidnight.setVisible(false);
 
             dialCircleBackground.setVisible(false);
-            dayGlobe.setVisible(true);
-            nightGlobe.setVisible(true);
-            dayTerminatorLine.setVisible(true);
-            dayTerminatorGlow.setVisible(true);
-            globeAtmosphere.setVisible(true);
+            masterGlobeGroup.setVisible(true);
 
             tinyGlobeScale.setX(TINYGLOBE_DOWNSCALE);
             tinyGlobeScale.setY(TINYGLOBE_DOWNSCALE);
@@ -2042,11 +2028,7 @@ public class Sundial {
             dialArcMidnight.setVisible(true);
 
             dialCircleBackground.setVisible(true);
-            dayGlobe.setVisible(false);
-            nightGlobe.setVisible(false);
-            dayTerminatorLine.setVisible(false);
-            dayTerminatorGlow.setVisible(false);
-            globeAtmosphere.setVisible(false);
+            masterGlobeGroup.setVisible(false);
 
             tinyGlobeScale.setX(1);
             tinyGlobeScale.setY(1);
