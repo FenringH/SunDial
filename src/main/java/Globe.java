@@ -6,13 +6,14 @@ import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 public class Globe extends Group {
 
-    private static final int SPHERE_DIVISIONS = 256;
+    private static final int SPHERE_DIVISIONS = 128;
     private static final int NUMBER_OF_PARALLELS = 360 / 10;
     private static final int NUMBER_OF_MERIDIANS = 180 / 10;
 
@@ -84,10 +85,10 @@ public class Globe extends Group {
         rotateSunPhase.setAxis(Rotate.Y_AXIS);
 
         dayLight = new PointLight(Color_Of_Light);
-        dayLight.setTranslateZ(-100000);
+        dayLight.setTranslateZ(-100 * radius);
 
         nightLight = new PointLight(Color.BLACK);
-        nightLight.setTranslateZ(100000);
+        nightLight.setTranslateZ(100 * radius);
 
         ambientLight = new AmbientLight(Color.BLACK);
 
@@ -106,11 +107,11 @@ public class Globe extends Group {
         daySphere.setMaterial(globeMaterial);
 
         Group daySphereGripper = new Group();
-        daySphereGripper.getTransforms().add(this.rotateLongitude);
+        daySphereGripper.getTransforms().add(rotateLongitude);
         daySphereGripper.getChildren().addAll(daySphere, dayLightHolder);
 
         Group daySphereHolder = new Group();
-        daySphereHolder.getTransforms().add(this.rotateLatitude);
+        daySphereHolder.getTransforms().add(rotateLatitude);
         daySphereHolder.getChildren().addAll(daySphereGripper);
 
         this.globe.getChildren().addAll(daySphereHolder);
@@ -127,8 +128,8 @@ public class Globe extends Group {
         if (rotateLatitudeTimeline != null) { rotateLatitudeTimeline.stop(); }
 
         if (duration < 1) {
-            this.rotateLongitude.setAngle(this.longitude);
-            this.rotateLatitude.setAngle(this.latitude);
+            rotateLongitude.setAngle(this.longitude);
+            rotateLatitude.setAngle(this.latitude);
             return;
         }
 
@@ -185,4 +186,15 @@ public class Globe extends Group {
         ambientLight.setColor(ambientLightColor);
     }
 
+    public Sphere getDaySphere() {
+        return daySphere;
+    }
+
+    public PointLight getDayLight() {
+        return dayLight;
+    }
+
+    public PointLight getNightLight() {
+        return nightLight;
+    }
 }

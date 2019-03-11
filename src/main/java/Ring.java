@@ -14,7 +14,7 @@ import javafx.util.Duration;
 
 public class Ring extends Group {
 
-    private static final int DIVISIONS = 256;
+    private static final int DIVISIONS = 128;
 
     private double longitude = 0;
     private double latitude = 0;

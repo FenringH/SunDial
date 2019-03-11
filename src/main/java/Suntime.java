@@ -291,7 +291,7 @@ public class Suntime {
 
     private double calcLocalHourAngle(double declinationOfTheSun, double observerLatitude) {
 
-        double dividend = /*sin(toRadians(-0.83d))*/ - sin(toRadians(observerLatitude)) * sin(toRadians(declinationOfTheSun));
+        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(observerLatitude)) * sin(toRadians(declinationOfTheSun));
         double divisor = cos(toRadians(observerLatitude)) * cos(toRadians(declinationOfTheSun));
         double division = dividend / divisor;
 
@@ -325,7 +325,7 @@ public class Suntime {
 
         double JDcorrection = 1d;
         double newMeanAnomaly, newEquationOfCenter, newEclipticalLongitude,
-                newDeclinationOfTheSun, newLocalHourAngle, newSolarTransit, newJulianDate = 0d;
+                newDeclinationOfTheSun, newLocalHourAngle, newSolarTransit, newJulianDate;
 
         for (int i = 0; i < MAX_ITERATIONS && abs(JDcorrection * this.precision) > 1; i++) {
             newMeanAnomaly = this.calcMeanAnomaly(estimateJulianDate);

@@ -173,6 +173,9 @@ public class Sunface extends Application {
 
 
         // Setup dialsGroup scale transform
+        Scale dialsScale = new Scale();
+        dialsGroup.getTransforms().add(dialsScale);
+/*
         double dialsMinX = dialsGroup.getLayoutBounds().getMinX();
         double dialsMinY = dialsGroup.getLayoutBounds().getMinY();
         double dialsMinZ = dialsGroup.getLayoutBounds().getMinZ();
@@ -189,12 +192,10 @@ public class Sunface extends Application {
         dialsGroup.setTranslateY(dialsLayoutHeight - dialsMaxY);
         dialsGroup.setTranslateZ(dialsLayoutDepth - dialsMaxZ);
 
-        Scale dialsScale = new Scale();
         dialsScale.setPivotX(dialsMinX);
         dialsScale.setPivotY(dialsMinY);
         dialsScale.setPivotZ(dialsMinZ);
-
-        dialsGroup.getTransforms().add(dialsScale);
+*/
 
 
         // Debug window
@@ -295,7 +296,7 @@ public class Sunface extends Application {
 
         sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowSize(primaryStage, dialsGroup, dialsScale, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, dialsGroup, dialsScale, event));
+        sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, sundial, dialsScale, event));
 
         sundial.getBackgroundGroup().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, dialsScale, event));
         sundial.getBackgroundGroup().setOnMouseReleased(event -> mouseButtonList.clear());
@@ -594,8 +595,8 @@ public class Sunface extends Application {
         GregorianCalendar timeZonedCalendar = new GregorianCalendar();
         timeZonedCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis() + timeZoneCorrection);
 
-        GregorianCalendar globalCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        globalCalendar.setTimeInMillis(timeZonedCalendar.getTimeInMillis());
+        GregorianCalendar globalCalendar = new GregorianCalendar();
+        globalCalendar.setTimeInMillis(timeZonedCalendar.getTimeInMillis() - timeZoneCorrection);
 
         suntimeLocal.setObserverTime(timeZonedCalendar);
         suntimeGlobal.setObserverTime(globalCalendar);
@@ -663,9 +664,7 @@ public class Sunface extends Application {
             }
 
             // update debug info
-            if (debugWindow.isShowing()) {
-                updateDebugWindow();
-            }
+            updateDebugWindow(sundial);
 
         }
     }
@@ -817,6 +816,7 @@ public class Sunface extends Application {
 
         dialsScale.setX(1.0d);
         dialsScale.setY(1.0d);
+        dialsScale.setZ(1.0d);
 
         stage.setWidth(dialsGroup.getLayoutBounds().getWidth());
         stage.setHeight(dialsGroup.getLayoutBounds().getHeight());
@@ -920,7 +920,7 @@ public class Sunface extends Application {
 
     }
 
-    private void resizeWindow(Stage stage, Group dialsGroup, Scale dialsScale, MouseEvent event) {
+    private void resizeWindow(Stage stage, Sundial sundial, Scale dialsScale, MouseEvent event) {
 
         if (!mouseButtonList.isEmpty()) {
             if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
@@ -965,12 +965,14 @@ public class Sunface extends Application {
         if (windowSizeX > maxWidth) { windowSizeX = maxWidth; }
         if (windowSizeY > maxHeight) { windowSizeY = maxHeight; }
 
-        dialsScale.setX((windowSizeX) / Sundial.DIAL_WIDTH);
-        dialsScale.setY((windowSizeY) / Sundial.DIAL_HEIGHT);
-        dialsScale.setZ(( windowSizeX > windowSizeY ? windowSizeX : windowSizeY ) / Sundial.DIAL_HEIGHT);
+        dialsScale.setX(windowSizeX / Sundial.DIAL_WIDTH);
+        dialsScale.setY(windowSizeY / Sundial.DIAL_HEIGHT);
+        dialsScale.setZ(windowSizeX / Sundial.DIAL_WIDTH);
 
         stage.setWidth(windowSizeX);
         stage.setHeight(windowSizeY);
+
+        updateDebugWindow(sundial);
     }
 
 
@@ -1021,6 +1023,7 @@ public class Sunface extends Application {
 
         dialsScale.setX(stage.getWidth() / Sundial.DIAL_WIDTH);
         dialsScale.setY(stage.getHeight() / Sundial.DIAL_HEIGHT);
+        dialsScale.setZ(stage.getWidth() / Sundial.DIAL_WIDTH);
     }
 
     private void minimizeWindow(Stage stage, Timeline timeline, MouseEvent event) {
@@ -1121,7 +1124,9 @@ public class Sunface extends Application {
         }
     }
 
-    private void updateDebugWindow() {
+    private void updateDebugWindow(Sundial sundial) {
+
+        if (!debugWindow.isShowing()) { return; }
 
         double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntimeLocal.getDeclinationOfTheSun()));
         double divisor = cos(toRadians(latitude)) * cos(toRadians(suntimeLocal.getDeclinationOfTheSun()));
@@ -1194,12 +1199,15 @@ public class Sunface extends Application {
                 + "localHourAngle divisor = " + divisor + "\n"
                 + "longitude = " + longitude + "\n"
                 + "latitude = " + latitude + "\n"
-                + "Cetus nightList = " + cetusNightListString + "\n"
-                + "Cetus okEh = " + cetustime.isOkEh() + "\n"
-                + "Cetus result = " + cetustime.getResult() + "\n"
-                + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
-                + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
-                + "Cetus expiry string = " + cetusExpiryDate + "\n"
+                + "dayLight X = " + sundial.getDayGlobe().getDayLight().getLocalToSceneTransform().getTx() + "\n"
+                + "dayLight Y = " + sundial.getDayGlobe().getDayLight().getLocalToSceneTransform().getTy() + "\n"
+                + "dayLight Z = " + sundial.getDayGlobe().getDayLight().getLocalToSceneTransform().getTz() + "\n"
+//                + "Cetus nightList = " + cetusNightListString + "\n"
+//                + "Cetus okEh = " + cetustime.isOkEh() + "\n"
+//                + "Cetus result = " + cetustime.getResult() + "\n"
+//                + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
+//                + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
+//                + "Cetus expiry string = " + cetusExpiryDate + "\n"
                 + "Cetus dataMap: \n" + cetusDataString + "\n"
                 ;
 

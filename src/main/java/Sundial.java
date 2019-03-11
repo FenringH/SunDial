@@ -155,8 +155,10 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
     private static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
 
-    private static final int LED_OPACITY_DURATION = 500;
+    private static final int LED_OPACITY_DURATION = 350;
     private static final int GLOBE_ROTATE_DURATION = 1000;
+    private static final int TINY_GLOBE_DURATION = 350;
+    private static final int CETUS_MARKER_DURATION = 150;
 
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
@@ -183,6 +185,10 @@ public class Sundial {
     public static final Color Color_Of_SunSet     = new Color(0.65, 0.00, 0.65, 1.00);
     public static final Color Color_Of_LocalTime  = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_TinyFrame  = new Color(1.00, 1.00, 1.00, 1.00);
+
+    public static final Color Color_Of_TinyDay      = new Color(0.65, 0.65,0.65, 1.00);
+    public static final Color Color_Of_TinyNight    = new Color(0.65, 0.00, 0.00, 1.00);
+    public static final Color Color_Of_TinyAmbient  = new Color(0.35, 0.35,0.35, 1.00);
 
     public static final Color Color_Of_TerminatorLine = new Color(0.25, 0.50, 1.00, 1.00);
     public static final Color Color_Of_TerminatorGlow = new Color(0.00, 0.10, 0.90, 1.00);
@@ -390,6 +396,7 @@ public class Sundial {
     private ArrayList<Boolean> dialLocalMinuteOn;
     private ArrayList<Timeline> dialLocalSecondTransitionList;
     private ArrayList<Timeline> dialLocalMinuteTransitionList;
+    private ArrayList<Timeline> cetusMarkerHoverTransitionList;
 
     private DotMatrix matrixYear;
     private DotMatrix matrixMonth;
@@ -442,6 +449,7 @@ public class Sundial {
 
     private int ledOpacityDuration = ledAnimationOnEh ? LED_OPACITY_DURATION : 0;
     private int globeRotateDuration = ledAnimationOnEh ? GLOBE_ROTATE_DURATION : 0;
+    private Integer cetusMarkerDuration = CETUS_MARKER_DURATION;
 
 
     // Constructor
@@ -600,7 +608,7 @@ public class Sundial {
         dayGlobe = new Globe(GLOBE_DAY_IMAGE, CENTER_X - MARGIN_X);
         dayGlobe.setLayoutX(CENTER_X);
         dayGlobe.setLayoutY(CENTER_Y);
-        dayGlobe.setNightLightColor(Color.DARKRED);
+        dayGlobe.setNightLightColor(Color.RED);
 
         nightGlobe = new Globe(GLOBE_NIGHT_IMAGE, CENTER_X - MARGIN_X);
         nightGlobe.setLayoutX(CENTER_X);
@@ -618,6 +626,7 @@ public class Sundial {
         Group dayGlobeGroup = new Group();
         dayGlobeGroup.getChildren().add(dayGlobe);
         SubScene dayGlobeScene = new SubScene(dayGlobeGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        dayGlobeScene.setBlendMode(BlendMode.ADD);
 
         Group nightGlobeGroup = new Group();
         nightGlobeGroup.getChildren().add(nightGlobe);
@@ -665,9 +674,9 @@ public class Sundial {
         tinyGlobe = new Globe(GLOBE_DAY_IMAGE, TINYGLOBE_RADIUS);
         tinyGlobe.setLayoutX(CENTER_X);
         tinyGlobe.setLayoutY(CENTER_Y + TINYGLOBE_OFFSET);
-        tinyGlobe.setDayLightColor(new Color(0.65, 0.65,0.65, 1.00));
-        tinyGlobe.setNightLightColor(new Color(0.65, 0.00, 0.00, 1.00));
-        tinyGlobe.setAmbientLightColor(new Color(0.35, 0.35,0.35, 1.00));
+        tinyGlobe.setDayLightColor(Color_Of_TinyDay);
+        tinyGlobe.setNightLightColor(Color_Of_TinyNight);
+        tinyGlobe.setAmbientLightColor(Color_Of_TinyAmbient);
         tinyGlobe.setVisible(true);
 
         Group tinyGlobeSceneGroup = new Group();
@@ -743,6 +752,7 @@ public class Sundial {
         cetusMarkerArcList = new ArrayList<>();
         cetusMarkerAngleList = new ArrayList<>();
         cetusTimeMatrixList = new ArrayList<>();
+        cetusMarkerHoverTransitionList = new ArrayList<>();
 
         cetusArcGroup = new Group();
         cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
@@ -771,7 +781,7 @@ public class Sundial {
             matrixStart.setRotate(90d);
             matrixStart.setStyle(CETUS_MARKER_SHADOW);
             matrixStart.setMouseTransparent(true);
-            matrixStart.setVisible(false);
+            matrixStart.setOpacity(0);
 
             Group startHorizonGroup = new Group();
             startHorizonGroup.getChildren().addAll(markerLineStart, matrixStart);
@@ -791,7 +801,7 @@ public class Sundial {
             matrixEnd.setRotate(90d);
             matrixEnd.setStyle(CETUS_MARKER_SHADOW);
             matrixEnd.setMouseTransparent(true);
-            matrixEnd.setVisible(false);
+            matrixEnd.setOpacity(0);
 
             Rotate markerLineEndRotate = centerRotate.clone();
             markerLineEndRotate.setAngle(endAngle);
@@ -817,21 +827,48 @@ public class Sundial {
             cetusArcGroup.getChildren().add(nightArc);
             cetusLineGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
 
-            nightArc.setOnMouseEntered(event -> {
-                matrixStart.setVisible(true);
-                matrixEnd.setVisible(true);
-                markerLineStart.setStartY(CETUS_MARKER_LENGTH * 2);
-                markerLineEnd.setStartY(CETUS_MARKER_LENGTH * 2);
-                nightArc.setFill(CETUS_ARC_GRADIENT_HOVER);
-            });
+            Timeline cetusMarkerTransitionOn = new Timeline();
+            cetusMarkerTransitionOn.setCycleCount(1);
+            cetusMarkerTransitionOn.setRate(1);
+            cetusMarkerTransitionOn.setAutoReverse(false);
 
-            nightArc.setOnMouseExited(event -> {
-                matrixStart.setVisible(false);
-                matrixEnd.setVisible(false);
-                markerLineStart.setStartY(CETUS_MARKER_LENGTH + MARGIN_Y);
-                markerLineEnd.setStartY(CETUS_MARKER_LENGTH + MARGIN_Y);
-                nightArc.setFill(CETUS_ARC_GRADIENT);
-            });
+            KeyValue keyValueStartOpacityOn = new KeyValue(matrixStart.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameStartOpacityOn = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueStartOpacityOn);
+            KeyValue keyValueEndOpacityOn = new KeyValue(matrixEnd.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameEndOpacityOn = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueEndOpacityOn);
+            KeyValue keyValueLineStartOn = new KeyValue(markerLineStart.startYProperty(), CETUS_MARKER_LENGTH * 2, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineStartOn = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueLineStartOn);
+            KeyValue keyValueLineEndOn = new KeyValue(markerLineEnd.startYProperty(), CETUS_MARKER_LENGTH * 2, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineEndOn = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueLineEndOn);
+            KeyValue keyValueArcFillOn = new KeyValue(nightArc.fillProperty(), CETUS_ARC_GRADIENT_HOVER, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameArcFillOn = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueArcFillOn);
+
+            cetusMarkerTransitionOn.getKeyFrames().addAll(keyFrameStartOpacityOn, keyFrameEndOpacityOn, keyFrameLineStartOn, keyFrameLineEndOn);
+
+            Timeline cetusMarkerTransitionOff = new Timeline();
+            cetusMarkerTransitionOff.setCycleCount(1);
+            cetusMarkerTransitionOff.setRate(1);
+            cetusMarkerTransitionOff.setAutoReverse(false);
+
+            KeyValue keyValueStartOpacityOff = new KeyValue(matrixStart.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameStartOpacityOff = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueStartOpacityOff);
+            KeyValue keyValueEndOpacityOff = new KeyValue(matrixEnd.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameEndOpacityOff = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueEndOpacityOff);
+            KeyValue keyValueLineStartOff = new KeyValue(markerLineStart.startYProperty(), CETUS_MARKER_LENGTH + MARGIN_Y, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineStartOff = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueLineStartOff);
+            KeyValue keyValueLineEndOff = new KeyValue(markerLineEnd.startYProperty(), CETUS_MARKER_LENGTH + MARGIN_Y, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineEndOff = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueLineEndOff);
+            KeyValue keyValueArcFillOff = new KeyValue(nightArc.fillProperty(), CETUS_ARC_GRADIENT, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameArcFillOff = new KeyFrame(Duration.millis(cetusMarkerDuration), keyValueArcFillOff);
+
+            cetusMarkerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
+
+            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOn);
+            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOff);
+
+            nightArc.setOnMouseEntered(event -> cetusMarkerTransitionOn.play());
+            nightArc.setOnMouseExited(event -> cetusMarkerTransitionOff.play());
+
         }
 
 
@@ -999,8 +1036,12 @@ public class Sundial {
         Polygon dialLocalHourPoly = new Polygon(
                 CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
                 CENTER_X - LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.75,
-                CENTER_X - LOCALTIME_STROKE_WIDTH / 2, MARGIN_Y + MARKER_HOUR_LENGTH / 4,
-                CENTER_X + LOCALTIME_STROKE_WIDTH / 2, MARGIN_Y + MARKER_HOUR_LENGTH / 4,
+                CENTER_X, MARGIN_Y,
+                CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH * 0.75,
+                CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH * 0.75,
+                CENTER_X, MARGIN_Y,
                 CENTER_X + LOCALTIME_DIAL_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.75,
                 CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
         );
@@ -1008,7 +1049,7 @@ public class Sundial {
         dialLocalHourPoly.setStroke(Color_Of_Void);
         dialLocalHourPoly.setOpacity(1);
 
-        dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly, dialLocalHourLine);
+        dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
         dialLocalHourGroup.setStyle(LOCALTIME_SHADOW);
         dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
@@ -1045,18 +1086,35 @@ public class Sundial {
             localSecond.setFill(Color_Of_Seconds);
             localSecond.setStroke(Color_Of_Void);
             localSecond.setStyle(LOCALSECOND_GLOW);
-            localSecond.setBlendMode(BlendMode.SCREEN);
-            localSecond.setOpacity(0.0);
             localSecond.setMouseTransparent(true);
 
+            Polygon polySecond = new Polygon(
+                    CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                    CENTER_X - LOCALTIME_DIAL_WIDTH / 3, LOCALTIME_DIAL_LENGTH * 0.90,
+                    CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT + LOCALMINUTE_WIDTH,
+                    CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                    CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                    CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT + LOCALMINUTE_WIDTH,
+                    CENTER_X + LOCALTIME_DIAL_WIDTH / 3, LOCALTIME_DIAL_LENGTH * 0.90,
+                    CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
+            );
+            polySecond.setFill(Color.RED);
+            polySecond.setStroke(Color_Of_Void);
+            polySecond.setMouseTransparent(true);
+            polySecond.setStyle(LOCALTIME_SHADOW);
+            polySecond.setVisible(false);
+
             Rotate localSecondRotate = new Rotate();
-            localSecondRotate.setPivotX(LOCALSECOND_WIDTH / 2);
-            localSecondRotate.setPivotY(CENTER_Y - LOCALSECOND_OFFSET);
+            localSecondRotate.setPivotX(CENTER_X);
+            localSecondRotate.setPivotY(CENTER_Y);
             localSecondRotate.setAngle(i * 6);
 
-            localSecond.getTransforms().add(localSecondRotate);
+            Group secondGroup = new Group(localSecond, polySecond);
+            secondGroup.setOpacity(0.0);
+            secondGroup.getTransforms().add(localSecondRotate);
+            secondGroup.setBlendMode(BlendMode.SCREEN);
 
-            Timeline timelineSecond = createTimelineForLED(localSecond, ledOpacityDuration);
+            Timeline timelineSecond = createTimelineForLED(secondGroup, ledOpacityDuration);
 
             Rectangle localMinute = new Rectangle(LOCALMINUTE_WIDTH, LOCALMINUTE_HEIGHT);
             localMinute.setArcWidth(LOCALMINUTE_ROUND);
@@ -1066,36 +1124,36 @@ public class Sundial {
             localMinute.setFill(Color_Of_Minutes);
             localMinute.setStroke(Color_Of_Void);
             localMinute.setStyle(LOCALMINUTE_GLOW);
-            localMinute.setBlendMode(BlendMode.SCREEN);
-//            localMinute.setOpacity(0.0);
             localMinute.setMouseTransparent(true);
 
-            Line lineMinute = new Line(CENTER_X, CENTER_Y - DOT_RADIUS, CENTER_X, LOCALMINUTE_OFFSET);
-            lineMinute.setStrokeWidth(1);
-            lineMinute.setStroke(Color_Of_Minutes);
-            lineMinute.setStyle(LOCALMINUTE_GLOW);
-            lineMinute.setBlendMode(BlendMode.SCREEN);
-//            lineMinute.setOpacity(0.0);
-            lineMinute.setMouseTransparent(true);
+            Polygon polyMinute = new Polygon(
+                    CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                    CENTER_X - LOCALTIME_DIAL_WIDTH / 2.5, LOCALTIME_DIAL_LENGTH * 0.85,
+                    CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT + LOCALMINUTE_WIDTH,
+                    CENTER_X - LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                    CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                    CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT + LOCALMINUTE_WIDTH,
+                    CENTER_X + LOCALTIME_DIAL_WIDTH / 2.5, LOCALTIME_DIAL_LENGTH * 0.85,
+                    CENTER_X + LOCALTIME_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
+            );
+            polyMinute.setFill(new Color(0.00, 1.00, 0.00, 1.00));
+            polyMinute.setStroke(Color_Of_Void);
+            polyMinute.setMouseTransparent(true);
+            polyMinute.setStyle(LOCALTIME_SHADOW);
 
             Rotate localMinuteRotate = new Rotate();
-//            localMinuteRotate.setPivotX(LOCALMINUTE_WIDTH / 2);
-//            localMinuteRotate.setPivotY(CENTER_Y - LOCALMINUTE_OFFSET);
             localMinuteRotate.setPivotX(CENTER_X);
             localMinuteRotate.setPivotY(CENTER_Y);
             localMinuteRotate.setAngle(i * 6);
 
-//            localMinute.getTransforms().add(localMinuteRotate);
-//            lineMinute.getTransforms().add(localMinuteRotate);
-
-            Group minuteGroup = new Group();
-            minuteGroup.getChildren().addAll(localMinute, lineMinute);
+            Group minuteGroup = new Group(localMinute, polyMinute);
             minuteGroup.setOpacity(0.0);
             minuteGroup.getTransforms().add(localMinuteRotate);
+            minuteGroup.setBlendMode(BlendMode.SCREEN);
 
             Timeline timelineMinute = createTimelineForLED(minuteGroup, ledOpacityDuration);
 
-            dialLocalSecondList.add(localSecond);
+            dialLocalSecondList.add(secondGroup);
             dialLocalMinuteList.add(minuteGroup);
 
             dialLocalSecondOn.add(false);
@@ -1104,6 +1162,7 @@ public class Sundial {
             dialLocalSecondTransitionList.add(timelineSecond);
             dialLocalMinuteTransitionList.add(timelineMinute);
         }
+
 
         Group sunriseGroup = new Group();
 
@@ -1755,8 +1814,8 @@ public class Sundial {
 
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
 
-        updateLEDs(dialLocalSecondList, dialLocalSecondOn, dialLocalSecondTransitionList, localTime.get(Calendar.SECOND), ledAnimationOnEh);
-        updateLEDs(dialLocalMinuteList, dialLocalMinuteOn, dialLocalMinuteTransitionList, localTime.get(Calendar.MINUTE), ledAnimationOnEh);
+        updateLEDs(dialLocalSecondList, dialLocalSecondOn, dialLocalSecondTransitionList, localTime.get(Calendar.SECOND));
+        updateLEDs(dialLocalMinuteList, dialLocalMinuteOn, dialLocalMinuteTransitionList, localTime.get(Calendar.MINUTE));
 
     }
 
@@ -1831,25 +1890,18 @@ public class Sundial {
         updateDialMarkers();
     }
 
-    private void updateLEDs(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn, boolean animate) {
+    private void updateLEDs(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
 
         for (int i = 0; i < ledList.size(); i++) {
 
             if (ledOn.get(i) == true) {
-
                 if(i == indexOn) { continue; }
-
-                if (animate) {
-                    timelineList.get(i).play();
-                } else {
-                    ledList.get(i).setOpacity(0.0);
-                }
-
+                timelineList.get(i).play();
                 ledOn.set(i, false);
             }
         }
 
-        if (animate) { timelineList.get(indexOn).stop(); }
+        timelineList.get(indexOn).stop();
         ledList.get(indexOn).setOpacity(1.0);
         ledOn.set(indexOn, true);
     }
@@ -1993,6 +2045,8 @@ public class Sundial {
 
     public void setGlobeVisibility(boolean isVisible) {
 
+        int tinyGlobeDuration = globeAnimationOnEh ? TINY_GLOBE_DURATION : 1;
+
         if (isVisible) {
 
             dialCircleCenterDot.setFill(Color_Of_Void);
@@ -2004,20 +2058,35 @@ public class Sundial {
             dialCircleBackground.setVisible(false);
             masterGlobeGroup.setVisible(true);
 
-            tinyGlobeScale.setX(TINYGLOBE_DOWNSCALE);
-            tinyGlobeScale.setY(TINYGLOBE_DOWNSCALE);
-
-            double tinyGlobeSlideX = -1 * CENTER_X + TINYGLOBE_RADIUS + TINYGLOBE_SLIDE;
-            double tinyGlobeSlideY = DIAL_HEIGHT - CENTER_Y - TINYGLOBE_OFFSET - TINYGLOBE_RADIUS - TINYGLOBE_SLIDE;
-
-            tinyGlobeGroup.setTranslateX(tinyGlobeSlideX);
-            tinyGlobeGroup.setTranslateY(tinyGlobeSlideY);
-            tinyGlobeGroup.setOpacity(TINYGLOBE_OFFSET_OPACITY);
-
             longitudeGroup.setVisible(true);
             latitudeGroup.setVisible(true);
 
             matrixTimeZone.setVisible(true);
+
+            double tinyGlobeSlideX = -1 * CENTER_X + TINYGLOBE_RADIUS + TINYGLOBE_SLIDE;
+            double tinyGlobeSlideY = DIAL_HEIGHT - CENTER_Y - TINYGLOBE_OFFSET - TINYGLOBE_RADIUS - TINYGLOBE_SLIDE;
+
+            Timeline timeline = new Timeline();
+            timeline.setCycleCount(1);
+            timeline.setRate(1);
+            timeline.setAutoReverse(false);
+
+            KeyValue keyValueScaleX = new KeyValue(tinyGlobeScale.xProperty(), TINYGLOBE_DOWNSCALE, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameScaleX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleX);
+            KeyValue keyValueScaleY = new KeyValue(tinyGlobeScale.yProperty(), TINYGLOBE_DOWNSCALE, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameScaleY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleY);
+
+            KeyValue keyValueSlideX = new KeyValue(tinyGlobeGroup.translateXProperty(), tinyGlobeSlideX, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameSlideX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideX);
+            KeyValue keyValueSlideY = new KeyValue(tinyGlobeGroup.translateYProperty(), tinyGlobeSlideY, Interpolator.EASE_OUT);
+            KeyFrame keyFrameSlideY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideY);
+
+            KeyValue keyValueOpacity = new KeyValue(tinyGlobeGroup.opacityProperty(), TINYGLOBE_OFFSET_OPACITY, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueOpacity);
+
+            timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY, keyFrameOpacity);
+            timeline.play();
+
         }
         else {
 
@@ -2030,20 +2099,35 @@ public class Sundial {
             dialCircleBackground.setVisible(true);
             masterGlobeGroup.setVisible(false);
 
-            tinyGlobeScale.setX(1);
-            tinyGlobeScale.setY(1);
-
-            double tinyGlobeSlideX = 0;
-            double tinyGlobeSlideY = 0;
-
-            tinyGlobeGroup.setTranslateX(tinyGlobeSlideX);
-            tinyGlobeGroup.setTranslateY(tinyGlobeSlideY);
-            tinyGlobeGroup.setOpacity(TINYGLOBE_DEFAULT_OPACITY);
-
             longitudeGroup.setVisible(false);
             latitudeGroup.setVisible(false);
 
             matrixTimeZone.setVisible(false);
+
+            double tinyGlobeSlideX = 0;
+            double tinyGlobeSlideY = 0;
+
+            Timeline timeline = new Timeline();
+            timeline.setCycleCount(1);
+            timeline.setRate(1);
+            timeline.setAutoReverse(false);
+
+            KeyValue keyValueScaleX = new KeyValue(tinyGlobeScale.xProperty(), 1, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameScaleX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleX);
+            KeyValue keyValueScaleY = new KeyValue(tinyGlobeScale.yProperty(), 1, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameScaleY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleY);
+
+            KeyValue keyValueSlideX = new KeyValue(tinyGlobeGroup.translateXProperty(), tinyGlobeSlideX, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameSlideX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideX);
+            KeyValue keyValueSlideY = new KeyValue(tinyGlobeGroup.translateYProperty(), tinyGlobeSlideY, Interpolator.EASE_OUT);
+            KeyFrame keyFrameSlideY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideY);
+
+            KeyValue keyValueOpacity = new KeyValue(tinyGlobeGroup.opacityProperty(), TINYGLOBE_DEFAULT_OPACITY, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueOpacity);
+
+            timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY, keyFrameOpacity);
+            timeline.play();
+
         }
 
         setDialFrameWarning(warning);
@@ -2120,10 +2204,14 @@ public class Sundial {
             matrixTime.setMouseTransparent(true);
             matrixDate.setMouseTransparent(true);
             matrixTimeZone.setMouseTransparent(true);
+            for (Node dialSecond : dialLocalSecondList) { dialSecond.setVisible(false); }
+            for (Node dialMinute : dialLocalMinuteList) { dialMinute.setVisible(false); }
         } else {
             matrixTime.setMouseTransparent(false);
             matrixDate.setMouseTransparent(false);
             matrixTimeZone.setMouseTransparent(false);
+            for (Node dialSecond : dialLocalSecondList) { dialSecond.setVisible(true); }
+            for (Node dialMinute : dialLocalMinuteList) { dialMinute.setVisible(true); }
         }
     }
 
@@ -2148,10 +2236,30 @@ public class Sundial {
         ledAnimationOnEh = !ledAnimationOnEh;
         globeAnimationOnEh = !globeAnimationOnEh;
 
-        if (globeAnimationOnEh) {
-            globeRotateDuration = GLOBE_ROTATE_DURATION;
-        } else {
-            globeRotateDuration = 0;
+        globeRotateDuration = globeAnimationOnEh ? GLOBE_ROTATE_DURATION : 0;
+
+        for (Timeline timeline : cetusMarkerHoverTransitionList) {
+            if (ledAnimationOnEh) {
+                timeline.setRate(1);
+            } else {
+                timeline.setRate(CETUS_MARKER_DURATION);
+            }
+        }
+
+        for (Timeline timeline : dialLocalSecondTransitionList) {
+            if (ledAnimationOnEh) {
+                timeline.setRate(1);
+            } else {
+                timeline.setRate(LED_OPACITY_DURATION);
+            }
+        }
+
+        for (Timeline timeline : dialLocalMinuteTransitionList) {
+            if (ledAnimationOnEh) {
+                timeline.setRate(1);
+            } else {
+                timeline.setRate(LED_OPACITY_DURATION);
+            }
         }
     }
 }
