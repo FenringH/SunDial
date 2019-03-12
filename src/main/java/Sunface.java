@@ -252,13 +252,12 @@ public class Sunface extends Application {
 
 
         // Events
+        sundial.getControlThingyHelp().setOnMouseClicked(event -> sundial.toggleHelp());
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
         sundial.getControlThingyMaximize().setOnMouseClicked(event -> toggleMaximizeWindow(primaryStage, dialsScale, event));
         sundial.getControlThingyMinimize().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
-        sundial.getControlThingyMinimize().setOnMouseReleased(event -> {
-            minimizeWindow(primaryStage, timeline, event);
-            mouseButtonList.clear();
-        });
+        sundial.getControlThingyMinimize().setOnMouseReleased(event -> { minimizeWindow(primaryStage, timeline, event); mouseButtonList.clear(); });
+        sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
 
         sundial.getMatrixTimeZone().setOnMousePressed(event -> {
             mouseButtonList.add(event.getButton());
@@ -1199,9 +1198,12 @@ public class Sunface extends Application {
                 + "localHourAngle divisor = " + divisor + "\n"
                 + "longitude = " + longitude + "\n"
                 + "latitude = " + latitude + "\n"
-                + "dayLight X = " + sundial.getDayGlobe().getDayLight().getLocalToSceneTransform().getTx() + "\n"
-                + "dayLight Y = " + sundial.getDayGlobe().getDayLight().getLocalToSceneTransform().getTy() + "\n"
-                + "dayLight Z = " + sundial.getDayGlobe().getDayLight().getLocalToSceneTransform().getTz() + "\n"
+                + "Tx =  " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getTx() + "\n"
+                + "Ty =  " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getTy() + "\n"
+                + "Mxx = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMxx() + "\n"
+                + "Mxy = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMxy() + "\n"
+                + "Myx = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMyx() + "\n"
+                + "Myy = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMyy() + "\n"
 //                + "Cetus nightList = " + cetusNightListString + "\n"
 //                + "Cetus okEh = " + cetustime.isOkEh() + "\n"
 //                + "Cetus result = " + cetustime.getResult() + "\n"
