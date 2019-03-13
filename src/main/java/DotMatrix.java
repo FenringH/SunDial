@@ -46,6 +46,7 @@ public class DotMatrix extends Group {
     final private static long MATRIX_PLUS =        0b00000_00100_00100_11111_00100_00100_00000L;
     final private static long MATRIX_COLON =       0b00000_00100_00000_00000_00100_00000_00000L;
     final private static long MATRIX_DOT =         0b00100_00000_00000_00000_00000_00000_00000L;
+    final private static long MATRIX_QUESTION =    0b00100_00000_00100_00010_00001_10001_01110L;
     final private static long MATRIX_UNKNOWN =     0b00100_01010_10101_01010_10101_01010_00100L;
 
     private Circle[][][] dots;
@@ -159,6 +160,7 @@ public class DotMatrix extends Group {
                 case '+': charCode = MATRIX_PLUS; break;
                 case ':': charCode = MATRIX_COLON; break;
                 case '.': charCode = MATRIX_DOT; break;
+                case '?': charCode = MATRIX_QUESTION; break;
                 default : charCode = MATRIX_UNKNOWN; break;
             }
 

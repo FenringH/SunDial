@@ -278,23 +278,23 @@ public class Sunface extends Application {
         });
         sundial.getTinyGlobeGroup().setOnDragDropped(event -> rotateGlobe(sundial, Position.GOOGLE_MAPS, event));
 
-        sundial.getLongitudeGroup().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LONGITUDE, event));
-        sundial.getLongitudeGroup().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getLongitudeGroup().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
-        sundial.getLongitudeGroup().setOnScroll(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
+        sundial.getMatrixLongitude().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LONGITUDE, event));
+        sundial.getMatrixLongitude().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
+        sundial.getMatrixLongitude().setOnScroll(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
 
-        sundial.getLatitudeGroup().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LATITUDE, event));
-        sundial.getLatitudeGroup().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getLatitudeGroup().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LATITUDE, event));
-        sundial.getLatitudeGroup().setOnScroll(event -> rotateGlobe(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLongitude().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLongitude().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLongitude().setOnScroll(event -> rotateGlobe(sundial, Position.LATITUDE, event));
 
         sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowSize(primaryStage, dialsGroup, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
         sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, sundial, event));
 
-        sundial.getBackgroundGroup().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, event));
-        sundial.getBackgroundGroup().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getBackgroundGroup().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
+        sundial.getDialMarginCircle().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, event));
+        sundial.getDialMarginCircle().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getDialMarginCircle().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
         sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(primaryStage, dialsGroup, event));
         sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
@@ -1087,7 +1087,7 @@ public class Sunface extends Application {
         sundial.toggleGlobeVisibility();
 
         if (sundial.globeVisibleEh) {
-            sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.OPEN_HAND));
+//            sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.OPEN_HAND));
             sundial.getDialCircleFrame().setOnMousePressed(event -> {
                 if (!event.isMiddleButtonDown()) { sundial.setTimeDisplayOpacity(0.2); }
                 recordGlobePosition(sundial, Position.BOTH, event);
@@ -1099,7 +1099,7 @@ public class Sunface extends Application {
             sundial.getDialCircleFrame().setOnMouseDragged(event -> rotateGlobe(sundial, event));
 
         } else {
-            sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.MOVE));
+//            sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.MOVE));
             sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(stage, dialsGroup, event));
             sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
             sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(stage, event));

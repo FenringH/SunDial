@@ -133,6 +133,7 @@ public class Sundial {
     private static final double LOCALSECOND_ROUND = 6;
     private static final double TINYGLOBE_RADIUS = 35;
     private static final double CONTROL_HELP_SIZE = 20.0d;
+    private static final double CONTROL_HELP_RADIUS = 10.0d;
     private static final double CONTROL_RESIZE_SIZE = 45.0d;
     private static final double CONTROL_CLOSE_RADIUS = 10.0d;
     private static final double CONTROL_MAXIMIZE_RADIUS = 10.0d;
@@ -176,7 +177,7 @@ public class Sundial {
     private static final double CONTROL_NIGHTMODE_OPACITY = 0.75d;
     private static final double CETUS_ARC_OPACITY = 1.00d;
     private static final double DAY_TERMINATOR_OPACITY = 0.65d;
-    private static final double HELP_RECTANGLE_OPACITY = 0.35d;
+    private static final double HELP_OVERLAY_OPACITY = 0.35d;
     private static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
 
     private static final double MATRIX_MARKER_OFFSET = 6.5d;
@@ -222,11 +223,13 @@ public class Sundial {
     private static final double CETUS_HORIZON_SCALE = 0.75d;
     private static final double MATRIX_TIMEZONE_SCALE = 1.25d;
     private static final double MATRIX_HIGHNOON_SCALE = 1.00d;
+    private static final double MATRIX_HELPMARK_SCALE = 1.00d;
 
     private static final double CONTROL_CLOSE_ANGLE = 37.0d;
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
     private static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
-    private static final double CONTROL_NIGHTMODE_ANGLE = 142.5d;
+    private static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MINIMIZE_ANGLE;
+    private static final double CONTROL_NIGHTMODE_ANGLE = 180 - CONTROL_CLOSE_ANGLE;
 
     private static final int LED_OPACITY_DURATION = 350;
     private static final int GLOBE_ROTATE_DURATION = 1000;
@@ -269,8 +272,8 @@ public class Sundial {
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
 
-    public static final Color Color_Of_HelpFill   = new Color(0.50, 0.35, 0.00, 0.20);
-    public static final Color Color_Of_HelpStroke = new Color(1.00, 0.75, 0.25, 1.00);
+    public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
+    public static final Color Color_Of_HelpStroke = new Color(0.15, 0.35, 1.00, 1.00);
     public static final Color Color_Of_ResizeFill   = new Color(0.25, 0.50, 1.00, 0.20);
     public static final Color Color_Of_ResizeStroke = new Color(0.50, 0.75, 1.00, 1.00);
     public static final Color Color_Of_CloseFill    = new Color(1.00, 0.25, 0.25, 0.20);
@@ -302,8 +305,8 @@ public class Sundial {
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 4.0, 0.50, 0, 0);";
     public static final String TERMINATOR_LINE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
 
-    public static final String CONTROL_HELP_SHADOW_OFF  = "-fx-effect: dropshadow(three-pass-box, rgba(128, 96, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_HELP_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_SHADOW_OFF  = "-fx-effect: dropshadow(three-pass-box, rgba( 32, 64,128, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_HELP_SHADOW_ON   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_RESIZE_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_RESIZE_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
@@ -517,6 +520,7 @@ public class Sundial {
     private Group horizonGroup;
     private Group longitudeGroup;
     private Group latitudeGroup;
+    private Circle controlThingyHelpCircle;
     private Group controlThingyHelp;
     private Group controlThingyResize;
     private Group controlThingyClose;
@@ -649,17 +653,22 @@ public class Sundial {
 
         // Control thingies
         controlThingyHelp = new Group();
-        Polygon thingyHelpTriangle = new Polygon(
-                CONTROL_HELP_SIZE, 0,
-                0, CONTROL_HELP_SIZE,
-                0, 0
-        );
-        thingyHelpTriangle.setFill(Color_Of_HelpFill);
-        thingyHelpTriangle.setStroke(Color_Of_HelpStroke);
-        thingyHelpTriangle.setStrokeWidth(CONTROL_HELP_STROKE_WIDTH);
-        controlThingyHelp.getChildren().add(thingyHelpTriangle);
-        controlThingyHelp.setTranslateX(CENTER_X - CONTROL_HELP_OFFSET);
-        controlThingyHelp.setTranslateY(CENTER_Y - CONTROL_HELP_OFFSET);
+
+        controlThingyHelpCircle = new Circle(0, 0, CONTROL_HELP_RADIUS);
+        controlThingyHelpCircle.setFill(Color_Of_HelpFill);
+        controlThingyHelpCircle.setStroke(Color_Of_HelpStroke);
+        controlThingyHelpCircle.setStrokeWidth(CONTROL_HELP_STROKE_WIDTH);
+
+        DotMatrix thingyHelpQuestionMark = new DotMatrix("?", Color.WHITE);
+        thingyHelpQuestionMark.setScaleX(MATRIX_HELPMARK_SCALE);
+        thingyHelpQuestionMark.setScaleY(MATRIX_HELPMARK_SCALE);
+        thingyHelpQuestionMark.setTranslateX(-thingyHelpQuestionMark.getLayoutBounds().getWidth() / 2);
+        thingyHelpQuestionMark.setTranslateY(-thingyHelpQuestionMark.getLayoutBounds().getHeight() / 2);
+        thingyHelpQuestionMark.setStyle(MATRIX_SHADOW);
+
+        controlThingyHelp.getChildren().addAll(controlThingyHelpCircle, thingyHelpQuestionMark);
+        controlThingyHelp.setTranslateX(CENTER_X + CONTROL_CLOSE_OFFSET * cos(toRadians(CONTROL_HELP_ANGLE)));
+        controlThingyHelp.setTranslateY(CENTER_Y - CONTROL_CLOSE_OFFSET * sin(toRadians(CONTROL_HELP_ANGLE)));
         controlThingyHelp.setStyle(CONTROL_HELP_SHADOW_OFF);
         controlThingyHelp.setOpacity(CONTROL_HELP_OPACITY);
 
@@ -1397,19 +1406,16 @@ public class Sundial {
         matrixLongitude.setLayoutX(CENTER_X + MATRIX_LONGITUDE_SLIDE - matrixLongitude.getLayoutBounds().getWidth() / 2);
         matrixLongitude.setLayoutY(CENTER_Y + matrixLongitude.getLayoutBounds().getHeight() + MATRIX_LONGITUDE_OFFSET);
 
-
-        longitudeGroup = new Group();
-        longitudeGroup.getChildren().add(matrixLongitude);
-
         Rectangle longitudeBackdrop = new Rectangle(
-                longitudeGroup.getLayoutBounds().getMinX(),
-                longitudeGroup.getLayoutBounds().getMinY(),
-                longitudeGroup.getLayoutBounds().getWidth(),
-                longitudeGroup.getLayoutBounds().getHeight());
-
+                matrixLongitude.getLayoutBounds().getMinX(),
+                matrixLongitude.getLayoutBounds().getMinY(),
+                matrixLongitude.getLayoutBounds().getWidth(),
+                matrixLongitude.getLayoutBounds().getHeight());
         longitudeBackdrop.setOpacity(0);
-        longitudeGroup.getChildren().add(longitudeBackdrop);
-        longitudeGroup.setVisible(false);
+
+        matrixLongitude.getChildren().add(longitudeBackdrop);
+        matrixLongitude.setVisible(false);
+
 
         matrixLatitude = new DotMatrix("000.00N", Color_Of_LocalTime);
         matrixLatitude.setScaleX(MATRIX_LATITUDE_SCALE);
@@ -1417,18 +1423,15 @@ public class Sundial {
         matrixLatitude.setLayoutX(CENTER_X + MATRIX_LATITUDE_SLIDE - matrixLatitude.getLayoutBounds().getWidth() / 2);
         matrixLatitude.setLayoutY(CENTER_Y + matrixLatitude.getLayoutBounds().getHeight() + MATRIX_LATITUDE_OFFSET);
 
-        latitudeGroup = new Group();
-        latitudeGroup.getChildren().add(matrixLatitude);
-
         Rectangle latitudeBackdrop = new Rectangle(
-                latitudeGroup.getLayoutBounds().getMinX(),
-                latitudeGroup.getLayoutBounds().getMinY(),
-                latitudeGroup.getLayoutBounds().getWidth(),
-                latitudeGroup.getLayoutBounds().getHeight());
-
+                matrixLatitude.getLayoutBounds().getMinX(),
+                matrixLatitude.getLayoutBounds().getMinY(),
+                matrixLatitude.getLayoutBounds().getWidth(),
+                matrixLatitude.getLayoutBounds().getHeight());
         latitudeBackdrop.setOpacity(0);
-        latitudeGroup.getChildren().add(latitudeBackdrop);
-        latitudeGroup.setVisible(false);
+
+        matrixLatitude.getChildren().add(latitudeBackdrop);
+        matrixLatitude.setVisible(false);
 
 
         matrixHighNoon = new DotMatrix("00:00:00", Color_Of_HighNoon);
@@ -1488,11 +1491,18 @@ public class Sundial {
         Rectangle helpRectangle = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
         helpRectangle.setArcWidth(HELP_RECTANGLE_ROUND);
         helpRectangle.setArcHeight(HELP_RECTANGLE_ROUND);
-        helpRectangle.setFill(Color.RED);
+        helpRectangle.setFill(Color.GRAY);
         helpRectangle.setStroke(Color_Of_Void);
-        helpRectangle.setBlendMode(BlendMode.MULTIPLY);
-        helpRectangle.setOpacity(HELP_RECTANGLE_OPACITY);
+        helpRectangle.setBlendMode(BlendMode.LIGHTEN);
+        helpRectangle.setOpacity(HELP_OVERLAY_OPACITY);
         helpRectangle.setMouseTransparent(true);
+
+        Circle helpCircle = new Circle(CENTER_X, CENTER_Y, CENTER_X);
+        helpCircle.setFill(Color.ORANGE);
+        helpCircle.setStroke(Color_Of_Void);
+        helpCircle.setBlendMode(BlendMode.OVERLAY);
+        helpCircle.setOpacity(HELP_OVERLAY_OPACITY);
+        helpCircle.setMouseTransparent(true);
 
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, HIGHNOON_DIAL_LENGTH / 2, highNoonDialRotate));
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNRISE_DIAL_LENGTH / 3, sunriseDialRotate));
@@ -1511,10 +1521,9 @@ public class Sundial {
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyMinimize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyClose));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyNightmode));
-        helpMarkers.add(createHelpMarkerGroup(getCenterX(controlThingyHelp), getCenterY(controlThingyHelp), controlThingyHelp));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlNightCompression));
 
-        helpOverlay.getChildren().add(helpRectangle);
+        helpOverlay.getChildren().add(helpCircle);
         helpOverlay.getChildren().addAll(helpMarkers);
         helpOverlay.setVisible(false);
 
@@ -1524,15 +1533,15 @@ public class Sundial {
         helpText.setStroke(Color.WHITE);
         helpText.setFill(Color_Of_Void);
         helpText.setText(HELPTEXT_DEFAULT);
-        helpText.setTranslateX(10);
-        helpText.setTranslateY(10);
+        helpText.setTranslateX(5);
+        helpText.setTranslateY(15);
 
         Rectangle helpTextRectangle = new Rectangle(0, 0, 20, 20);
         helpTextRectangle.setArcWidth(10);
         helpTextRectangle.setArcHeight(10);
         helpTextRectangle.setStroke(Color_Of_Void);
         helpTextRectangle.setFill(Color.BLACK);
-        helpTextRectangle.setOpacity(0.60);
+        helpTextRectangle.setOpacity(0.50);
 
         helpTextRectangle.widthProperty().bind(Bindings.createDoubleBinding(() -> {
             double size = helpText.layoutBoundsProperty().get().getWidth();
@@ -1541,7 +1550,7 @@ public class Sundial {
 
         helpTextRectangle.heightProperty().bind(Bindings.createDoubleBinding(() -> {
             double size = helpText.layoutBoundsProperty().get().getHeight();
-            return size + 10;
+            return size + 5;
         }, helpText.layoutBoundsProperty()));
 
         helpTextGroup = new Group(helpTextRectangle, helpText);
@@ -1583,8 +1592,8 @@ public class Sundial {
         foregroundGroup.getChildren().add(tinyGlobeGroup);
         foregroundGroup.getChildren().add(matrixTime);
         foregroundGroup.getChildren().add(matrixDate);
-        foregroundGroup.getChildren().add(longitudeGroup);
-        foregroundGroup.getChildren().add(latitudeGroup);
+        foregroundGroup.getChildren().add(matrixLongitude);
+        foregroundGroup.getChildren().add(matrixLatitude);
 
         foregroundGroup.getChildren().add(controlThingyResize);
         foregroundGroup.getChildren().add(controlThingyClose);
@@ -1594,9 +1603,8 @@ public class Sundial {
         foregroundGroup.getChildren().add(controlThingyNightmode);
 
         foregroundGroup.getChildren().add(helpOverlay);
-        foregroundGroup.getChildren().add(helpTextGroup);
-
         foregroundGroup.getChildren().add(nightModeOverlay);
+        foregroundGroup.getChildren().add(helpTextGroup);
 
         SubScene foregroundScene = new SubScene(foregroundGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
 
@@ -1613,8 +1621,8 @@ public class Sundial {
         controlNightCompression.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(MATRIX_GLOW2); });
         controlNightCompression.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(MATRIX_SHADOW2); });
 
-        controlThingyHelp.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, CONTROL_HELP_GLOW); });
-        controlThingyHelp.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, helpEh ? CONTROL_HELP_SHADOW_ON : CONTROL_HELP_SHADOW_OFF); });
+        controlThingyHelp.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, CONTROL_HELP_SHADOW_ON); });
+        controlThingyHelp.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, CONTROL_HELP_GLOW); });
 
         controlThingyResize.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_RESIZE); controlThingyResize.setCursor(Cursor.NW_RESIZE); setGroupGlow(controlThingyResize, CONTROL_RESIZE_GLOW); });
         controlThingyResize.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyResize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyResize, CONTROL_RESIZE_SHADOW); });
@@ -1649,19 +1657,19 @@ public class Sundial {
         matrixWeek.setOnMouseEntered(event -> { matrixWeek.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixWeek, MATRIX_GLOW); });
         matrixWeek.setOnMouseExited(event -> { matrixWeek.setCursor(Cursor.DEFAULT); setGroupGlow(matrixWeek, MATRIX_SHADOW); });
 
-        longitudeGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_LONGITUDE); longitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(longitudeGroup, MATRIX_GLOW); });
-        longitudeGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); longitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(longitudeGroup, MATRIX_SHADOW); });
+        matrixLongitude.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_LONGITUDE); matrixLongitude.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixLongitude, MATRIX_GLOW); });
+        matrixLongitude.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixLongitude.setCursor(Cursor.DEFAULT); setGroupGlow(matrixLongitude, MATRIX_SHADOW); });
 
-        latitudeGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_LATITUDE); latitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(latitudeGroup, MATRIX_GLOW); });
-        latitudeGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); latitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(latitudeGroup, MATRIX_SHADOW); });
+        matrixLatitude.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_LATITUDE); matrixLatitude.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixLatitude, MATRIX_GLOW); });
+        matrixLatitude.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixLatitude.setCursor(Cursor.DEFAULT); setGroupGlow(matrixLatitude, MATRIX_SHADOW); });
 
         tinyGlobeFrame.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_TINYGLOBE); tinyGlobeFrame.setCursor(Cursor.HAND); tinyGlobeFrame.setStyle(MATRIX_GLOW); });
         tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(MATRIX_SHADOW); });
 
-        backgroundGroup.setOnMouseEntered(event -> { backgroundGroup.setCursor(Cursor.MOVE); });
-        backgroundGroup.setOnMouseExited(event -> { backgroundGroup.setCursor(Cursor.DEFAULT); });
+        dialMarginCircle.setOnMouseEntered(event -> { dialMarginCircle.setCursor(Cursor.MOVE); });
+        dialMarginCircle.setOnMouseExited(event -> { dialMarginCircle.setCursor(Cursor.DEFAULT); });
 
-        dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DIALFRAME); dialCircleFrame.setCursor(Cursor.MOVE); });
+        dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DIALFRAME); dialCircleFrame.setCursor(globeVisibleEh ? Cursor.OPEN_HAND : Cursor.MOVE); });
         dialCircleFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); dialCircleFrame.setCursor(Cursor.DEFAULT); });
 
         horizonGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HORIZON); horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, HORIZON_HOVER_GLOW); });
@@ -1725,6 +1733,8 @@ public class Sundial {
             double t = node.localToSceneTransformProperty().get().getTy();
             return t;
         }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
+
+        markerGroup.visibleProperty().bind(node.visibleProperty());
 
         return markerGroup;
     }
@@ -2324,8 +2334,8 @@ public class Sundial {
             dialCircleBackground.setVisible(false);
             masterGlobeGroup.setVisible(true);
 
-            longitudeGroup.setVisible(true);
-            latitudeGroup.setVisible(true);
+            matrixLongitude.setVisible(true);
+            matrixLatitude.setVisible(true);
 
             matrixTimeZone.setVisible(true);
 
@@ -2365,8 +2375,8 @@ public class Sundial {
             dialCircleBackground.setVisible(true);
             masterGlobeGroup.setVisible(false);
 
-            longitudeGroup.setVisible(false);
-            latitudeGroup.setVisible(false);
+            matrixLongitude.setVisible(false);
+            matrixLatitude.setVisible(false);
 
             matrixTimeZone.setVisible(false);
 
@@ -2530,9 +2540,17 @@ public class Sundial {
     }
 
     public void toggleHelp() {
+
         helpEh = !helpEh;
+
         helpOverlay.setVisible(helpEh);
         helpTextGroup.setVisible(helpEh);
+
+        if (helpEh) {
+            controlThingyHelpCircle.setStroke(Color.WHITE);
+        } else {
+            controlThingyHelpCircle.setStroke(Color_Of_HelpStroke);
+        }
     }
 
     public void toggleNightmode() {
