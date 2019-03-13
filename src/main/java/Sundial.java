@@ -1,6 +1,7 @@
 import javafx.animation.*;
 import javafx.beans.binding.Bindings;
 import javafx.scene.*;
+import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -10,6 +11,7 @@ import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
@@ -43,6 +45,63 @@ public class Sundial {
     private static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
     private static final String DEFAULT_DAY_MAP               = "maps/earth_diffuse_gall-peters_02.jpg";
     private static final String DEFAULT_NIGHT_MAP             = "maps/earth_night_v1.png";
+
+    private static final String HELPTEXT_DEFAULT = "Hover over controllable surfaces" +
+            "\nto display available controls.";
+    private static final String HELPTEXT_HORIZON = "LMB : toggle year chart";
+    private static final String HELPTEXT_NIGHTCOMPRESSION = "LMB + drag : change night compression (slow)" +
+            "\nRMB + drag : change night compression (fast)" +
+            "\nSCROLL : change night compression (fine)" +
+            "\nMMB : reset night compression";
+    private static final String HELPTEXT_HOUR = "LMB + drag : change hours (slow)" +
+            "\nRMB + drag : change hours (fast)" +
+            "\nSCROLL : change hours (fine)" +
+            "\nMMB : reset time and date";
+    private static final String HELPTEXT_MINUTE = "LMB + drag : change minutes (slow)" +
+            "\nRMB + drag : change minutes (fast)" +
+            "\nSCROLL : change minutes (fine)" +
+            "\nMMB : reset time and date";
+    private static final String HELPTEXT_DAY = "LMB + drag : change day (slow)" +
+            "\nRMB + drag : change day (fast)" +
+            "\nSCROLL : change day (fine)" +
+            "\nMMB : reset time and date";
+    private static final String HELPTEXT_MONTH = "LMB + drag : change month (slow)" +
+            "\nRMB + drag : change month (fast)" +
+            "\nSCROLL : change month (fine)" +
+            "\nMMB : reset time and date";
+    private static final String HELPTEXT_YEAR = "LMB + drag : change year (slow)" +
+            "\nRMB + drag : change year (fast)" +
+            "\nSCROLL : change year (fine)" +
+            "\nMMB : reset time and date";
+    private static final String HELPTEXT_LONGITUDE = "LMB + drag : change longitude (fast)" +
+            "\nRMB + drag : change longitude (slow)" +
+            "\nSCROLL : change longitude (fine)" +
+            "\nMMB : reset longitude";
+    private static final String HELPTEXT_LATITUDE = "LMB + drag : change latitude (fast)" +
+            "\nRMB + drag : change latitude (slow)" +
+            "\nSCROLL : change latitude (fine)" +
+            "\nMMB : reset latitude";
+    private static final String HELPTEXT_TIMEZONE = "SCROLL : change time zone" +
+            "\nMMB : reset time zone";
+    private static final String HELPTEXT_CLOSE = "LMB : close application";
+    private static final String HELPTEXT_MINIMIZE = "LMB : minimize application" +
+            "\nRMB : toggle debug window";
+    private static final String HELPTEXT_MAXIMIZE = "LMB : toggle maximize window";
+    private static final String HELPTEXT_RESIZE = "LMB + drag : change window size (square)" +
+            "\nRMB + drag : change window size" +
+            "\nMMB : reset window size";
+    private static final String HELPTEXT_NIGHTMODE = "LMB : toggle night mode";
+    private static final String HELPTEXT_HIGHNOON = "HOVER : show high noon" +
+            "\nLMB : toggle animations";
+    private static final String HELPTEXT_TINYGLOBE = "LMB : toggle globe mode" +
+            "\nRMB : toggle Cetus time" +
+            "\nMMB : reset coordinates" +
+            "\nDRAG-DROP : drag GoogleMaps url to set coordinates";
+    private static final String HELPTEXT_DIALFRAME = "LMB : move window" +
+            "\nLMB (globe mode) : rotate globe (fast)" +
+            "\nRMB (globe mode) : rotate globe (slow)" +
+            "\nMMB (globe mode) : reset coordinates";
+
 
     public static final double DIAL_WIDTH = 440.0d;
     public static final double DIAL_HEIGHT = 440.0d;
@@ -117,7 +176,7 @@ public class Sundial {
     private static final double CONTROL_NIGHTMODE_OPACITY = 0.75d;
     private static final double CETUS_ARC_OPACITY = 1.00d;
     private static final double DAY_TERMINATOR_OPACITY = 0.65d;
-    private static final double HELP_RECTANGLE_OPACITY = 0.25d;
+    private static final double HELP_RECTANGLE_OPACITY = 0.35d;
     private static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
 
     private static final double MATRIX_MARKER_OFFSET = 6.5d;
@@ -262,6 +321,8 @@ public class Sundial {
     public static final String CETUS_MATRIX_SHADOW_DAY   = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
     public static final String CETUS_MATRIX_SHADOW_NIGHT = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
+    public static final String HELP_MARKER_GLOW = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+
     private static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
     private static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
     private static final Image TINYGLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
@@ -402,7 +463,7 @@ public class Sundial {
 
     private Circle dialCircleBackground;
     private Circle dialCircleFrame;
-    private Circle dialCircleCenterDot;
+    private Circle controlNightCompression;
     private Line sunTimeDial;
     private Line dialLineHighNoon;
     private Line sunriseDial;
@@ -439,6 +500,8 @@ public class Sundial {
     private ArrayList<DotMatrix> cetusTimeMatrixList;
     private DotMatrix matrixTimeZone;
 
+    private TextArea helpTextArea;
+
     private Globe dayGlobe;
     private Globe nightGlobe;
     private Ring dayTerminatorLine;
@@ -468,6 +531,7 @@ public class Sundial {
     private Group helpOverlay;
     private ArrayList<Group> helpMarkers;
     private Group nightModeOverlay;
+    private Group helpTextGroup;
 
     public boolean globeVisibleEh = false;
     public boolean cetusTimeVisibleEh = false;
@@ -1045,10 +1109,10 @@ public class Sundial {
         dialCircleCenterPoint.setFill(Color_Of_LocalTime);
         dialCircleCenterPoint.setStroke(Color_Of_Void);
 
-        dialCircleCenterDot = new Circle(CENTER_X, CENTER_Y, DOT_RADIUS);
-        dialCircleCenterDot.setFill(Color_Of_LocalTime);
-        dialCircleCenterDot.setStroke(Color_Of_Void);
-        dialCircleCenterDot.setStyle(MATRIX_SHADOW2);
+        controlNightCompression = new Circle(CENTER_X, CENTER_Y, DOT_RADIUS);
+        controlNightCompression.setFill(Color_Of_LocalTime);
+        controlNightCompression.setStroke(Color_Of_Void);
+        controlNightCompression.setStyle(MATRIX_SHADOW2);
 
         sunTimeDial = new Line(CENTER_X, SUNTIME_DIAL_LENGTH, CENTER_X, MARGIN_Y);
         sunTimeDial.setStroke(Color_Of_SunTime);
@@ -1424,36 +1488,65 @@ public class Sundial {
         Rectangle helpRectangle = new Rectangle(DIAL_WIDTH, DIAL_HEIGHT);
         helpRectangle.setArcWidth(HELP_RECTANGLE_ROUND);
         helpRectangle.setArcHeight(HELP_RECTANGLE_ROUND);
-        helpRectangle.setFill(Color.BLACK);
+        helpRectangle.setFill(Color.RED);
         helpRectangle.setStroke(Color_Of_Void);
-        helpRectangle.setBlendMode(BlendMode.DARKEN);
+        helpRectangle.setBlendMode(BlendMode.MULTIPLY);
         helpRectangle.setOpacity(HELP_RECTANGLE_OPACITY);
         helpRectangle.setMouseTransparent(true);
 
-        Rotate emptyRotate = new Rotate();
-
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, HIGHNOON_DIAL_LENGTH / 2, highNoonDialRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixHour.getLocalToSceneTransform().getTx(), matrixHour.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixMinute.getLocalToSceneTransform().getTx(), matrixMinute.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixDay.getLocalToSceneTransform().getTx(), matrixDay.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixMonth.getLocalToSceneTransform().getTx(), matrixMonth.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixYear.getLocalToSceneTransform().getTx(), matrixYear.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixTimeZone.getLocalToSceneTransform().getTx(), matrixTimeZone.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixLongitude.getLocalToSceneTransform().getTx(), matrixLongitude.getLocalToSceneTransform().getTy(), emptyRotate));
-        helpMarkers.add(createHelpMarkerGroup(matrixLatitude.getLocalToSceneTransform().getTx(), matrixLatitude.getLocalToSceneTransform().getTy(), emptyRotate));
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNRISE_DIAL_LENGTH / 3, sunriseDialRotate));
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNSET_DIAL_LENGTH / 3, sunsetDialRotate));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixHour), getCenterY(matrixHour), matrixHour));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixMinute), getCenterY(matrixMinute), matrixMinute));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixDay), getCenterY(matrixDay), matrixDay));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixMonth), getCenterY(matrixMonth), matrixMonth));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixYear), getCenterY(matrixYear), matrixYear));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixTimeZone), getCenterY(matrixTimeZone), matrixTimeZone));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixLongitude), getCenterY(matrixLongitude), matrixLongitude));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixLatitude), getCenterY(matrixLatitude), matrixLatitude));
         helpMarkers.add(createHelpMarkerGroup(0, 0, tinyGlobeFrame));
-        helpMarkers.add(createHelpMarkerGroup(CONTROL_RESIZE_SIZE * 0.66, CONTROL_RESIZE_SIZE * 0.66, controlThingyResize));
+        helpMarkers.add(createHelpMarkerGroup(CONTROL_RESIZE_SIZE * 0.666, CONTROL_RESIZE_SIZE * 0.666, controlThingyResize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyMaximize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyMinimize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyClose));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyNightmode));
-        helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyHelp));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(controlThingyHelp), getCenterY(controlThingyHelp), controlThingyHelp));
+        helpMarkers.add(createHelpMarkerGroup(0, 0, controlNightCompression));
 
         helpOverlay.getChildren().add(helpRectangle);
         helpOverlay.getChildren().addAll(helpMarkers);
         helpOverlay.setVisible(false);
+
+
+        Text helpText = new Text();
+        helpText.setFont(new Font(12));
+        helpText.setStroke(Color.WHITE);
+        helpText.setFill(Color_Of_Void);
+        helpText.setText(HELPTEXT_DEFAULT);
+        helpText.setTranslateX(10);
+        helpText.setTranslateY(10);
+
+        Rectangle helpTextRectangle = new Rectangle(0, 0, 20, 20);
+        helpTextRectangle.setArcWidth(10);
+        helpTextRectangle.setArcHeight(10);
+        helpTextRectangle.setStroke(Color_Of_Void);
+        helpTextRectangle.setFill(Color.BLACK);
+        helpTextRectangle.setOpacity(0.60);
+
+        helpTextRectangle.widthProperty().bind(Bindings.createDoubleBinding(() -> {
+            double size = helpText.layoutBoundsProperty().get().getWidth();
+            return size + 10;
+        }, helpText.layoutBoundsProperty()));
+
+        helpTextRectangle.heightProperty().bind(Bindings.createDoubleBinding(() -> {
+            double size = helpText.layoutBoundsProperty().get().getHeight();
+            return size + 10;
+        }, helpText.layoutBoundsProperty()));
+
+        helpTextGroup = new Group(helpTextRectangle, helpText);
+        helpTextGroup.setMouseTransparent(true);
+        helpTextGroup.setVisible(false);
 
 
         // LAYERS
@@ -1481,7 +1574,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(horizonGroup);
         foregroundGroup.getChildren().add(dialHourMatrixMarkers);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
-        foregroundGroup.getChildren().add(dialCircleCenterDot);
+        foregroundGroup.getChildren().add(controlNightCompression);
         foregroundGroup.getChildren().add(dialLocalHourGroup);
         foregroundGroup.getChildren().add(cetusTimer);
         foregroundGroup.getChildren().add(matrixDayLength);
@@ -1501,6 +1594,8 @@ public class Sundial {
         foregroundGroup.getChildren().add(controlThingyNightmode);
 
         foregroundGroup.getChildren().add(helpOverlay);
+        foregroundGroup.getChildren().add(helpTextGroup);
+
         foregroundGroup.getChildren().add(nightModeOverlay);
 
         SubScene foregroundScene = new SubScene(foregroundGroup, DIAL_WIDTH, DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
@@ -1515,79 +1610,87 @@ public class Sundial {
 
 
         // EVENTS
-        dialCircleCenterDot.setOnMouseEntered(event -> { dialCircleCenterDot.setCursor(Cursor.V_RESIZE); dialCircleCenterDot.setStyle(MATRIX_GLOW2); });
-        dialCircleCenterDot.setOnMouseExited(event -> { dialCircleCenterDot.setCursor(Cursor.DEFAULT); dialCircleCenterDot.setStyle(MATRIX_SHADOW2); });
+        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(MATRIX_GLOW2); });
+        controlNightCompression.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(MATRIX_SHADOW2); });
 
-        controlThingyHelp.setOnMouseEntered(event -> { controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, CONTROL_HELP_GLOW); });
-        controlThingyHelp.setOnMouseExited(event -> { controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, helpEh ? CONTROL_HELP_SHADOW_ON : CONTROL_HELP_SHADOW_OFF); });
+        controlThingyHelp.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, CONTROL_HELP_GLOW); });
+        controlThingyHelp.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, helpEh ? CONTROL_HELP_SHADOW_ON : CONTROL_HELP_SHADOW_OFF); });
 
-        controlThingyResize.setOnMouseEntered(event -> { controlThingyResize.setCursor(Cursor.NW_RESIZE); setGroupGlow(controlThingyResize, CONTROL_RESIZE_GLOW); });
-        controlThingyResize.setOnMouseExited(event -> { controlThingyResize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyResize, CONTROL_RESIZE_SHADOW); });
+        controlThingyResize.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_RESIZE); controlThingyResize.setCursor(Cursor.NW_RESIZE); setGroupGlow(controlThingyResize, CONTROL_RESIZE_GLOW); });
+        controlThingyResize.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyResize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyResize, CONTROL_RESIZE_SHADOW); });
 
-        controlThingyClose.setOnMouseEntered(event -> { controlThingyClose.setCursor(Cursor.HAND); setGroupGlow(controlThingyClose, CONTROL_CLOSE_GLOW); });
-        controlThingyClose.setOnMouseExited(event -> { controlThingyClose.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyClose, CONTROL_CLOSE_SHADOW); });
+        controlThingyClose.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_CLOSE); controlThingyClose.setCursor(Cursor.HAND); setGroupGlow(controlThingyClose, CONTROL_CLOSE_GLOW); });
+        controlThingyClose.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyClose.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyClose, CONTROL_CLOSE_SHADOW); });
 
-        controlThingyMaximize.setOnMouseEntered(event -> { controlThingyMaximize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_GLOW); });
-        controlThingyMaximize.setOnMouseExited(event -> { controlThingyMaximize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_SHADOW); });
+        controlThingyMaximize.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_MAXIMIZE); controlThingyMaximize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_GLOW); });
+        controlThingyMaximize.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyMaximize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMaximize, CONTROL_MAXIMIZE_SHADOW); });
 
-        controlThingyMinimize.setOnMouseEntered(event -> { controlThingyMinimize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_GLOW); });
-        controlThingyMinimize.setOnMouseExited(event -> { controlThingyMinimize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_SHADOW); });
+        controlThingyMinimize.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_MINIMIZE); controlThingyMinimize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_GLOW); });
+        controlThingyMinimize.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyMinimize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMinimize, CONTROL_MINIMIZE_SHADOW); });
 
-        controlThingyNightmode.setOnMouseEntered(event -> { controlThingyNightmode.setCursor(Cursor.HAND); setGroupGlow(controlThingyNightmode, CONTROL_NIGHTMODE_GLOW); });
-        controlThingyNightmode.setOnMouseExited(event -> { controlThingyNightmode.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyNightmode, CONTROL_NIGHTMODE_SHADOW); });
+        controlThingyNightmode.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_NIGHTMODE); controlThingyNightmode.setCursor(Cursor.HAND); setGroupGlow(controlThingyNightmode, CONTROL_NIGHTMODE_GLOW); });
+        controlThingyNightmode.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyNightmode.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyNightmode, CONTROL_NIGHTMODE_SHADOW); });
 
-        matrixYear.setOnMouseEntered(event -> { matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, MATRIX_GLOW); });
-        matrixYear.setOnMouseExited(event -> { matrixYear.setCursor(Cursor.DEFAULT); setGroupGlow(matrixYear, MATRIX_SHADOW); });
+        matrixYear.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_YEAR); matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, MATRIX_GLOW); });
+        matrixYear.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixYear.setCursor(Cursor.DEFAULT); setGroupGlow(matrixYear, MATRIX_SHADOW); });
 
-        matrixMonth.setOnMouseEntered(event -> { matrixMonth.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixMonth, MATRIX_GLOW); });
-        matrixMonth.setOnMouseExited(event -> { matrixMonth.setCursor(Cursor.DEFAULT); setGroupGlow(matrixMonth, MATRIX_SHADOW); });
+        matrixMonth.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_MONTH); matrixMonth.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixMonth, MATRIX_GLOW); });
+        matrixMonth.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixMonth.setCursor(Cursor.DEFAULT); setGroupGlow(matrixMonth, MATRIX_SHADOW); });
 
-        matrixDay.setOnMouseEntered(event -> { matrixDay.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixDay, MATRIX_GLOW); });
-        matrixDay.setOnMouseExited(event -> { matrixDay.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDay, MATRIX_SHADOW); });
+        matrixDay.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DAY); matrixDay.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixDay, MATRIX_GLOW); });
+        matrixDay.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixDay.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDay, MATRIX_SHADOW); });
 
-        matrixHour.setOnMouseEntered(event -> { matrixHour.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixHour, MATRIX_GLOW); });
-        matrixHour.setOnMouseExited(event -> { matrixHour.setCursor(Cursor.DEFAULT); setGroupGlow(matrixHour, MATRIX_SHADOW); });
+        matrixHour.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HOUR); matrixHour.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixHour, MATRIX_GLOW); });
+        matrixHour.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixHour.setCursor(Cursor.DEFAULT); setGroupGlow(matrixHour, MATRIX_SHADOW); });
 
-        matrixMinute.setOnMouseEntered(event -> { matrixMinute.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixMinute, MATRIX_GLOW); });
-        matrixMinute.setOnMouseExited(event -> { matrixMinute.setCursor(Cursor.DEFAULT); setGroupGlow(matrixMinute, MATRIX_SHADOW); });
+        matrixMinute.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_MINUTE); matrixMinute.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixMinute, MATRIX_GLOW); });
+        matrixMinute.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixMinute.setCursor(Cursor.DEFAULT); setGroupGlow(matrixMinute, MATRIX_SHADOW); });
 
         matrixWeek.setOnMouseEntered(event -> { matrixWeek.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixWeek, MATRIX_GLOW); });
         matrixWeek.setOnMouseExited(event -> { matrixWeek.setCursor(Cursor.DEFAULT); setGroupGlow(matrixWeek, MATRIX_SHADOW); });
 
-        longitudeGroup.setOnMouseEntered(event -> { longitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(longitudeGroup, MATRIX_GLOW); });
-        longitudeGroup.setOnMouseExited(event -> { longitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(longitudeGroup, MATRIX_SHADOW); });
+        longitudeGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_LONGITUDE); longitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(longitudeGroup, MATRIX_GLOW); });
+        longitudeGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); longitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(longitudeGroup, MATRIX_SHADOW); });
 
-        latitudeGroup.setOnMouseEntered(event -> { latitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(latitudeGroup, MATRIX_GLOW); });
-        latitudeGroup.setOnMouseExited(event -> { latitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(latitudeGroup, MATRIX_SHADOW); });
+        latitudeGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_LATITUDE); latitudeGroup.setCursor(Cursor.V_RESIZE); setGroupGlow(latitudeGroup, MATRIX_GLOW); });
+        latitudeGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); latitudeGroup.setCursor(Cursor.DEFAULT); setGroupGlow(latitudeGroup, MATRIX_SHADOW); });
 
-        tinyGlobeFrame.setOnMouseEntered(event -> { tinyGlobeFrame.setCursor(Cursor.HAND); tinyGlobeFrame.setStyle(MATRIX_GLOW); });
-        tinyGlobeFrame.setOnMouseExited(event -> { tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(MATRIX_SHADOW); });
+        tinyGlobeFrame.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_TINYGLOBE); tinyGlobeFrame.setCursor(Cursor.HAND); tinyGlobeFrame.setStyle(MATRIX_GLOW); });
+        tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(MATRIX_SHADOW); });
 
-        backgroundGroup.setOnMouseEntered(event -> backgroundGroup.setCursor(Cursor.MOVE));
-        backgroundGroup.setOnMouseExited(event -> backgroundGroup.setCursor(Cursor.DEFAULT));
+        backgroundGroup.setOnMouseEntered(event -> { backgroundGroup.setCursor(Cursor.MOVE); });
+        backgroundGroup.setOnMouseExited(event -> { backgroundGroup.setCursor(Cursor.DEFAULT); });
 
-        dialCircleFrame.setOnMouseEntered(event -> dialCircleFrame.setCursor(Cursor.MOVE));
-        dialCircleFrame.setOnMouseExited(event -> dialCircleFrame.setCursor(Cursor.DEFAULT));
+        dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DIALFRAME); dialCircleFrame.setCursor(Cursor.MOVE); });
+        dialCircleFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); dialCircleFrame.setCursor(Cursor.DEFAULT); });
 
-        horizonGroup.setOnMouseEntered(event -> { horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, HORIZON_HOVER_GLOW); });
-        horizonGroup.setOnMouseExited(event -> { horizonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(horizonGroup, ""); });
+        horizonGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HORIZON); horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, HORIZON_HOVER_GLOW); });
+        horizonGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); horizonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(horizonGroup, ""); });
 
-        dialHighNoonGroup.setOnMouseEntered(event -> { dialHighNoonGroup.setCursor(Cursor.HAND); matrixHighNoon.setVisible(true); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW2); });
-        dialHighNoonGroup.setOnMouseExited(event -> { dialHighNoonGroup.setCursor(Cursor.DEFAULT); matrixHighNoon.setVisible(false); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW); });
+        dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); matrixHighNoon.setVisible(true); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW2); });
+        dialHighNoonGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); dialHighNoonGroup.setCursor(Cursor.DEFAULT); matrixHighNoon.setVisible(false); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW); });
 
-        matrixTimeZone.setOnMouseEntered(event -> { matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(MATRIX_GLOW); });
-        matrixTimeZone.setOnMouseExited(event -> { matrixTimeZone.setCursor(Cursor.DEFAULT); matrixTimeZone.setStyle(MATRIX_SHADOW); });
+        matrixTimeZone.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_TIMEZONE); matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(MATRIX_GLOW); });
+        matrixTimeZone.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixTimeZone.setCursor(Cursor.DEFAULT); matrixTimeZone.setStyle(MATRIX_SHADOW); });
 
     }
 
 
     // Utility
+    private double getCenterX(Node node) {
+        return (node.getLocalToSceneTransform().getMxx() * node.getLayoutBounds().getWidth()) / 2d;
+    }
+
+    private double getCenterY(Node node) {
+        return (node.getLocalToSceneTransform().getMyy() * node.getLayoutBounds().getHeight()) / 2d;
+    }
+
     private Group createHelpMarker(double centerX, double centerY) {
 
         Circle circle = new Circle(5);
         circle.setFill(Color.WHITE);
         circle.setStroke(Color_Of_Void);
-        circle.setStyle(LOCALSECOND_GLOW);
+        circle.setStyle(HELP_MARKER_GLOW);
 
         Group marker = new Group(circle);
         marker.setMouseTransparent(true);
@@ -1609,19 +1712,19 @@ public class Sundial {
         return markerGroup;
     }
 
-    private Group createHelpMarkerGroup(double centerX, double centerY, Node node) {
+    private Group createHelpMarkerGroup(double offsetX, double offsetY, Node node) {
 
-        Group markerGroup = new Group(createHelpMarker(centerX, centerY));
+        Group markerGroup = new Group(createHelpMarker(offsetX, offsetY));
 
         markerGroup.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
-            double tX = node.localToSceneTransformProperty().get().getTx();
-            return tX;
-        }, node.localToSceneTransformProperty()));
+            double t = node.localToSceneTransformProperty().get().getTx();
+            return t;
+        }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
 
         markerGroup.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
-            double tY = node.localToSceneTransformProperty().get().getTy();
-            return tY;
-        }, node.localToSceneTransformProperty()));
+            double t = node.localToSceneTransformProperty().get().getTy();
+            return t;
+        }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
 
         return markerGroup;
     }
@@ -1774,8 +1877,8 @@ public class Sundial {
         return dialsGroup;
     }
 
-    public Circle getDialCircleCenterDot() {
-        return dialCircleCenterDot;
+    public Circle getControlNightCompression() {
+        return controlNightCompression;
     }
 
     public Circle getDialCircleFrame() {
@@ -2212,8 +2315,8 @@ public class Sundial {
 
         if (isVisible) {
 
-            dialCircleCenterDot.setFill(Color_Of_Void);
-            dialCircleCenterDot.setStroke(Color_Of_LocalTime);
+            controlNightCompression.setFill(Color_Of_Void);
+            controlNightCompression.setStroke(Color_Of_LocalTime);
 
             dialArcNight.setOpacity(0);
             dialArcMidnight.setVisible(false);
@@ -2253,8 +2356,8 @@ public class Sundial {
         }
         else {
 
-            dialCircleCenterDot.setFill(Color_Of_LocalTime);
-            dialCircleCenterDot.setStroke(Color_Of_Void);
+            controlNightCompression.setFill(Color_Of_LocalTime);
+            controlNightCompression.setStroke(Color_Of_Void);
 
             dialArcNight.setOpacity(1);
             dialArcMidnight.setVisible(true);
@@ -2429,6 +2532,7 @@ public class Sundial {
     public void toggleHelp() {
         helpEh = !helpEh;
         helpOverlay.setVisible(helpEh);
+        helpTextGroup.setVisible(helpEh);
     }
 
     public void toggleNightmode() {
