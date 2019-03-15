@@ -49,59 +49,80 @@ public class Sundial {
 
     private static final String HELPTEXT_DEFAULT = "Hover over controllable surfaces" +
             "\nto display available controls.";
-    private static final String HELPTEXT_HORIZON = "LMB : toggle Year-Chart";
-    private static final String HELPTEXT_NIGHTCOMPRESSION = "LMB + drag : change Night-Compression (slow)" +
+    private static final String HELPTEXT_HORIZON = "DAY LENGTH" +
+            "\nLMB : toggle Year-Chart";
+    private static final String HELPTEXT_NIGHTCOMPRESSION = "NIGHT COMPRESSION" +
+            "\nLMB + drag : change Night-Compression (slow)" +
             "\nRMB + drag : change Night-Compression\u0165 (fast)" +
             "\nSCROLL : change Night-Compression\u0165 (fine)" +
             "\nMMB : reset Night-Compression\u0165";
-    private static final String HELPTEXT_HOUR = "LMB + drag : change Hours (slow)" +
+    private static final String HELPTEXT_HOUR = "HOURS" +
+            "\nLMB + drag : change Hours (slow)" +
             "\nRMB + drag : change Hours (fast)" +
             "\nSCROLL : change Hours (fine)" +
             "\nMMB : reset Time and Date";
-    private static final String HELPTEXT_MINUTE = "LMB + drag : change Minutes (slow)" +
+    private static final String HELPTEXT_MINUTE = "MINUTES" +
+            "\nLMB + drag : change Minutes (slow)" +
             "\nRMB + drag : change Minutes (fast)" +
             "\nSCROLL : change Minutes (fine)" +
             "\nMMB : reset Time and Date";
-    private static final String HELPTEXT_DAY = "LMB + drag : change Day (slow)" +
+    private static final String HELPTEXT_DAY = "DAY" +
+            "\nLMB + drag : change Day (slow)" +
             "\nRMB + drag : change Day (fast)" +
             "\nSCROLL : change Day (fine)" +
             "\nMMB : reset Time and Date";
-    private static final String HELPTEXT_MONTH = "LMB + drag : change Month (slow)" +
+    private static final String HELPTEXT_MONTH = "MONTH" +
+            "\nLMB + drag : change Month (slow)" +
             "\nRMB + drag : change Month (fast)" +
             "\nSCROLL : change Month (fine)" +
             "\nMMB : reset Time and Date";
-    private static final String HELPTEXT_YEAR = "LMB + drag : change Year (slow)" +
+    private static final String HELPTEXT_YEAR = "YEAR" +
+            "\nLMB + drag : change Year (slow)" +
             "\nRMB + drag : change Year (fast)" +
             "\nSCROLL : change Year (fine)" +
             "\nMMB : reset Time and Date";
-    private static final String HELPTEXT_LONGITUDE = "LMB + drag : change Longitude (fast)" +
+    private static final String HELPTEXT_LONGITUDE = "LONGITUDE" +
+            "\nLMB + drag : change Longitude (fast)" +
             "\nRMB + drag : change Longitude (slow)" +
             "\nSCROLL : change Longitude (fine)" +
             "\nMMB : reset Longitude";
-    private static final String HELPTEXT_LATITUDE = "LMB + drag : change Latitude (fast)" +
+    private static final String HELPTEXT_LATITUDE = "LATITUDE" +
+            "\nLMB + drag : change Latitude (fast)" +
             "\nRMB + drag : change Latitude (slow)" +
             "\nSCROLL : change Latitude (fine)" +
             "\nMMB : reset Latitude";
-    private static final String HELPTEXT_TIMEZONE = "SCROLL : change Time Zone" +
+    private static final String HELPTEXT_TIMEZONE = "TIME ZONE" +
+            "\nSCROLL : change Time Zone" +
             "\nMMB : reset Time Zone";
-    private static final String HELPTEXT_CLOSE = "LMB : Close application";
-    private static final String HELPTEXT_MINIMIZE = "LMB : Minimize application" +
+    private static final String HELPTEXT_CLOSE = "CLOSE" +
+            "\nLMB : Close application";
+    private static final String HELPTEXT_MINIMIZE = "MINIMIZE" +
+            "\nLMB : Minimize application" +
             "\nRMB : toggle Debug window";
-    private static final String HELPTEXT_MAXIMIZE = "LMB : Maximize application";
-    private static final String HELPTEXT_RESIZE = "LMB + drag : Resize window (squared)" +
+    private static final String HELPTEXT_MAXIMIZE = "MAXIMIZE" +
+            "\nLMB : Maximize application";
+    private static final String HELPTEXT_RESIZE = "RESIZE" +
+            "\nLMB + drag : Resize window (squared)" +
             "\nRMB + drag : Resize window" +
             "\nMMB : Reset window size";
-    private static final String HELPTEXT_NIGHTMODE = "LMB : toggle Night-mode";
-    private static final String HELPTEXT_HIGHNOON = "HOVER : show High Noon time" +
+    private static final String HELPTEXT_NIGHTMODE = "NIGHT-MODE" +
+            "\nLMB : toggle Night-mode";
+    private static final String HELPTEXT_ALWAYSONTOP = "ALWAYS-ON-TOP" +
+            "\nLMB : toggle Always-On-Top";
+    private static final String HELPTEXT_HIGHNOON = "HIGH NOON" +
+            "\nHOVER : show High Noon time" +
             "\nLMB : toggle Animations";
-    private static final String HELPTEXT_TINYGLOBE = "LMB : toggle Globe-mode" +
+    private static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
+            "\nLMB : toggle Globe-mode" +
             "\nRMB : toggle Cetus time" +
             "\nMMB : reset Coordinates" +
             "\nDRAG-DROP : drag GoogleMaps url to set coordinates";
-    private static final String HELPTEXT_GLOBE = "LMB : rotate Globe (fast)" +
+    private static final String HELPTEXT_GLOBE = "GLOBE" +
+            "\nLMB : rotate Globe (fast)" +
             "\nRMB : rotate Globe (slow)" +
             "\nMMB : reset Coordinates";
-    private static final String HELPTEXT_WINDOW = "LMB : move Window";
+    private static final String HELPTEXT_WINDOW = "WINDOW" +
+            "\nLMB : move Window";
 
 
     public static final double DIAL_WIDTH = 440.0d;
@@ -124,7 +145,7 @@ public class Sundial {
     private static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS;
     private static final double LOCALTIME_DIAL_WIDTH = 14.0d;
     private static final double HIGHNOON_DIAL_WIDTH = 14.0d;
-    private static final double DAYLENGTH_ARC_RADIUS = 105.0d;
+    private static final double DAYLENGTH_ARC_RADIUS = 110.0d;
     private static final double DAY_ARC_MARGIN = 10.0d;
     private static final double LOCALMINUTE_WIDTH = 8;
     private static final double LOCALMINUTE_HEIGHT = 16;
@@ -140,6 +161,7 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_RADIUS = 10.0d;
     private static final double CONTROL_MINIMIZE_RADIUS = 10.0d;
     private static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
+    private static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     private static final double CETUS_MARKER_LENGTH = 50.0d;
     private static final double HELP_OVERLAY_ROUND = DIAL_WIDTH / 2 + 20.0d;
     private static final double HELP_MARKER_ROUND = 10.0d;
@@ -163,6 +185,7 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_STROKE_WIDTH = 3.00d;
     private static final double CONTROL_MINIMIZE_STROKE_WIDTH = 3.00d;
     private static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 3.00d;
+    private static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 3.0d;
     private static final double CETUS_MARKER_WIDTH = 1.00d;
     private static final double DAY_TERMINATOR_WIDTH = 1.5d;
     private static final double DAY_TERMINATOR_GLOW_WIDTH = 25.00d;
@@ -179,13 +202,14 @@ public class Sundial {
     private static final double CONTROL_MAXIMIZE_OPACITY = 1.00d;
     private static final double CONTROL_MINIMIZE_OPACITY = 1.00d;
     private static final double CONTROL_NIGHTMODE_OPACITY = 1.00d;
+    private static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     private static final double CETUS_ARC_OPACITY = 1.00d;
     private static final double DAY_TERMINATOR_OPACITY = 0.65d;
     private static final double HELP_OVERLAY_OPACITY = 0.35d;
     private static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
 
     private static final double MATRIX_MARKER_OFFSET = 6.5d;
-    private static final double MATRIX_HORIZON_OFFSET = 77.0d;
+    private static final double MATRIX_HORIZON_OFFSET = 80.0d;
     private static final double MATRIX_TIME_OFFSET = 0.0d;
     private static final double MATRIX_DATE_OFFSET = 45.0d;
     private static final double MATRIX_WEEK_OFFSET = 70.0d;
@@ -211,13 +235,13 @@ public class Sundial {
     private static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     private static final double CETUS_HORIZON_OFFSET = 50.0d;
     private static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y + 65.0d;
-    private static final double HELP_TEXT_OFFSET = 5.0d;
+    private static final double HELP_TEXT_OFFSET = 10.0d;
 
     private static final double MATRIX_TIME_SCALE = 3.50d;
     private static final double MATRIX_DATE_SCALE = 1.50d;
     private static final double MATRIX_WEEK_SCALE = 1.00d;
-    private static final double MATRIX_HORIZON_SCALE = 0.75d;
-    private static final double MATRIX_DAYLENGTH_SCALE = 0.75d;
+    private static final double MATRIX_HORIZON_SCALE = 1.00d;
+    private static final double MATRIX_DAYLENGTH_SCALE = 1.00d;
     private static final double MATRIX_LONGITUDE_SCALE = 1.25d;
     private static final double MATRIX_LATITUDE_SCALE = 1.25d;
     private static final double MATRIX_HOUR_SCALE = 1.00d;
@@ -233,14 +257,14 @@ public class Sundial {
     private static final double CONTROL_CLOSE_ANGLE = 37.0d;
     private static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
     private static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
-    private static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MINIMIZE_ANGLE;
+    private static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MAXIMIZE_ANGLE;
     private static final double CONTROL_NIGHTMODE_ANGLE = 180 - CONTROL_CLOSE_ANGLE;
+    private static final double CONTROL_ALWAYSONTOP_ANGLE = 180 - CONTROL_MINIMIZE_ANGLE;
 
     private static final int LED_OPACITY_DURATION = 350;
     private static final int GLOBE_ROTATE_DURATION = 1000;
     private static final int TINY_GLOBE_DURATION = 350;
     private static final int CETUS_MARKER_DURATION = 150;
-
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
     public static final Color Color_Of_Earth      = new Color(0.85, 0.85, 0.65, 1.00);
@@ -289,6 +313,8 @@ public class Sundial {
     public static final Color Color_Of_MinimizeStroke = new Color(0.90, 0.90, 0.20, 1.00);
     public static final Color Color_Of_NightmodeFill   = new Color(0.50, 0.10, 0.50, 0.20);
     public static final Color Color_Of_NightmodeStroke = new Color(0.80, 0.20, 0.80, 1.00);
+    public static final Color Color_Of_AlwaysOnTopFill = new Color(0.35, 0.35, 0.35, 0.20);
+    public static final Color Color_Of_AlwaysOnTopStroke = new Color(0.75, 0.75, 0.75, 1.00);
 
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
     public static final Color Color_Of_CetusFrame  = new Color(0.85, 0.60, 0.95, 1.00);
@@ -296,9 +322,9 @@ public class Sundial {
     public static final Color Color_Of_CetusDay    = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusNight  = new Color(0.90, 0.70, 1.00, 1.00);
 
-    public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_GLOW2            = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String MATRIX_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String MATRIX_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_SHADOW2          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
     public static final String MATRIX_BLOCK            = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
     public static final String HORIZON_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
@@ -307,22 +333,24 @@ public class Sundial {
     public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALTIME_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
 
-    public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 4.0, 0.50, 0, 0);";
+    public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
     public static final String TERMINATOR_LINE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
 
-    public static final String CONTROL_HELP_SHADOW_OFF  = "-fx-effect: dropshadow(three-pass-box, rgba( 16, 32,128, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_HELP_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_HELP_SHADOW_ON   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_RESIZE_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_RESIZE_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_CLOSE_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_CLOSE_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MAXIMIZE_SHADOW  = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MAXIMIZE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MINIMIZE_SHADOW  = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MINIMIZE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_NIGHTMODE_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba(112, 32,112, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_NIGHTMODE_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_SHADOW_OFF    = "-fx-effect: dropshadow(three-pass-box, rgba( 16, 32,128, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_SHADOW_ON     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_RESIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_RESIZE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_CLOSE_SHADOW       = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_CLOSE_GLOW         = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MAXIMIZE_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MAXIMIZE_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MINIMIZE_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MINIMIZE_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_NIGHTMODE_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba(112, 32,112, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_NIGHTMODE_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_ALWAYSONTOP_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_ALWAYSONTOP_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
 
     public static final String CETUS_MARKER_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64,255, 1.0),  8.0, 0.50, 0, 0);";
     public static final String CETUS_MARKER_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0),  8.0, 0.50, 0, 0);";
@@ -532,6 +560,8 @@ public class Sundial {
     private Group controlThingyMaximize;
     private Group controlThingyMinimize;
     private Group controlThingyNightmode;
+    private Circle thingyAlwaysOnTopCircle;
+    private Group controlThingyAlwaysOnTop;
     private Group backgroundGroup;
     private Group cetusArcGroup;
     private Group cetusLineGroup;
@@ -634,6 +664,8 @@ public class Sundial {
     // stuff
     private void init() {
 
+        dialsGroup = new Group();
+
         // Rotates
         centerRotate = new Rotate();
         centerRotate.setPivotX(CENTER_X);
@@ -660,8 +692,8 @@ public class Sundial {
         controlThingyHelp = new Group();
 
         controlThingyHelpCircle = new Circle(0, 0, CONTROL_HELP_RADIUS);
-        controlThingyHelpCircle.setFill(Color_Of_HelpFill);
-        controlThingyHelpCircle.setStroke(Color_Of_HelpStroke);
+        controlThingyHelpCircle.setFill(Color_Of_ResizeFill);
+        controlThingyHelpCircle.setStroke(Color_Of_ResizeStroke);
         controlThingyHelpCircle.setStrokeWidth(CONTROL_HELP_STROKE_WIDTH);
 
         DotMatrix thingyHelpQuestionMark = new DotMatrix("?", Color.WHITE);
@@ -674,7 +706,7 @@ public class Sundial {
         controlThingyHelp.getChildren().addAll(controlThingyHelpCircle, thingyHelpQuestionMark);
         controlThingyHelp.setTranslateX(CENTER_X + CONTROL_CLOSE_OFFSET * cos(toRadians(CONTROL_HELP_ANGLE)));
         controlThingyHelp.setTranslateY(CENTER_Y - CONTROL_CLOSE_OFFSET * sin(toRadians(CONTROL_HELP_ANGLE)));
-        controlThingyHelp.setStyle(CONTROL_HELP_SHADOW_OFF);
+        controlThingyHelp.setStyle(CONTROL_RESIZE_SHADOW);
         controlThingyHelp.setOpacity(CONTROL_HELP_OPACITY);
 
         controlThingyResize = new Group();
@@ -736,6 +768,16 @@ public class Sundial {
         controlThingyNightmode.setStyle(CONTROL_NIGHTMODE_SHADOW);
         controlThingyNightmode.setOpacity(CONTROL_NIGHTMODE_OPACITY);
 
+        controlThingyAlwaysOnTop = new Group();
+        thingyAlwaysOnTopCircle = new Circle(0, 0, CONTROL_ALWAYSONTOP_RADIUS);
+        thingyAlwaysOnTopCircle.setFill(Color_Of_AlwaysOnTopFill);
+        thingyAlwaysOnTopCircle.setStroke(Color_Of_AlwaysOnTopStroke);
+        thingyAlwaysOnTopCircle.setStrokeWidth(CONTROL_ALWAYSONTOP_STROKE_WIDTH);
+        controlThingyAlwaysOnTop.getChildren().add(thingyAlwaysOnTopCircle);
+        controlThingyAlwaysOnTop.setTranslateX(CENTER_X + CONTROL_MINIMIZE_OFFSET * cos(toRadians(CONTROL_ALWAYSONTOP_ANGLE)));
+        controlThingyAlwaysOnTop.setTranslateY(CENTER_Y - CONTROL_MINIMIZE_OFFSET * sin(toRadians(CONTROL_ALWAYSONTOP_ANGLE)));
+        controlThingyAlwaysOnTop.setStyle(CONTROL_ALWAYSONTOP_SHADOW);
+        controlThingyAlwaysOnTop.setOpacity(CONTROL_ALWAYSONTOP_OPACITY);
 
         // Master globe group
         dayGlobe = new Globe(GLOBE_DAY_IMAGE, CENTER_X - MARGIN_X);
@@ -857,13 +899,6 @@ public class Sundial {
         dialArcMidnight.setType(ArcType.ROUND);
         dialArcMidnight.setStroke(Color_Of_Void);
         dialArcMidnight.setFill(Color_Of_Midnight);
-
-        dialArcDayLength = new Arc(CENTER_X, CENTER_Y, DAYLENGTH_ARC_RADIUS, DAYLENGTH_ARC_RADIUS, 90 - sunsetDialAngle, 360 - (sunsetDialAngle - sunriseDialAngle));
-        dialArcDayLength.setType(ArcType.OPEN);
-        dialArcDayLength.setStroke(Color_Of_LocalTime);
-        dialArcDayLength.setStrokeWidth(DAYLENGTH_STROKE_WIDTH);
-        dialArcDayLength.setFill(Color_Of_Void);
-        dialArcDayLength.setOpacity(DAYLENGTH_ARC_OPACITY);
 
         dialMarginCircle = new Circle(CENTER_X, CENTER_Y, DIAL_WIDTH / 2);
         dialMarginCircle.setFill(Color_Of_Margin);
@@ -1303,7 +1338,7 @@ public class Sundial {
                 + ":" + sunrise.get(Calendar.SECOND)
                 ;
 
-        matrixSunrise = new DotMatrix("00:00:00", Color_Of_Horizon);
+        matrixSunrise = new DotMatrix("00:00", Color_Of_Horizon);
         matrixSunrise.setTranslateX(CENTER_X - matrixSunrise.getLayoutBounds().getWidth() / 2 + matrixSunrise.getLayoutBounds().getHeight() / 2);
         matrixSunrise.setTranslateY(MATRIX_HORIZON_OFFSET);
         matrixSunrise.setRotate(90d);
@@ -1330,7 +1365,7 @@ public class Sundial {
                 + ":" + sunset.get(Calendar.SECOND)
                 ;
 
-        matrixSunset = new DotMatrix("00:00:00", Color_Of_Horizon);
+        matrixSunset = new DotMatrix("00:00", Color_Of_Horizon);
         matrixSunset.setTranslateX(CENTER_X - matrixSunset.getLayoutBounds().getWidth() / 2 - matrixSunset.getLayoutBounds().getHeight() / 2);
         matrixSunset.setTranslateY(MATRIX_HORIZON_OFFSET);
         matrixSunset.setRotate(-90d);
@@ -1390,19 +1425,27 @@ public class Sundial {
 
 
         matrixTime = new Group();
-        matrixTime.getChildren().addAll(matrixHour, /*matrixSeparatorHourToMinute,*/  matrixMinute/*, matrixSeparatorMinuteToSecond, matrixSecond*/);
+        matrixTime.getChildren().addAll(matrixHour, matrixMinute);
         matrixTime.setScaleX(MATRIX_TIME_SCALE);
         matrixTime.setScaleY(MATRIX_TIME_SCALE);
         matrixTime.setLayoutX(CENTER_X - matrixTime.getLayoutBounds().getWidth() / 2);
         matrixTime.setLayoutY(CENTER_Y - matrixTime.getLayoutBounds().getHeight() / 2 + MATRIX_TIME_OFFSET);
 
-        matrixDayLength = new DotMatrix("00h00m00s", Color_Of_LocalTime);
+
+        dialArcDayLength = new Arc(CENTER_X, CENTER_Y, DAYLENGTH_ARC_RADIUS, DAYLENGTH_ARC_RADIUS, 90 - sunsetDialAngle, 360 - (sunsetDialAngle - sunriseDialAngle));
+        dialArcDayLength.setType(ArcType.OPEN);
+        dialArcDayLength.setStroke(Color_Of_LocalTime);
+        dialArcDayLength.setStrokeWidth(DAYLENGTH_STROKE_WIDTH);
+        dialArcDayLength.setFill(Color_Of_Void);
+        dialArcDayLength.setOpacity(DAYLENGTH_ARC_OPACITY);
+        dialArcDayLength.setMouseTransparent(true);
+
+        matrixDayLength = new DotMatrix("00h00m", Color_Of_LocalTime);
         matrixDayLength.setScaleX(MATRIX_DAYLENGTH_SCALE);
         matrixDayLength.setScaleY(MATRIX_DAYLENGTH_SCALE);
         matrixDayLength.setLayoutX(CENTER_X - matrixDayLength.getLayoutBounds().getWidth() / 2);
         matrixDayLength.setLayoutY(CENTER_Y + matrixDayLength.getLayoutBounds().getHeight() - DAYLENGTH_ARC_RADIUS);
         matrixDayLength.setStyle(LOCALTIME_SHADOW);
-        matrixDayLength.setMouseTransparent(true);
 
 
         matrixLongitude = new DotMatrix("000.00E", Color_Of_LocalTime);
@@ -1516,8 +1559,9 @@ public class Sundial {
         helpGlobeMarker.visibleProperty().bind(globeMasterGroup.visibleProperty());
 
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, HIGHNOON_DIAL_LENGTH / 2, dialHighNoonGroup, highNoonDialRotate));
-        helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNRISE_DIAL_LENGTH / 3, sunriseDial, sunriseDialRotate));
-        helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNSET_DIAL_LENGTH / 3, sunsetDial, sunsetDialRotate));
+        helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixDayLength), getCenterY(matrixDayLength), matrixDayLength));
+//        helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNRISE_DIAL_LENGTH / 3, sunriseDial, sunriseDialRotate));
+//        helpMarkers.add(createHelpMarkerGroup(CENTER_X, SUNSET_DIAL_LENGTH / 3, sunsetDial, sunsetDialRotate));
         helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixHour), getCenterY(matrixHour), matrixHour));
         helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixMinute), getCenterY(matrixMinute), matrixMinute));
         helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixDay), getCenterY(matrixDay), matrixDay));
@@ -1532,6 +1576,7 @@ public class Sundial {
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyMinimize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyClose));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyNightmode));
+        helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyAlwaysOnTop));
         helpMarkers.add(createHelpMarkerGroup(CENTER_X, CENTER_Y, controlNightCompression));
 
         helpOverlay.getChildren().addAll(helpBackdrop);
@@ -1571,8 +1616,6 @@ public class Sundial {
 
 
         // LAYERS
-        dialsGroup = new Group();
-
         backgroundGroup = new Group();
         backgroundGroup.getChildren().add(dialMarginFillBox);
         backgroundGroup.getChildren().add(dialMarginCircle);
@@ -1612,6 +1655,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(controlThingyMaximize);
         foregroundGroup.getChildren().add(controlThingyMinimize);
         foregroundGroup.getChildren().add(controlThingyNightmode);
+        foregroundGroup.getChildren().add(controlThingyAlwaysOnTop);
 
         foregroundGroup.getChildren().add(helpOverlay);
         foregroundGroup.getChildren().add(controlThingyHelp);
@@ -1634,8 +1678,8 @@ public class Sundial {
         controlNightCompression.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(MATRIX_GLOW2); });
         controlNightCompression.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(MATRIX_SHADOW2); });
 
-        controlThingyHelp.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, CONTROL_HELP_SHADOW_ON); });
-        controlThingyHelp.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, CONTROL_HELP_GLOW); });
+        controlThingyHelp.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, CONTROL_RESIZE_GLOW); });
+        controlThingyHelp.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, CONTROL_RESIZE_SHADOW); });
 
         controlThingyResize.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_RESIZE); controlThingyResize.setCursor(Cursor.NW_RESIZE); setGroupGlow(controlThingyResize, CONTROL_RESIZE_GLOW); });
         controlThingyResize.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyResize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyResize, CONTROL_RESIZE_SHADOW); });
@@ -1651,6 +1695,9 @@ public class Sundial {
 
         controlThingyNightmode.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_NIGHTMODE); controlThingyNightmode.setCursor(Cursor.HAND); setGroupGlow(controlThingyNightmode, CONTROL_NIGHTMODE_GLOW); });
         controlThingyNightmode.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyNightmode.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyNightmode, CONTROL_NIGHTMODE_SHADOW); });
+
+        controlThingyAlwaysOnTop.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_ALWAYSONTOP); controlThingyAlwaysOnTop.setCursor(Cursor.HAND); setGroupGlow(controlThingyAlwaysOnTop, CONTROL_ALWAYSONTOP_GLOW); });
+        controlThingyAlwaysOnTop.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); controlThingyAlwaysOnTop.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyAlwaysOnTop, CONTROL_ALWAYSONTOP_SHADOW); });
 
         matrixYear.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_YEAR); matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, MATRIX_GLOW); });
         matrixYear.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixYear.setCursor(Cursor.DEFAULT); setGroupGlow(matrixYear, MATRIX_SHADOW); });
@@ -1685,8 +1732,8 @@ public class Sundial {
         dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(globeVisibleEh ? HELPTEXT_GLOBE : HELPTEXT_WINDOW); dialCircleFrame.setCursor(globeVisibleEh ? Cursor.OPEN_HAND : Cursor.MOVE); });
         dialCircleFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); dialCircleFrame.setCursor(Cursor.DEFAULT); });
 
-        horizonGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HORIZON); horizonGroup.setCursor(Cursor.HAND); setGroupGlow(horizonGroup, HORIZON_HOVER_GLOW); });
-        horizonGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); horizonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(horizonGroup, ""); });
+        matrixDayLength.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HORIZON); matrixDayLength.setCursor(Cursor.HAND); setGroupGlow(matrixDayLength, MATRIX_GLOW); });
+        matrixDayLength.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixDayLength.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDayLength, MATRIX_SHADOW); });
 
         dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); matrixHighNoon.setVisible(true); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW2); });
         dialHighNoonGroup.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); dialHighNoonGroup.setCursor(Cursor.DEFAULT); matrixHighNoon.setVisible(false); setGroupGlow(dialHighNoonGroup, MATRIX_GLOW); });
@@ -1694,7 +1741,10 @@ public class Sundial {
         matrixTimeZone.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_TIMEZONE); matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(MATRIX_GLOW); });
         matrixTimeZone.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixTimeZone.setCursor(Cursor.DEFAULT); matrixTimeZone.setStyle(MATRIX_SHADOW); });
 
-        dialsGroup.setOnMouseMoved(event -> moveGroup(helpTextGroup, event));
+        dialsGroup.setOnMouseMoved(event -> {
+            if (helpTextGroup.isVisible()) { moveGroup(helpTextGroup, event); }
+        });
+
     }
 
 
@@ -1867,19 +1917,79 @@ public class Sundial {
         updateDialMarkers();
     }
 
-    public static String getShortTime(GregorianCalendar calendar) {
+    public static String getShortTimeString(GregorianCalendar calendar) {
+
         String hourString = ("00" + calendar.get(Calendar.HOUR_OF_DAY));
-        hourString = hourString.substring(hourString.length() - 2, hourString.length());
+        hourString = hourString.substring(hourString.length() - 2);
         String minuteString = ("00" + calendar.get(Calendar.MINUTE));
-        minuteString = minuteString.substring(minuteString.length() - 2, minuteString.length());
+        minuteString = minuteString.substring(minuteString.length() - 2);
         String secondString = ("00" + calendar.get(Calendar.SECOND));
-        secondString = secondString.substring(secondString.length() - 2, secondString.length());
+        secondString = secondString.substring(secondString.length() - 2);
 
         return hourString + ":" + minuteString + ":" + secondString;
     }
 
-    public static String getShorterTime(GregorianCalendar calendar) {
-        return getShortTime(calendar).substring(0, 5);
+    public static String getShorterTimeString(GregorianCalendar calendar) {
+
+        int minutes = calendar.get(Calendar.MINUTE) + round(calendar.get(Calendar.SECOND) / 60f);
+
+        String hourString = ("00" + calendar.get(Calendar.HOUR_OF_DAY));
+        hourString = hourString.substring(hourString.length() - 2);
+        String minuteString = ("00" + minutes);
+        minuteString = minuteString.substring(minuteString.length() - 2);
+
+        return hourString + ":" + minuteString;
+    }
+
+    public static String getShortTimeLengthString(double seconds) {
+
+        double precisionDays = seconds / (24 * 60 * 60);
+        int days = (int) floor(precisionDays);
+        double precisionHours = (precisionDays - days) * 24;
+        int hours = (int) floor(precisionHours);
+        double precisionMins = (precisionHours - hours) * 60;
+        int mins = (int) floor(precisionMins);
+        double precisionSecs = (precisionMins - mins) * 60;
+        int secs = (int) floor(precisionSecs);
+
+        String hoursString = ("00" + hours);
+        hoursString = hoursString.substring(hoursString.length() - 2);
+        String minsString = ("00" + mins);
+        minsString = minsString.substring(minsString.length() - 2);
+        String secsString = ("00" + secs);
+        secsString = secsString.substring(secsString.length() - 2);
+
+        String result = "";
+        result += hoursString + "h";
+        result += minsString + "m";
+        result += secsString + "s";
+
+        return result;
+    }
+
+    public static String getShorterTimeLengthString(double seconds) {
+
+        double precisionDays = seconds / (24 * 60 * 60);
+        int days = (int) floor(precisionDays);
+        double precisionHours = (precisionDays - days) * 24;
+        int hours = (int) floor(precisionHours);
+        double precisionMins = (precisionHours - hours) * 60;
+        int mins = (int) floor(precisionMins);
+        double precisionSecs = (precisionMins - mins) * 60;
+        int secs = (int) floor(precisionSecs);
+
+        mins += (int) round(precisionSecs / 60f);
+
+        String hoursString = ("00" + hours);
+        hoursString = hoursString.substring(hoursString.length() - 2);
+        String minsString = ("00" + mins);
+        minsString = minsString.substring(minsString.length() - 2);
+
+        String result = "";
+        result += hoursString + "h";
+        result += minsString + "m";
+
+        return result;
     }
 
     public static String formatCoordinateToString(double coordinate, String suffixPositive, String suffixNegative) {
@@ -1904,38 +2014,6 @@ public class Sundial {
         return result;
     }
 
-    public static String getTimeLengthString(double seconds) {
-
-        String result = "24h00m00s";
-
-        double precisionDays = seconds / (24 * 60 * 60);
-        int days = (int) floor(precisionDays);
-        double precisionHours = (precisionDays - days) * 24;
-        int hours = (int) floor(precisionHours);
-        double precisionMins = (precisionHours - hours) * 60;
-        int mins = (int) floor(precisionMins);
-        double precisionSecs = (precisionMins - mins) * 60;
-        int secs = (int) floor(precisionSecs);
-
-        if (days < 1) {
-//            String daysString = ("00" + days);
-//            daysString = daysString.substring(daysString.length() - 2, daysString.length());
-            String hoursString = ("00" + hours);
-            hoursString = hoursString.substring(hoursString.length() - 2, hoursString.length());
-            String minsString = ("00" + mins);
-            minsString = minsString.substring(minsString.length() - 2, minsString.length());
-            String secsString = ("00" + secs);
-            secsString = secsString.substring(secsString.length() - 2, secsString.length());
-
-            result = "";
-//        result += daysString + "d";
-            result += hoursString + "h";
-            result += minsString + "m";
-            result += secsString + "s";
-        }
-
-        return result;
-    }
 
     // Getters
     public Group getDialsGroup() {
@@ -2054,6 +2132,10 @@ public class Sundial {
         return controlThingyNightmode;
     }
 
+    public Group getControlThingyAlwaysOnTop() {
+        return controlThingyAlwaysOnTop;
+    }
+
     public Group getHorizonGroup() {
         return horizonGroup;
     }
@@ -2105,7 +2187,7 @@ public class Sundial {
             i++;
         }
 
-        cetusTimer.setString(getTimeLengthString(offsetTime / 1000d).substring(1));
+        cetusTimer.setString(getShorterTimeLengthString(offsetTime / 1000d));
 
         if (i % 2 == 0) {
             cetusTimer.setStroke(Color_Of_CetusNight);
@@ -2124,7 +2206,7 @@ public class Sundial {
     public void setHighNoon(GregorianCalendar highNoon) {
         this.highNoon = highNoon;
         setHighNoonDialAngle(getAbsoluteAngle(this.highNoon));
-        matrixHighNoon.setString(getShortTime(highNoon));
+        matrixHighNoon.setString(getShortTimeString(highNoon));
     }
 
     public void setHorizon(GregorianCalendar sunrise, GregorianCalendar sunset) {
@@ -2132,12 +2214,12 @@ public class Sundial {
         this.sunset = sunset;
         this.daylength = (this.sunset.getTimeInMillis() - this.sunrise.getTimeInMillis()) / 1000;
 
-        String daylengthString = getTimeLengthString(this.daylength);
+        String daylengthString = getShorterTimeLengthString(this.daylength);
 
         setHorizonDialAngle(getAbsoluteAngle(this.sunrise), getAbsoluteAngle(this.sunset));
 
-        matrixSunrise.setString(getShortTime(this.sunrise));
-        matrixSunset.setString(getShortTime(this.sunset));
+        matrixSunrise.setString(getShorterTimeString(this.sunrise));
+        matrixSunset.setString(getShorterTimeString(this.sunset));
 
         matrixDayLength.setString(daylengthString);
     }
@@ -2211,8 +2293,8 @@ public class Sundial {
             DotMatrix matrixStart = cetusTimeMatrixList.get(i * 2);
             DotMatrix matrixEnd = cetusTimeMatrixList.get((i * 2) + 1);
 
-            matrixStart.setString(getShorterTime(startTime));
-            matrixEnd.setString(getShorterTime(endTime));
+            matrixStart.setString(getShorterTimeString(startTime));
+            matrixEnd.setString(getShorterTimeString(endTime));
 
             if (startAngle > 0 && startAngle <= 180) { matrixStart.setRotate(270); }
             else { matrixStart.setRotate(90); }
@@ -2607,12 +2689,20 @@ public class Sundial {
         if (helpEh) {
             controlThingyHelpCircle.setStroke(Color.WHITE);
         } else {
-            controlThingyHelpCircle.setStroke(Color_Of_HelpStroke);
+            controlThingyHelpCircle.setStroke(Color_Of_ResizeStroke);
         }
     }
 
     public void toggleNightmode() {
         nightmodeEh = !nightmodeEh;
         nightModeOverlay.setVisible(nightmodeEh);
+    }
+
+    public void setAlwaysOnTop(boolean alwaysOnTopEh) {
+        if (alwaysOnTopEh) {
+            thingyAlwaysOnTopCircle.setStroke(Color.WHITE);
+        } else {
+            thingyAlwaysOnTopCircle.setStroke(Color_Of_AlwaysOnTopStroke);
+        }
     }
 }

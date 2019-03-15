@@ -48,6 +48,8 @@ public class Sunface extends Application {
     private static final double MIN_WIDTH = 150;
     private static final double MIN_HEIGHT = 150;
 
+    private static final double SNAP_TO_CENTER_RADIUS = 50;
+
     private static final int OFFSET_BY_YEAR = Calendar.YEAR;
     private static final int OFFSET_BY_MONTH = Calendar.MONTH;
     private static final int OFFSET_BY_DAY = Calendar.DAY_OF_MONTH;
@@ -94,7 +96,10 @@ public class Sunface extends Application {
     private double savedWindowSizeY;
     private double savedLongitude = longitude;
     private double savedLatitude = latitude;
+
     private boolean maximizedEh = false;
+    private boolean snapToCenterEh = true;
+    private boolean alwaysOnTopEh = false;
 
     private TextArea debugTextArea;
     private String debugErrorMessage;
@@ -253,6 +258,7 @@ public class Sunface extends Application {
         sundial.getControlThingyMinimize().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
         sundial.getControlThingyMinimize().setOnMouseReleased(event -> { minimizeWindow(primaryStage, timeline, event); mouseButtonList.clear(); });
         sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
+        sundial.getControlThingyAlwaysOnTop().setOnMouseClicked(event -> toggleAlwaysOnTop(primaryStage, sundial));
 
         sundial.getMatrixTimeZone().setOnMousePressed(event -> {
             mouseButtonList.add(event.getButton());
@@ -332,7 +338,7 @@ public class Sunface extends Application {
 
         sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleAnimation());
 
-        sundial.getHorizonGroup().setOnMouseClicked(event -> {
+        sundial.getMatrixDayLength().setOnMouseClicked(event -> {
             if (statsWindow.isShowing()) { statsWindow.close(); }
             else { statsWindow.show(); }
         });
@@ -344,7 +350,9 @@ public class Sunface extends Application {
         initCurrentTime(sundial);
         primaryStage.show();
         timeline.play();
+
         recordWindowPosition(primaryStage, dialsGroup, null);
+        toggleAlwaysOnTop(primaryStage, sundial);
 
     }
 
@@ -1030,6 +1038,10 @@ public class Sunface extends Application {
 
     private void changeWindowPosition(Stage stage, MouseEvent event) {
 
+        if (!mouseButtonList.isEmpty()) {
+            if(!mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.PRIMARY)) { return; }
+        }
+
         double winSizeX = stage.getWidth();
         double winSizeY = stage.getHeight();
 
@@ -1044,7 +1056,9 @@ public class Sunface extends Application {
 
         Rectangle2D recCenterOfPointer = new Rectangle2D(centerPositionX, centerPositionY, 0, 0);
         if (Screen.getScreensForRectangle(recCenterOfPointer).size() <= 0) { return; }
+
         Rectangle2D currentScreen = Screen.getScreensForRectangle(recCenterOfPointer).get(0).getVisualBounds();
+
         double currentScreenMinX = currentScreen.getMinX();
         double currentScreenMaxX = currentScreen.getMaxX();
         double currentScreenMinY = currentScreen.getMinY();
@@ -1053,6 +1067,28 @@ public class Sunface extends Application {
         double newPositionX = positionX;
         double newPositionY = positionY;
 
+        double screenCenterX = currentScreenMinX + (currentScreenMaxX - currentScreenMinX) / 2;
+        double screenCenterY = currentScreenMinY + (currentScreenMaxY - currentScreenMinY) / 2;
+
+        debugTextArea.setText(""
+                + "\nnewPositionX = " + newPositionX
+                + "\nnewPositionY = " + newPositionY
+                + "\nscreenCenterX = " + screenCenterX
+                + "\nscreenCenterY = " + screenCenterY
+                + "\ncenterPositionX = " + centerPositionX
+                + "\ncenterPositionY = " + centerPositionY
+        );
+
+        // snap to screen center
+        if (snapToCenterEh) {
+
+            if (abs(abs(screenCenterX) - abs(centerPositionX)) < SNAP_TO_CENTER_RADIUS && abs(abs(screenCenterY) - abs(centerPositionY)) < SNAP_TO_CENTER_RADIUS) {
+                newPositionX = screenCenterX - winSizeX / 2;
+                newPositionY = screenCenterY - winSizeY / 2;
+            }
+        }
+
+        // stop at screen border
         if (positionX < currentScreenMinX)
             newPositionX = currentScreenMinX;
         if (positionX > (currentScreenMaxX - winSizeX))
@@ -1105,6 +1141,14 @@ public class Sunface extends Application {
             sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(stage, event));
 
         }
+    }
+
+    private void toggleAlwaysOnTop(Stage stage, Sundial sundial) {
+
+        alwaysOnTopEh = !alwaysOnTopEh;
+
+        stage.setAlwaysOnTop(alwaysOnTopEh);
+        sundial.setAlwaysOnTop(alwaysOnTopEh);
     }
 
     private void updateDebugWindow(Sundial sundial) {
