@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -32,6 +33,14 @@ public class Sunchart {
     private XYChart.Series sunriseSeries;
     private XYChart.Series sunsetSeries;
     private XYChart.Series daylengthSeries;
+
+    private ArrayList<Tooltip> sunriseTooltipList;
+    private ArrayList<Tooltip> sunsetTooltipList;
+    private ArrayList<Tooltip> daylengthTooltipList;
+
+    private ArrayList<XYChart.Data<Integer, Double>> sunriseDataList;
+    private ArrayList<XYChart.Data<Integer, Double>> sunsetDataList;
+    private ArrayList<XYChart.Data<Integer, Double>> daylenghDataList;
 
     private LineChart suntimeLineChart;
 
@@ -65,13 +74,37 @@ public class Sunchart {
         daylengthSeries = new XYChart.Series();
         daylengthSeries.setName("Day Length");
 
+        sunriseTooltipList = new ArrayList<>();
+        sunsetTooltipList = new ArrayList<>();
+        daylengthTooltipList = new ArrayList<>();
+
+        sunriseDataList = new ArrayList<>();
+        sunsetDataList = new ArrayList<>();
+        daylenghDataList = new ArrayList<>();
+
         for (int i = 0; i < dataSize; i++) {
 
-            String dateNumber = 1 + i * CHART_RESOLUTION + "";
+            int dayOfYear = 1 + i * CHART_RESOLUTION;
 
-            sunriseSeries.getData().add(new XYChart.Data<>(dateNumber, 0));
-            sunsetSeries.getData().add(new XYChart.Data<>(dateNumber, 24));
-            daylengthSeries.getData().add(new XYChart.Data<>(dateNumber, 24));
+            XYChart.Data<Integer, Double> sunriseData = new XYChart.Data<>(dayOfYear, 0d);
+            XYChart.Data<Integer, Double> sunsetData = new XYChart.Data<>(dayOfYear, 0d);
+            XYChart.Data<Integer, Double> daylengthData = new XYChart.Data<>(dayOfYear, 0d);
+
+            sunriseDataList.add(sunriseData);
+            sunsetDataList.add(sunsetData);
+            daylenghDataList.add(daylengthData);
+
+            Tooltip sunriseTooltip = new Tooltip(getInfoString(calendar, 0));
+            Tooltip sunsetTooltip = new Tooltip(getInfoString(calendar, 0));
+            Tooltip daylengthTooltip = new Tooltip(getInfoString(calendar, 0));
+
+            sunriseTooltipList.add(sunriseTooltip);
+            sunsetTooltipList.add(sunsetTooltip);
+            daylengthTooltipList.add(daylengthTooltip);
+
+            sunriseSeries.getData().add(sunriseData);
+            sunsetSeries.getData().add(sunsetData);
+            daylengthSeries.getData().add(daylengthData);
         }
 
         chartTitle = formatTitle();
@@ -193,17 +226,18 @@ public class Sunchart {
                 sunsetTime = 0;
             }
 
-            XYChart.Data<Integer, Double> sunriseData = new XYChart.Data<>(dayOfYear, sunriseTime);
-            XYChart.Data<Integer, Double> sunsetData = new XYChart.Data<>(dayOfYear, sunsetTime);
-            XYChart.Data<Integer, Double> daylengthData = new XYChart.Data<>(dayOfYear, daylength);
+            sunriseDataList.get(i).setYValue(sunriseTime);
+            sunsetDataList.get(i).setYValue(sunsetTime);
+            daylenghDataList.get(i).setYValue(daylength);
 
-            sunriseSeries.getData().set(i, sunriseData);
-            sunsetSeries.getData().set(i, sunsetData);
-            daylengthSeries.getData().set(i, daylengthData);
+            sunriseTooltipList.get(i).setText(getInfoString(calendar, sunriseTime));
+            sunsetTooltipList.get(i).setText(getInfoString(calendar, sunsetTime));
+            daylengthTooltipList.get(i).setText(getInfoString(calendar, daylength));
 
-            Tooltip.install(sunriseData.getNode(), new Tooltip(getInfoString(calendar, sunriseTime)));
-            Tooltip.install(sunsetData.getNode(), new Tooltip(getInfoString(calendar, sunsetTime)));
-            Tooltip.install(daylengthData.getNode(), new Tooltip(getInfoString(calendar, daylength)));
+            Tooltip.install(sunriseDataList.get(i).getNode(), sunriseTooltipList.get(i));
+            Tooltip.install(sunsetDataList.get(i).getNode(), sunsetTooltipList.get(i));
+            Tooltip.install(daylenghDataList.get(i).getNode(), daylengthTooltipList.get(i));
+
         }
 
     }
