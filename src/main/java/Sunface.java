@@ -289,10 +289,10 @@ public class Sunface extends Application {
         sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
         sundial.getMatrixLongitude().setOnScroll(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
 
-        sundial.getMatrixLongitude().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LATITUDE, event));
-        sundial.getMatrixLongitude().setOnMouseReleased(event -> mouseButtonList.clear());
-        sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LATITUDE, event));
-        sundial.getMatrixLongitude().setOnScroll(event -> rotateGlobe(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLatitude().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLatitude().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixLatitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLatitude().setOnScroll(event -> rotateGlobe(sundial, Position.LATITUDE, event));
 
         sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowSize(primaryStage, dialsGroup, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
