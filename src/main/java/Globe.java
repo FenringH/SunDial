@@ -132,26 +132,30 @@ public class Globe extends Group {
         this.longitude = longitude;
         this.latitude = latitude;
 
-        int animationDuration = animated ? this.animationDuration : 1;
-
         if (rotateLongitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLongitudeTimeline.stop(); }
-        if (rotateLatitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLatitudeTimeline.stop(); }
+        if (rotateLatitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLatitudeTimeline.stop();}
 
-        KeyValue keyValueLongitude = new KeyValue(rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
+        if (animated) {
 
-        KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
+            KeyValue keyValueLongitude = new KeyValue(rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
 
-        rotateLongitudeTimeline.getKeyFrames().clear();
-        rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
+            KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
 
-        rotateLatitudeTimeline.getKeyFrames().clear();
-        rotateLatitudeTimeline.getKeyFrames().add(keyFrameLatitude);
+            rotateLongitudeTimeline.getKeyFrames().clear();
+            rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
 
+            rotateLatitudeTimeline.getKeyFrames().clear();
+            rotateLatitudeTimeline.getKeyFrames().add(keyFrameLatitude);
 
-        rotateLongitudeTimeline.play();
-        rotateLatitudeTimeline.play();
+            rotateLongitudeTimeline.play();
+            rotateLatitudeTimeline.play();
+
+        } else {
+            rotateLongitude.setAngle(this.longitude);
+            rotateLatitude.setAngle(this.latitude);
+        }
     }
 
     public void setDayDiffuseMap(Image map) {

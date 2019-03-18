@@ -115,28 +115,31 @@ public class Ring extends Group {
         this.longitude = longitude;
         this.latitude = latitude;
 
-        int animationDuration = animated ? this.animationDuration : 1;
-
         if (rotateLongitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLongitudeTimeline.stop(); }
         if (rotateLatitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLatitudeTimeline.stop(); }
 
+        if (animated) {
 
-        KeyValue keyValueLongitude = new KeyValue(this.rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
+            KeyValue keyValueLongitude = new KeyValue(this.rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
 
-        KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
+            KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
 
-        rotateLongitudeTimeline.getKeyFrames().clear();
-        rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
+            rotateLongitudeTimeline.getKeyFrames().clear();
+            rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
 
-        rotateLatitudeTimeline.getKeyFrames().clear();
-        rotateLatitudeTimeline.getKeyFrames().add(keyFrameLatitude);
+            rotateLatitudeTimeline.getKeyFrames().clear();
+            rotateLatitudeTimeline.getKeyFrames().add(keyFrameLatitude);
 
 
-        rotateLongitudeTimeline.play();
-        rotateLatitudeTimeline.play();
+            rotateLongitudeTimeline.play();
+            rotateLatitudeTimeline.play();
 
+        } else {
+            rotateLongitude.setAngle(this.longitude);
+            rotateLatitude.setAngle(this.latitude);
+        }
     }
 
     public void setDayLightPosition(double phase, double tilt) {

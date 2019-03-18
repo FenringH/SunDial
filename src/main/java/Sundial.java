@@ -174,8 +174,8 @@ public class Sundial {
     private static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     private static final double SUNTIME_STROKE_WIDTH = 2.00d;
     private static final double HIGHNOON_STROKE_WIDTH = 1.50d;
-    private static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.00d;
-    private static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.50d;
+    private static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.25d;
+    private static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
     private static final double SUNRISE_STROKE_WIDTH = 1.00d;
     private static final double SUNSET_STROKE_WIDTH = 1.00d;
     private static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
@@ -333,6 +333,7 @@ public class Sundial {
     public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
     public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALHOUR_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALTIME_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
@@ -1208,12 +1209,13 @@ public class Sundial {
                 CENTER_X + LOCALTIME_HOUR_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.75,
                 CENTER_X + LOCALTIME_HOUR_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
         );
-        dialLocalHourPoly.setFill(Color_Of_LocalTime);
+        dialLocalHourPoly.setFill(Color.WHITE);
+        dialLocalHourPoly.setStroke(Color_Of_Void);
         dialLocalHourPoly.setOpacity(1);
 
         dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
-        dialLocalHourGroup.setStyle(LOCALTIME_SHADOW);
+        dialLocalHourGroup.setStyle(LOCALTIME_GLOW);
         dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
         dialLocalHourGroup.setMouseTransparent(true);
 
@@ -1221,13 +1223,17 @@ public class Sundial {
         dialLocalMinuteGroup = new Group();
 
         Polygon dialLocalMinutePoly = new Polygon(
+                CENTER_X, LOCALTIME_DIAL_LENGTH * 0.65,
+                CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH / 2, LOCALTIME_DIAL_LENGTH,
                 CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
                 CENTER_X - LOCALTIME_MINUTE_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.85,
                 CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT,
                 CENTER_X, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT * 1.75,
                 CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT,
                 CENTER_X + LOCALTIME_MINUTE_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.85,
-                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH
+                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH / 2, LOCALTIME_DIAL_LENGTH,
+                CENTER_X, LOCALTIME_DIAL_LENGTH * 0.65
         );
         dialLocalMinutePoly.setFill(Color_Of_Void);
         dialLocalMinutePoly.setStroke(Color.WHITE);
@@ -2547,11 +2553,11 @@ public class Sundial {
     }
 
     public void rotateGlobeAnimated(double longitude, double latitude) {
-        dayGlobe.rotateGlobe(longitude, latitude, true);
-        nightGlobe.rotateGlobe(longitude, latitude, true);
-        dayTerminatorLine.rotateRing(longitude, latitude, true);
-        dayTerminatorGlow.rotateRing(longitude, latitude, true);
-        tinyGlobe.rotateGlobe(longitude, latitude, true);
+        dayGlobe.rotateGlobe(longitude, latitude, globeAnimationOnEh);
+        nightGlobe.rotateGlobe(longitude, latitude, globeAnimationOnEh);
+        dayTerminatorLine.rotateRing(longitude, latitude, globeAnimationOnEh);
+        dayTerminatorGlow.rotateRing(longitude, latitude, globeAnimationOnEh);
+        tinyGlobe.rotateGlobe(longitude, latitude, globeAnimationOnEh);
     }
 
     public void toggleCetusTime() {
@@ -2633,8 +2639,6 @@ public class Sundial {
 
         ledAnimationOnEh = !ledAnimationOnEh;
         globeAnimationOnEh = !globeAnimationOnEh;
-
-        globeRotateDuration = globeAnimationOnEh ? GLOBE_ROTATE_DURATION : 0;
 
         for (Timeline timeline : cetusMarkerHoverTransitionList) {
             if (ledAnimationOnEh) {
