@@ -1,7 +1,4 @@
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -16,6 +13,8 @@ public class Globe extends Group {
     private static final int SPHERE_DIVISIONS = 128;
     private static final int NUMBER_OF_PARALLELS = 360 / 10;
     private static final int NUMBER_OF_MERIDIANS = 180 / 10;
+
+    private static final int DEFAULT_ANIMATION_DURATION = 1000;
 
     private static final double MAP_WIDTH  = 8192 / 2d;
     private static final double MAP_HEIGHT = 4092 / 2d;
@@ -33,7 +32,8 @@ public class Globe extends Group {
     private double longitude = 0;
     private double latitude = 0;
 
-    private Group globe;
+    private int animationDuration;
+
     private Sphere daySphere;
     private PhongMaterial globeMaterial;
 
@@ -56,21 +56,22 @@ public class Globe extends Group {
     private Rotate rotateSunPhase;
 
     public Globe(double radius) {
-        this(DEFAULT_DAY_IMAGE, radius);
+        this(DEFAULT_DAY_IMAGE, radius, DEFAULT_ANIMATION_DURATION);
     }
 
-    public Globe(Image dayDiffuseMap, double radius) {
+    public Globe(Image dayDiffuseMap, double radius, int animationDuration) {
+
         super();
-        globe = new Group();
+
         this.dayDiffuseMap = dayDiffuseMap;
-        rotateLongitudeTimeline = new Timeline();
-        rotateLatitudeTimeline = new Timeline();
-        getChildren().add(getGlobe(radius));
-    }
+        this.animationDuration = animationDuration;
 
-    private Group getGlobe(double radius) {
 
-        globe = new Group();
+        rotateSunTilt = new Rotate();
+        rotateSunPhase = new Rotate();
+
+        rotateSunTilt.setAxis(Rotate.X_AXIS);
+        rotateSunPhase.setAxis(Rotate.Y_AXIS);
 
         rotateLongitude = new Rotate();
         rotateLatitude = new Rotate();
@@ -78,11 +79,17 @@ public class Globe extends Group {
         rotateLongitude.setAxis(Rotate.Y_AXIS);
         rotateLatitude.setAxis(Rotate.X_AXIS);
 
-        rotateSunTilt = new Rotate();
-        rotateSunPhase = new Rotate();
 
-        rotateSunTilt.setAxis(Rotate.X_AXIS);
-        rotateSunPhase.setAxis(Rotate.Y_AXIS);
+        rotateLongitudeTimeline = new Timeline();
+        rotateLongitudeTimeline.setCycleCount(1);
+        rotateLongitudeTimeline.setRate(1);
+        rotateLongitudeTimeline.setAutoReverse(false);
+
+        rotateLatitudeTimeline = new Timeline();
+        rotateLatitudeTimeline.setCycleCount(1);
+        rotateLatitudeTimeline.setRate(1);
+        rotateLatitudeTimeline.setAutoReverse(false);
+
 
         dayLight = new PointLight(Color_Of_Light);
         dayLight.setTranslateZ(-100 * radius);
@@ -92,6 +99,14 @@ public class Globe extends Group {
 
         ambientLight = new AmbientLight(Color.BLACK);
 
+        globeMaterial = new PhongMaterial();
+        globeMaterial.setDiffuseMap(dayDiffuseMap);
+
+        daySphere = new Sphere(radius, SPHERE_DIVISIONS);
+        daySphere.setMaterial(globeMaterial);
+
+
+        // Gyroscope rotation system
         Group dayLightGripper = new Group();
         dayLightGripper.getChildren().addAll(dayLight, nightLight, ambientLight);
         dayLightGripper.getTransforms().add(rotateSunTilt);
@@ -99,12 +114,6 @@ public class Globe extends Group {
         Group dayLightHolder = new Group();
         dayLightHolder.getChildren().add(dayLightGripper);
         dayLightHolder.getTransforms().add(rotateSunPhase);
-
-        globeMaterial = new PhongMaterial();
-        globeMaterial.setDiffuseMap(dayDiffuseMap);
-
-        daySphere = new Sphere(radius, SPHERE_DIVISIONS);
-        daySphere.setMaterial(globeMaterial);
 
         Group daySphereGripper = new Group();
         daySphereGripper.getTransforms().add(rotateLongitude);
@@ -114,50 +123,35 @@ public class Globe extends Group {
         daySphereHolder.getTransforms().add(rotateLatitude);
         daySphereHolder.getChildren().addAll(daySphereGripper);
 
-        this.globe.getChildren().addAll(daySphereHolder);
 
-        return globe;
+        super.getChildren().add(daySphereHolder);
     }
 
-    public void rotateGlobe(double longitude, double latitude, int duration) {
+    public void rotateGlobe(double longitude, double latitude, boolean animated) {
 
         this.longitude = longitude;
         this.latitude = latitude;
 
-        if (rotateLongitudeTimeline != null) { rotateLongitudeTimeline.stop(); }
-        if (rotateLatitudeTimeline != null) { rotateLatitudeTimeline.stop(); }
+        int animationDuration = animated ? this.animationDuration : 1;
 
-        if (duration < 1) {
-            rotateLongitude.setAngle(this.longitude);
-            rotateLatitude.setAngle(this.latitude);
-            return;
-        }
+        if (rotateLongitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLongitudeTimeline.stop(); }
+        if (rotateLatitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLatitudeTimeline.stop(); }
 
-        rotateLongitudeTimeline = new Timeline();
-        rotateLongitudeTimeline.setCycleCount(1);
-        rotateLongitudeTimeline.setRate(1);
-        rotateLongitudeTimeline.setAutoReverse(false);
+        KeyValue keyValueLongitude = new KeyValue(rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
 
-        KeyValue keyValueLongitude = new KeyValue(this.rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(duration), keyValueLongitude);
+        KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
 
+        rotateLongitudeTimeline.getKeyFrames().clear();
         rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
 
-
-        rotateLatitudeTimeline = new Timeline();
-        rotateLatitudeTimeline.setCycleCount(1);
-        rotateLatitudeTimeline.setRate(1);
-        rotateLatitudeTimeline.setAutoReverse(false);
-
-        KeyValue keyValueLatitude = new KeyValue(this.rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(duration), keyValueLatitude);
-
+        rotateLatitudeTimeline.getKeyFrames().clear();
         rotateLatitudeTimeline.getKeyFrames().add(keyFrameLatitude);
 
 
         rotateLongitudeTimeline.play();
         rotateLatitudeTimeline.play();
-
     }
 
     public void setDayDiffuseMap(Image map) {
@@ -168,7 +162,7 @@ public class Globe extends Group {
     public void setDayLightPosition(double phase, double tilt) {
 
         sunPhase = phase;
-        sunTilt = 0d - tilt;
+        sunTilt = -tilt;
 
         rotateSunPhase.setAngle(sunPhase * 360);
         rotateSunTilt.setAngle(sunTilt);
@@ -196,5 +190,13 @@ public class Globe extends Group {
 
     public PointLight getNightLight() {
         return nightLight;
+    }
+
+    public Timeline getRotateLongitudeTimeline() {
+        return rotateLongitudeTimeline;
+    }
+
+    public Timeline getRotateLatitudeTimeline() {
+        return rotateLatitudeTimeline;
     }
 }

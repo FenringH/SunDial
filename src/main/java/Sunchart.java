@@ -30,6 +30,10 @@ public class Sunchart {
     private GregorianCalendar calendar;
     private Suntime suntime;
 
+    private ArrayList<Double> sunriseValueList;
+    private ArrayList<Double> sunsetValueList;
+    private ArrayList<Double> daylengthValueList;
+
     private XYChart.Series sunriseSeries;
     private XYChart.Series sunsetSeries;
     private XYChart.Series daylengthSeries;
@@ -73,6 +77,10 @@ public class Sunchart {
 
         daylengthSeries = new XYChart.Series();
         daylengthSeries.setName("Day Length");
+
+        sunriseValueList = new ArrayList<>();
+        sunsetValueList = new ArrayList<>();
+        daylengthValueList = new ArrayList<>();
 
         sunriseTooltipList = new ArrayList<>();
         sunsetTooltipList = new ArrayList<>();
@@ -125,6 +133,7 @@ public class Sunchart {
         suntimeLineChart.setAnimated(false);
 
         recalculateDataPoints();
+        updateChartData();
     }
 
     private String formatTitle() {
@@ -191,7 +200,11 @@ public class Sunchart {
         return stringBuilder.toString();
     }
 
-    private void recalculateDataPoints() {
+    public void recalculateDataPoints() {
+
+        sunriseValueList.clear();
+        sunsetValueList.clear();
+        daylengthValueList.clear();
 
         for (int i = 0; i < dataSize; i++) {
 
@@ -226,6 +239,29 @@ public class Sunchart {
                 sunsetTime = 0;
             }
 
+            sunriseValueList.add(sunriseTime);
+            sunsetValueList.add(sunsetTime);
+            daylengthValueList.add(daylength);
+
+        }
+
+    }
+
+    public void updateChartData() {
+
+        recalculateDataPoints();
+
+        chartTitle = formatTitle();
+        suntimeLineChart.setTitle(this.chartTitle);
+
+        for (int i = 0; i < dataSize; i++) {
+
+            stringConverterAxisX.setCalendar(calendar);
+
+            double sunriseTime = sunriseValueList.get(i);
+            double sunsetTime = sunsetValueList.get(i);
+            double daylength = daylengthValueList.get(i);
+
             sunriseDataList.get(i).setYValue(sunriseTime);
             sunsetDataList.get(i).setYValue(sunsetTime);
             daylenghDataList.get(i).setYValue(daylength);
@@ -239,7 +275,6 @@ public class Sunchart {
             Tooltip.install(daylenghDataList.get(i).getNode(), daylengthTooltipList.get(i));
 
         }
-
     }
 
     public void setSpacetimePosition(double longitude, double latitude, int year) {
@@ -250,11 +285,6 @@ public class Sunchart {
 
         calendar.set(Calendar.YEAR, this.year);
 
-        chartTitle = formatTitle();
-
-        suntimeLineChart.setTitle(this.chartTitle);
-
-        recalculateDataPoints();
     }
 
     public LineChart getChart() {
@@ -339,5 +369,17 @@ public class Sunchart {
         }
     };
 
+    // Getters
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public int getYear() {
+        return year;
+    }
 
 }

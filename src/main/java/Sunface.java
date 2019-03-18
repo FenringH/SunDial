@@ -107,8 +107,6 @@ public class Sunface extends Application {
     private Suntime suntimeLocal;
     private Suntime suntimeGlobal;
 
-    private TimeZone currentTimezone;
-    private TimeZone offsetTimezone;
     private int timeZoneOffset;
 
     private Cetustime cetustime;
@@ -134,9 +132,6 @@ public class Sunface extends Application {
         currentLocalTime = new GregorianCalendar();
         offsetLocalTime = new GregorianCalendar();
 
-        currentTimezone = currentLocalTime.getTimeZone();
-        offsetTimezone = offsetLocalTime.getTimeZone();
-
         timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
 
         // Create 'sun' objects
@@ -156,11 +151,11 @@ public class Sunface extends Application {
                 .nightCompression(0)
                 .build();
 
-        sundial.getDayGlobe().rotateGlobe(longitude, latitude, 0);
-        sundial.getNightGlobe().rotateGlobe(longitude, latitude, 0);
-        sundial.getDayTerminatorLine().rotateRing(longitude, latitude, 0);
-        sundial.getDayTerminatorGlow().rotateRing(longitude, latitude, 0);
-        sundial.getTinyGlobe().rotateGlobe(longitude, latitude, 0);
+        sundial.getDayGlobe().rotateGlobe(longitude, latitude, false);
+        sundial.getNightGlobe().rotateGlobe(longitude, latitude, false);
+        sundial.getDayTerminatorLine().rotateRing(longitude, latitude, false);
+        sundial.getDayTerminatorGlow().rotateRing(longitude, latitude, false);
+        sundial.getTinyGlobe().rotateGlobe(longitude, latitude, false);
 
         cetustime = new Cetustime();
         cetusNightList = cetustime.getNightList(currentLocalTime);
@@ -285,14 +280,14 @@ public class Sunface extends Application {
         sundial.getTinyGlobeGroup().setOnDragDropped(event -> rotateGlobe(sundial, Position.GOOGLE_MAPS, event));
 
         sundial.getMatrixLongitude().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LONGITUDE, event));
-        sundial.getMatrixLongitude().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixLongitude().setOnMouseReleased(event -> { mouseButtonList.clear();  updateSunchart(sunchart); });
         sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
-        sundial.getMatrixLongitude().setOnScroll(event -> rotateGlobe(sundial, Position.LONGITUDE, event));
+        sundial.getMatrixLongitude().setOnScroll(event -> { rotateGlobe(sundial, Position.LONGITUDE, event); });
 
         sundial.getMatrixLatitude().setOnMousePressed(event -> recordGlobePosition(sundial, Position.LATITUDE, event));
-        sundial.getMatrixLatitude().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixLatitude().setOnMouseReleased(event -> { mouseButtonList.clear(); updateSunchart(sunchart); });
         sundial.getMatrixLatitude().setOnMouseDragged(event -> rotateGlobe(sundial, Position.LATITUDE, event));
-        sundial.getMatrixLatitude().setOnScroll(event -> rotateGlobe(sundial, Position.LATITUDE, event));
+        sundial.getMatrixLatitude().setOnScroll(event -> { rotateGlobe(sundial, Position.LATITUDE, event); });
 
         sundial.getControlThingyResize().setOnMousePressed(event -> recordWindowSize(primaryStage, dialsGroup, event));
         sundial.getControlThingyResize().setOnMouseReleased(event -> mouseButtonList.clear());
@@ -307,32 +302,32 @@ public class Sunface extends Application {
         sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
         sundial.getMatrixYear().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
-        sundial.getMatrixYear().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixYear().setOnMouseReleased(event -> { mouseButtonList.clear(); updateSunchart(sunchart); });
         sundial.getMatrixYear().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_YEAR, event));
         sundial.getMatrixYear().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_YEAR, event));
 
         sundial.getMatrixMonth().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
-        sundial.getMatrixMonth().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixMonth().setOnMouseReleased(event -> { mouseButtonList.clear();  updateSunchart(sunchart); });
         sundial.getMatrixMonth().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_MONTH, event));
         sundial.getMatrixMonth().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_MONTH, event));
 
         sundial.getMatrixDay().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
-        sundial.getMatrixDay().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixDay().setOnMouseReleased(event -> { mouseButtonList.clear();  updateSunchart(sunchart); });
         sundial.getMatrixDay().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_DAY, event));
         sundial.getMatrixDay().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_DAY, event));
 
         sundial.getMatrixHour().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
-        sundial.getMatrixHour().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixHour().setOnMouseReleased(event -> { mouseButtonList.clear();  updateSunchart(sunchart); });
         sundial.getMatrixHour().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_HOUR, event));
         sundial.getMatrixHour().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_HOUR, event));
 
         sundial.getMatrixMinute().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
-        sundial.getMatrixMinute().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixMinute().setOnMouseReleased(event -> { mouseButtonList.clear();  updateSunchart(sunchart); });
         sundial.getMatrixMinute().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_MINUTE, event));
         sundial.getMatrixMinute().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_MINUTE, event));
 
         sundial.getMatrixWeek().setOnMousePressed(event -> recordCalendarPosition(sundial, event));
-        sundial.getMatrixWeek().setOnMouseReleased(event -> mouseButtonList.clear());
+        sundial.getMatrixWeek().setOnMouseReleased(event -> { mouseButtonList.clear();  updateSunchart(sunchart); });
         sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTime(sundial, OFFSET_BY_WEEK, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTime(sundial, OFFSET_BY_WEEK, event));
 
@@ -579,6 +574,7 @@ public class Sunface extends Application {
 
         // Store current Julian Day Number before updating current time
         long oldJulianDayNumber = Suntime.getJulianDayNumber(offsetLocalTime);
+        int oldYear = offsetLocalTime.get(Calendar.YEAR);
 
         long newTimeInSeconds = newLocalTime.getTimeInMillis() / 1000;
         long currentTimeInSeconds = currentLocalTime.getTimeInMillis() / 1000;
@@ -590,8 +586,7 @@ public class Sunface extends Application {
         currentLocalTime = newLocalTime;
         offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + offsetSeconds * 1000);
 
-        // Update suntimeLocal and sundial objects
-//        suntimeLocal.setObserverTime(offsetLocalTime);
+        // Update suntime and sundial objects
         long timeZoneCorrection = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
 
         GregorianCalendar timeZonedCalendar = new GregorianCalendar();
@@ -604,18 +599,10 @@ public class Sunface extends Application {
         suntimeGlobal.setObserverTime(globalCalendar);
 
         long newJulianDayNumber = suntimeLocal.getJulianDayNumber();
-
-        sundial.setLocalTime(offsetLocalTime);
-        sundial.updateCetusTimer(cetustime);
+        int newYear = timeZonedCalendar.get(Calendar.YEAR);
 
         double phase = suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber();
         double tilt = suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(globalCalendar));
-
-        sundial.getDayGlobe().setDayLightPosition(phase, tilt);
-        sundial.getNightGlobe().setDayLightPosition(phase, tilt);
-        sundial.getTinyGlobe().setDayLightPosition(phase, tilt);
-        sundial.getDayTerminatorLine().setDayLightPosition(phase, tilt);
-        sundial.getDayTerminatorGlow().setDayLightPosition(phase, tilt);
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);
@@ -631,6 +618,15 @@ public class Sunface extends Application {
         secondString = secondString.substring(secondString.length() - 2);
         String weekString = ("00" + offsetLocalTime.get(Calendar.WEEK_OF_YEAR));
         weekString = weekString.substring(weekString.length() - 2);
+
+        sundial.setLocalTime(offsetLocalTime);
+        sundial.updateCetusTimer(cetustime);
+
+        sundial.getDayGlobe().setDayLightPosition(phase, tilt);
+        sundial.getNightGlobe().setDayLightPosition(phase, tilt);
+        sundial.getTinyGlobe().setDayLightPosition(phase, tilt);
+        sundial.getDayTerminatorLine().setDayLightPosition(phase, tilt);
+        sundial.getDayTerminatorGlow().setDayLightPosition(phase, tilt);
 
         sundial.getMatrixHour().setString(hourString);
         sundial.getMatrixMinute().setString(minuteString);
@@ -660,14 +656,8 @@ public class Sunface extends Application {
             sundial.setCetusTime(cetusNightList, timeZonedCalendar);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
 
-            // update chart
-            if (statsWindow.isShowing()) {
-                sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
-            }
-
-            // update debug info
+            updateSunchart(sunchart);
             updateDebugWindow(sundial);
-
         }
     }
 
@@ -680,8 +670,9 @@ public class Sunface extends Application {
             latitude = DEFAULT_LATITUDE;
         }
 
-        initCurrentTime(sundial);
+//        initCurrentTime(sundial);
         sundial.rotateGlobeAnimated(longitude, latitude);
+        sundial.getDayGlobe().getRotateLongitudeTimeline().setOnFinished(event -> initCurrentTime(sundial));
     }
 
     private void recordGlobePosition(Sundial sundial, Position type, MouseEvent event) {
@@ -1123,19 +1114,18 @@ public class Sunface extends Application {
         sundial.toggleGlobeVisibility();
 
         if (sundial.globeVisibleEh) {
-//            sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.OPEN_HAND));
             sundial.getDialCircleFrame().setOnMousePressed(event -> {
                 if (!event.isMiddleButtonDown()) { sundial.setTimeDisplayOpacity(0.2); }
                 recordGlobePosition(sundial, Position.BOTH, event);
             });
             sundial.getDialCircleFrame().setOnMouseReleased(event ->  {
-                sundial.setTimeDisplayOpacity(1);
                 mouseButtonList.clear();
+                sundial.setTimeDisplayOpacity(1);
+                updateSunchart(sunchart);
             });
             sundial.getDialCircleFrame().setOnMouseDragged(event -> rotateGlobe(sundial, event));
 
         } else {
-//            sundial.getDialCircleFrame().setOnMouseEntered(event -> sundial.getDialCircleFrame().setCursor(Cursor.MOVE));
             sundial.getDialCircleFrame().setOnMousePressed(event -> recordWindowPosition(stage, dialsGroup, event));
             sundial.getDialCircleFrame().setOnMouseReleased(event -> mouseButtonList.clear());
             sundial.getDialCircleFrame().setOnMouseDragged(event -> changeWindowPosition(stage, event));
@@ -1247,4 +1237,24 @@ public class Sunface extends Application {
 
         debugTextArea.setText(debugText);
     }
+
+    private void updateSunchart(Sunchart sunchart) {
+
+        if (statsWindow.isShowing()) {
+
+            if (
+                    mouseButtonList.isEmpty() &&
+                        (
+                        longitude != sunchart.getLongitude() ||
+                        latitude != sunchart.getLatitude() ||
+                        offsetLocalTime.get(Calendar.YEAR) != sunchart.getYear()
+                        )
+                    ) {
+
+                sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
+                sunchart.updateChartData();
+            }
+        }
+    }
+
 }

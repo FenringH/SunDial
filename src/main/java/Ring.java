@@ -1,7 +1,4 @@
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -15,11 +12,13 @@ import javafx.util.Duration;
 public class Ring extends Group {
 
     private static final int DIVISIONS = 128;
+    private static final int DEFAULT_ANIMATION_DURATION = 1000;
 
     private double longitude = 0;
     private double latitude = 0;
 
-    private Group ring;
+    private int animationDuration;
+
     private Cylinder cylinder;
     private Sphere sphere;
 
@@ -41,20 +40,14 @@ public class Ring extends Group {
     private Rotate rotatePhase;
 
     public Ring(double radius, double height) {
-        this(radius, height, Color.WHITE);
+        this(radius, height, Color.WHITE, DEFAULT_ANIMATION_DURATION);
     }
 
-    public Ring(double radius, double height, Color color) {
+    public Ring(double radius, double height, Color color, int animationDuration) {
+
         super();
-        ring = new Group();
-        rotateLongitudeTimeline = new Timeline();
-        rotateLatitudeTimeline = new Timeline();
-        getChildren().add(getRing(color, radius, height));
-    }
 
-    private Group getRing(Color color, double radius, double height) {
-
-        ring = new Group();
+        this.animationDuration = animationDuration;
 
         rotateTilt = new Rotate();
         rotatePhase = new Rotate();
@@ -67,6 +60,17 @@ public class Ring extends Group {
 
         rotateLongitude.setAxis(Rotate.Y_AXIS);
         rotateLatitude.setAxis(Rotate.X_AXIS);
+
+
+        rotateLongitudeTimeline = new Timeline();
+        rotateLongitudeTimeline.setCycleCount(1);
+        rotateLongitudeTimeline.setRate(1);
+        rotateLongitudeTimeline.setAutoReverse(false);
+
+        rotateLatitudeTimeline = new Timeline();
+        rotateLatitudeTimeline.setCycleCount(1);
+        rotateLatitudeTimeline.setRate(1);
+        rotateLatitudeTimeline.setAutoReverse(false);
 
         ringMaterial = new PhongMaterial();
         ringMaterial.setDiffuseColor(color);
@@ -84,6 +88,8 @@ public class Ring extends Group {
 
         ambientLight = new AmbientLight(Color.WHITE);
 
+
+        // Gyroscope
         Group ringGripper = new Group();
         ringGripper.getChildren().addAll(sphere, cylinder, ambientLight);
         ringGripper.getTransforms().add(rotateTilt);
@@ -100,44 +106,31 @@ public class Ring extends Group {
         globeHolder.getTransforms().add(rotateLatitude);
         globeHolder.getChildren().addAll(globeGripper);
 
-        this.ring.getChildren().addAll(globeHolder);
-
-        return ring;
+        super.getChildren().add(globeHolder);
     }
 
-    public void rotateRing(double longitude, double latitude, int duration) {
+
+    public void rotateRing(double longitude, double latitude, boolean animated) {
 
         this.longitude = longitude;
         this.latitude = latitude;
 
-        if (rotateLongitudeTimeline != null) { rotateLongitudeTimeline.stop(); }
-        if (rotateLatitudeTimeline != null) { rotateLatitudeTimeline.stop(); }
+        int animationDuration = animated ? this.animationDuration : 1;
 
-        if (duration < 1) {
-            rotateLongitude.setAngle(this.longitude);
-            rotateLatitude.setAngle(this.latitude);
-            return;
-        }
+        if (rotateLongitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLongitudeTimeline.stop(); }
+        if (rotateLatitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLatitudeTimeline.stop(); }
 
-        rotateLongitudeTimeline = new Timeline();
-        rotateLongitudeTimeline.setCycleCount(1);
-        rotateLongitudeTimeline.setRate(1);
-        rotateLongitudeTimeline.setAutoReverse(false);
 
         KeyValue keyValueLongitude = new KeyValue(this.rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(duration), keyValueLongitude);
-
-        rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
-
-
-        rotateLatitudeTimeline = new Timeline();
-        rotateLatitudeTimeline.setCycleCount(1);
-        rotateLatitudeTimeline.setRate(1);
-        rotateLatitudeTimeline.setAutoReverse(false);
+        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
 
         KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(duration), keyValueLatitude);
+        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
 
+        rotateLongitudeTimeline.getKeyFrames().clear();
+        rotateLongitudeTimeline.getKeyFrames().add(keyFrameLongitude);
+
+        rotateLatitudeTimeline.getKeyFrames().clear();
         rotateLatitudeTimeline.getKeyFrames().add(keyFrameLatitude);
 
 
