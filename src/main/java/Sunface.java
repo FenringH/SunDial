@@ -1,9 +1,9 @@
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
-import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.*;
@@ -17,6 +17,8 @@ import javafx.util.Duration;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -158,7 +160,7 @@ public class Sunface extends Application {
         sundial.getTinyGlobe().rotateGlobe(longitude, latitude, false);
 
         cetustime = new Cetustime();
-        cetusNightList = cetustime.getNightList(currentLocalTime);
+//        cetusNightList = cetustime.getNightList(currentLocalTime);
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
 
@@ -271,8 +273,7 @@ public class Sunface extends Application {
         sundial.getTinyGlobeGroup().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
         sundial.getTinyGlobeGroup().setOnMouseReleased(event -> {
             if (!mouseButtonList.isEmpty()) {
-                MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-                toggleGlobe(sundial, mouseButton);
+                tinyGlobeAction(sundial, event);
             }
             mouseButtonList.clear();
         });
@@ -395,13 +396,14 @@ public class Sunface extends Application {
         primaryStage.setOnHidden(event -> timeline.pause());
         primaryStage.setOnShown(event -> timeline.play());
 
+
         // Showtime
         initCurrentTime(sundial);
         primaryStage.show();
         timeline.play();
 
         recordWindowPosition(primaryStage, null);
-        toggleAlwaysOnTop(primaryStage, sundial);
+        setAlwaysOnTop(primaryStage, sundial, alwaysOnTopEh);
 
     }
 
@@ -724,8 +726,8 @@ public class Sunface extends Application {
         if (type == Position.LONGITUDE) { longitude = DEFAULT_LONGITUDE; }
         else if (type == Position.LATITUDE) { latitude = DEFAULT_LATITUDE; }
         else if (type == Position.BOTH){
-            longitude = DEFAULT_LONGITUDE;
-            latitude = DEFAULT_LATITUDE;
+            longitude = customLongitude;
+            latitude = customLatitude;
         }
 
         if (sundial.globeAnimationOnEh) {
@@ -768,9 +770,19 @@ public class Sunface extends Application {
                 latitude = Double.parseDouble(matcher.group(1));
                 longitude = Double.parseDouble(matcher.group(2));
             } catch (NumberFormatException e) {
+                sundial.getInfoText().setText("Catasptrophic error while parsing coordinates!\nPlease don't try again.");
+                sundial.moveGroup(sundial.getInfoTextGroup(), null);
+                sundial.getInfoTextGroup().setVisible(true);
                 debugErrorMessage = "NumberFormatException while parsing string: " + string + "\n" + e.getMessage();
             }
+        } else {
+            sundial.getInfoText().setText("Unable to match coordinates.\nPlease try again.");
+            sundial.moveGroup(sundial.getInfoTextGroup(), null);
+            sundial.getInfoTextGroup().setVisible(true);
         }
+
+        customLongitude = longitude;
+        customLatitude = latitude;
 
         initCurrentTime(sundial);
         sundial.rotateGlobeAnimated(longitude, latitude);
@@ -1157,29 +1169,104 @@ public class Sunface extends Application {
         stage.setY(newPositionY);
     }
 
-    private void toggleGlobe(Sundial sundial, MouseButton mouseButton) {
+    private void tinyGlobeAction(Sundial sundial, MouseEvent event) {
 
-        if (mouseButton.equals(MouseButton.SECONDARY)) {
-            mouseButtonList.clear();
-            sundial.toggleCetusTime();
+        mouseButtonList.clear();
+
+        // LMB action (toggle Globe)
+        if (event.getButton().equals(MouseButton.PRIMARY)) {
+            sundial.toggleGlobeVisibility();
             return;
         }
 
-        if (mouseButton.equals(MouseButton.MIDDLE)) {
-            mouseButtonList.clear();
+        // RMB action (toggle Cetus time)
+        if (event.getButton().equals(MouseButton.SECONDARY)) {
+
+            if (sundial.cetusTimeVisibleEh()) {
+                sundial.setCetusTimeVisibility(false);
+            } else {
+
+                if (cetustime.cetusTimeExpiredEh()) {
+
+                    RefreshCetusDataTask refreshCetusDataTask = new RefreshCetusDataTask(cetustime);
+
+                    refreshCetusDataTask.setOnScheduled(refreshEvent -> {
+                        sundial.getInfoText().setText("Syncing with Cetus...");
+                        sundial.moveGroup(sundial.getInfoTextGroup(), event);
+                        sundial.getInfoTextGroup().setVisible(true);
+                    });
+
+                    refreshCetusDataTask.setOnFailed(refreshEvent -> {
+                        sundial.getInfoText().setText("Failed to sync with Cetus.\nPlease try again.");
+                        sundial.moveGroup(sundial.getInfoTextGroup(), event);
+                        sundial.getInfoTextGroup().setVisible(true);
+                    });
+
+                    refreshCetusDataTask.setOnSucceeded(refreshEvent -> {
+                        showCetusTime(sundial);
+                        sundial.getInfoTextGroup().setVisible(false);
+                    });
+
+                    ExecutorService executorService = Executors.newSingleThreadExecutor();
+                    executorService.execute(refreshCetusDataTask);
+                    executorService.shutdown();
+
+                } else {
+                    showCetusTime(sundial);
+                }
+            }
+
+            return;
+        }
+
+        // MMB action (reset Coordinates)
+        if (event.getButton().equals(MouseButton.MIDDLE)) {
             resetGlobePosition(sundial, Position.BOTH);
             return;
         }
 
-        sundial.toggleGlobeVisibility();
+    }
+
+    private void showCetusTime(Sundial sundial) {
+
+        if (cetustime.cetusTimeOkEh()) {
+            sundial.setCetusTime(cetustime.getNightList(offsetLocalTime), offsetLocalTime);
+            sundial.setCetusTimeVisibility(true);
+        } else {
+            sundial.getInfoText().setText("Cetus time unavailable: \n" + cetustime.getResult());
+            sundial.moveGroup(sundial.getInfoTextGroup(), null);
+            sundial.getInfoTextGroup().setVisible(true);
+        }
+
+        updateDebugWindow(sundial);
+
+    }
+
+    private class RefreshCetusDataTask extends Task<Boolean> {
+
+        Cetustime cetustime;
+
+        public RefreshCetusDataTask(Cetustime cetustime) {
+            this.cetustime = cetustime;
+        }
+
+        @Override
+        protected Boolean call() {
+            System.out.println("Starting cetustime request... " + cetustime.cetusTimeExpiredEh());
+            this.cetustime.requestNewData();
+            System.out.println("Cetustime request processed... " + cetustime.cetusTimeExpiredEh());
+            return cetustime.cetusTimeOkEh();
+        }
+    }
+
+    private void setAlwaysOnTop(Stage stage, Sundial sundial, boolean alwaysOnTopEh) {
+        stage.setAlwaysOnTop(alwaysOnTopEh);
+        sundial.setAlwaysOnTop(alwaysOnTopEh);
     }
 
     private void toggleAlwaysOnTop(Stage stage, Sundial sundial) {
-
         alwaysOnTopEh = !alwaysOnTopEh;
-
-        stage.setAlwaysOnTop(alwaysOnTopEh);
-        sundial.setAlwaysOnTop(alwaysOnTopEh);
+        setAlwaysOnTop(stage, sundial, alwaysOnTopEh);
     }
 
     private void updateDebugWindow(Sundial sundial) {
@@ -1264,11 +1351,13 @@ public class Sunface extends Application {
                 + "Myx = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMyx() + "\n"
                 + "Myy = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMyy() + "\n"
 //                + "Cetus nightList = " + cetusNightListString + "\n"
-//                + "Cetus okEh = " + cetustime.isOkEh() + "\n"
-//                + "Cetus result = " + cetustime.getResult() + "\n"
+                + "Cetus okEh = " + cetustime.cetusTimeOkEh() + "\n"
+                + "Cetus result = " + cetustime.getResult() + "\n"
+                + "Cetus data expired = " + cetustime.cetusTimeExpiredEh() + "\n"
 //                + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
-//                + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
+                + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
 //                + "Cetus expiry string = " + cetusExpiryDate + "\n"
+                + "Cetus reloadCounter: " + cetustime.getReloadCounter() + "\n"
                 + "Cetus dataMap: \n" + cetusDataString + "\n"
                 ;
 

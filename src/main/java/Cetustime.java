@@ -21,6 +21,8 @@ public class Cetustime {
     private static final String ISDAY_KEY = "isDay";
     private static final String EXPIRY_KEY = "expiry";
 
+    private static final long CETUS_DATA_EXPIRY_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in ms
+
     public static final int DAY_LENGTH = 100 * 60 * 1000;              // in ms
     public static final int NIGHT_LENGTH = 50 * 60 * 1000;             // in ms
     public static final int CYCLE_LENGTH = DAY_LENGTH + NIGHT_LENGTH;  // in ms
@@ -31,20 +33,30 @@ public class Cetustime {
     private boolean dayEh;
     private GregorianCalendar expiry;
 
-    private boolean okEh;
+    private GregorianCalendar lastUpdateDate;
+
+    private boolean cetusTimeOkEh;
+    private boolean cetusTimeExpiredEh;
+
+    private int reloadCounter;
+
     private String result;
 
     public Cetustime() {
 
-        okEh = true;
-        result = "success";
+        cetusTimeOkEh = false;
+        cetusTimeExpiredEh = true;
+        result = "unknown";
+
+        lastUpdateDate = new GregorianCalendar();
+
+        reloadCounter = 0;
 
         dataMap = new HashMap<>();
 
         dayEh = false;
         expiry = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 
-        requestNewData();
     }
 
     public boolean cetusDayEh() {
@@ -56,8 +68,6 @@ public class Cetustime {
     }
 
     public void requestNewData() {
-
-        okEh = true;
 
         try {
 
@@ -72,14 +82,22 @@ public class Cetustime {
             dayEh = dataMap.get(ISDAY_KEY).equals("true");
             expiry = parseDate(dataMap.get(EXPIRY_KEY), expiry.getTimeZone());
 
+            lastUpdateDate = new GregorianCalendar();
+
+            cetusTimeOkEh = true;
+            cetusTimeExpiredEh = false;
+            result = "Success";
+
+            reloadCounter++;
+
         } catch (IOException e) {
-            okEh = false;
+            cetusTimeOkEh = false;
             result = "failed with IOException: " + e.getMessage();
         } catch (NullPointerException e) {
-            okEh = false;
+            cetusTimeOkEh = false;
             result = "failed with NullPointerException: " + e.getMessage();
         } catch (NumberFormatException e) {
-            okEh = false;
+            cetusTimeOkEh = false;
             result = "failed with NumberFormatException: " + e.getMessage();
         }
     }
@@ -87,6 +105,8 @@ public class Cetustime {
     public ArrayList<ArrayList<GregorianCalendar>> getNightList(GregorianCalendar date) {
 
         ArrayList<ArrayList<GregorianCalendar>> nightList = new ArrayList<>();
+
+        if (!cetusTimeOkEh) { return nightList; }
 
         GregorianCalendar dateUtc = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         dateUtc.setTimeInMillis(date.getTimeInMillis());
@@ -177,24 +197,36 @@ public class Cetustime {
 
     private String readContent(URLConnection connection) throws IOException {
 
-        String content = "";
+        StringBuilder content = new StringBuilder();
 
-        if (connection == null) { return content; }
+        if (connection == null) { return content.toString(); }
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
         String input;
-        while ((input = bufferedReader.readLine()) != null) { content += input + "\n"; }
+        while ((input = bufferedReader.readLine()) != null) { content.append(input).append("\n"); }
 
-        if (bufferedReader != null) { bufferedReader.close(); }
+        bufferedReader.close();
 
-        return content;
+        return content.toString();
+    }
+
+    public boolean cetusTimeExpiredEh() {
+
+        long curentTimeMs = new GregorianCalendar().getTimeInMillis();
+        long lastUpdateTimeMs = lastUpdateDate.getTimeInMillis();
+
+        if (abs(curentTimeMs - lastUpdateTimeMs) > CETUS_DATA_EXPIRY_TIMEOUT) {
+            cetusTimeExpiredEh = true;
+        }
+
+        return cetusTimeExpiredEh;
     }
 
 
     // Gettttterers
-    public boolean isOkEh() {
-        return okEh;
+    public boolean cetusTimeOkEh() {
+        return cetusTimeOkEh;
     }
 
     public String getResult() {
@@ -203,5 +235,9 @@ public class Cetustime {
 
     public HashMap<String, String> getDataMap() {
         return dataMap;
+    }
+
+    public int getReloadCounter() {
+        return reloadCounter;
     }
 }

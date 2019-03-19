@@ -115,8 +115,9 @@ public class Sundial {
     private static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
             "\nLMB : toggle Globe-mode" +
             "\nRMB : toggle Cetus time" +
-            "\nMMB : reset Coordinates" +
-            "\nDRAG-DROP : drag GoogleMaps url to set coordinates";
+            "\nMMB : reset Coordinates to DEFAULT" +
+            "\nDRAG-DROP : drag and drop GoogleMaps url ..." +
+            "\n... to set DEFAULT Coordinates";
     private static final String HELPTEXT_GLOBE = "GLOBE" +
             "\nLMB : rotate Globe (fast)" +
             "\nRMB : rotate Globe (slow)" +
@@ -333,7 +334,7 @@ public class Sundial {
     public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
     public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALHOUR_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALHOUR_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 32,255, 1.0), 10.0, 0.50, 0, 0);";
     public static final String LOCALTIME_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
@@ -539,8 +540,6 @@ public class Sundial {
     private ArrayList<DotMatrix> cetusTimeMatrixList;
     private DotMatrix matrixTimeZone;
 
-    private TextArea helpTextArea;
-
     private Globe dayGlobe;
     private Globe nightGlobe;
     private Ring dayTerminatorLine;
@@ -573,10 +572,14 @@ public class Sundial {
     private Group helpOverlay;
     private ArrayList<Group> helpMarkers;
     private Group nightModeOverlay;
+
+    private Text helpText;
     private Group helpTextGroup;
+    private Text infoText;
+    private Group infoTextGroup;
 
     public boolean globeVisibleEh = false;
-    public boolean cetusTimeVisibleEh = false;
+    private boolean cetusTimeVisibleEh = false;
     public boolean ledAnimationOnEh = true;
     public boolean globeAnimationOnEh = true;
     public boolean helpEh = false;
@@ -1215,7 +1218,7 @@ public class Sundial {
 
         dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
-        dialLocalHourGroup.setStyle(LOCALTIME_GLOW);
+        dialLocalHourGroup.setStyle(LOCALHOUR_GLOW);
         dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
         dialLocalHourGroup.setMouseTransparent(true);
 
@@ -1224,15 +1227,15 @@ public class Sundial {
 
         Polygon dialLocalMinutePoly = new Polygon(
                 CENTER_X, LOCALTIME_DIAL_LENGTH * 0.65,
-                CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH / 2, LOCALTIME_DIAL_LENGTH,
-                CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
+                CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, LOCALTIME_DIAL_LENGTH,
+                CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, LOCALTIME_DIAL_LENGTH,
                 CENTER_X - LOCALTIME_MINUTE_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.85,
                 CENTER_X - LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT,
                 CENTER_X, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT * 1.75,
                 CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, LOCALMINUTE_OFFSET + LOCALMINUTE_HEIGHT,
                 CENTER_X + LOCALTIME_MINUTE_WIDTH / 2, LOCALTIME_DIAL_LENGTH * 0.85,
-                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH, LOCALTIME_DIAL_LENGTH,
-                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH / 2, LOCALTIME_DIAL_LENGTH,
+                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, LOCALTIME_DIAL_LENGTH,
+                CENTER_X + LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, LOCALTIME_DIAL_LENGTH,
                 CENTER_X, LOCALTIME_DIAL_LENGTH * 0.65
         );
         dialLocalMinutePoly.setFill(Color_Of_Void);
@@ -1423,7 +1426,7 @@ public class Sundial {
         dialArcDayLength.setOpacity(DAYLENGTH_ARC_OPACITY);
         dialArcDayLength.setMouseTransparent(true);
 
-        matrixDayLength = new DotMatrix("00h00m00s", Color_Of_LocalTime);
+        matrixDayLength = new DotMatrix("00h00m", Color_Of_LocalTime);
         matrixDayLength.setScaleX(MATRIX_DAYLENGTH_SCALE);
         matrixDayLength.setScaleY(MATRIX_DAYLENGTH_SCALE);
         matrixDayLength.setLayoutX(CENTER_X - matrixDayLength.getLayoutBounds().getWidth() / 2);
@@ -1566,7 +1569,7 @@ public class Sundial {
         helpOverlay.setVisible(false);
 
 
-        Text helpText = new Text();
+        helpText = new Text();
         helpText.setFont(new Font(12));
         helpText.setStroke(Color.WHITE);
         helpText.setFill(Color_Of_Void);
@@ -1594,6 +1597,36 @@ public class Sundial {
         helpTextGroup = new Group(helpTextRectangle, helpText);
         helpTextGroup.setMouseTransparent(true);
         helpTextGroup.setVisible(false);
+
+
+        infoText = new Text();
+        infoText.setFont(new Font(12));
+        infoText.setStroke(Color.WHITE);
+        infoText.setFill(Color_Of_Void);
+        infoText.setText(HELPTEXT_DEFAULT);
+        infoText.setTranslateX(5);
+        infoText.setTranslateY(15);
+
+        Rectangle infoTextRectangle = new Rectangle(0, 0, 20, 20);
+        infoTextRectangle.setArcWidth(10);
+        infoTextRectangle.setArcHeight(10);
+        infoTextRectangle.setStroke(Color_Of_Void);
+        infoTextRectangle.setFill(Color.BLACK);
+        infoTextRectangle.setOpacity(0.50);
+
+        infoTextRectangle.widthProperty().bind(Bindings.createDoubleBinding(() -> {
+            double size = infoText.layoutBoundsProperty().get().getWidth();
+            return size + 10;
+        }, infoText.layoutBoundsProperty()));
+
+        infoTextRectangle.heightProperty().bind(Bindings.createDoubleBinding(() -> {
+            double size = infoText.layoutBoundsProperty().get().getHeight();
+            return size + 5;
+        }, infoText.layoutBoundsProperty()));
+
+        infoTextGroup = new Group(infoTextRectangle, infoText);
+        infoTextGroup.setMouseTransparent(true);
+        infoTextGroup.setVisible(false);
 
 
         // LAYERS
@@ -1642,6 +1675,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(helpOverlay);
         foregroundGroup.getChildren().add(controlThingyHelp);
         foregroundGroup.getChildren().add(helpTextGroup);
+        foregroundGroup.getChildren().add(infoTextGroup);
 
         foregroundGroup.getChildren().add(nightModeOverlay);
 
@@ -1706,7 +1740,7 @@ public class Sundial {
         matrixLatitude.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); matrixLatitude.setCursor(Cursor.DEFAULT); setGroupGlow(matrixLatitude, MATRIX_SHADOW); });
 
         tinyGlobeFrame.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_TINYGLOBE); tinyGlobeFrame.setCursor(Cursor.HAND); tinyGlobeFrame.setStyle(MATRIX_GLOW); });
-        tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(MATRIX_SHADOW); });
+        tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(MATRIX_SHADOW); if (infoTextGroup.isVisible()) { infoTextGroup.setVisible(false); } } );
 
         dialMarginCircle.setOnMouseEntered(event -> { helpText.setText(HELPTEXT_WINDOW); dialMarginCircle.setCursor(Cursor.MOVE); });
         dialMarginCircle.setOnMouseExited(event -> {  helpText.setText(HELPTEXT_DEFAULT); dialMarginCircle.setCursor(Cursor.DEFAULT); });
@@ -1725,16 +1759,24 @@ public class Sundial {
 
         dialsGroup.setOnMouseMoved(event -> {
             if (helpTextGroup.isVisible()) { moveGroup(helpTextGroup, event); }
+            if (infoTextGroup.isVisible()) { moveGroup(infoTextGroup, event); }
         });
 
     }
 
 
     // Utility
-    private void moveGroup(Node node, MouseEvent event) {
+    public void moveGroup(Node node, MouseEvent event) {
 
-        double mouseX = event.getX();
-        double mouseY = event.getY();
+        double mouseX, mouseY;
+
+        if (event != null) {
+            mouseX = event.getX();
+            mouseY = event.getY();
+        } else {
+            mouseX = node.getLayoutBounds().getMaxX();
+            mouseY = node.getLayoutBounds().getMaxY();
+        }
 
         double width = node.getLayoutBounds().getWidth();
         double height = node.getLayoutBounds().getHeight();
@@ -1907,8 +1949,10 @@ public class Sundial {
 
         String hourString = ("00" + calendar.get(Calendar.HOUR_OF_DAY));
         hourString = hourString.substring(hourString.length() - 2);
+
         String minuteString = ("00" + calendar.get(Calendar.MINUTE));
         minuteString = minuteString.substring(minuteString.length() - 2);
+
         String secondString = ("00" + calendar.get(Calendar.SECOND));
         secondString = secondString.substring(secondString.length() - 2);
 
@@ -1921,61 +1965,51 @@ public class Sundial {
 
         String hourString = ("00" + calendar.get(Calendar.HOUR_OF_DAY));
         hourString = hourString.substring(hourString.length() - 2);
+
         String minuteString = ("00" + minutes);
         minuteString = minuteString.substring(minuteString.length() - 2);
 
         return hourString + ":" + minuteString;
     }
 
-    public static String getShortTimeLengthString(double seconds) {
+    public static String getShortTimeLengthString(double inputSeconds) {
 
-        double precisionDays = seconds / (24 * 60 * 60);
-        int days = (int) floor(precisionDays);
-        double precisionHours = (precisionDays - days) * 24;
+        double precisionHours = inputSeconds / (60 * 60);
         int hours = (int) floor(precisionHours);
+
         double precisionMins = (precisionHours - hours) * 60;
-        int mins = (int) floor(precisionMins);
-        double precisionSecs = (precisionMins - mins) * 60;
-        int secs = (int) floor(precisionSecs);
+        int minutes = (int) floor(precisionMins);
+
+        double precisionSecs = (precisionMins - minutes) * 60;
+        int seconds = (int) floor(precisionSecs);
 
         String hoursString = ("00" + hours);
         hoursString = hoursString.substring(hoursString.length() - 2);
-        String minsString = ("00" + mins);
-        minsString = minsString.substring(minsString.length() - 2);
-        String secsString = ("00" + secs);
-        secsString = secsString.substring(secsString.length() - 2);
 
-        String result = "";
-        result += hoursString + "h";
-        result += minsString + "m";
-        result += secsString + "s";
+        String minutesString = ("00" + minutes);
+        minutesString = minutesString.substring(minutesString.length() - 2);
 
-        return result;
+        String secondsString = ("00" + seconds);
+        secondsString = secondsString.substring(secondsString.length() - 2);
+
+        return hoursString + "h" + minutesString + "m" + secondsString + "s";
     }
 
-    public static String getShorterTimeLengthString(double seconds) {
+    public static String getShorterTimeLengthString(double inputSeconds) {
 
-        double precisionDays = seconds / (24 * 60 * 60);
-        int days = (int) floor(precisionDays);
-        double precisionHours = (precisionDays - days) * 24;
+        double precisionHours = inputSeconds / (60 * 60);
         int hours = (int) floor(precisionHours);
-        double precisionMins = (precisionHours - hours) * 60;
-        int mins = (int) floor(precisionMins);
-        double precisionSecs = (precisionMins - mins) * 60;
-        int secs = (int) floor(precisionSecs);
 
-        mins += (int) round(precisionSecs / 60f);
+        double precisionMins = (precisionHours - hours) * 60;
+        int minutes = (int) round(precisionMins);
 
         String hoursString = ("00" + hours);
         hoursString = hoursString.substring(hoursString.length() - 2);
-        String minsString = ("00" + mins);
-        minsString = minsString.substring(minsString.length() - 2);
 
-        String result = "";
-        result += hoursString + "h";
-        result += minsString + "m";
+        String minutesString = ("00" + minutes);
+        minutesString = minutesString.substring(minutesString.length() - 2);
 
-        return result;
+        return hoursString + "h" + minutesString + "m";
     }
 
     public static String formatCoordinateToString(double coordinate, String suffixPositive, String suffixNegative) {
@@ -2158,6 +2192,14 @@ public class Sundial {
         return helpTextGroup;
     }
 
+    public Group getInfoTextGroup() {
+        return infoTextGroup;
+    }
+
+    public Text getInfoText() {
+        return infoText;
+    }
+
     // Setters
     public void updateCetusTimer(Cetustime cetustime) {
 
@@ -2196,15 +2238,20 @@ public class Sundial {
     }
 
     public void setHorizon(GregorianCalendar sunrise, GregorianCalendar sunset) {
+
         this.sunrise = sunrise;
         this.sunset = sunset;
+
         this.daylength = (this.sunset.getTimeInMillis() - this.sunrise.getTimeInMillis()) / 1000;
+
+        long daySeconds = 24 * 60 * 60;
+        long clampedDayLength = this.daylength >= daySeconds ? daySeconds : this.daylength;
 
         setHorizonDialAngle(getAbsoluteAngle(this.sunrise), getAbsoluteAngle(this.sunset));
 
         matrixSunrise.setString(getShorterTimeString(this.sunrise));
         matrixSunset.setString(getShorterTimeString(this.sunset));
-        matrixDayLength.setString(getShortTimeLengthString(this.daylength));
+        matrixDayLength.setString(getShorterTimeLengthString(clampedDayLength));
     }
 
     public void setLocalTime(GregorianCalendar localTime) {
@@ -2389,12 +2436,28 @@ public class Sundial {
 
     public void updateDialMarkers() {
 
+        int localHour = localTime.get(Calendar.HOUR_OF_DAY);
+        int localMinute = localTime.get(Calendar.MINUTE);
+
         int dialMarkerRotateListSize = dialMarkerRotateList.size();
         for (int i = 0; i < dialMarkerRotateListSize; i++) {
+
             dialMarkerRotateList.get(i).setAngle(getNightCompressionAngle(i * 360d / 96d));
+
             if (i % 4 == 0) {
+
+                int hourIndex = i / 4;
+                double partial = localMinute / 60d;
+
                 double angle = dialMarkerRotateList.get(i).getAngle();
-                hourMarkerMatrixList.get(i / 4).setRotate(-1 * angle);
+                hourMarkerMatrixList.get(hourIndex).setRotate(-1 * angle);
+                hourMarkerMatrixList.get(hourIndex).setStroke(new Color(1, 0.5, 0, 0));
+
+                if (hourIndex == localHour) {
+                    hourMarkerMatrixList.get(hourIndex).setStroke(new Color(1, 0.5, 0, 1 - partial));
+                    hourMarkerMatrixList.get((hourIndex + 1) % 24).setStroke(new Color(1, 0.5, 0, partial));
+                }
+
             }
         }
 
@@ -2561,17 +2624,18 @@ public class Sundial {
     }
 
     public void toggleCetusTime() {
-
-        if(cetusTimeVisibleEh) {
-            cetusTimeVisibleEh = false;
-        } else {
-            cetusTimeVisibleEh = true;
-        }
-
+        cetusTimeVisibleEh = !cetusTimeVisibleEh;
         setCetusTimeVisibility(cetusTimeVisibleEh);
     }
 
-    private void setCetusTimeVisibility(boolean visibleEh) {
+    public boolean cetusTimeVisibleEh() {
+        return cetusTimeVisibleEh;
+    }
+
+    public void setCetusTimeVisibility(boolean visibleEh) {
+
+        cetusTimeVisibleEh = visibleEh;
+
         cetusArcGroup.setVisible(visibleEh);
         cetusLineGroup.setVisible(visibleEh);
         cetusTimer.setVisible(visibleEh);
