@@ -1,7 +1,6 @@
 import javafx.animation.*;
 import javafx.beans.binding.Bindings;
 import javafx.scene.*;
-import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -1071,7 +1070,7 @@ public class Sundial {
             markerMinute.setTranslateX(CENTER_X - LOCALMINUTE_WIDTH / 2);
             markerMinute.setTranslateY(LOCALMINUTE_OFFSET);
             markerMinute.setFill(MINUTE_MARKER_GRADIENT);
-//            markerMinute.setStroke(Color.BLACK);
+//            markerMinute.setFill(Color.BLACK);
 //            markerMinute.setStrokeWidth(0.5d);
             markerMinute.setOpacity(opacity);
 //            markerMinute.setBlendMode(BlendMode.OVERLAY);
@@ -2218,10 +2217,10 @@ public class Sundial {
         cetusTimer.setString(getShortTimeLengthString(offsetTime / 1000d).substring(1));
 
         if (i % 2 == 0) {
-            cetusTimer.setStroke(Color_Of_CetusNight);
+            cetusTimer.setFill(Color_Of_CetusNight);
             cetusTimer.setStyle(CETUS_MATRIX_SHADOW_NIGHT);
         } else {
-            cetusTimer.setStroke(Color_Of_CetusDay);
+            cetusTimer.setFill(Color_Of_CetusDay);
             cetusTimer.setStyle(CETUS_MATRIX_SHADOW_DAY);
         }
     }
@@ -2436,30 +2435,30 @@ public class Sundial {
 
     public void updateDialMarkers() {
 
-        int localHour = localTime.get(Calendar.HOUR_OF_DAY);
-        int localMinute = localTime.get(Calendar.MINUTE);
-
         int dialMarkerRotateListSize = dialMarkerRotateList.size();
         for (int i = 0; i < dialMarkerRotateListSize; i++) {
 
             dialMarkerRotateList.get(i).setAngle(getNightCompressionAngle(i * 360d / 96d));
 
             if (i % 4 == 0) {
-
                 int hourIndex = i / 4;
-                double partial = localMinute / 60d;
-
                 double angle = dialMarkerRotateList.get(i).getAngle();
                 hourMarkerMatrixList.get(hourIndex).setRotate(-1 * angle);
-                hourMarkerMatrixList.get(hourIndex).setStroke(new Color(1, 0.5, 0, 0));
-
-                if (hourIndex == localHour) {
-                    hourMarkerMatrixList.get(hourIndex).setStroke(new Color(1, 0.5, 0, 1 - partial));
-                    hourMarkerMatrixList.get((hourIndex + 1) % 24).setStroke(new Color(1, 0.5, 0, partial));
-                }
-
+                hourMarkerMatrixList.get(hourIndex).setFill(new Color(1.00, 0.70, 0.20, 1.00));
             }
         }
+
+
+        int localHour = localTime.get(Calendar.HOUR_OF_DAY);
+        int localMinute = localTime.get(Calendar.MINUTE);
+
+        int hourIndexStart = (localHour + 12) % 24;
+        int hourIndexEnd = (localHour + 12 + 1) % 24;
+        double partial = localMinute / 60d;
+
+        hourMarkerMatrixList.get(hourIndexStart).setFill(new Color(1, 0.70 + (0.30 * (1 - partial)), 0.20 + (0.80 * (1 - partial)), 1));
+        hourMarkerMatrixList.get(hourIndexEnd).setFill(new Color(1, 0.70 + (0.30 * partial), 0.20 + (0.80 * partial), 1));
+
 
         int cetusMarkerRotateListSize = cetusMarkerRotateList.size();
         for (int i = 0; i < cetusMarkerRotateListSize; i++) {

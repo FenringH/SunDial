@@ -69,10 +69,10 @@ public class DotMatrix extends Group {
         if (dotPaint == null) { this.dotPaint = DEFAULT_DOT_PAINT; }
         else { this.dotPaint = dotPaint; }
 
-        getChildren().add(getStringGroup(this.string, this.dotPaint));
+        super.getChildren().add(getStringGroup(this.string));
     }
 
-    private Group getCharGroup(int charIndex, char c, Paint dotPaint) {
+    private Group getCharGroup(int charIndex, char c) {
 
         Group charGroup = new Group();
 
@@ -86,7 +86,9 @@ public class DotMatrix extends Group {
                 double positionX = (dx * 2.0) + 1.0;
                 double positionY = ((MATRIX_COLUMNS - dy) * 2.0) + 3.0;
 
-                Circle dot = new Circle(positionX, positionY, DOT_SIZE, dotPaint);
+                Circle dot = new Circle(positionX, positionY, DOT_SIZE);
+                dot.setFill(dotPaint);
+
                 charGroup.getChildren().add(dot);
 
                 dots[charIndex][dy][dx] = dot;
@@ -96,7 +98,7 @@ public class DotMatrix extends Group {
         return charGroup;
     }
 
-    private Group getStringGroup(String string, Paint dotPaint) {
+    private Group getStringGroup(String string) {
 
         int stringSize = string.length();
         if (stringSize > MAX_CHARS) { string = string.substring(0, MAX_CHARS - 1); }
@@ -105,7 +107,7 @@ public class DotMatrix extends Group {
 
         for (int index = 0; index < stringSize; index++) {
             char regularChar = string.charAt(index);
-            Group digitChar = this.getCharGroup(index, regularChar, dotPaint);
+            Group digitChar = this.getCharGroup(index, regularChar);
             double shiftX = (MATRIX_COLUMNS + 1) * 2 * index;
             digitChar.setLayoutX(shiftX);
             stringGroup.getChildren().add(digitChar);
@@ -181,7 +183,37 @@ public class DotMatrix extends Group {
         }
     }
 
-    public void setStroke(Paint dotPaint) {
+    public void setFill(Paint dotPaint) {
         this.dotPaint = dotPaint;
+
+        for (Circle[][] dotMatrix : dots) {
+            for (Circle[] dotLine : dotMatrix) {
+                for (Circle dot : dotLine) {
+                    dot.setFill(this.dotPaint);
+                }
+            }
+        }
+    }
+
+    public void setStroke(Paint strokePaint) {
+
+        for (Circle[][] dotMatrix : dots) {
+            for (Circle[] dotLine : dotMatrix) {
+                for (Circle dot : dotLine) {
+                    dot.setStroke(strokePaint);
+                }
+            }
+        }
+    }
+
+    public void setStrokeWidth(double width) {
+
+        for (Circle[][] dotMatrix : dots) {
+            for (Circle[] dotLine : dotMatrix) {
+                for (Circle dot : dotLine) {
+                    dot.setStrokeWidth(width);
+                }
+            }
+        }
     }
 }

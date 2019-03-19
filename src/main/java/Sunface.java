@@ -160,7 +160,6 @@ public class Sunface extends Application {
         sundial.getTinyGlobe().rotateGlobe(longitude, latitude, false);
 
         cetustime = new Cetustime();
-//        cetusNightList = cetustime.getNightList(currentLocalTime);
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
 
@@ -681,6 +680,7 @@ public class Sunface extends Application {
 
         sundial.setLocalTime(offsetLocalTime);
         sundial.updateCetusTimer(cetustime);
+        sundial.updateDialMarkers();
 
         sundial.getDayGlobe().setDayLightPosition(phase, tilt);
         sundial.getNightGlobe().setDayLightPosition(phase, tilt);
