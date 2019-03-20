@@ -2291,8 +2291,15 @@ public class Sundial {
         for (int i = 0; i < ledList.size(); i++) {
 
             if (ledOn.get(i)) {
+
                 if(i == indexOn) { continue; }
-                timelineList.get(i).play();
+
+                if (ledAnimationOnEh) {
+                    timelineList.get(i).play();
+                } else {
+                    ledList.get(i).setOpacity(0);
+                }
+
                 ledOn.set(i, false);
             }
         }
@@ -2763,21 +2770,6 @@ public class Sundial {
             }
         }
 
-        for (Timeline timeline : dialLocalSecondLedTransitionList) {
-            if (ledAnimationOnEh) {
-                timeline.setRate(1);
-            } else {
-                timeline.setRate(LED_OPACITY_DURATION);
-            }
-        }
-
-        for (Timeline timeline : dialLocalMinuteLedTransitionList) {
-            if (ledAnimationOnEh) {
-                timeline.setRate(1);
-            } else {
-                timeline.setRate(LED_OPACITY_DURATION);
-            }
-        }
     }
 
     public void toggleHelp() {
