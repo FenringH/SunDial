@@ -120,7 +120,7 @@ public class Sunchart {
         stringConverterAxisX = new StringConverterAxisX<>(this.calendar);
         stringConverterAxisY = new StringConverterAxisY<>();
 
-        NumberAxis suntimeAxisX = new NumberAxis("Date", 0, 365, 1);
+        NumberAxis suntimeAxisX = new NumberAxis("Date", 0, DAYS_IN_YEAR, 1);
         suntimeAxisX.setTickLabelFormatter(stringConverterAxisX);
         suntimeAxisX.setForceZeroInRange(true);
 
@@ -254,7 +254,14 @@ public class Sunchart {
         chartTitle = formatTitle();
         suntimeLineChart.setTitle(this.chartTitle);
 
+        GregorianCalendar dayCalendar = new GregorianCalendar();
+        dayCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+
         for (int i = 0; i < dataSize; i++) {
+
+            int dayOfYear = 1 + i * CHART_RESOLUTION;
+
+            dayCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
 
             stringConverterAxisX.setCalendar(calendar);
 
@@ -266,9 +273,9 @@ public class Sunchart {
             sunsetDataList.get(i).setYValue(sunsetTime);
             daylenghDataList.get(i).setYValue(daylength);
 
-            sunriseTooltipList.get(i).setText(getInfoString(calendar, sunriseTime));
-            sunsetTooltipList.get(i).setText(getInfoString(calendar, sunsetTime));
-            daylengthTooltipList.get(i).setText(getInfoString(calendar, daylength));
+            sunriseTooltipList.get(i).setText(getInfoString(dayCalendar, sunriseTime));
+            sunsetTooltipList.get(i).setText(getInfoString(dayCalendar, sunsetTime));
+            daylengthTooltipList.get(i).setText(getInfoString(dayCalendar, daylength));
 
             Tooltip.install(sunriseDataList.get(i).getNode(), sunriseTooltipList.get(i));
             Tooltip.install(sunsetDataList.get(i).getNode(), sunsetTooltipList.get(i));
