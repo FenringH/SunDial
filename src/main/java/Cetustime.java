@@ -21,7 +21,7 @@ public class Cetustime {
     private static final String ISDAY_KEY = "isDay";
     private static final String EXPIRY_KEY = "expiry";
 
-    private static final long CETUS_DATA_EXPIRY_TIMEOUT = 10000; /*3 * 60 * 60 * 1000;*/ // 3 hours in ms
+    private static final long CETUS_DATA_EXPIRY_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in ms
 
     public static final int DAY_LENGTH = 100 * 60 * 1000;              // in ms
     public static final int NIGHT_LENGTH = 50 * 60 * 1000;             // in ms

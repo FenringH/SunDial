@@ -145,11 +145,7 @@ public class Sunface extends Application {
                 .nightCompression(0)
                 .build();
 
-        sundial.getDayGlobe().rotateGlobe(longitude, latitude, false);
-        sundial.getNightGlobe().rotateGlobe(longitude, latitude, false);
-        sundial.getDayTerminatorLine().rotateRing(longitude, latitude, false);
-        sundial.getDayTerminatorGlow().rotateRing(longitude, latitude, false);
-        sundial.getTinyGlobe().rotateGlobe(longitude, latitude, false);
+        sundial.rotateGlobe(longitude, latitude);
 
         cetustime = new Cetustime();
 
@@ -630,7 +626,6 @@ public class Sunface extends Application {
 
         // Store current Julian Day Number before updating current time
         long oldJulianDayNumber = Suntime.getJulianDayNumber(offsetLocalTime);
-        int oldYear = offsetLocalTime.get(Calendar.YEAR);
 
         long newTimeInSeconds = newLocalTime.getTimeInMillis() / 1000;
         long currentTimeInSeconds = currentLocalTime.getTimeInMillis() / 1000;
@@ -655,7 +650,6 @@ public class Sunface extends Application {
         suntimeGlobal.setObserverTime(globalCalendar);
 
         long newJulianDayNumber = suntimeLocal.getJulianDayNumber();
-        int newYear = timeZonedCalendar.get(Calendar.YEAR);
 
         double phase = suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber();
         double tilt = suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(globalCalendar));
@@ -679,11 +673,7 @@ public class Sunface extends Application {
         sundial.updateCetusTimer(cetustime);
         sundial.updateDialMarkers();
 
-        sundial.getDayGlobe().setDayLightPosition(phase, tilt);
-        sundial.getNightGlobe().setDayLightPosition(phase, tilt);
-        sundial.getTinyGlobe().setDayLightPosition(phase, tilt);
-        sundial.getDayTerminatorLine().setDayLightPosition(phase, tilt);
-        sundial.getDayTerminatorGlow().setDayLightPosition(phase, tilt);
+        sundial.setGlobeDaylight(phase, tilt);
 
         sundial.getMatrixHour().setString(hourString);
         sundial.getMatrixMinute().setString(minuteString);

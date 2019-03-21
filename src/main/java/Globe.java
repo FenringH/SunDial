@@ -1,4 +1,9 @@
 import javafx.animation.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableDoubleValue;
 import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -29,8 +34,8 @@ public class Globe extends Group {
     private static final Image DEFAULT_DAY_IMAGE = new Image(DEFAULT_DAY_MAP, 1003, 639, true, false);
     private static final Image DEFAULT_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP, 1003, 639, true, false);
 
-    private double longitude = 0;
-    private double latitude = 0;
+    private double longitude;
+    private double latitude;
 
     private int animationDuration;
 
@@ -203,4 +208,6 @@ public class Globe extends Group {
     public Timeline getRotateLatitudeTimeline() {
         return rotateLatitudeTimeline;
     }
+
+
 }
