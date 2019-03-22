@@ -27,49 +27,15 @@ import static java.lang.Math.*;
 
 public class Sunface extends Application {
 
-    private final static String A_BEGINNING =
-            "A beginning is a very delicate time." +
-            "Know then, that is is the year 10191. The known universe is ruled by the Padishah Emperor Shaddam the Fourth, my father. " +
-            "In this time, the most precious substance in the universe is the spice Melange. " +
-            "The spice extends life. The spice expands consciousness. " +
-            "A product of the Spice, the red Sapho juice, stains the lips of the Mentats but allows them to be human computers, " +
-            "as thinking machines have been outlawed. The spice is vital to space travel. " +
-            "The Spacing Guild and its navigators, who the spice has mutated over 4000 years, use the orange spice gas, " +
-            "which gives them the ability to fold space. That is, travel to any part of the universe without moving. " +
-            "Because the Guild controls all interplanetary travel, they are the highest power in the Universe. " +
-            "The Spice also plays a very secret role in the Bene Gesserit sisterhood, of which I am a part. " +
-            "The sisterhood has been interfering with the marriages, and the children thereof, " +
-            "of the great Houses of the Universe, cleverly intermixing one bloodline with another to form the Kwisatz Haderach, a super being. " +
-            "They plan to control this super being and use his powers for their own selfish purposes. " +
-            "The breeding plan has been carried out in a strict manner for 90 generations. " +
-            "The goal of the super being is in sight.";
 
-    private static final String ICON_APP_URL = "icons/sun1.png";
-
-    private static final double DEFAULT_FPS = 30.0;
-    private static final double DEFAULT_LONGITUDE = round(Suntime.DEFAULT_LONGITUDE * 100d) / 100d;
-    private static final double DEFAULT_LATITUDE = round(Suntime.DEFAULT_LATITUDE * 100d) / 100d;
-
-    private static final double MIN_WIDTH = 150;
-    private static final double MIN_HEIGHT = 150;
-
-    private static final double SNAP_TO_CENTER_RADIUS = 50;
-
-    private static final double NORMAL_STEP_SIZE = 20.0d;
-    private static final double FAST_STEP_SIZE = 2.0d;
-
-    private static final DecimalFormat julianDateFormat = new DecimalFormat("###,###,###.00000000");
-
-    private static final String GOOGLEMAPS_REGEX = ".*\\/@([\\+\\-0-9]+\\.[0-9]*),([\\+\\-0-9]+\\.[0-9]*),.*";
-
-    private int fpsSetting = (int) floor(1000 / DEFAULT_FPS);
+    private int fpsSetting = (int) floor(1000 / Sunconfig.DEFAULT_FPS);
 
     private GregorianCalendar currentLocalTime;
     private GregorianCalendar offsetLocalTime;
-    private double longitude = DEFAULT_LONGITUDE;
-    private double latitude = DEFAULT_LATITUDE;
-    private double customLongitude = DEFAULT_LONGITUDE;
-    private double customLatitude = DEFAULT_LATITUDE;
+    private double longitude = Sunconfig.DEFAULT_LONGITUDE;
+    private double latitude = Sunconfig.DEFAULT_LATITUDE;
+    private double customLongitude = Sunconfig.DEFAULT_LONGITUDE;
+    private double customLatitude = Sunconfig.DEFAULT_LATITUDE;
 
     private enum PositionType {LONGITUDE, LATITUDE, BOTH, GOOGLE_MAPS};
     private enum OffsetType {YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, WEEK};
@@ -164,24 +130,24 @@ public class Sunface extends Application {
         dialsGroup.getTransforms().add(dialsScale);
 
         dialsScale.xProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.widthProperty().get() / Sundial.DIAL_WIDTH), primaryStage.widthProperty()));
+                (primaryStage.widthProperty().get() / Sunconfig.DIAL_WIDTH), primaryStage.widthProperty()));
 
         dialsScale.yProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.heightProperty().get() / Sundial.DIAL_HEIGHT), primaryStage.heightProperty()));
+                (primaryStage.heightProperty().get() / Sunconfig.DIAL_HEIGHT), primaryStage.heightProperty()));
 
         dialsScale.zProperty().bind(Bindings.createDoubleBinding(() -> {
             // For Z scale pick smaller value between width and height
             double stageWidth = primaryStage.widthProperty().get();
             double stageHeight = primaryStage.heightProperty().get();
             double stageSize = (stageWidth > stageHeight) ? stageHeight : stageWidth;
-            double dialsSize = (Sundial.DIAL_WIDTH > Sundial.DIAL_HEIGHT) ? Sundial.DIAL_HEIGHT : Sundial.DIAL_WIDTH;
+            double dialsSize = (Sunconfig.DIAL_WIDTH > Sunconfig.DIAL_HEIGHT) ? Sunconfig.DIAL_HEIGHT : Sunconfig.DIAL_WIDTH;
             return stageSize / dialsSize;
         }, primaryStage.widthProperty(), primaryStage.heightProperty()));
 
 
 
         // App icons
-        Image appIconSun = new Image(ICON_APP_URL, 512, 512, true, true);
+        Image appIconSun = new Image(Sunconfig.ICON_APP_URL, 512, 512, true, true);
 
 
         // Debug window
@@ -190,7 +156,7 @@ public class Sunface extends Application {
         debugTextArea.setMinHeight(800);
         debugTextArea.setEditable(false);
         debugTextArea.setWrapText(true);
-        debugTextArea.setText(A_BEGINNING);
+        debugTextArea.setText(Sunconfig.A_BEGINNING);
 
         Group debugGroup = new Group();
         debugGroup.getChildren().add(debugTextArea);
@@ -225,8 +191,8 @@ public class Sunface extends Application {
         // Primary window
         primaryStage.setTitle("Sunface");
         primaryStage.setScene(mainScene);
-        primaryStage.setMinWidth(MIN_WIDTH);
-        primaryStage.setMinHeight(MIN_HEIGHT);
+        primaryStage.setMinWidth(Sunconfig.MIN_WIDTH);
+        primaryStage.setMinHeight(Sunconfig.MIN_HEIGHT);
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.getIcons().add(appIconSun);
 
@@ -485,8 +451,8 @@ public class Sunface extends Application {
         int offsetSecond = 0;
         int offsetWeek = 0;
 
-        double stepSize = NORMAL_STEP_SIZE;
-        if (event.isSecondaryButtonDown()) { stepSize = FAST_STEP_SIZE; }
+        double stepSize = Sunconfig.NORMAL_STEP_SIZE;
+        if (event.isSecondaryButtonDown()) { stepSize = Sunconfig.FAST_STEP_SIZE; }
 
         if (deltaMouseY >= stepSize) {
             offsetFactor = -1;
@@ -596,8 +562,8 @@ public class Sunface extends Application {
         double deltaMouseX = mouseX - savedMouseX;
         double deltaMouseY = mouseY - savedMouseY;
 
-        double stepSize = NORMAL_STEP_SIZE;
-        if (event.isSecondaryButtonDown()) { stepSize = FAST_STEP_SIZE; }
+        double stepSize = Sunconfig.NORMAL_STEP_SIZE;
+        if (event.isSecondaryButtonDown()) { stepSize = Sunconfig.FAST_STEP_SIZE; }
 
         if (deltaMouseY >= stepSize) {
             sundial.increaseNightCompression();
@@ -710,8 +676,8 @@ public class Sunface extends Application {
 
     private void resetGlobePosition(Sundial sundial, PositionType type) {
 
-        if (type == PositionType.LONGITUDE) { longitude = DEFAULT_LONGITUDE; }
-        else if (type == PositionType.LATITUDE) { latitude = DEFAULT_LATITUDE; }
+        if (type == PositionType.LONGITUDE) { longitude = Sunconfig.DEFAULT_LONGITUDE; }
+        else if (type == PositionType.LATITUDE) { latitude = Sunconfig.DEFAULT_LATITUDE; }
         else if (type == PositionType.BOTH){
             longitude = customLongitude;
             latitude = customLatitude;
@@ -749,7 +715,7 @@ public class Sunface extends Application {
             return;
         }
 
-        Pattern pattern = Pattern.compile(GOOGLEMAPS_REGEX);
+        Pattern pattern = Pattern.compile(Sunconfig.GOOGLEMAPS_REGEX);
         Matcher matcher = pattern.matcher(string);
 
         if (matcher.matches()) {
@@ -1038,8 +1004,8 @@ public class Sunface extends Application {
 
         double minWidth, minHeight, maxWidth, maxHeight;
 
-        minWidth = MIN_WIDTH;
-        minHeight = MIN_HEIGHT;
+        minWidth = Sunconfig.MIN_WIDTH;
+        minHeight = Sunconfig.MIN_HEIGHT;
 
         Rectangle2D recCenterOfPointer = new Rectangle2D(savedWindowPositionX + savedWindowSizeX / 2, savedWindowPositionY + savedWindowSizeY / 2, 0, 0);
 
@@ -1059,8 +1025,8 @@ public class Sunface extends Application {
             else { windowSizeX = windowSizeY; }
         }
 
-        if (windowSizeX < minWidth) { windowSizeX = MIN_WIDTH; }
-        if (windowSizeY < minHeight) { windowSizeY = MIN_HEIGHT; }
+        if (windowSizeX < minWidth) { windowSizeX = Sunconfig.MIN_WIDTH; }
+        if (windowSizeY < minHeight) { windowSizeY = Sunconfig.MIN_HEIGHT; }
         if (windowSizeX > maxWidth) { windowSizeX = maxWidth; }
         if (windowSizeY > maxHeight) { windowSizeY = maxHeight; }
 
@@ -1183,7 +1149,7 @@ public class Sunface extends Application {
         // snap to screen center
         if (snapToCenterEh) {
 
-            if (abs(abs(screenCenterX) - abs(centerPositionX)) < SNAP_TO_CENTER_RADIUS && abs(abs(screenCenterY) - abs(centerPositionY)) < SNAP_TO_CENTER_RADIUS) {
+            if (abs(abs(screenCenterX) - abs(centerPositionX)) < Sunconfig.SNAP_TO_CENTER_RADIUS && abs(abs(screenCenterY) - abs(centerPositionY)) < Sunconfig.SNAP_TO_CENTER_RADIUS) {
                 newPositionX = screenCenterX - winSizeX / 2;
                 newPositionY = screenCenterY - winSizeY / 2;
             }
@@ -1368,7 +1334,7 @@ public class Sunface extends Application {
         String debugText = ""
                 + "Day[9] date              : " + offsetLocalTime.getTime().toString() + "\n"
                 + "Day[9] day of the year   : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR) + "\n"
-                + "Day[9] Julian Date       : " + julianDateFormat.format(julianDate) + " (UTC)" + "\n"
+                + "Day[9] Julian Date       : " + Sunconfig.julianDateFormat.format(julianDate) + " (UTC)" + "\n"
                 + "Day[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString() + "\n"
                 + "Day[9] Julian Day Number : " + julianDayNumber + "\n"
                 + "TimeZone String : " + timeZoneString + "\n"
