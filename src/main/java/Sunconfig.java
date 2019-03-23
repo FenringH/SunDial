@@ -184,7 +184,7 @@ public class Sunconfig {
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS;
     public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
-    public static final double LOCALTIME_MINUTE_WIDTH = 14.0d;
+    public static final double LOCALTIME_MINUTE_WIDTH = 12.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 16.0d;
     public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
     public static final double DAY_ARC_MARGIN = 10.0d;
@@ -377,8 +377,10 @@ public class Sunconfig {
     public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
     public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALHOUR_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 0.8), 15.0, 0.50, 0, 0);";
-    public static final String LOCALTIME_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,255, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALHOUR_DIAL_GLOWIER  = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
+    public static final String LOCALSECOND_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALHOUR_DIAL_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
     public static final String TERMINATOR_LINE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";

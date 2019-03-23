@@ -4,13 +4,9 @@ import javafx.event.Event;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -64,7 +60,6 @@ public class Sundial {
     private Rotate dialRotateLocalHour;
     private Rotate dialRotateLocalMinute;
     private Rotate dialRotateLocalSecond;
-    private Rotate dialRotateLocalSecondTrail;
     private ArrayList<Rotate> dialMarkerRotateList;
     private ArrayList<Rotate> cetusMarkerRotateList;
     private ArrayList<Double> cetusMarkerAngleList;
@@ -76,14 +71,14 @@ public class Sundial {
     private Circle dialCircleBackground;
     private Circle dialCircleFrame;
     private Circle controlNightCompression;
+    private Circle dialCircleCenterPoint;
     private Line sunTimeDial;
-    private Line dialLineHighNoon;
     private Line sunriseDial;
     private Line sunsetDial;
+    private Group dialLocalSecondGroup;
     private Group dialLocalMinuteGroup;
     private Group dialLocalHourGroup;
     private Group dialHighNoonGroup;
-    private Rectangle dialLineLocalMinute;
     private ArrayList<Arc> cetusMarkerArcList;
 
     private ArrayList<Node> dialLocalSecondLedList;
@@ -125,10 +120,7 @@ public class Sundial {
     private Group tinyGlobeGroup;
     private Group globeMasterGroup;
     private Scale tinyGlobeScale;
-    private Group coordinatesGroup;
     private Group horizonGroup;
-    private Group longitudeGroup;
-    private Group latitudeGroup;
     private Circle controlThingyHelpCircle;
     private Group controlThingyHelp;
     private Group controlThingyResize;
@@ -145,7 +137,14 @@ public class Sundial {
     private Group matrixDate;
     private Group helpOverlay;
     private ArrayList<Group> helpMarkers;
+    private ArrayList<Line> dialHourLineMarkerList;
     private Group nightModeOverlay;
+
+    private Group dialMinuteMarkers;
+    private Group dialHourMatrixMarkers;
+
+    private Timeline tinyGlobeMoveOutTimeline;
+    private Timeline tinyGlobeMoveInTimeline;
 
     private Text helpText;
     private Group helpTextGroup;
@@ -258,7 +257,6 @@ public class Sundial {
         dialRotateLocalHour = centerRotate.clone();
         dialRotateLocalMinute = centerRotate.clone();
         dialRotateLocalSecond = centerRotate.clone();
-        dialRotateLocalSecondTrail = centerRotate.clone();
 
         sunTimeDialRotate.setAngle(getNightCompressionAngle(sunTimeDialAngle));
         highNoonDialRotate.setAngle(getNightCompressionAngle(highNoonDialAngle));
@@ -470,6 +468,54 @@ public class Sundial {
         tinyGlobeGroup.setOpacity(Sunconfig.TINYGLOBE_DEFAULT_OPACITY);
 
 
+        double tinyGlobeSlideOutX = -1 * Sunconfig.CENTER_X + Sunconfig.TINYGLOBE_RADIUS + Sunconfig.TINYGLOBE_SLIDE;
+        double tinyGlobeSlideOutY = Sunconfig.DIAL_HEIGHT - Sunconfig.CENTER_Y - Sunconfig.TINYGLOBE_OFFSET - Sunconfig.TINYGLOBE_RADIUS - Sunconfig.TINYGLOBE_SLIDE;
+
+        tinyGlobeMoveOutTimeline = new Timeline();
+        tinyGlobeMoveOutTimeline.setCycleCount(1);
+        tinyGlobeMoveOutTimeline.setRate(1);
+        tinyGlobeMoveOutTimeline.setAutoReverse(false);
+
+        KeyValue keyValueScaleOutX = new KeyValue(tinyGlobeScale.xProperty(), Sunconfig.TINYGLOBE_DOWNSCALE, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleOutX = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueScaleOutX);
+        KeyValue keyValueScaleOutY = new KeyValue(tinyGlobeScale.yProperty(), Sunconfig.TINYGLOBE_DOWNSCALE, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleOutY = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueScaleOutY);
+
+        KeyValue keyValueSlideOutX = new KeyValue(tinyGlobeGroup.translateXProperty(), tinyGlobeSlideOutX, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameSlideOutX = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueSlideOutX);
+        KeyValue keyValueSlideOutY = new KeyValue(tinyGlobeGroup.translateYProperty(), tinyGlobeSlideOutY, Interpolator.EASE_OUT);
+        KeyFrame keyFrameSlideOutY = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueSlideOutY);
+
+        KeyValue keyValueOpacityOut = new KeyValue(tinyGlobeGroup.opacityProperty(), Sunconfig.TINYGLOBE_OFFSET_OPACITY, Interpolator.EASE_OUT);
+        KeyFrame keyFrameOpacityOut = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueOpacityOut);
+
+        tinyGlobeMoveOutTimeline.getKeyFrames().addAll(keyFrameScaleOutX, keyFrameScaleOutY, keyFrameSlideOutX, keyFrameSlideOutY, keyFrameOpacityOut);
+
+
+        double tinyGlobeSlideInX = 0;
+        double tinyGlobeSlideInY = 0;
+
+        tinyGlobeMoveInTimeline = new Timeline();
+        tinyGlobeMoveInTimeline.setCycleCount(1);
+        tinyGlobeMoveInTimeline.setRate(1);
+        tinyGlobeMoveInTimeline.setAutoReverse(false);
+
+        KeyValue keyValueScaleInX = new KeyValue(tinyGlobeScale.xProperty(), 1, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleInX = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueScaleInX);
+        KeyValue keyValueScaleInY = new KeyValue(tinyGlobeScale.yProperty(), 1, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleInY = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueScaleInY);
+
+        KeyValue keyValueSlideInX = new KeyValue(tinyGlobeGroup.translateXProperty(), tinyGlobeSlideInX, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameSlideInX = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueSlideInX);
+        KeyValue keyValueSlideInY = new KeyValue(tinyGlobeGroup.translateYProperty(), tinyGlobeSlideInY, Interpolator.EASE_OUT);
+        KeyFrame keyFrameSlideInY = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueSlideInY);
+
+        KeyValue keyValueOpacityIn = new KeyValue(tinyGlobeGroup.opacityProperty(), Sunconfig.TINYGLOBE_DEFAULT_OPACITY, Interpolator.EASE_OUT);
+        KeyFrame keyFrameOpacityIn = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueOpacityIn);
+
+        tinyGlobeMoveInTimeline.getKeyFrames().addAll(keyFrameScaleInX, keyFrameScaleInY, keyFrameSlideInX, keyFrameSlideInY, keyFrameOpacityIn);
+
+
         // Stuff
         dialMarginBox = new Rectangle(Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT);
         dialMarginBox.setTranslateX(0);
@@ -651,7 +697,7 @@ public class Sundial {
         cetusTimer.setVisible(false);
 
 
-        Group dialMinuteMarkers = new Group();
+        dialMinuteMarkers = new Group();
         dialMinuteMarkers.setBlendMode(BlendMode.COLOR_BURN);
         dialMinuteMarkers.setMouseTransparent(true);
 
@@ -711,10 +757,9 @@ public class Sundial {
         }
 
 
-        Group dialHourLineMarkers = new Group();
-        dialHourLineMarkers.setMouseTransparent(true);
+        dialHourLineMarkerList = new ArrayList<>();
 
-        Group dialHourMatrixMarkers = new Group();
+        dialHourMatrixMarkers = new Group();
         dialHourMatrixMarkers.setMouseTransparent(true);
 
         dialMarkerRotateList = new ArrayList<>();
@@ -739,6 +784,7 @@ public class Sundial {
             markerLine.setStrokeWidth(strokeWidth);
             markerLine.setOpacity(opacity);
             markerLine.getTransforms().add(markerRotate);
+            markerLine.setMouseTransparent(true);
 
             if (i % 4 == 0) {
 
@@ -765,11 +811,12 @@ public class Sundial {
                 hourMarkerMatrixList.add(markerMatrix);
             }
 
-            dialHourLineMarkers.getChildren().add(markerLine);
+            dialHourLineMarkerList.add(markerLine);
             dialMarkerRotateList.add(markerRotate);
         }
 
-        Circle dialCircleCenterPoint = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, 1);
+
+        dialCircleCenterPoint = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, 1);
         dialCircleCenterPoint.setFill(Sunconfig.Color_Of_LocalTime);
         dialCircleCenterPoint.setStroke(Sunconfig.Color_Of_Void);
 
@@ -816,55 +863,71 @@ public class Sundial {
         dialHighNoonGroup.setBlendMode(BlendMode.SCREEN);
 
 
-        dialLocalHourGroup = new Group();
-
+        // Dial HOUR
         Polygon dialLocalHourPoly = new Polygon(
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y + 5,
-                Sunconfig.CENTER_X, Sunconfig.MARGIN_Y,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                Sunconfig.CENTER_X, Sunconfig.MARGIN_Y,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y + 5,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH
+
+                // outside
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.25,
+                0, Sunconfig.MARGIN_Y + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2,
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.25,
+                + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
+
+                // inside
+                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40
         );
-        dialLocalHourPoly.setFill(Color.WHITE);
-        dialLocalHourPoly.setStroke(Sunconfig.Color_Of_Void);
+        dialLocalHourPoly.setTranslateX(Sunconfig.CENTER_X);
+        dialLocalHourPoly.setFill(Sunconfig.Color_Of_Void);
+        dialLocalHourPoly.setStroke(Color.WHITE);
+        dialLocalHourPoly.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
         dialLocalHourPoly.setOpacity(1);
 
-        dialLocalHourGroup.getChildren().addAll(dialLocalHourPoly);
+        dialLocalHourGroup = new Group(dialLocalHourPoly);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
-        dialLocalHourGroup.setStyle(Sunconfig.LOCALHOUR_GLOW);
-//        dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
+        dialLocalHourGroup.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
+        dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
         dialLocalHourGroup.setMouseTransparent(true);
 
 
-        dialLocalMinuteGroup = new Group();
-
+        // Dial MINUTE
         Polygon dialLocalMinutePoly = new Polygon(
-                Sunconfig.CENTER_X, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X - Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
-                Sunconfig.CENTER_X, Sunconfig.LOCALMINUTE_OFFSET + Sunconfig.LOCALMINUTE_POLY_HEIGHT,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                Sunconfig.CENTER_X, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75
+                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
+                - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                - Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
+                0, Sunconfig.LOCALMINUTE_OFFSET + Sunconfig.LOCALMINUTE_POLY_HEIGHT + 5,
+                + Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
+                + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, Sunconfig.LOCALTIME_DIAL_LENGTH
         );
+        dialLocalMinutePoly.setTranslateX(Sunconfig.CENTER_X);
         dialLocalMinutePoly.setFill(Sunconfig.Color_Of_Void);
         dialLocalMinutePoly.setStroke(Color.WHITE);
         dialLocalMinutePoly.setStrokeWidth(Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH);
         dialLocalMinutePoly.setOpacity(1);
 
-        dialLocalMinuteGroup.getChildren().addAll(dialLocalMinutePoly);
+        dialLocalMinuteGroup = new Group(dialLocalMinutePoly);
         dialLocalMinuteGroup.getTransforms().add(dialRotateLocalMinute);
-        dialLocalMinuteGroup.setStyle(Sunconfig.HELP_MARKER_GLOW);
+        dialLocalMinuteGroup.setStyle(Sunconfig.LOCALMINUTE_DIAL_GLOW);
         dialLocalMinuteGroup.setMouseTransparent(true);
+
+
+        // Dial SECOND
+        Line localSecondLine = new Line(
+                0, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                0, Sunconfig.LOCALMINUTE_OFFSET + Sunconfig.LOCALMINUTE_POLY_HEIGHT + 5
+        );
+        localSecondLine.setTranslateX(Sunconfig.CENTER_X);
+        localSecondLine.setStroke(Color.WHITE);
+        localSecondLine.setStrokeWidth(Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH);
+        localSecondLine.setOpacity(0.8);
+
+        dialLocalSecondGroup = new Group(localSecondLine);
+        dialLocalSecondGroup.getTransforms().add(dialRotateLocalSecond);
+        dialLocalSecondGroup.setStyle(Sunconfig.LOCALSECOND_DIAL_GLOW);
+        dialLocalSecondGroup.setMouseTransparent(true);
 
 
         dialLocalSecondLedList = new ArrayList<>();
@@ -876,6 +939,7 @@ public class Sundial {
 
         for (int i = 0; i < 60; i++) {
 
+/*
             Rectangle localSecond = new Rectangle(Sunconfig.LOCALSECOND_WIDTH, Sunconfig.LOCALSECOND_HEIGHT);
             localSecond.setArcWidth(Sunconfig.LOCALSECOND_ROUND);
             localSecond.setArcHeight(Sunconfig.LOCALSECOND_ROUND);
@@ -885,6 +949,7 @@ public class Sundial {
             localSecond.setStroke(Sunconfig.Color_Of_Void);
             localSecond.setStyle(Sunconfig.LOCALSECOND_GLOW);
             localSecond.setMouseTransparent(true);
+*/
 
             Polygon localSecondPoly = new Polygon(
                     -1, Sunconfig.LOCALMINUTE_POLY_HEIGHT,
@@ -911,6 +976,7 @@ public class Sundial {
             secondGroup.getTransforms().add(localSecondRotate);
             secondGroup.setBlendMode(BlendMode.SCREEN);
 
+/*
             Rectangle localMinute = new Rectangle(Sunconfig.LOCALMINUTE_WIDTH, Sunconfig.LOCALMINUTE_HEIGHT);
             localMinute.setArcWidth(Sunconfig.LOCALMINUTE_ROUND);
             localMinute.setArcHeight(Sunconfig.LOCALMINUTE_ROUND);
@@ -920,6 +986,7 @@ public class Sundial {
             localMinute.setStroke(Sunconfig.Color_Of_Void);
             localMinute.setStyle(Sunconfig.LOCALMINUTE_GLOW);
             localMinute.setMouseTransparent(true);
+*/
 
             Polygon localMinutePoly = new Polygon(
                     -1, Sunconfig.LOCALMINUTE_POLY_HEIGHT,
@@ -1144,8 +1211,6 @@ public class Sundial {
         setGroupGlow(matrixWeek, Sunconfig.MATRIX_SHADOW);
         setGroupGlow(matrixLongitude, Sunconfig.MATRIX_SHADOW);
         setGroupGlow(matrixLatitude, Sunconfig.MATRIX_SHADOW);
-        setGroupGlow(longitudeGroup, Sunconfig.MATRIX_SHADOW);
-        setGroupGlow(latitudeGroup, Sunconfig.MATRIX_SHADOW);
 
         matrixSeparatorDayToMonth.setStyle(Sunconfig.MATRIX_SHADOW);
         matrixSeparatorHourToMinute.setStyle(Sunconfig.MATRIX_SHADOW);
@@ -1290,21 +1355,22 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialArcNight);
         foregroundGroup.getChildren().add(dialArcMidnight);
         foregroundGroup.getChildren().add(dialMinuteMarkers);
-        foregroundGroup.getChildren().add(dialArcDayLength);
         foregroundGroup.getChildren().add(dialCircleFrame);
-        foregroundGroup.getChildren().add(dialHourLineMarkers);
+        foregroundGroup.getChildren().addAll(dialHourLineMarkerList);
         foregroundGroup.getChildren().add(cetusArcGroup);
         foregroundGroup.getChildren().add(cetusLineGroup);
+        foregroundGroup.getChildren().add(dialLocalSecondGroup);
         foregroundGroup.getChildren().add(dialLocalMinuteGroup);
         foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
         foregroundGroup.getChildren().add(dialHighNoonGroup);
-        foregroundGroup.getChildren().add(dialLocalHourGroup);
         foregroundGroup.getChildren().add(horizonGroup);
+        foregroundGroup.getChildren().add(dialLocalHourGroup);
         foregroundGroup.getChildren().add(dialHourMatrixMarkers);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
         foregroundGroup.getChildren().add(controlNightCompression);
         foregroundGroup.getChildren().add(cetusTimer);
+        foregroundGroup.getChildren().add(dialArcDayLength);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(matrixHighNoon);
         foregroundGroup.getChildren().add(matrixTimeZone);
@@ -1597,6 +1663,7 @@ public class Sundial {
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
 
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
+        dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
 
         updateDialMarkers();
     }
@@ -1796,10 +1863,6 @@ public class Sundial {
         return tinyGlobeFrame;
     }
 
-    public Group getCoordinatesGroup() {
-        return coordinatesGroup;
-    }
-
     public Group getControlThingyClose() {
         return controlThingyClose;
     }
@@ -1822,14 +1885,6 @@ public class Sundial {
 
     public Group getHorizonGroup() {
         return horizonGroup;
-    }
-
-    public Group getLongitudeGroup() {
-        return longitudeGroup;
-    }
-
-    public Group getLatitudeGroup() {
-        return latitudeGroup;
     }
 
     public Group getBackgroundGroup() {
@@ -1865,9 +1920,7 @@ public class Sundial {
     }
 
     // Setters
-    public void updateCetusTimer(Cetustime cetustime) {
-
-        ArrayList<ArrayList<GregorianCalendar>> nightList = cetustime.getNightList(localTime);
+    public void updateCetusTimer(ArrayList<ArrayList<GregorianCalendar>> nightList) {
 
         long offsetTime = 0;
 
@@ -1925,6 +1978,7 @@ public class Sundial {
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
 
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
+        dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
 
         updateLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedTransitionList, localTime.get(Calendar.SECOND));
         updateLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedTransitionList, localTime.get(Calendar.MINUTE));
@@ -2212,89 +2266,34 @@ public class Sundial {
 
     public void setGlobeVisibility(boolean isVisible) {
 
-        int tinyGlobeDuration = globeAnimationOnEh ? Sunconfig.TINY_GLOBE_DURATION : 1;
+        int tinyGlobeMoveRate = globeAnimationOnEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
+
+        tinyGlobeMoveOutTimeline.setRate(tinyGlobeMoveRate);
+        tinyGlobeMoveInTimeline.setRate(tinyGlobeMoveRate);
+
+        controlNightCompression.setFill(isVisible ? Sunconfig.Color_Of_Void : Sunconfig.Color_Of_LocalTime);
+        controlNightCompression.setStroke(isVisible ? Sunconfig.Color_Of_LocalTime : Sunconfig.Color_Of_Void);
+        dialArcNight.setOpacity(isVisible ? 0 : 1);
+
+        for (Line hourLineMarker : dialHourLineMarkerList) { hourLineMarker.setStroke(isVisible ? Color.WHITE : Color.BLACK); }
+
+        dialArcMidnight.setVisible(!isVisible);
+        dialCircleBackground.setVisible(!isVisible);
+        dialMinuteMarkers.setVisible(!isVisible);
+
+        globeMasterGroup.setVisible(isVisible);
+        matrixLongitude.setVisible(isVisible);
+        matrixLatitude.setVisible(isVisible);
+        matrixTimeZone.setVisible(isVisible);
+
+        if (tinyGlobeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveOutTimeline.stop(); }
+        if (tinyGlobeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveInTimeline.stop(); }
 
         if (isVisible) {
-
-            controlNightCompression.setFill(Sunconfig.Color_Of_Void);
-            controlNightCompression.setStroke(Sunconfig.Color_Of_LocalTime);
-
-            dialArcNight.setOpacity(0);
-            dialArcMidnight.setVisible(false);
-
-            dialCircleBackground.setVisible(false);
-            globeMasterGroup.setVisible(true);
-
-            matrixLongitude.setVisible(true);
-            matrixLatitude.setVisible(true);
-
-            matrixTimeZone.setVisible(true);
-
-            double tinyGlobeSlideX = -1 * Sunconfig.CENTER_X + Sunconfig.TINYGLOBE_RADIUS + Sunconfig.TINYGLOBE_SLIDE;
-            double tinyGlobeSlideY = Sunconfig.DIAL_HEIGHT - Sunconfig.CENTER_Y - Sunconfig.TINYGLOBE_OFFSET - Sunconfig.TINYGLOBE_RADIUS - Sunconfig.TINYGLOBE_SLIDE;
-
-            Timeline timeline = new Timeline();
-            timeline.setCycleCount(1);
-            timeline.setRate(1);
-            timeline.setAutoReverse(false);
-
-            KeyValue keyValueScaleX = new KeyValue(tinyGlobeScale.xProperty(), Sunconfig.TINYGLOBE_DOWNSCALE, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameScaleX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleX);
-            KeyValue keyValueScaleY = new KeyValue(tinyGlobeScale.yProperty(), Sunconfig.TINYGLOBE_DOWNSCALE, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameScaleY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleY);
-
-            KeyValue keyValueSlideX = new KeyValue(tinyGlobeGroup.translateXProperty(), tinyGlobeSlideX, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameSlideX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideX);
-            KeyValue keyValueSlideY = new KeyValue(tinyGlobeGroup.translateYProperty(), tinyGlobeSlideY, Interpolator.EASE_OUT);
-            KeyFrame keyFrameSlideY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideY);
-
-            KeyValue keyValueOpacity = new KeyValue(tinyGlobeGroup.opacityProperty(), Sunconfig.TINYGLOBE_OFFSET_OPACITY, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueOpacity);
-
-            timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY, keyFrameOpacity);
-            timeline.play();
-
+            tinyGlobeMoveOutTimeline.play();
         }
         else {
-
-            controlNightCompression.setFill(Sunconfig.Color_Of_LocalTime);
-            controlNightCompression.setStroke(Sunconfig.Color_Of_Void);
-
-            dialArcNight.setOpacity(1);
-            dialArcMidnight.setVisible(true);
-
-            dialCircleBackground.setVisible(true);
-            globeMasterGroup.setVisible(false);
-
-            matrixLongitude.setVisible(false);
-            matrixLatitude.setVisible(false);
-
-            matrixTimeZone.setVisible(false);
-
-            double tinyGlobeSlideX = 0;
-            double tinyGlobeSlideY = 0;
-
-            Timeline timeline = new Timeline();
-            timeline.setCycleCount(1);
-            timeline.setRate(1);
-            timeline.setAutoReverse(false);
-
-            KeyValue keyValueScaleX = new KeyValue(tinyGlobeScale.xProperty(), 1, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameScaleX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleX);
-            KeyValue keyValueScaleY = new KeyValue(tinyGlobeScale.yProperty(), 1, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameScaleY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueScaleY);
-
-            KeyValue keyValueSlideX = new KeyValue(tinyGlobeGroup.translateXProperty(), tinyGlobeSlideX, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameSlideX = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideX);
-            KeyValue keyValueSlideY = new KeyValue(tinyGlobeGroup.translateYProperty(), tinyGlobeSlideY, Interpolator.EASE_OUT);
-            KeyFrame keyFrameSlideY = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueSlideY);
-
-            KeyValue keyValueOpacity = new KeyValue(tinyGlobeGroup.opacityProperty(), Sunconfig.TINYGLOBE_DEFAULT_OPACITY, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(tinyGlobeDuration), keyValueOpacity);
-
-            timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY, keyFrameOpacity);
-            timeline.play();
-
+            tinyGlobeMoveInTimeline.play();
         }
 
         setDialFrameWarning(warning);
@@ -2386,19 +2385,26 @@ public class Sundial {
         matrixTime.setOpacity(opacity);
         matrixDate.setOpacity(opacity);
         matrixTimeZone.setOpacity(opacity);
+
         dialLocalHourGroup.setOpacity(opacity);
         dialLocalMinuteGroup.setOpacity(opacity);
+        dialLocalSecondGroup.setOpacity(opacity);
 
         if (opacity < 0.5) {
+
             matrixTime.setMouseTransparent(true);
             matrixDate.setMouseTransparent(true);
             matrixTimeZone.setMouseTransparent(true);
+
             for (Node dialSecond : dialLocalSecondLedList) { dialSecond.setVisible(false); }
             for (Node dialMinute : dialLocalMinuteLedList) { dialMinute.setVisible(false); }
+
         } else {
+
             matrixTime.setMouseTransparent(false);
             matrixDate.setMouseTransparent(false);
             matrixTimeZone.setMouseTransparent(false);
+
             for (Node dialSecond : dialLocalSecondLedList) { dialSecond.setVisible(true); }
             for (Node dialMinute : dialLocalMinuteLedList) { dialMinute.setVisible(true); }
         }

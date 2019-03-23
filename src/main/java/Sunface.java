@@ -9,14 +9,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,7 +71,7 @@ public class Sunface extends Application {
     private Sunchart sunchart;
 
     private Stage debugWindow;
-    private Stage statsWindow;
+    private Stage sunchartWindow;
 
     private ArrayList<ArrayList<GregorianCalendar>> cetusNightList;
 
@@ -178,14 +176,14 @@ public class Sunface extends Application {
         LineChart lineChart = sunchart.getChart();
         Scene chartScene = new Scene(lineChart, 800, 600);
 
-        statsWindow = new Stage();
-        statsWindow.setTitle("Sunchart");
-        statsWindow.setScene(chartScene);
-        statsWindow.setX(0);
-        statsWindow.setY(0);
-        statsWindow.setWidth(chartScene.getWidth());
-        statsWindow.setHeight(chartScene.getHeight());
-        statsWindow.getIcons().add(appIconSun);
+        sunchartWindow = new Stage();
+        sunchartWindow.setTitle("Sunchart");
+        sunchartWindow.setScene(chartScene);
+        sunchartWindow.setX(0);
+        sunchartWindow.setY(0);
+        sunchartWindow.setWidth(chartScene.getWidth());
+        sunchartWindow.setHeight(chartScene.getHeight());
+        sunchartWindow.getIcons().add(appIconSun);
 
 
         // Primary window
@@ -208,11 +206,16 @@ public class Sunface extends Application {
 
         // Events
         sundial.getControlThingyHelp().setOnMouseClicked(event -> sundial.toggleHelp());
+
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
+
         sundial.getControlThingyMaximize().setOnMouseClicked(event -> toggleMaximizeWindow(primaryStage, event));
+
         sundial.getControlThingyMinimize().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
         sundial.getControlThingyMinimize().setOnMouseReleased(event -> { minimizeWindow(primaryStage, timeline, event); mouseButtonList.clear(); });
+
         sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
+
         sundial.getControlThingyAlwaysOnTop().setOnMouseClicked(event -> toggleAlwaysOnTop(primaryStage, sundial));
 
         sundial.getMatrixTimeZone().setOnMousePressed(event -> {
@@ -346,10 +349,7 @@ public class Sunface extends Application {
 
         sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleAnimation());
 
-        sundial.getMatrixDayLength().setOnMouseClicked(event -> {
-            if (statsWindow.isShowing()) { statsWindow.close(); }
-            else { statsWindow.show(); }
-        });
+        sundial.getMatrixDayLength().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
 
         primaryStage.setOnHidden(event -> timeline.pause());
         primaryStage.setOnShown(event -> timeline.play());
@@ -588,7 +588,6 @@ public class Sunface extends Application {
     private void updateCurrentTime(Sundial sundial, boolean initialize) {
 
         GregorianCalendar newLocalTime = new GregorianCalendar();
-        GregorianCalendar oldLocalTime = (GregorianCalendar) currentLocalTime.clone();
 
         // Store current Julian Day Number before updating current time
         long oldJulianDayNumber = Suntime.getJulianDayNumber(offsetLocalTime);
@@ -613,12 +612,12 @@ public class Sunface extends Application {
         globalCalendar.setTimeInMillis(timeZonedCalendar.getTimeInMillis() - timeZoneCorrection);
 
         suntimeLocal.setObserverTime(timeZonedCalendar);
-        suntimeGlobal.setObserverTime(globalCalendar);
+        suntimeGlobal.setObserverTime(offsetLocalTime);
 
         long newJulianDayNumber = suntimeLocal.getJulianDayNumber();
 
         double phase = suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber();
-        double tilt = suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(globalCalendar));
+        double tilt = suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(offsetLocalTime));
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);
@@ -634,20 +633,6 @@ public class Sunface extends Application {
         secondString = secondString.substring(secondString.length() - 2);
         String weekString = ("00" + offsetLocalTime.get(Calendar.WEEK_OF_YEAR));
         weekString = weekString.substring(weekString.length() - 2);
-
-        sundial.setLocalTime(offsetLocalTime);
-        sundial.updateCetusTimer(cetustime);
-        sundial.updateDialMarkers();
-
-        sundial.setGlobeDaylight(phase, tilt);
-
-        sundial.getMatrixHour().setString(hourString);
-        sundial.getMatrixMinute().setString(minuteString);
-        sundial.getMatrixSecond().setString(secondString);
-        sundial.getMatrixDay().setString(dayString);
-        sundial.getMatrixMonth().setString(monthString);
-        sundial.getMatrixYear().setString(yearString);
-        sundial.getMatrixWeek().setString(weekString);
 
         // Update daily data only if it's a new day, or forced initialization event
         if (newJulianDayNumber != oldJulianDayNumber || initialize) {
@@ -668,10 +653,24 @@ public class Sunface extends Application {
             sundial.setCoordinates(longitude, latitude);
             sundial.setCetusTime(cetusNightList, timeZonedCalendar);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
-
-            updateSunchart(sunchart);
-            updateDebugWindow(sundial);
         }
+
+        sundial.setLocalTime(offsetLocalTime);
+        sundial.updateCetusTimer(cetusNightList);
+        sundial.updateDialMarkers();
+
+        sundial.setGlobeDaylight(phase, tilt);
+
+        sundial.getMatrixHour().setString(hourString);
+        sundial.getMatrixMinute().setString(minuteString);
+        sundial.getMatrixSecond().setString(secondString);
+        sundial.getMatrixDay().setString(dayString);
+        sundial.getMatrixMonth().setString(monthString);
+        sundial.getMatrixYear().setString(yearString);
+        sundial.getMatrixWeek().setString(weekString);
+
+        updateSunchart(sunchart);
+        updateDebugWindow(sundial);
     }
 
     private void resetGlobePosition(Sundial sundial, PositionType type) {
@@ -741,15 +740,12 @@ public class Sunface extends Application {
 
         if (sundial.getInfoTextGroup().isVisible()) {
 
-            HideInfoTextTask hideInfoTextTask = new HideInfoTextTask(sundial);
+            SleepTask sleepTask = new SleepTask(sundial);
 
-            hideInfoTextTask.setOnSucceeded(refreshEvent -> {
-                showCetusTime(sundial);
-                sundial.getInfoTextGroup().setVisible(false);
-            });
+            sleepTask.setOnSucceeded(refreshEvent -> sundial.getInfoTextGroup().setVisible(false));
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.execute(hideInfoTextTask);
+            executorService.execute(sleepTask);
             executorService.shutdown();
         }
 
@@ -757,11 +753,11 @@ public class Sunface extends Application {
         sundial.rotateGlobeAnimated(longitude, latitude);
     }
 
-    private class HideInfoTextTask extends Task<Boolean> {
+    private class SleepTask extends Task<Boolean> {
 
         Sundial sundial;
 
-        public HideInfoTextTask(Sundial sundial) {
+        public SleepTask(Sundial sundial) {
             this.sundial = sundial;
         }
 
@@ -1041,14 +1037,9 @@ public class Sunface extends Application {
 
         double maxWidth, maxHeight;
         double screenWidth, screenHeight;
-        Rectangle2D currentScreen;
 
-        Rectangle2D recCenterOfPointer = new Rectangle2D(stage.getX() + stage.getWidth() / 2, stage.getY() + stage.getHeight() / 2, 0, 0);
-        if (Screen.getScreensForRectangle(recCenterOfPointer).size() > 0) {
-            currentScreen = Screen.getScreensForRectangle(recCenterOfPointer).get(0).getVisualBounds();
-        } else {
-            return;
-        }
+        Rectangle2D currentScreen = getCurrentScreen(stage);
+        if(currentScreen == null) { return; }
 
         screenWidth = currentScreen.getMaxX() - currentScreen.getMinX();
         screenHeight = currentScreen.getMaxY() - currentScreen.getMinY();
@@ -1089,18 +1080,67 @@ public class Sunface extends Application {
         if (!mouseButtonList.isEmpty()) {
 
             if (mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.SECONDARY)) {
-
-                if (debugWindow.isShowing()) {
-                    debugWindow.close();
-                } else {
-                    debugWindow.show();
-                }
-
+                toggleDebugWindow(stage);
                 return;
             }
         }
 
         stage.setIconified(true);
+    }
+
+    private Rectangle2D getCurrentScreen(Stage stage) {
+
+        Rectangle2D currentScreen;
+
+        Rectangle2D recCenterOfPointer = new Rectangle2D(stage.getX() + stage.getWidth() / 2, stage.getY() + stage.getHeight() / 2, 0, 0);
+
+        if (Screen.getScreensForRectangle(recCenterOfPointer).size() > 0) {
+            currentScreen = Screen.getScreensForRectangle(recCenterOfPointer).get(0).getVisualBounds();
+        } else {
+            return null;
+        }
+
+        return currentScreen;
+    }
+
+    private void toggleDebugWindow(Stage stage) {
+
+        double x, y;
+
+        Rectangle2D currentScreen = getCurrentScreen(stage);
+        if (currentScreen == null) { x = 0; y = 0; }
+        else {
+            x = currentScreen.getMinX();
+            y = currentScreen.getMinY();
+        }
+
+        if (debugWindow.isShowing()) {
+            debugWindow.close();
+        } else {
+            debugWindow.setX(x);
+            debugWindow.setY(y);
+            debugWindow.show();
+        }
+    }
+
+    private void toggleSunchartWindow(Stage stage) {
+
+        double x, y;
+
+        Rectangle2D currentScreen = getCurrentScreen(stage);
+        if (currentScreen == null) { x = 0; y = 0; }
+        else {
+            x = currentScreen.getMinX();
+            y = currentScreen.getMinY();
+        }
+
+        if (sunchartWindow.isShowing()) {
+            sunchartWindow.close();
+        } else {
+            sunchartWindow.setX(x);
+            sunchartWindow.setY(y);
+            sunchartWindow.show();
+        }
     }
 
     private void changeWindowPosition(Stage stage, MouseEvent event) {
@@ -1185,34 +1225,8 @@ public class Sunface extends Application {
             if (sundial.cetusTimeVisibleEh()) {
                 sundial.setCetusTimeVisibility(false);
             } else {
-                if (cetustime.cetusTimeExpiredEh()) {
-
-                    refreshCetusDataTask = new RefreshCetusDataTask(cetustime);
-
-                    refreshCetusDataTask.setOnScheduled(refreshEvent -> {
-                        sundial.getInfoText().setText("Syncing with Cetus...");
-                        sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
-                        sundial.getInfoTextGroup().setVisible(true);
-                    });
-
-                    refreshCetusDataTask.setOnFailed(refreshEvent -> {
-                        sundial.getInfoText().setText("Failed to sync with Cetus.\nPlease try again.");
-                        sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
-                        sundial.getInfoTextGroup().setVisible(true);
-                    });
-
-                    refreshCetusDataTask.setOnSucceeded(refreshEvent -> {
-                        showCetusTime(sundial);
-                        sundial.getInfoTextGroup().setVisible(false);
-                    });
-
-                    ExecutorService executorService = Executors.newSingleThreadExecutor();
-                    executorService.execute(refreshCetusDataTask);
-                    executorService.shutdown();
-
-                } else {
-                    showCetusTime(sundial);
-                }
+                if (cetustime.cetusTimeExpiredEh()) { refreshCetusTime(sundial, mouseEvent); }
+                showCetusTime(sundial);
             }
 
             return;
@@ -1226,11 +1240,42 @@ public class Sunface extends Application {
 
     }
 
+    private void refreshCetusTime(Sundial sundial, MouseEvent mouseEvent) {
+
+        refreshCetusDataTask = new RefreshCetusDataTask(cetustime);
+
+        refreshCetusDataTask.setOnScheduled(refreshEvent -> {
+            sundial.getInfoText().setText("Syncing with Cetus...");
+            sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
+            sundial.getInfoTextGroup().setVisible(true);
+        });
+
+        refreshCetusDataTask.setOnFailed(refreshEvent -> {
+            sundial.getInfoText().setText("Failed to sync with Cetus.\nPlease try again.");
+            sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
+            sundial.getInfoTextGroup().setVisible(true);
+        });
+
+        refreshCetusDataTask.setOnSucceeded(refreshEvent -> {
+            showCetusTime(sundial);
+            sundial.getInfoTextGroup().setVisible(false);
+        });
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(refreshCetusDataTask);
+        executorService.shutdown();
+    }
+
     private void showCetusTime(Sundial sundial) {
 
         if (cetustime.cetusTimeOkEh()) {
-            sundial.setCetusTime(cetustime.getNightList(offsetLocalTime), offsetLocalTime);
+
+            if (cetusNightList.isEmpty()) { cetusNightList = cetustime.getNightList(offsetLocalTime); }
+
+            sundial.setCetusTime(cetusNightList, offsetLocalTime);
+            sundial.updateCetusTimer(cetusNightList);
             sundial.setCetusTimeVisibility(true);
+
         } else {
             sundial.getInfoText().setText("Cetus time unavailable: \n" + cetustime.getResult());
             sundial.moveGroup(sundial.getInfoTextGroup(), null);
@@ -1239,20 +1284,16 @@ public class Sunface extends Application {
 
         if (sundial.getInfoTextGroup().isVisible()) {
 
-            HideInfoTextTask hideInfoTextTask = new HideInfoTextTask(sundial);
+            SleepTask sleepTask = new SleepTask(sundial);
 
-            hideInfoTextTask.setOnSucceeded(refreshEvent -> {
-                showCetusTime(sundial);
-                sundial.getInfoTextGroup().setVisible(false);
-            });
+            sleepTask.setOnSucceeded(hideInfoTextEvent -> sundial.getInfoTextGroup().setVisible(false));
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.execute(hideInfoTextTask);
+            executorService.execute(sleepTask);
             executorService.shutdown();
         }
 
         updateDebugWindow(sundial);
-
     }
 
     private class RefreshCetusDataTask extends Task<Boolean> {
@@ -1381,7 +1422,7 @@ public class Sunface extends Application {
 
     private void updateSunchart(Sunchart sunchart) {
 
-        if (statsWindow.isShowing()) {
+        if (sunchartWindow.isShowing()) {
 
             if (
                     mouseButtonList.isEmpty() &&
