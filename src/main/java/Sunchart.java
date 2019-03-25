@@ -1,12 +1,10 @@
 import javafx.scene.Group;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
@@ -63,11 +61,11 @@ public class Sunchart {
         calendar = new GregorianCalendar();
         calendar.set(Calendar.YEAR, this.year);
 
-        suntime = new Suntime.Builder()
+        suntime = new Suntime.PleaseBuildSuntime()
                 .localTime(calendar)
                 .observerLongitude(this.longitude)
                 .observerLatitude(this.latitude)
-                .build();
+                .thankYou();
 
         sunriseSeries = new XYChart.Series();
         sunriseSeries.setName("Sunrise");

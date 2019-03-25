@@ -5,6 +5,7 @@ import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static java.lang.Math.round;
@@ -200,6 +201,7 @@ public class Sunconfig {
     public static final double LOCALSECOND_ROUND = 6;
     public static final double TINYGLOBE_RADIUS = 35;
     public static final double CONTROL_HELP_SIZE = 20.0d;
+    public static final double CONTROL_THINGY_RADIUS = 10.0d;
     public static final double CONTROL_HELP_RADIUS = 10.0d;
     public static final double CONTROL_RESIZE_SIZE = 45.0d;
     public static final double CONTROL_CLOSE_RADIUS = 10.0d;
@@ -225,6 +227,7 @@ public class Sunconfig {
     public static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
     public static final double MARKER_FRAME_STROKE_WIDTH = 2.00d;
     public static final double TINYGLOBE_FRAME_STROKE_WIDTH = 2.00d;
+    public static final double CONTROL_THINGY_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_HELP_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_RESIZE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_CLOSE_STROKE_WIDTH = 3.00d;
@@ -253,6 +256,7 @@ public class Sunconfig {
     public static final double DAY_TERMINATOR_OPACITY = 0.75d;
     public static final double HELP_OVERLAY_OPACITY = 0.35d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
+    public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
     public static final double MATRIX_HORIZON_OFFSET = 80.0d;
@@ -271,12 +275,14 @@ public class Sunconfig {
     public static final double LOCALMINUTE_OFFSET = 50.0d;
     public static final double LOCALSECOND_OFFSET = 50.0d;
     public static final double MATRIX_MINUTE_OFFSET = 70.0d;
-    public static final double CONTROL_HELP_OFFSET = 169.0d;
+    public static final double CONTROL_HELP_OFFSET = 236.0d;
     public static final double CONTROL_RESIZE_OFFSET = 137.0d;
+    public static final double CONTROL_THINGY_OFFSET = 236.0d;
     public static final double CONTROL_CLOSE_OFFSET = 236.0d;
     public static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
+    public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
     public static final double CETUS_TIMER_OFFSET = 160.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
@@ -299,7 +305,7 @@ public class Sunconfig {
     public static final double CETUS_HORIZON_SCALE = 0.75d;
     public static final double MATRIX_TIMEZONE_SCALE = 1.25d;
     public static final double MATRIX_HIGHNOON_SCALE = 1.00d;
-    public static final double MATRIX_HELPMARK_SCALE = 1.25d;
+    public static final double MATRIX_CONTROLTHINGY_SCALE = 1.25d;
 
     public static final double CONTROL_CLOSE_ANGLE = 37.0d;
     public static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
@@ -361,6 +367,8 @@ public class Sunconfig {
     public static final Color Color_Of_NightmodeStroke = new Color(0.80, 0.20, 0.80, 1.00);
     public static final Color Color_Of_AlwaysOnTopFill = new Color(0.35, 0.35, 0.35, 0.20);
     public static final Color Color_Of_AlwaysOnTopStroke = new Color(0.75, 0.75, 0.75, 1.00);
+    public static final Color Color_Of_ThingyFill = new Color(0.35, 0.35, 0.35, 0.20);
+    public static final Color Color_Of_ThingyStroke = new Color(0.75, 0.75, 0.75, 1.00);
 
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
     public static final Color Color_Of_CetusFrame  = new Color(0.85, 0.60, 0.95, 1.00);
@@ -385,6 +393,8 @@ public class Sunconfig {
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
     public static final String TERMINATOR_LINE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
 
+    public static final String CONTROL_THINGY_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_THINGY_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_HELP_SHADOW_OFF    = "-fx-effect: dropshadow(three-pass-box, rgba( 16, 32,128, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_HELP_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_HELP_SHADOW_ON     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
@@ -410,9 +420,6 @@ public class Sunconfig {
 
     public static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
     public static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
-    public static final Image TINYGLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
-    public static final Image TINYGLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
-    public static final Image TINYGLOBE_CETUS_IMAGE = new Image("images/LotusFlower_edit.png",2048, 1264, true, false);
 
     public static final RadialGradient FRAME_DIAL_NOMINAL = new RadialGradient(
             0, 0,

@@ -1,5 +1,7 @@
 import javafx.animation.*;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
@@ -43,6 +45,12 @@ public class Sundial {
     private GregorianCalendar sunset;
     private GregorianCalendar localTime;
     private long daylength;                 // length of day in seconds
+
+    private DoubleProperty longitude;
+    private DoubleProperty latitude;
+    private DoubleProperty phase;
+    private DoubleProperty tilt;
+
 
     // graphical primitives
     private Group dialsGroup;
@@ -107,29 +115,18 @@ public class Sundial {
     private ArrayList<DotMatrix> cetusTimeMatrixList;
     private DotMatrix matrixTimeZone;
 
-    private Globe dayGlobe;
-    private Globe nightGlobe;
-    private Grid dayGrid;
-    private Ring dayTerminatorLine;
-    private Ring dayTerminatorGlow;
-    private Ring tinyDayTerminatorLine;
-    private Circle globeAtmosphere;
-    private Globe tinyGlobe;
-    private Circle tinyGlobeFrame;
-    private Circle tinyGlobeDot;
+    private ControlThingy controlThingyHelp;
+    private ControlThingy controlThingyResize;
+    private ControlThingy controlThingyClose;
+    private ControlThingy controlThingyMaximize;
+    private ControlThingy controlThingyMinimize;
+    private ControlThingy controlThingyNightmode;
+    private ControlThingy controlThingyAlwaysOnTop;
+
     private Group tinyGlobeGroup;
     private Group globeMasterGroup;
     private Scale tinyGlobeScale;
     private Group horizonGroup;
-    private Circle controlThingyHelpCircle;
-    private Group controlThingyHelp;
-    private Group controlThingyResize;
-    private Group controlThingyClose;
-    private Group controlThingyMaximize;
-    private Group controlThingyMinimize;
-    private Group controlThingyNightmode;
-    private Circle thingyAlwaysOnTopCircle;
-    private Group controlThingyAlwaysOnTop;
     private Group backgroundGroup;
     private Group cetusArcGroup;
     private Group cetusLineGroup;
@@ -139,12 +136,13 @@ public class Sundial {
     private ArrayList<Group> helpMarkers;
     private ArrayList<Line> dialHourLineMarkerList;
     private Group nightModeOverlay;
-
     private Group dialMinuteMarkers;
     private Group dialHourMatrixMarkers;
 
     private Timeline tinyGlobeMoveOutTimeline;
     private Timeline tinyGlobeMoveInTimeline;
+    private Timeline longitudeTimeline;
+    private Timeline latitudeTimeline;
 
     private Text helpText;
     private Group helpTextGroup;
@@ -164,7 +162,7 @@ public class Sundial {
 
 
     // Constructor
-    public Sundial(Builder builder) {
+    public Sundial(PleaseBuildSundial builder) {
         this.sunTimeDialAngle = builder.sunTimeDialAngle;
         this.highNoonDialAngle = builder.highNoonDialAngle;
         this.sunriseDialAngle = builder.sunriseDialAngle;
@@ -181,7 +179,7 @@ public class Sundial {
     }
 
     // Builder
-    public static class Builder {
+    public static class PleaseBuildSundial {
         private double sunTimeDialAngle;
         private double highNoonDialAngle;
         private double sunriseDialAngle;
@@ -190,7 +188,7 @@ public class Sundial {
         private String localTimeText;
         private double nightCompression;
 
-        public Builder() {
+        public PleaseBuildSundial() {
             this.sunTimeDialAngle = Sunconfig.DEFAULT_sunTimeDialAngle;
             this.highNoonDialAngle = Sunconfig.DEFAULT_highNoonDialAngle;
             this.sunriseDialAngle = Sunconfig.DEFAULT_sunriseDialAngle;
@@ -200,42 +198,42 @@ public class Sundial {
             this.nightCompression = Sunconfig.DEFAULT_nightCompression;
         }
 
-        public Builder sunTimeDialAngle(double sunTimeDialAngle) {
+        public PleaseBuildSundial sunTimeDialAngle(double sunTimeDialAngle) {
             this.sunTimeDialAngle = sunTimeDialAngle;
             return this;
         }
 
-        public Builder highNoonDialAngle(double highNoonDialAngle) {
+        public PleaseBuildSundial highNoonDialAngle(double highNoonDialAngle) {
             this.highNoonDialAngle = highNoonDialAngle;
             return this;
         }
 
-        public Builder sunriseDialAngle(double sunriseDialAngle) {
+        public PleaseBuildSundial sunriseDialAngle(double sunriseDialAngle) {
             this.sunriseDialAngle = sunriseDialAngle;
             return this;
         }
 
-        public Builder sunsetDialAngle(double sunsetDialAngle) {
+        public PleaseBuildSundial sunsetDialAngle(double sunsetDialAngle) {
             this.sunsetDialAngle = sunsetDialAngle;
             return this;
         }
 
-        public Builder localTimeDialAngle(double localTimeDialAngle) {
+        public PleaseBuildSundial localTimeDialAngle(double localTimeDialAngle) {
             this.localTimeDialAngle = localTimeDialAngle;
             return this;
         }
 
-        public Builder localTimeText(String localTimeText) {
+        public PleaseBuildSundial localTimeText(String localTimeText) {
             this.localTimeText = localTimeText;
             return this;
         }
 
-        public Builder nightCompression(double nightCompression) {
+        public PleaseBuildSundial nightCompression(double nightCompression) {
             this.nightCompression = nightCompression;
             return this;
         }
 
-        public Sundial build() {
+        public Sundial thankYou() {
             return new Sundial(this);
         }
     }
@@ -244,6 +242,31 @@ public class Sundial {
     private void init() {
 
         dialsGroup = new Group();
+        helpText = new Text();
+
+
+        longitude = new SimpleDoubleProperty(0f);
+        latitude = new SimpleDoubleProperty(0f);
+
+        longitude.addListener((observable, oldValue, newValue) -> {});
+        latitude.addListener((observable, oldValue, newValue) -> {});
+
+        phase = new SimpleDoubleProperty(0f);
+        tilt = new SimpleDoubleProperty(0f);
+
+        phase.addListener((observable, oldValue, newValue) -> {});
+        tilt.addListener((observable, oldValue, newValue) -> {});
+
+        longitudeTimeline = new Timeline();
+        longitudeTimeline.setCycleCount(1);
+        longitudeTimeline.setRate(1);
+        longitudeTimeline.setAutoReverse(false);
+
+        latitudeTimeline = new Timeline();
+        latitudeTimeline.setCycleCount(1);
+        latitudeTimeline.setRate(1);
+        latitudeTimeline.setAutoReverse(false);
+
 
         // Rotates
         centerRotate = new Rotate();
@@ -267,209 +290,35 @@ public class Sundial {
         dialRotateLocalSecond.setAngle(getNightCompressionAngle(dialAngleLocalSecond));
 
         // Control thingies
-        controlThingyHelp = new Group();
+        controlThingyHelp = Suncreator.createControlThingy(Suncreator.ControlThingyType.HELP, helpText);
+        controlThingyResize = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
+        controlThingyClose = Suncreator.createControlThingy(Suncreator.ControlThingyType.CLOSE, helpText);
+        controlThingyMaximize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MAXIMIZE, helpText);
+        controlThingyMinimize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MINIMIZE, helpText);
+        controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGTMODE, helpText);
+        controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
 
-        controlThingyHelpCircle = new Circle(0, 0, Sunconfig.CONTROL_HELP_RADIUS);
-        controlThingyHelpCircle.setFill(Sunconfig.Color_Of_ResizeFill);
-        controlThingyHelpCircle.setStroke(Sunconfig.Color_Of_ResizeStroke);
-        controlThingyHelpCircle.setStrokeWidth(Sunconfig.CONTROL_HELP_STROKE_WIDTH);
-
-        DotMatrix thingyHelpQuestionMark = new DotMatrix("?", Color.WHITE);
-        thingyHelpQuestionMark.setScaleX(Sunconfig.MATRIX_HELPMARK_SCALE);
-        thingyHelpQuestionMark.setScaleY(Sunconfig.MATRIX_HELPMARK_SCALE);
-        thingyHelpQuestionMark.setTranslateX(-thingyHelpQuestionMark.getLayoutBounds().getWidth() / 2);
-        thingyHelpQuestionMark.setTranslateY(-thingyHelpQuestionMark.getLayoutBounds().getHeight() / 2);
-        thingyHelpQuestionMark.setStyle(Sunconfig.MATRIX_SHADOW);
-
-        controlThingyHelp.getChildren().addAll(controlThingyHelpCircle, thingyHelpQuestionMark);
-        controlThingyHelp.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_CLOSE_OFFSET * cos(toRadians(Sunconfig.CONTROL_HELP_ANGLE)));
-        controlThingyHelp.setTranslateY(Sunconfig.CENTER_Y - Sunconfig.CONTROL_CLOSE_OFFSET * sin(toRadians(Sunconfig.CONTROL_HELP_ANGLE)));
-        controlThingyHelp.setStyle(Sunconfig.CONTROL_RESIZE_SHADOW);
-        controlThingyHelp.setOpacity(Sunconfig.CONTROL_HELP_OPACITY);
-
-        controlThingyResize = new Group();
-        Polygon thingyResizeTriangle = new Polygon(
-                Sunconfig.CONTROL_RESIZE_SIZE, 0,
-                Sunconfig.CONTROL_RESIZE_SIZE, Sunconfig.CONTROL_RESIZE_SIZE,
-                0, Sunconfig.CONTROL_RESIZE_SIZE
-        );
-        thingyResizeTriangle.setFill(Sunconfig.Color_Of_ResizeFill);
-        thingyResizeTriangle.setStroke(Sunconfig.Color_Of_ResizeStroke);
-        thingyResizeTriangle.setStrokeWidth(Sunconfig.CONTROL_RESIZE_STROKE_WIDTH);
-        controlThingyResize.getChildren().add(thingyResizeTriangle);
-        controlThingyResize.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_RESIZE_OFFSET);
-        controlThingyResize.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.CONTROL_RESIZE_OFFSET);
-        controlThingyResize.setStyle(Sunconfig.CONTROL_RESIZE_SHADOW);
-        controlThingyResize.setOpacity(Sunconfig.CONTROL_RESIZE_OPACITY);
-
-        controlThingyClose = new Group();
-        Circle thingyCloseCircle = new Circle(0, 0, Sunconfig.CONTROL_CLOSE_RADIUS);
-        thingyCloseCircle.setFill(Sunconfig.Color_Of_CloseFill);
-        thingyCloseCircle.setStroke(Sunconfig.Color_Of_CloseStroke);
-        thingyCloseCircle.setStrokeWidth(Sunconfig.CONTROL_CLOSE_STROKE_WIDTH);
-        controlThingyClose.getChildren().add(thingyCloseCircle);
-        controlThingyClose.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_CLOSE_OFFSET * cos(toRadians(Sunconfig.CONTROL_CLOSE_ANGLE)));
-        controlThingyClose.setTranslateY(Sunconfig.CENTER_Y - Sunconfig.CONTROL_CLOSE_OFFSET * sin(toRadians(Sunconfig.CONTROL_CLOSE_ANGLE)));
-        controlThingyClose.setStyle(Sunconfig.CONTROL_CLOSE_SHADOW);
-        controlThingyClose.setOpacity(Sunconfig.CONTROL_CLOSE_OPACITY);
-
-        controlThingyMaximize = new Group();
-        Circle thingyMaximizeCircle = new Circle(0, 0, Sunconfig.CONTROL_MAXIMIZE_RADIUS);
-        thingyMaximizeCircle.setFill(Sunconfig.Color_Of_MaximizeFill);
-        thingyMaximizeCircle.setStroke(Sunconfig.Color_Of_MaximizeStroke);
-        thingyMaximizeCircle.setStrokeWidth(Sunconfig.CONTROL_MAXIMIZE_STROKE_WIDTH);
-        controlThingyMaximize.getChildren().add(thingyMaximizeCircle);
-        controlThingyMaximize.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_MAXIMIZE_OFFSET * cos(toRadians(Sunconfig.CONTROL_MAXIMIZE_ANGLE)));
-        controlThingyMaximize.setTranslateY(Sunconfig.CENTER_Y - Sunconfig.CONTROL_MAXIMIZE_OFFSET * sin(toRadians(Sunconfig.CONTROL_MAXIMIZE_ANGLE)));
-        controlThingyMaximize.setStyle(Sunconfig.CONTROL_MAXIMIZE_SHADOW);
-        controlThingyMaximize.setOpacity(Sunconfig.CONTROL_MAXIMIZE_OPACITY);
-
-        controlThingyMinimize = new Group();
-        Circle thingyMinimizeCircle = new Circle(0, 0, Sunconfig.CONTROL_MINIMIZE_RADIUS);
-        thingyMinimizeCircle.setFill(Sunconfig.Color_Of_MinimizeFill);
-        thingyMinimizeCircle.setStroke(Sunconfig.Color_Of_MinimizeStroke);
-        thingyMinimizeCircle.setStrokeWidth(Sunconfig.CONTROL_MINIMIZE_STROKE_WIDTH);
-        controlThingyMinimize.getChildren().add(thingyMinimizeCircle);
-        controlThingyMinimize.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_MINIMIZE_OFFSET * cos(toRadians(Sunconfig.CONTROL_MINIMIZE_ANGLE)));
-        controlThingyMinimize.setTranslateY(Sunconfig.CENTER_Y - Sunconfig.CONTROL_MINIMIZE_OFFSET * sin(toRadians(Sunconfig.CONTROL_MINIMIZE_ANGLE)));
-        controlThingyMinimize.setStyle(Sunconfig.CONTROL_MINIMIZE_SHADOW);
-        controlThingyMinimize.setOpacity(Sunconfig.CONTROL_MINIMIZE_OPACITY);
-
-        controlThingyNightmode = new Group();
-        Circle thingyNightmodeCircle = new Circle(0, 0, Sunconfig.CONTROL_NIGHTMODE_RADIUS);
-        thingyNightmodeCircle.setFill(Sunconfig.Color_Of_NightmodeFill);
-        thingyNightmodeCircle.setStroke(Sunconfig.Color_Of_NightmodeStroke);
-        thingyNightmodeCircle.setStrokeWidth(Sunconfig.CONTROL_NIGHTMODE_STROKE_WIDTH);
-        controlThingyNightmode.getChildren().add(thingyNightmodeCircle);
-        controlThingyNightmode.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_MINIMIZE_OFFSET * cos(toRadians(Sunconfig.CONTROL_NIGHTMODE_ANGLE)));
-        controlThingyNightmode.setTranslateY(Sunconfig.CENTER_Y - Sunconfig.CONTROL_MINIMIZE_OFFSET * sin(toRadians(Sunconfig.CONTROL_NIGHTMODE_ANGLE)));
-        controlThingyNightmode.setStyle(Sunconfig.CONTROL_NIGHTMODE_SHADOW);
-        controlThingyNightmode.setOpacity(Sunconfig.CONTROL_NIGHTMODE_OPACITY);
-
-        controlThingyAlwaysOnTop = new Group();
-        thingyAlwaysOnTopCircle = new Circle(0, 0, Sunconfig.CONTROL_ALWAYSONTOP_RADIUS);
-        thingyAlwaysOnTopCircle.setFill(Sunconfig.Color_Of_AlwaysOnTopFill);
-        thingyAlwaysOnTopCircle.setStroke(Sunconfig.Color_Of_AlwaysOnTopStroke);
-        thingyAlwaysOnTopCircle.setStrokeWidth(Sunconfig.CONTROL_ALWAYSONTOP_STROKE_WIDTH);
-        controlThingyAlwaysOnTop.getChildren().add(thingyAlwaysOnTopCircle);
-        controlThingyAlwaysOnTop.setTranslateX(Sunconfig.CENTER_X + Sunconfig.CONTROL_MINIMIZE_OFFSET * cos(toRadians(Sunconfig.CONTROL_ALWAYSONTOP_ANGLE)));
-        controlThingyAlwaysOnTop.setTranslateY(Sunconfig.CENTER_Y - Sunconfig.CONTROL_MINIMIZE_OFFSET * sin(toRadians(Sunconfig.CONTROL_ALWAYSONTOP_ANGLE)));
-        controlThingyAlwaysOnTop.setStyle(Sunconfig.CONTROL_ALWAYSONTOP_SHADOW);
-        controlThingyAlwaysOnTop.setOpacity(Sunconfig.CONTROL_ALWAYSONTOP_OPACITY);
-
-        // Master globe group
-        dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
-        dayGlobe.setLayoutX(Sunconfig.CENTER_X);
-        dayGlobe.setLayoutY(Sunconfig.CENTER_Y);
-        dayGlobe.setNightLightColor(Color.RED);
-
-        nightGlobe = new Globe(Sunconfig.GLOBE_NIGHT_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
-        nightGlobe.setLayoutX(Sunconfig.CENTER_X);
-        nightGlobe.setLayoutY(Sunconfig.CENTER_Y);
-        nightGlobe.setAmbientLightColor(Color.WHITE);
-
-        dayGrid = new Grid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, 1, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
-        dayGrid.setLayoutX(Sunconfig.CENTER_X);
-        dayGrid.setLayoutY(Sunconfig.CENTER_Y);
-
-        dayTerminatorLine = new Ring(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.DAY_TERMINATOR_WIDTH, Sunconfig.Color_Of_TerminatorLine, Sunconfig.GLOBE_ROTATE_DURATION);
-        dayTerminatorLine.setLayoutX(Sunconfig.CENTER_X);
-        dayTerminatorLine.setLayoutY(Sunconfig.CENTER_Y);
-
-        dayTerminatorGlow = new Ring(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.DAY_TERMINATOR_GLOW_WIDTH, Sunconfig.Color_Of_TerminatorGlow, Sunconfig.GLOBE_ROTATE_DURATION);
-        dayTerminatorGlow.setLayoutX(Sunconfig.CENTER_X);
-        dayTerminatorGlow.setLayoutY(Sunconfig.CENTER_Y);
-
-        Group dayGlobeGroup = new Group();
-        dayGlobeGroup.getChildren().add(dayGlobe);
-        SubScene dayGlobeScene = new SubScene(dayGlobeGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayGlobeScene.setBlendMode(BlendMode.ADD);
-
-        Group nightGlobeGroup = new Group();
-        nightGlobeGroup.getChildren().add(nightGlobe);
-        SubScene nightGlobeScene = new SubScene(nightGlobeGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        nightGlobeScene.setBlendMode(BlendMode.SCREEN);
-
-        Group dayGridGroup = new Group();
-        dayGridGroup.getChildren().add(dayGrid);
-        SubScene dayGridScene = new SubScene(dayGridGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayGridScene.setBlendMode(BlendMode.SCREEN);
-        dayGridScene.setEffect(new GaussianBlur(1));
-        dayGridScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
-
-        Group dayTerminatorLineGroup = new Group();
-        dayTerminatorLineGroup.getChildren().add(dayTerminatorLine);
-        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLineGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
-        dayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_WIDTH));
-        dayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
-
-        Group dayTerminatorGlowGroup = new Group();
-        dayTerminatorGlowGroup.getChildren().add(dayTerminatorGlow);
-        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlowGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
-        dayTerminatorGlowScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_GLOW_WIDTH));
-        dayTerminatorGlowScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
-
-        globeAtmosphere = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X - Sunconfig.MARGIN_X + 2);
-        globeAtmosphere.setFill(Sunconfig.GLOBE_ATMOSPHERE);
-        globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
-        globeAtmosphere.setMouseTransparent(true);
-
-        globeMasterGroup = new Group(dayGlobeScene, nightGlobeScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
+        // Master globe
+        globeMasterGroup = Suncreator.createMasterGlobe(longitude, latitude, phase, tilt);
         globeMasterGroup.setVisible(false);
 
-
-        // Tiny globe group
-        tinyGlobeFrame = new Circle(Sunconfig.TINYGLOBE_RADIUS);
-        tinyGlobeFrame.setLayoutX(Sunconfig.CENTER_X);
-        tinyGlobeFrame.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
-        tinyGlobeFrame.setFill(Sunconfig.Color_Of_Void);
-        tinyGlobeFrame.setStroke(Sunconfig.Color_Of_TinyFrame);
-        tinyGlobeFrame.setStrokeWidth(Sunconfig.TINYGLOBE_FRAME_STROKE_WIDTH);
-        tinyGlobeFrame.setStyle(Sunconfig.MATRIX_SHADOW);
-
-        tinyGlobeDot = new Circle(1.0d);
-        tinyGlobeDot.setLayoutX(Sunconfig.CENTER_X);
-        tinyGlobeDot.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
-        tinyGlobeDot.setFill(Sunconfig.Color_Of_TinyFrame);
-        tinyGlobeDot.setStroke(Sunconfig.Color_Of_Void);
-
-        tinyGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.TINYGLOBE_RADIUS, Sunconfig.GLOBE_ROTATE_DURATION);
-        tinyGlobe.setLayoutX(Sunconfig.CENTER_X);
-        tinyGlobe.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
-        tinyGlobe.setDayLightColor(Sunconfig.Color_Of_TinyDay);
-        tinyGlobe.setNightLightColor(Sunconfig.Color_Of_TinyNight);
-        tinyGlobe.setAmbientLightColor(Sunconfig.Color_Of_TinyAmbient);
-        tinyGlobe.setVisible(true);
-
-        Group tinyGlobeSceneGroup = new Group();
-        tinyGlobeSceneGroup.getChildren().addAll(tinyGlobe);
-        SubScene tinyGlobeScene = new SubScene(tinyGlobeSceneGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-
-        tinyDayTerminatorLine = new Ring(Sunconfig.TINYGLOBE_RADIUS, 1, Sunconfig.Color_Of_TerminatorLine, Sunconfig.GLOBE_ROTATE_DURATION);
-        tinyDayTerminatorLine.setLayoutX(Sunconfig.CENTER_X);
-        tinyDayTerminatorLine.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
-
-        Group tinyDayTerminatorLineGroup = new Group();
-        tinyDayTerminatorLineGroup.getChildren().add(tinyDayTerminatorLine);
-        SubScene tinyDayTerminatorLineScene = new SubScene(tinyDayTerminatorLineGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        tinyDayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
-        tinyDayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_WIDTH));
-        tinyDayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
-
+        // Tiny globe
         tinyGlobeScale = new Scale();
-        tinyGlobeScale.setPivotX(Sunconfig.CENTER_X);
-        tinyGlobeScale.setPivotY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
+        tinyGlobeScale.setPivotX(Sunconfig.CENTER_X + Sunconfig.TINYGLOBE_RADIUS);
+        tinyGlobeScale.setPivotY(Sunconfig.CENTER_Y - Sunconfig.TINYGLOBE_RADIUS);
 
-        tinyGlobeGroup = new Group();
-        tinyGlobeGroup.getChildren().addAll(tinyGlobeScene, tinyDayTerminatorLineScene, tinyGlobeDot, tinyGlobeFrame);
+        tinyGlobeGroup = Suncreator.createTinyGlobe(longitude, latitude, phase, tilt);
         tinyGlobeGroup.getTransforms().add(tinyGlobeScale);
         tinyGlobeGroup.setOpacity(Sunconfig.TINYGLOBE_DEFAULT_OPACITY);
 
+        double tinyGlobeSlideInX = Sunconfig.CENTER_X - Sunconfig.TINYGLOBE_RADIUS;
+        double tinyGlobeSlideInY = Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET - Sunconfig.TINYGLOBE_RADIUS;
 
-        double tinyGlobeSlideOutX = -1 * Sunconfig.CENTER_X + Sunconfig.TINYGLOBE_RADIUS + Sunconfig.TINYGLOBE_SLIDE;
-        double tinyGlobeSlideOutY = Sunconfig.DIAL_HEIGHT - Sunconfig.CENTER_Y - Sunconfig.TINYGLOBE_OFFSET - Sunconfig.TINYGLOBE_RADIUS - Sunconfig.TINYGLOBE_SLIDE;
+        double tinyGlobeSlideOutX = Sunconfig.CENTER_X - Sunconfig.CENTER_X * cos(toRadians(45)) - Sunconfig.TINYGLOBE_RADIUS;
+        double tinyGlobeSlideOutY = Sunconfig.CENTER_Y + Sunconfig.CENTER_Y * sin(toRadians(45)) - Sunconfig.TINYGLOBE_RADIUS;
+
+        tinyGlobeGroup.setTranslateX(tinyGlobeSlideInX);
+        tinyGlobeGroup.setTranslateY(tinyGlobeSlideInY);
 
         tinyGlobeMoveOutTimeline = new Timeline();
         tinyGlobeMoveOutTimeline.setCycleCount(1);
@@ -491,9 +340,6 @@ public class Sundial {
 
         tinyGlobeMoveOutTimeline.getKeyFrames().addAll(keyFrameScaleOutX, keyFrameScaleOutY, keyFrameSlideOutX, keyFrameSlideOutY, keyFrameOpacityOut);
 
-
-        double tinyGlobeSlideInX = 0;
-        double tinyGlobeSlideInY = 0;
 
         tinyGlobeMoveInTimeline = new Timeline();
         tinyGlobeMoveInTimeline.setCycleCount(1);
@@ -1268,7 +1114,7 @@ public class Sundial {
         helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixTimeZone), getCenterY(matrixTimeZone), matrixTimeZone));
         helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixLongitude), getCenterY(matrixLongitude), matrixLongitude));
         helpMarkers.add(createHelpMarkerGroup(getCenterX(matrixLatitude), getCenterY(matrixLatitude), matrixLatitude));
-        helpMarkers.add(createHelpMarkerGroup(0, 0, tinyGlobeFrame));
+        helpMarkers.add(createHelpMarkerGroup(Sunconfig.TINYGLOBE_RADIUS, Sunconfig.TINYGLOBE_RADIUS, tinyGlobeGroup));
         helpMarkers.add(createHelpMarkerGroup(Sunconfig.CONTROL_RESIZE_SIZE * 0.666, Sunconfig.CONTROL_RESIZE_SIZE * 0.666, controlThingyResize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyMaximize));
         helpMarkers.add(createHelpMarkerGroup(0, 0, controlThingyMinimize));
@@ -1283,7 +1129,6 @@ public class Sundial {
         helpOverlay.setVisible(false);
 
 
-        helpText = new Text();
         helpText.setFont(new Font(12));
         helpText.setStroke(Color.WHITE);
         helpText.setFill(Sunconfig.Color_Of_Void);
@@ -1409,27 +1254,6 @@ public class Sundial {
         controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW2); });
         controlNightCompression.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2); });
 
-        controlThingyHelp.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.HAND); setGroupGlow(controlThingyHelp, Sunconfig.CONTROL_RESIZE_GLOW); });
-        controlThingyHelp.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyHelp.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyHelp, Sunconfig.CONTROL_RESIZE_SHADOW); });
-
-        controlThingyResize.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_RESIZE); controlThingyResize.setCursor(Cursor.NW_RESIZE); setGroupGlow(controlThingyResize, Sunconfig.CONTROL_RESIZE_GLOW); });
-        controlThingyResize.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyResize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyResize, Sunconfig.CONTROL_RESIZE_SHADOW); });
-
-        controlThingyClose.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_CLOSE); controlThingyClose.setCursor(Cursor.HAND); setGroupGlow(controlThingyClose, Sunconfig.CONTROL_CLOSE_GLOW); });
-        controlThingyClose.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyClose.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyClose, Sunconfig.CONTROL_CLOSE_SHADOW); });
-
-        controlThingyMaximize.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_MAXIMIZE); controlThingyMaximize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMaximize, Sunconfig.CONTROL_MAXIMIZE_GLOW); });
-        controlThingyMaximize.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyMaximize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMaximize, Sunconfig.CONTROL_MAXIMIZE_SHADOW); });
-
-        controlThingyMinimize.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_MINIMIZE); controlThingyMinimize.setCursor(Cursor.HAND); setGroupGlow(controlThingyMinimize, Sunconfig.CONTROL_MINIMIZE_GLOW); });
-        controlThingyMinimize.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyMinimize.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyMinimize, Sunconfig.CONTROL_MINIMIZE_SHADOW); });
-
-        controlThingyNightmode.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTMODE); controlThingyNightmode.setCursor(Cursor.HAND); setGroupGlow(controlThingyNightmode, Sunconfig.CONTROL_NIGHTMODE_GLOW); });
-        controlThingyNightmode.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyNightmode.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyNightmode, Sunconfig.CONTROL_NIGHTMODE_SHADOW); });
-
-        controlThingyAlwaysOnTop.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_ALWAYSONTOP); controlThingyAlwaysOnTop.setCursor(Cursor.HAND); setGroupGlow(controlThingyAlwaysOnTop, Sunconfig.CONTROL_ALWAYSONTOP_GLOW); });
-        controlThingyAlwaysOnTop.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlThingyAlwaysOnTop.setCursor(Cursor.DEFAULT); setGroupGlow(controlThingyAlwaysOnTop, Sunconfig.CONTROL_ALWAYSONTOP_SHADOW); });
-
         matrixYear.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_YEAR); matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, Sunconfig.MATRIX_GLOW); });
         matrixYear.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixYear.setCursor(Cursor.DEFAULT); setGroupGlow(matrixYear, Sunconfig.MATRIX_SHADOW); });
 
@@ -1454,8 +1278,8 @@ public class Sundial {
         matrixLatitude.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_LATITUDE); matrixLatitude.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixLatitude, Sunconfig.MATRIX_GLOW); });
         matrixLatitude.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixLatitude.setCursor(Cursor.DEFAULT); setGroupGlow(matrixLatitude, Sunconfig.MATRIX_SHADOW); });
 
-        tinyGlobeFrame.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_TINYGLOBE); tinyGlobeFrame.setCursor(Cursor.HAND); tinyGlobeFrame.setStyle(Sunconfig.MATRIX_GLOW); });
-        tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(Sunconfig.MATRIX_SHADOW); });
+        tinyGlobeGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_TINYGLOBE); tinyGlobeGroup.setCursor(Cursor.HAND); tinyGlobeGroup.setStyle(Sunconfig.MATRIX_GLOW); });
+        tinyGlobeGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); tinyGlobeGroup.setCursor(Cursor.DEFAULT); tinyGlobeGroup.setStyle(Sunconfig.MATRIX_SHADOW); });
 
         dialMarginCircle.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_WINDOW); dialMarginCircle.setCursor(Cursor.MOVE); });
         dialMarginCircle.setOnMouseExited(event -> {  helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialMarginCircle.setCursor(Cursor.DEFAULT); });
@@ -1815,7 +1639,7 @@ public class Sundial {
         return dialMarginFillBox;
     }
 
-    public Group getControlThingyResize() {
+    public ControlThingy getControlThingyResize() {
         return controlThingyResize;
     }
 
@@ -1831,55 +1655,23 @@ public class Sundial {
         return matrixLatitude;
     }
 
-    public Globe getDayGlobe() {
-        return dayGlobe;
-    }
-
-    public Globe getNightGlobe() {
-        return nightGlobe;
-    }
-
-    public Grid getDayGrid() {
-        return dayGrid;
-    }
-
-    public Ring getDayTerminatorLine() {
-        return dayTerminatorLine;
-    }
-
-    public Ring getDayTerminatorGlow() {
-        return dayTerminatorGlow;
-    }
-
-    public Globe getTinyGlobe() {
-        return tinyGlobe;
-    }
-
-    public Ring getTinyDayTerminatorLine() {
-        return tinyDayTerminatorLine;
-    }
-
-    public Circle getTinyGlobeFrame() {
-        return tinyGlobeFrame;
-    }
-
-    public Group getControlThingyClose() {
+    public ControlThingy getControlThingyClose() {
         return controlThingyClose;
     }
 
-    public Group getControlThingyMaximize() {
+    public ControlThingy getControlThingyMaximize() {
         return controlThingyMaximize;
     }
 
-    public Group getControlThingyMinimize() {
+    public ControlThingy getControlThingyMinimize() {
         return controlThingyMinimize;
     }
 
-    public Group getControlThingyNightmode() {
+    public ControlThingy getControlThingyNightmode() {
         return controlThingyNightmode;
     }
 
-    public Group getControlThingyAlwaysOnTop() {
+    public ControlThingy getControlThingyAlwaysOnTop() {
         return controlThingyAlwaysOnTop;
     }
 
@@ -1917,6 +1709,14 @@ public class Sundial {
 
     public Text getInfoText() {
         return infoText;
+    }
+
+    public Timeline getLongitudeTimeline() {
+        return longitudeTimeline;
+    }
+
+    public Timeline getLatitudeTimeline() {
+        return latitudeTimeline;
     }
 
     // Setters
@@ -2311,36 +2111,35 @@ public class Sundial {
 
     public void setGlobeDaylight(double phase, double tilt) {
 
-        dayGlobe.setDayLightPosition(phase, tilt);
-        nightGlobe.setDayLightPosition(phase, tilt);
-        dayTerminatorLine.setDayLightPosition(phase, tilt);
-        dayTerminatorGlow.setDayLightPosition(phase, tilt);
-
-        tinyGlobe.setDayLightPosition(phase, tilt);
-        tinyDayTerminatorLine.setDayLightPosition(phase, tilt);
+        this.phase.set(phase);
+        this.tilt.set(tilt);
     }
 
     public void rotateGlobe(double longitude, double latitude) {
 
-        dayGlobe.rotateGlobe(longitude, latitude, false);
-        nightGlobe.rotateGlobe(longitude,latitude, false);
-        dayGrid.rotateRing(longitude, latitude, false);
-        dayTerminatorLine.rotateRing(longitude, latitude, false);
-        dayTerminatorGlow.rotateRing(longitude, latitude, false);
-
-        tinyGlobe.rotateGlobe(longitude, latitude, false);
-        tinyDayTerminatorLine.rotateRing(longitude, latitude, false);
+        this.longitude.set(longitude);
+        this.latitude.set(latitude);
     }
 
     public void rotateGlobeAnimated(double longitude, double latitude) {
-        dayGlobe.rotateGlobe(longitude, latitude, globeAnimationOnEh);
-        nightGlobe.rotateGlobe(longitude, latitude, globeAnimationOnEh);
-        dayGrid.rotateRing(longitude, latitude, globeAnimationOnEh);
-        dayTerminatorLine.rotateRing(longitude, latitude, globeAnimationOnEh);
-        dayTerminatorGlow.rotateRing(longitude, latitude, globeAnimationOnEh);
 
-        tinyGlobe.rotateGlobe(longitude, latitude, globeAnimationOnEh);
-        tinyDayTerminatorLine.rotateRing(longitude, latitude, globeAnimationOnEh);
+        if (longitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { longitudeTimeline.stop(); }
+        if (latitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { latitudeTimeline.stop();}
+
+        KeyValue keyValueLongitude = new KeyValue(this.longitude, longitude, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(Sunconfig.GLOBE_ROTATE_DURATION), keyValueLongitude);
+
+        KeyValue keyValueLatitude = new KeyValue(this.latitude, latitude, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(Sunconfig.GLOBE_ROTATE_DURATION), keyValueLatitude);
+
+        longitudeTimeline.getKeyFrames().clear();
+        longitudeTimeline.getKeyFrames().add(keyFrameLongitude);
+
+        latitudeTimeline.getKeyFrames().clear();
+        latitudeTimeline.getKeyFrames().add(keyFrameLatitude);
+
+        longitudeTimeline.play();
+        latitudeTimeline.play();
     }
 
     public void toggleCetusTime() {
@@ -2360,11 +2159,6 @@ public class Sundial {
         cetusLineGroup.setVisible(visibleEh);
         cetusTimer.setVisible(visibleEh);
 
-        if (visibleEh) {
-            tinyGlobeFrame.setStroke(Sunconfig.Color_Of_CetusFrame);
-        } else {
-            tinyGlobeFrame.setStroke(Sunconfig.Color_Of_TinyFrame);
-        }
     }
 
     private Timeline createTimelineForLED(Node node, int duration) {
@@ -2448,23 +2242,16 @@ public class Sundial {
         helpOverlay.setVisible(helpEh);
         helpTextGroup.setVisible(helpEh);
 
-        if (helpEh) {
-            controlThingyHelpCircle.setStroke(Color.WHITE);
-        } else {
-            controlThingyHelpCircle.setStroke(Sunconfig.Color_Of_ResizeStroke);
-        }
+        controlThingyHelp.toggle();
     }
 
     public void toggleNightmode() {
         nightmodeEh = !nightmodeEh;
         nightModeOverlay.setVisible(nightmodeEh);
+        controlThingyNightmode.toggle();
     }
 
-    public void setAlwaysOnTop(boolean alwaysOnTopEh) {
-        if (alwaysOnTopEh) {
-            thingyAlwaysOnTopCircle.setStroke(Color.WHITE);
-        } else {
-            thingyAlwaysOnTopCircle.setStroke(Sunconfig.Color_Of_AlwaysOnTopStroke);
-        }
+    public void toggleAlwaysOnTop() {
+        controlThingyAlwaysOnTop.toggle();
     }
 }

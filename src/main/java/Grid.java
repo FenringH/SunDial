@@ -1,11 +1,10 @@
 import javafx.animation.*;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
@@ -22,8 +21,11 @@ public class Grid extends Group {
 
     private static final int DEFAULT_ANIMATION_DURATION = 1000;
 
-    private double longitude;
-    private double latitude;
+    private DoubleProperty longitude;
+    private DoubleProperty latitude;
+
+    private DoubleProperty tilt;
+    private DoubleProperty phase;
 
     private int animationDuration;
 
@@ -40,9 +42,6 @@ public class Grid extends Group {
     private Timeline rotateLatitudeTimeline;
 
     private AmbientLight ambientLight;
-
-    private double sunTilt;
-    private double sunPhase;
 
     private Rotate rotateTilt;
     private Rotate rotatePhase;
@@ -69,6 +68,17 @@ public class Grid extends Group {
         rotateLongitude.setAxis(Rotate.Y_AXIS);
         rotateLatitude.setAxis(Rotate.X_AXIS);
 
+        longitude = new SimpleDoubleProperty(0f);
+        latitude = new SimpleDoubleProperty( 0f);
+
+        longitude.addListener((observable, oldValue, newValue) -> rotateLongitude.setAngle(longitude.get()));
+        latitude.addListener((observable, oldValue, newValue) -> rotateLatitude.setAngle(latitude.get()));
+
+        phase = new SimpleDoubleProperty(0f);
+        tilt = new SimpleDoubleProperty(0f);
+
+        phase.addListener((observable, oldValue, newValue) -> rotatePhase.setAngle(phase.get()));
+        tilt.addListener((observable, oldValue, newValue) -> rotateTilt.setAngle(tilt.get()));
 
         rotateLongitudeTimeline = new Timeline();
         rotateLongitudeTimeline.setCycleCount(1);
@@ -146,18 +156,18 @@ public class Grid extends Group {
 
     public void rotateRing(double longitude, double latitude, boolean animated) {
 
-        this.longitude = longitude;
-        this.latitude = latitude;
+        this.longitude.set(longitude);
+        this.latitude.set(latitude);
 
         if (rotateLongitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLongitudeTimeline.stop(); }
         if (rotateLatitudeTimeline.getStatus().equals(Animation.Status.RUNNING)) { rotateLatitudeTimeline.stop(); }
 
         if (animated) {
 
-            KeyValue keyValueLongitude = new KeyValue(this.rotateLongitude.angleProperty(), this.longitude, Interpolator.EASE_BOTH);
+            KeyValue keyValueLongitude = new KeyValue(this.rotateLongitude.angleProperty(), this.longitude.get(), Interpolator.EASE_BOTH);
             KeyFrame keyFrameLongitude = new KeyFrame(Duration.millis(animationDuration), keyValueLongitude);
 
-            KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude, Interpolator.EASE_BOTH);
+            KeyValue keyValueLatitude = new KeyValue(rotateLatitude.angleProperty(), this.latitude.get(), Interpolator.EASE_BOTH);
             KeyFrame keyFrameLatitude = new KeyFrame(Duration.millis(animationDuration), keyValueLatitude);
 
             rotateLongitudeTimeline.getKeyFrames().clear();
@@ -171,18 +181,49 @@ public class Grid extends Group {
             rotateLatitudeTimeline.play();
 
         } else {
-            rotateLongitude.setAngle(this.longitude);
-            rotateLatitude.setAngle(this.latitude);
+            rotateLongitude.setAngle(this.longitude.get());
+            rotateLatitude.setAngle(this.latitude.get());
         }
     }
 
     public void setDayLightPosition(double phase, double tilt) {
 
-        sunPhase = phase;
-        sunTilt = 0d - tilt;
+        this.phase.set(phase);
+        this.tilt.set(-tilt);
 
-        rotatePhase.setAngle(sunPhase * 360 + 90);
-        rotateTilt.setAngle(sunTilt);
+        rotatePhase.setAngle(this.phase.get() * 360 + 90);
+        rotateTilt.setAngle(this.tilt.get());
     }
 
+    public double getLongitude() {
+        return longitude.get();
+    }
+
+    public DoubleProperty longitudeProperty() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude.get();
+    }
+
+    public DoubleProperty latitudeProperty() {
+        return latitude;
+    }
+
+    public double getTilt() {
+        return tilt.get();
+    }
+
+    public DoubleProperty tiltProperty() {
+        return tilt;
+    }
+
+    public double getPhase() {
+        return phase.get();
+    }
+
+    public DoubleProperty phaseProperty() {
+        return phase;
+    }
 }

@@ -93,21 +93,21 @@ public class Sunface extends Application {
         timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
 
         // Create 'sun' objects
-        suntimeLocal = new Suntime.Builder()
+        suntimeLocal = new Suntime.PleaseBuildSuntime()
                 .localTime(currentLocalTime)
                 .observerLongitude(longitude)
                 .observerLatitude(latitude)
-                .build();
+                .thankYou();
 
-        suntimeGlobal = new Suntime.Builder()
+        suntimeGlobal = new Suntime.PleaseBuildSuntime()
                 .localTime(currentLocalTime)
                 .observerLongitude(longitude)
                 .observerLatitude(latitude)
-                .build();
+                .thankYou();
 
-        Sundial sundial = new Sundial.Builder()
+        Sundial sundial = new Sundial.PleaseBuildSundial()
                 .nightCompression(0)
-                .build();
+                .thankYou();
 
         sundial.rotateGlobe(longitude, latitude);
 
@@ -209,7 +209,7 @@ public class Sunface extends Application {
 
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
 
-        sundial.getControlThingyMaximize().setOnMouseClicked(event -> toggleMaximizeWindow(primaryStage, event));
+        sundial.getControlThingyMaximize().setOnMouseClicked(event -> { toggleMaximizeWindow(primaryStage, event); sundial.getControlThingyMaximize().toggle(); });
 
         sundial.getControlThingyMinimize().setOnMousePressed(event -> mouseButtonList.add(event.getButton()));
         sundial.getControlThingyMinimize().setOnMouseReleased(event -> { minimizeWindow(primaryStage, timeline, event); mouseButtonList.clear(); });
@@ -683,7 +683,7 @@ public class Sunface extends Application {
         }
 
         if (sundial.globeAnimationOnEh) {
-            sundial.getDayGlobe().getRotateLongitudeTimeline().setOnFinished(event -> initCurrentTime(sundial));
+            sundial.getLongitudeTimeline().setOnFinished(event -> initCurrentTime(sundial));
             sundial.rotateGlobeAnimated(longitude, latitude);
         } else {
             sundial.rotateGlobe(longitude, latitude);
@@ -1313,7 +1313,7 @@ public class Sunface extends Application {
 
     private void setAlwaysOnTop(Stage stage, Sundial sundial, boolean alwaysOnTopEh) {
         stage.setAlwaysOnTop(alwaysOnTopEh);
-        sundial.setAlwaysOnTop(alwaysOnTopEh);
+        sundial.toggleAlwaysOnTop();
     }
 
     private void toggleAlwaysOnTop(Stage stage, Sundial sundial) {

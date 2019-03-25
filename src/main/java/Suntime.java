@@ -1,6 +1,5 @@
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 import static java.lang.Math.*;
@@ -42,8 +41,8 @@ public class Suntime {
     private double localHourAngle;
     private double siderealTime;
 
-    // Constructors - Builder
-    private Suntime(Builder builder) {
+    // Constructors
+    private Suntime(PleaseBuildSuntime builder) {
         this.localTime = builder.localTime;
         this.julianDate = builder.julianDate;
         this.julianDayNumber = builder.julianDayNumber;
@@ -66,7 +65,7 @@ public class Suntime {
     }
 
     // Builder
-    public static class Builder {
+    public static class PleaseBuildSuntime {
         private GregorianCalendar localTime;
         private double julianDate;
         private long julianDayNumber;
@@ -74,7 +73,7 @@ public class Suntime {
         private double observerLatitude;
         private long precision;
 
-        public Builder() {
+        public PleaseBuildSuntime() {
             this.localTime = new GregorianCalendar();
             this.julianDate = J2000;
             this.julianDayNumber = J2000;
@@ -83,7 +82,7 @@ public class Suntime {
             this.precision = DEFAULT_PRECISION;
         }
 
-        public Builder localTime(GregorianCalendar localTime) {
+        public PleaseBuildSuntime localTime(GregorianCalendar localTime) {
             if (localTime == null) { return this; }
             this.localTime = localTime;
             this.julianDate = Suntime.getJulianDate(localTime);
@@ -91,34 +90,34 @@ public class Suntime {
             return this;
         }
 
-        public Builder julianDate(double julianDate) {
+        public PleaseBuildSuntime julianDate(double julianDate) {
             this.julianDate = julianDate;
             this.localTime = Suntime.getCalendarDate(julianDate, this.localTime.getTimeZone());
             this.julianDayNumber = Suntime.getJulianDayNumber(this.localTime);
             return this;
         }
 
-        public Builder julianDayNumber(long julianDayNumber) {
+        public PleaseBuildSuntime julianDayNumber(long julianDayNumber) {
             this.julianDayNumber = julianDayNumber;
             return this;
         }
 
-        public Builder observerLongitude(double observerLongitude) {
+        public PleaseBuildSuntime observerLongitude(double observerLongitude) {
             this.observerLongitude = observerLongitude;
             return this;
         }
 
-        public Builder observerLatitude(double observerLatitude) {
+        public PleaseBuildSuntime observerLatitude(double observerLatitude) {
             this.observerLatitude = observerLatitude;
             return this;
         }
 
-        public Builder precision(long precision) {
+        public PleaseBuildSuntime precision(long precision) {
             this.precision = precision;
             return this;
         }
 
-        public Suntime build() {
+        public Suntime thankYou() {
             return new Suntime(this);
         }
     }
