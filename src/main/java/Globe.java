@@ -67,13 +67,11 @@ public class Globe extends Group {
 
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty(0f);
-
-        longitude.addListener((observable, oldValue, newValue) -> rotateLongitude.setAngle(this.longitude.get()));
-        latitude.addListener((observable, oldValue, newValue) -> rotateLatitude.setAngle(this.latitude.get()));
-
         tilt = new SimpleDoubleProperty(0f);
         phase = new SimpleDoubleProperty(0f);
 
+        longitude.addListener((observable, oldValue, newValue) -> rotateLongitude.setAngle(this.longitude.get()));
+        latitude.addListener((observable, oldValue, newValue) -> rotateLatitude.setAngle(this.latitude.get()));
         tilt.addListener((observable, oldValue, newValue) -> rotateTilt.setAngle(this.tilt.get()));
         phase.addListener((observable, oldValue, newValue) -> rotatePhase.setAngle(this.phase.get()));
 
@@ -166,7 +164,7 @@ public class Globe extends Group {
         this.phase.set(phase);
         this.tilt.set(tilt);
 
-        rotatePhase.setAngle(this.phase.get() * 360);
+        rotatePhase.setAngle(this.phase.get());
         rotateTilt.setAngle(this.tilt.get());
     }
 

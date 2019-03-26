@@ -70,15 +70,13 @@ public class Grid extends Group {
 
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty( 0f);
+        tilt = new SimpleDoubleProperty(0f);
+        phase = new SimpleDoubleProperty(0f);
 
         longitude.addListener((observable, oldValue, newValue) -> rotateLongitude.setAngle(longitude.get()));
         latitude.addListener((observable, oldValue, newValue) -> rotateLatitude.setAngle(latitude.get()));
-
-        phase = new SimpleDoubleProperty(0f);
-        tilt = new SimpleDoubleProperty(0f);
-
-        phase.addListener((observable, oldValue, newValue) -> rotatePhase.setAngle(phase.get()));
         tilt.addListener((observable, oldValue, newValue) -> rotateTilt.setAngle(tilt.get()));
+        phase.addListener((observable, oldValue, newValue) -> rotatePhase.setAngle(phase.get()));
 
         rotateLongitudeTimeline = new Timeline();
         rotateLongitudeTimeline.setCycleCount(1);
@@ -189,9 +187,9 @@ public class Grid extends Group {
     public void setDayLightPosition(double phase, double tilt) {
 
         this.phase.set(phase);
-        this.tilt.set(-tilt);
+        this.tilt.set(tilt);
 
-        rotatePhase.setAngle(this.phase.get() * 360 + 90);
+        rotatePhase.setAngle(this.phase.get());
         rotateTilt.setAngle(this.tilt.get());
     }
 

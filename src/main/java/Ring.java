@@ -65,13 +65,11 @@ public class Ring extends Group {
 
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty(0f);
-
-        longitude.addListener((observable, oldValue, newValue) -> rotateLongitude.setAngle(longitude.get()));
-        latitude.addListener((observable, oldValue, newValue) -> rotateLatitude.setAngle(latitude.get()));
-
         tilt = new SimpleDoubleProperty(0f);
         phase = new SimpleDoubleProperty(0f);
 
+        longitude.addListener((observable, oldValue, newValue) -> rotateLongitude.setAngle(longitude.get()));
+        latitude.addListener((observable, oldValue, newValue) -> rotateLatitude.setAngle(latitude.get()));
         tilt.addListener((observable, oldValue, newValue) -> rotateTilt.setAngle(tilt.get()));
         phase.addListener((observable, oldValue, newValue) -> rotatePhase.setAngle(phase.get()));
 
@@ -105,6 +103,8 @@ public class Ring extends Group {
         // Gyroscope
         Group ringGripper = new Group();
         ringGripper.getChildren().addAll(sphere, cylinder, ambientLight);
+        ringGripper.setRotationAxis(Rotate.Y_AXIS);
+        ringGripper.setRotate(90);
         ringGripper.getTransforms().add(rotateTilt);
 
         Group ringHolder = new Group();

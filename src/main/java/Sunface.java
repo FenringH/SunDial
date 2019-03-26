@@ -218,6 +218,8 @@ public class Sunface extends Application {
 
         sundial.getControlThingyAlwaysOnTop().setOnMouseClicked(event -> toggleAlwaysOnTop(primaryStage, sundial));
 
+        sundial.getControlThingyGlobeGrid().setOnMouseClicked(event -> sundial.toggleGlobeGrid());
+
         sundial.getMatrixTimeZone().setOnMousePressed(event -> {
             mouseButtonList.add(event.getButton());
             changeTimeZone(sundial, event);
@@ -616,8 +618,8 @@ public class Sunface extends Application {
 
         long newJulianDayNumber = suntimeLocal.getJulianDayNumber();
 
-        double phase = suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber();
-        double tilt = suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(offsetLocalTime));
+        double phase = (suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber()) * 360;
+        double tilt = -suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(offsetLocalTime));
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);
@@ -1225,8 +1227,12 @@ public class Sunface extends Application {
             if (sundial.cetusTimeVisibleEh()) {
                 sundial.setCetusTimeVisibility(false);
             } else {
-                if (cetustime.cetusTimeExpiredEh()) { refreshCetusTime(sundial, mouseEvent); }
-                showCetusTime(sundial);
+                if (cetustime.cetusTimeExpiredEh()) {
+                    refreshCetusTime(sundial, mouseEvent);
+                }
+                else {
+                    showCetusTime(sundial, mouseEvent);
+                }
             }
 
             return;
@@ -1257,7 +1263,7 @@ public class Sunface extends Application {
         });
 
         refreshCetusDataTask.setOnSucceeded(refreshEvent -> {
-            showCetusTime(sundial);
+            showCetusTime(sundial, mouseEvent);
             sundial.getInfoTextGroup().setVisible(false);
         });
 
@@ -1266,7 +1272,7 @@ public class Sunface extends Application {
         executorService.shutdown();
     }
 
-    private void showCetusTime(Sundial sundial) {
+    private void showCetusTime(Sundial sundial, MouseEvent mouseEvent) {
 
         if (cetustime.cetusTimeOkEh()) {
 
@@ -1278,7 +1284,7 @@ public class Sunface extends Application {
 
         } else {
             sundial.getInfoText().setText("Cetus time unavailable: \n" + cetustime.getResult());
-            sundial.moveGroup(sundial.getInfoTextGroup(), null);
+            sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
             sundial.getInfoTextGroup().setVisible(true);
         }
 

@@ -136,8 +136,8 @@ public class Sunchart {
 
     private String formatTitle() {
         return "Suntime at "
-                + Sundial.formatCoordinateToString(this.longitude, "E", "W")
-                + ", " + Sundial.formatCoordinateToString(this.latitude, "N", "S")
+                + Sunutil.formatCoordinateToString(this.longitude, "E", "W")
+                + ", " + Sunutil.formatCoordinateToString(this.latitude, "N", "S")
                 + " in " + calendar.get(Calendar.YEAR) + "."
         ;
     }
