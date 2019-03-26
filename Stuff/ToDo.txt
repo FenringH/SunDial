@@ -1,13 +1,13 @@
 
-- redesign minute/second LEDs, or remove them
++ redesign minute/second LEDs, or remove them
 
-- redesign minute/second markers, or remove them
++ redesign minute/second markers, or remove them
 
 - rewrite Sunchart class to explore better performance for chart redraw
 
-- create new sub class Suncontrols for control surfaces
++ create new sub class Suncontrols for control surfaces
 
-- create new class with static methods that contains all creators for Sundial class
++ create new class with static methods that contains all creators for Sundial class
 
 - new feature: display information about sun elevation at noon
 

@@ -135,6 +135,7 @@ public class Suncreator {
                     .colorStroke(Sunconfig.Color_Of_GlobeGridStroke, Color.WHITE)
                     .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
                     .colorFill(Sunconfig.Color_Of_GlobeGridFill)
+                    .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
                     .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
                     .cursor(Cursor.HAND)
                     .helpText(Sunconfig.HELPTEXT_GLOBEGRID, helpText)
@@ -183,7 +184,7 @@ public class Suncreator {
         nightGlobe.phaseProperty().bind(phase);
         nightGlobe.tiltProperty().bind(tilt);
 
-        Grid dayGrid = new Grid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, 1, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
+        Grid dayGrid = new Grid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBEGRID_LINE_WIDTH, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGrid.setLayoutX(Sunconfig.CENTER_X);
         dayGrid.setLayoutY(Sunconfig.CENTER_Y);
         dayGrid.longitudeProperty().bind(longitude);
@@ -227,7 +228,7 @@ public class Suncreator {
         dayTerminatorLineGroup.getChildren().add(dayTerminatorLine);
         SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLineGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
-        dayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_WIDTH));
+        dayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.GLOBEGRID_LINE_WIDTH));
         dayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
 
         Group dayTerminatorGlowGroup = new Group();
@@ -242,7 +243,7 @@ public class Suncreator {
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
 
-        return new Group(dayGlobeScene, nightGlobeScene, dayGrid, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
+        return new Group(dayGlobeScene, nightGlobeScene, dayGridScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
     }
 
     public static Group createTinyGlobe(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {
