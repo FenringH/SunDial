@@ -207,33 +207,24 @@ public class Suncreator {
         dayTerminatorGlow.phaseProperty().bind(phase);
         dayTerminatorGlow.tiltProperty().bind(tilt);
 
-        Group dayGlobeGroup = new Group();
-        dayGlobeGroup.getChildren().add(dayGlobe);
-        SubScene dayGlobeScene = new SubScene(dayGlobeGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        SubScene dayGlobeScene = new SubScene(dayGlobe, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayGlobeScene.setBlendMode(BlendMode.ADD);
 
-        Group nightGlobeGroup = new Group();
-        nightGlobeGroup.getChildren().add(nightGlobe);
-        SubScene nightGlobeScene = new SubScene(nightGlobeGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene nightGlobeScene = new SubScene(nightGlobe, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         nightGlobeScene.setBlendMode(BlendMode.SCREEN);
 
-        Group dayGridGroup = new Group();
-        dayGridGroup.getChildren().add(dayGrid);
-        SubScene dayGridScene = new SubScene(dayGridGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene dayGridScene = new SubScene(dayGrid, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayGridScene.setBlendMode(BlendMode.SCREEN);
         dayGridScene.setEffect(new GaussianBlur(1));
         dayGridScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
 
-        Group dayTerminatorLineGroup = new Group();
-        dayTerminatorLineGroup.getChildren().add(dayTerminatorLine);
-        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLineGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLine, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
         dayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.GLOBEGRID_LINE_WIDTH));
         dayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
 
-        Group dayTerminatorGlowGroup = new Group();
-        dayTerminatorGlowGroup.getChildren().add(dayTerminatorGlow);
-        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlowGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlow, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
         dayTerminatorGlowScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_GLOW_WIDTH));
         dayTerminatorGlowScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);

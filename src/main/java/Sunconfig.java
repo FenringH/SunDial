@@ -266,6 +266,8 @@ public class Sunconfig {
     public static final double HELP_OVERLAY_OPACITY = 0.35d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
+    public static final double TIMEDATE_DEFAULT_OPACITY = 1.00d;
+    public static final double TIMEDATE_TRANSPARENT_OPACITY = 0.20d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
     public static final double MATRIX_HORIZON_OFFSET = 80.0d;
