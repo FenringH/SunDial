@@ -324,6 +324,7 @@ public class Sundial {
                 Suncreator.createSunriseGroup(sunriseDialRotate, matrixSunrise),
                 Suncreator.createSunsetGroup(sunsetDialRotate, matrixSunset)
         );
+        horizonGroup.setMouseTransparent(true);
 
         // Time and Date
         matrixDay = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);

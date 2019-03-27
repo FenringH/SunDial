@@ -68,7 +68,6 @@ public class Sunface extends Application {
     private Suntime suntimeGlobal;
 
     private Cetustime cetustime;
-    private RefreshCetusDataTask refreshCetusDataTask;
 
     private Sunchart sunchart;
 
@@ -637,7 +636,7 @@ public class Sunface extends Application {
 
     private void refreshCetusTime(Sundial sundial, MouseEvent mouseEvent) {
 
-        refreshCetusDataTask = new RefreshCetusDataTask(cetustime);
+        RefreshCetusDataTask refreshCetusDataTask = new RefreshCetusDataTask(cetustime);
 
         refreshCetusDataTask.setOnScheduled(refreshEvent -> {
             sundial.getInfoText().setText("Syncing with Cetus...");

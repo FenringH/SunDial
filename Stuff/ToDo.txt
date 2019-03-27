@@ -14,6 +14,7 @@
 - new feature: expands controls to enable cycling through modes on RMB
     - for instance, nighmode LMB for on/off, nightmode RMB to cycle through options
 
+- fix Cetus time display to sync with change of Timezone
 
 
 
