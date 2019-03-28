@@ -529,6 +529,7 @@ public class Sunface extends Application {
             default: {}
         }
 
+/*
         offsetLocalTime.set(
                 offsetLocalTime.get(Calendar.YEAR) + offsetYear,
                 offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
@@ -537,8 +538,24 @@ public class Sunface extends Application {
                 offsetLocalTime.get(Calendar.MINUTE) + offsetMinute,
                 offsetLocalTime.get(Calendar.SECOND) + offsetSecond
         );
+*/
 
-        offsetLocalTime.setTimeInMillis(offsetLocalTime.getTimeInMillis() + offsetWeek * 7 * 24 * 60 * 60 * 1000);
+        offsetLocalTime.set(
+                offsetLocalTime.get(Calendar.YEAR) + offsetYear,
+                offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
+                offsetLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
+                offsetLocalTime.get(Calendar.HOUR_OF_DAY),
+                offsetLocalTime.get(Calendar.MINUTE),
+                offsetLocalTime.get(Calendar.SECOND)
+        );
+
+        offsetLocalTime.setTimeInMillis(
+                offsetLocalTime.getTimeInMillis()
+                + offsetWeek * (7 * 24 * 60 * 60 * 1000)
+                + offsetHour * (60 * 60 * 1000)
+                + offsetMinute * (60 * 1000)
+                + offsetSecond * 1000
+        );
 
         if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
         else { sundial.setDialFrameWarning(true); }
@@ -1235,7 +1252,7 @@ public class Sunface extends Application {
 
     private void changeWindowPosition(Stage stage, MouseEvent event) {
 
-        if(getLastButton().equals(MouseButton.PRIMARY)) { return; }
+        if(!getLastButton().equals(MouseButton.PRIMARY)) { return; }
 
         double winSizeX = stage.getWidth();
         double winSizeY = stage.getHeight();
