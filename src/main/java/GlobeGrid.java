@@ -12,12 +12,12 @@ import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 
-public class Grid extends Group {
+public class GlobeGrid extends Group {
 
     private static final int DENSITY_X = 36;
     private static final int DENSITY_Y = 18;
 
-    private static final int DIVISIONS = DENSITY_X;
+    private static final int DIVISIONS = 128;
 
     private static final int DEFAULT_ANIMATION_DURATION = 1000;
 
@@ -33,7 +33,7 @@ public class Grid extends Group {
     private Sphere sphere;
 
     private PhongMaterial ringMaterial;
-    private PhongMaterial sphereMaterial;
+    private PhongMaterial darkMaterial;
 
     private Rotate rotateLongitude;
     private Rotate rotateLatitude;
@@ -46,11 +46,11 @@ public class Grid extends Group {
     private Rotate rotateTilt;
     private Rotate rotatePhase;
 
-    public Grid(double radius, double width) {
+    public GlobeGrid(double radius, double width) {
         this(radius, width, Color.WHITE, DEFAULT_ANIMATION_DURATION);
     }
 
-    public Grid(double radius, double width, Color color, int animationDuration) {
+    public GlobeGrid(double radius, double width, Color color, int animationDuration) {
 
         super();
 
@@ -91,8 +91,7 @@ public class Grid extends Group {
         ringMaterial = new PhongMaterial();
         ringMaterial.setDiffuseColor(color);
 
-        sphereMaterial = new PhongMaterial();
-        sphereMaterial.setDiffuseColor(Color.BLACK);
+        darkMaterial = new PhongMaterial(Color.BLACK);
 
 
         cylinderGroup = new Group();
@@ -117,38 +116,37 @@ public class Grid extends Group {
             double meridianRadius = radius * Math.cos(angle);
             double meridianHeight = radius * Math.sin(angle);
 
-            Cylinder cylinderHwite = new Cylinder(meridianRadius, width, DIVISIONS);
-            cylinderHwite.setMaterial(ringMaterial);
-            cylinderHwite.setTranslateY(meridianHeight);
-            cylinderHwite.setDrawMode(DrawMode.LINE);
+            Cylinder lightCylinder = new Cylinder(meridianRadius, width, DIVISIONS);
+            lightCylinder.setMaterial(ringMaterial);
+            lightCylinder.setTranslateY(meridianHeight);
 
-            cylinderGroup.getChildren().addAll(cylinderHwite);
+            Cylinder darkCylinder = new Cylinder(meridianRadius - width, width * 1.01, DIVISIONS);
+            darkCylinder.setMaterial(darkMaterial);
+            darkCylinder.setTranslateY(meridianHeight);
+
+            cylinderGroup.getChildren().addAll(darkCylinder, lightCylinder);
         }
 
         sphere = new Sphere(radius - width / 2, DIVISIONS);
-        sphere.setMaterial(sphereMaterial);
+        sphere.setMaterial(darkMaterial);
 
         ambientLight = new AmbientLight(Color.WHITE);
 
 
         // Gyroscope
-        Group ringGripper = new Group();
-        ringGripper.getChildren().addAll(sphere, cylinderGroup, ambientLight);
-        ringGripper.getTransforms().add(rotateTilt);
+        Group gridTilter = new Group(sphere, cylinderGroup, ambientLight);
+        gridTilter.getTransforms().add(rotateTilt);
 
-        Group ringHolder = new Group();
-        ringHolder.getChildren().add(ringGripper);
-        ringHolder.getTransforms().add(rotatePhase);
+        Group gridPhaser = new Group(gridTilter);
+        gridPhaser.getTransforms().add(rotatePhase);
 
-        Group globeGripper = new Group();
-        globeGripper.getTransforms().add(rotateLongitude);
-        globeGripper.getChildren().addAll(ringHolder);
+        Group gridLongituder = new Group(gridPhaser);
+        gridLongituder.getTransforms().add(rotateLongitude);
 
-        Group globeHolder = new Group();
-        globeHolder.getTransforms().add(rotateLatitude);
-        globeHolder.getChildren().addAll(globeGripper);
+        Group gridLatituder = new Group(gridLongituder);
+        gridLatituder.getTransforms().add(rotateLatitude);
 
-        super.getChildren().add(globeHolder);
+        super.getChildren().add(gridLatituder);
     }
 
 

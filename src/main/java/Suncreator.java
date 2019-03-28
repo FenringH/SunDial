@@ -33,7 +33,8 @@ public class Suncreator {
         MINIMIZE,
         NIGTMODE,
         ALWAYSONTOP,
-        GLOBEGRID
+        GLOBEGRID,
+        GLOBELINES
     };
 
     public static ControlThingy createControlThingy(ControlThingyType type, Text helpText) {
@@ -130,16 +131,30 @@ public class Suncreator {
                 break;
             case GLOBEGRID:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, Sunconfig.CONTROL_GLOBEGRID_ANGLE)
+                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 40)
                     .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
                     .colorStroke(Sunconfig.Color_Of_GlobeGridStroke, Color.WHITE)
                     .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
                     .colorFill(Sunconfig.Color_Of_GlobeGridFill)
-                    .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+//                    .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
                     .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
                     .cursor(Cursor.HAND)
                     .helpText(Sunconfig.HELPTEXT_GLOBEGRID, helpText)
                     .thankYou();
+                controlThingy.setVisible(false);
+                break;
+            case GLOBELINES:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 50)
+                        .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_GlobeGridStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_GlobeGridFill)
+//                    .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_GLOBELINES, helpText)
+                        .thankYou();
                 controlThingy.setVisible(false);
                 break;
             default:
@@ -164,7 +179,10 @@ public class Suncreator {
             DoubleProperty latitude,
             DoubleProperty phase,
             DoubleProperty tilt,
-            BooleanProperty gridVisibleEh) {
+            DoubleProperty lightScale,
+            BooleanProperty gridVisibleEh,
+            BooleanProperty linesVisibleEh
+    ) {
 
         Globe dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
@@ -174,6 +192,7 @@ public class Suncreator {
         dayGlobe.latitudeProperty().bind(latitude);
         dayGlobe.phaseProperty().bind(phase);
         dayGlobe.tiltProperty().bind(tilt);
+        dayGlobe.lightScaleProperty().bind(lightScale);
 
         Globe nightGlobe = new Globe(Sunconfig.GLOBE_NIGHT_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         nightGlobe.setLayoutX(Sunconfig.CENTER_X);
@@ -184,12 +203,19 @@ public class Suncreator {
         nightGlobe.phaseProperty().bind(phase);
         nightGlobe.tiltProperty().bind(tilt);
 
-        Grid dayGrid = new Grid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBEGRID_LINE_WIDTH, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
-        dayGrid.setLayoutX(Sunconfig.CENTER_X);
-        dayGrid.setLayoutY(Sunconfig.CENTER_Y);
-        dayGrid.longitudeProperty().bind(longitude);
-        dayGrid.latitudeProperty().bind(latitude);
-        dayGrid.visibleProperty().bind(gridVisibleEh);
+        GlobeGrid globeGrid = new GlobeGrid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBEGRID_LINE_WIDTH, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
+        globeGrid.setLayoutX(Sunconfig.CENTER_X);
+        globeGrid.setLayoutY(Sunconfig.CENTER_Y);
+        globeGrid.longitudeProperty().bind(longitude);
+        globeGrid.latitudeProperty().bind(latitude);
+        globeGrid.visibleProperty().bind(gridVisibleEh);
+
+        GlobeLines globeLines = new GlobeLines(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, 2, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
+        globeLines.setLayoutX(Sunconfig.CENTER_X);
+        globeLines.setLayoutY(Sunconfig.CENTER_Y);
+        globeLines.longitudeProperty().bind(longitude);
+        globeLines.latitudeProperty().bind(latitude);
+        globeLines.visibleProperty().bind(linesVisibleEh);
 
         Ring dayTerminatorLine = new Ring(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.DAY_TERMINATOR_WIDTH, Sunconfig.Color_Of_TerminatorLine, Sunconfig.GLOBE_ROTATE_DURATION);
         dayTerminatorLine.setLayoutX(Sunconfig.CENTER_X);
@@ -214,10 +240,15 @@ public class Suncreator {
         SubScene nightGlobeScene = new SubScene(nightGlobe, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         nightGlobeScene.setBlendMode(BlendMode.SCREEN);
 
-        SubScene dayGridScene = new SubScene(dayGrid, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayGridScene.setBlendMode(BlendMode.SCREEN);
-        dayGridScene.setEffect(new GaussianBlur(1));
-        dayGridScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
+        SubScene globeGridScene = new SubScene(globeGrid, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        globeGridScene.setBlendMode(BlendMode.SCREEN);
+        globeGridScene.setEffect(new GaussianBlur(1));
+        globeGridScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
+
+        SubScene globeLinesScene = new SubScene(globeLines, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        globeLinesScene.setBlendMode(BlendMode.SCREEN);
+        globeLinesScene.setEffect(new GaussianBlur(1));
+        globeLinesScene.setOpacity(Sunconfig.DAY_GRIDLINE_OPACITY);
 
         SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLine, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
@@ -234,7 +265,7 @@ public class Suncreator {
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
 
-        return new Group(dayGlobeScene, nightGlobeScene, dayGridScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
+        return new Group(dayGlobeScene, nightGlobeScene, globeGridScene, globeLinesScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
     }
 
     public static Group createTinyGlobe(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {

@@ -10,11 +10,17 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
+import static java.lang.Math.*;
 
-public class Ring extends Group {
+
+public class GlobeLines extends Group {
 
     private static final int DIVISIONS = 128;
+
     private static final int DEFAULT_ANIMATION_DURATION = 1000;
+
+    private static final double TROPIC_LINE_ANGLE = 23.26d;
+    private static final double POLAR_LINE_ANGLE = 66.33d;
 
     private DoubleProperty longitude;
     private DoubleProperty latitude;
@@ -24,11 +30,10 @@ public class Ring extends Group {
 
     private int animationDuration;
 
-    private Cylinder cylinder;
+    private Group cylinderGroup;
     private Sphere sphere;
 
     private PhongMaterial ringMaterial;
-    private PhongMaterial sphereMaterial;
 
     private Rotate rotateLongitude;
     private Rotate rotateLatitude;
@@ -41,11 +46,11 @@ public class Ring extends Group {
     private Rotate rotateTilt;
     private Rotate rotatePhase;
 
-    public Ring(double radius, double width) {
+    public GlobeLines(double radius, double width) {
         this(radius, width, Color.WHITE, DEFAULT_ANIMATION_DURATION);
     }
 
-    public Ring(double radius, double width, Color color, int animationDuration) {
+    public GlobeLines(double radius, double width, Color color, int animationDuration) {
 
         super();
 
@@ -64,7 +69,7 @@ public class Ring extends Group {
         rotateLatitude.setAxis(Rotate.X_AXIS);
 
         longitude = new SimpleDoubleProperty(0f);
-        latitude = new SimpleDoubleProperty(0f);
+        latitude = new SimpleDoubleProperty( 0f);
         tilt = new SimpleDoubleProperty(0f);
         phase = new SimpleDoubleProperty(0f);
 
@@ -86,36 +91,75 @@ public class Ring extends Group {
         ringMaterial = new PhongMaterial();
         ringMaterial.setDiffuseColor(color);
 
-        sphereMaterial = new PhongMaterial();
-        sphereMaterial.setDiffuseColor(Color.BLACK);
+        PhongMaterial equatorMaterial = new PhongMaterial(Color.WHITE);
+        PhongMaterial tropicMaterial = new PhongMaterial(new Color(1.00, 0.50, 0.15, 1.00));
+        PhongMaterial polarMaterial = new PhongMaterial(new Color(0.15, 0.50, 1.00, 1.00));
+        PhongMaterial darkMaterial = new PhongMaterial(Color.BLACK);
 
-        cylinder = new Cylinder(radius, width, DIVISIONS);
-        cylinder.setMaterial(ringMaterial);
-        cylinder.setRotationAxis(Rotate.Z_AXIS);
-        cylinder.setRotate(90);
+        Cylinder equatorCylinder = new Cylinder(radius * cos(toRadians(0)), width, DIVISIONS);
+        equatorCylinder.setMaterial(equatorMaterial);
+        equatorCylinder.setTranslateY(radius * sin(toRadians(0)));
 
-        sphere = new Sphere(radius - 1, DIVISIONS);
-        sphere.setMaterial(sphereMaterial);
+        Cylinder tropicCylinderN = new Cylinder(radius * cos(toRadians(TROPIC_LINE_ANGLE)), width, DIVISIONS);
+        tropicCylinderN.setMaterial(tropicMaterial);
+        tropicCylinderN.setTranslateY(radius * sin(toRadians(TROPIC_LINE_ANGLE)));
+
+        Cylinder tropicCylinderS = new Cylinder(radius * cos(toRadians(-TROPIC_LINE_ANGLE)), width, DIVISIONS);
+        tropicCylinderS.setMaterial(tropicMaterial);
+        tropicCylinderS.setTranslateY(radius * sin(toRadians(-TROPIC_LINE_ANGLE)));
+
+        Cylinder polarCylinderN = new Cylinder(radius * cos(toRadians(POLAR_LINE_ANGLE)), width, DIVISIONS);
+        polarCylinderN.setMaterial(polarMaterial);
+        polarCylinderN.setTranslateY(radius * sin(toRadians(POLAR_LINE_ANGLE)));
+
+        Cylinder polarCylinderS = new Cylinder(radius * cos(toRadians(-POLAR_LINE_ANGLE)), width, DIVISIONS);
+        polarCylinderS.setMaterial(polarMaterial);
+        polarCylinderS.setTranslateY(radius * sin(toRadians(-POLAR_LINE_ANGLE)));
+
+        cylinderGroup = new Group(equatorCylinder, tropicCylinderN, tropicCylinderS, polarCylinderN, polarCylinderS);
+
+
+        Cylinder darkEquatorCylinder = new Cylinder(radius * cos(toRadians(0)) - width, width + 1, DIVISIONS);
+        darkEquatorCylinder.setMaterial(darkMaterial);
+        darkEquatorCylinder.setTranslateY(radius * sin(toRadians(0)));
+
+        Cylinder darkTropicCylinderN = new Cylinder(radius * cos(toRadians(TROPIC_LINE_ANGLE)) - width, width + 1, DIVISIONS);
+        darkTropicCylinderN.setMaterial(darkMaterial);
+        darkTropicCylinderN.setTranslateY(radius * sin(toRadians(TROPIC_LINE_ANGLE)));
+
+        Cylinder darkTropicCylinderS = new Cylinder(radius * cos(toRadians(-TROPIC_LINE_ANGLE)) - width, width + 1, DIVISIONS);
+        darkTropicCylinderS.setMaterial(darkMaterial);
+        darkTropicCylinderS.setTranslateY(radius * sin(toRadians(-TROPIC_LINE_ANGLE)));
+
+        Cylinder darkPolarCylinderN = new Cylinder(radius * cos(toRadians(POLAR_LINE_ANGLE)) - width, width + 1, DIVISIONS);
+        darkPolarCylinderN.setMaterial(darkMaterial);
+        darkPolarCylinderN.setTranslateY(radius * sin(toRadians(POLAR_LINE_ANGLE)));
+
+        Cylinder darkPolarCylinderS = new Cylinder(radius * cos(toRadians(-POLAR_LINE_ANGLE)) - width, width + 1, DIVISIONS);
+        darkPolarCylinderS.setMaterial(darkMaterial);
+        darkPolarCylinderS.setTranslateY(radius * sin(toRadians(-POLAR_LINE_ANGLE)));
+
+        Group darkCylinderGroup = new Group(darkEquatorCylinder, darkTropicCylinderN, darkTropicCylinderS, darkPolarCylinderN, darkPolarCylinderS);
+
+        sphere = new Sphere(radius - width, DIVISIONS);
+        sphere.setMaterial(darkMaterial);
 
         ambientLight = new AmbientLight(Color.WHITE);
 
-
         // Gyroscope
-        Group ringTilter = new Group(sphere, cylinder, ambientLight);
-        ringTilter.setRotationAxis(Rotate.Y_AXIS);
-        ringTilter.setRotate(90);
-        ringTilter.getTransforms().add(rotateTilt);
+        Group gridTilter = new Group(sphere, darkCylinderGroup, cylinderGroup, ambientLight);
+        gridTilter.getTransforms().add(rotateTilt);
 
-        Group ringPhaser = new Group(ringTilter);
-        ringPhaser.getTransforms().add(rotatePhase);
+        Group gridPhaser = new Group(gridTilter);
+        gridPhaser.getTransforms().add(rotatePhase);
 
-        Group ringLongituder = new Group(ringPhaser);
-        ringLongituder.getTransforms().add(rotateLongitude);
+        Group gridLongituder = new Group(gridPhaser);
+        gridLongituder.getTransforms().add(rotateLongitude);
 
-        Group ringLatituder = new Group(ringLongituder);
-        ringLatituder.getTransforms().add(rotateLatitude);
+        Group gridLatituder = new Group(gridLongituder);
+        gridLatituder.getTransforms().add(rotateLatitude);
 
-        super.getChildren().add(ringLatituder);
+        super.getChildren().add(gridLatituder);
     }
 
 
@@ -154,9 +198,9 @@ public class Ring extends Group {
     public void setDayLightPosition(double phase, double tilt) {
 
         this.phase.set(phase);
-        this.tilt.set(-tilt);
+        this.tilt.set(tilt);
 
-        rotatePhase.setAngle(this.phase.get() * 360 + 90);
+        rotatePhase.setAngle(this.phase.get());
         rotateTilt.setAngle(this.tilt.get());
     }
 

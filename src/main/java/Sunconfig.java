@@ -157,7 +157,10 @@ public class Sunconfig {
             "\n... to set DEFAULT Coordinates";
 
     public static final String HELPTEXT_GLOBEGRID = "GLOBE GRID" +
-            "\nLMB : toggle Grid";
+            "\nLMB : toggle Parallels and Meridians";
+
+    public static final String HELPTEXT_GLOBELINES = "GLOBE LINES" +
+            "\nLMB : toggle Equator, Tropic and Polar circles";
 
     public static final String HELPTEXT_GLOBE = "GLOBE" +
             "\nLMB : rotate Globe (fast)" +
@@ -214,7 +217,7 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_RADIUS = 10.0d;
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
-    public static final double CONTROL_GLOBEGRID_RADIUS = 10.0d;
+    public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CETUS_MARKER_LENGTH = 50.0d;
     public static final double HELP_OVERLAY_ROUND = DIAL_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
@@ -241,7 +244,7 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 3.0d;
-    public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 3.0d;
+    public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
     public static final double DAY_TERMINATOR_WIDTH = 1.25d;
     public static final double DAY_TERMINATOR_GLOW_WIDTH = 25.00d;
@@ -263,6 +266,7 @@ public class Sunconfig {
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     public static final double CETUS_ARC_OPACITY = 1.00d;
     public static final double DAY_TERMINATOR_OPACITY = 0.50d;
+    public static final double DAY_GRIDLINE_OPACITY = 1.00d;
     public static final double HELP_OVERLAY_OPACITY = 0.35d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
@@ -346,6 +350,7 @@ public class Sunconfig {
 
     public static final Color Color_Of_DaySky     = new Color(0.50, 0.75, 1.00, 1.00);
     public static final Color Color_Of_Atmosphere = new Color(0.25, 0.50, 0.90, 0.85);
+    public static final Color Color_Of_Space      = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky   = new Color(0.50, 0.35, 1.00, 1.00);
     public static final Color Color_Of_Midnight   = new Color(0.00, 0.00, 0.00, 0.20);
     public static final Color Color_Of_Margin     = new Color(0.15, 0.30, 0.70, 1.00);
@@ -382,8 +387,8 @@ public class Sunconfig {
     public static final Color Color_Of_NightmodeStroke = new Color(0.80, 0.20, 0.80, 1.00);
     public static final Color Color_Of_AlwaysOnTopFill = new Color(0.35, 0.35, 0.35, 0.20);
     public static final Color Color_Of_AlwaysOnTopStroke = new Color(0.75, 0.75, 0.75, 1.00);
-    public static final Color Color_Of_GlobeGridFill = new Color(0.35, 0.35, 0.35, 0.20);
-    public static final Color Color_Of_GlobeGridStroke = new Color(0.75, 0.75, 0.75, 1.00);
+    public static final Color Color_Of_GlobeGridFill = new Color(0.45, 0.20, 0.10, 0.20);
+    public static final Color Color_Of_GlobeGridStroke = new Color(0.90, 0.40, 0.20, 1.00);
     public static final Color Color_Of_ThingyFill = new Color(0.35, 0.35, 0.35, 0.20);
     public static final Color Color_Of_ThingyStroke = new Color(0.75, 0.75, 0.75, 1.00);
 
@@ -538,7 +543,7 @@ public class Sunconfig {
             new Stop(0.950, Color_Of_Void),
             new Stop(0.980, Color_Of_Atmosphere),
             new Stop(0.990, Color.SKYBLUE),
-            new Stop(1.000, Color_Of_Void)
+            new Stop(1.000, Color_Of_Space)
     );
 
 }

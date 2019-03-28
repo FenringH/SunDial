@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
 import javafx.util.Duration;
 
 public class Globe extends Group {
@@ -21,9 +22,11 @@ public class Globe extends Group {
     private DoubleProperty tilt;
     private DoubleProperty phase;
 
+    private DoubleProperty lightScale;
+
     private int animationDuration;
 
-    private Sphere daySphere;
+    private Sphere sphere;
     private PhongMaterial globeMaterial;
 
     private Image dayDiffuseMap;
@@ -40,6 +43,7 @@ public class Globe extends Group {
 
     private Rotate rotateTilt;
     private Rotate rotatePhase;
+    private Scale lightScaleTransform;
 
     public Globe(double radius) {
         this(Sunconfig.GLOBE_DAY_IMAGE, radius, DEFAULT_ANIMATION_DURATION);
@@ -64,6 +68,8 @@ public class Globe extends Group {
         rotateLongitude.setAxis(Rotate.Y_AXIS);
         rotateLatitude.setAxis(Rotate.X_AXIS);
 
+        lightScaleTransform = new Scale();
+
 
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty(0f);
@@ -75,6 +81,8 @@ public class Globe extends Group {
         tilt.addListener((observable, oldValue, newValue) -> rotateTilt.setAngle(this.tilt.get()));
         phase.addListener((observable, oldValue, newValue) -> rotatePhase.setAngle(this.phase.get()));
 
+        lightScale = new SimpleDoubleProperty(1f);
+        lightScale.addListener((observable, oldValue, newValue) -> lightScaleTransform.setZ(this.lightScale.get()));
 
         rotateLongitudeTimeline = new Timeline();
         rotateLongitudeTimeline.setCycleCount(1);
@@ -98,29 +106,28 @@ public class Globe extends Group {
         globeMaterial = new PhongMaterial();
         globeMaterial.setDiffuseMap(dayDiffuseMap);
 
-        daySphere = new Sphere(radius, SPHERE_DIVISIONS);
-        daySphere.setMaterial(globeMaterial);
+        sphere = new Sphere(radius, SPHERE_DIVISIONS);
+        sphere.setMaterial(globeMaterial);
 
 
         // Gyroscope rotation system
-        Group dayLightGripper = new Group();
-        dayLightGripper.getChildren().addAll(dayLight, nightLight, ambientLight);
-        dayLightGripper.getTransforms().add(rotateTilt);
+        Group lightTilter = new Group(dayLight, nightLight, ambientLight);
+        lightTilter.getTransforms().add(rotateTilt);
 
-        Group dayLightHolder = new Group();
-        dayLightHolder.getChildren().add(dayLightGripper);
-        dayLightHolder.getTransforms().add(rotatePhase);
+        Group lightPhaser = new Group(lightTilter);
+        lightPhaser.getTransforms().add(rotatePhase);
 
-        Group daySphereGripper = new Group();
-        daySphereGripper.getTransforms().add(rotateLongitude);
-        daySphereGripper.getChildren().addAll(daySphere, dayLightHolder);
+        Group lightScaleGroup = new Group(lightPhaser);
+//        lightScaleGroup.getTransforms().add(lightScaleTransform);
 
-        Group daySphereHolder = new Group();
-        daySphereHolder.getTransforms().add(rotateLatitude);
-        daySphereHolder.getChildren().addAll(daySphereGripper);
+        Group sphereLongituder = new Group(sphere, lightScaleGroup);
+        sphereLongituder.getTransforms().add(rotateLongitude);
 
+        Group sphereLatituder = new Group(sphereLongituder);
+        sphereLatituder.getTransforms().add(rotateLatitude);
 
-        super.getChildren().add(daySphereHolder);
+        super.getChildren().add(sphereLatituder);
+//        super.getTransforms().add(lightScaleTransform);
     }
 
     public void rotateGlobe(double longitude, double latitude, boolean animated) {
@@ -180,8 +187,8 @@ public class Globe extends Group {
         ambientLight.setColor(ambientLightColor);
     }
 
-    public Sphere getDaySphere() {
-        return daySphere;
+    public Sphere getSphere() {
+        return sphere;
     }
 
     public PointLight getDayLight() {
@@ -230,5 +237,17 @@ public class Globe extends Group {
 
     public DoubleProperty phaseProperty() {
         return phase;
+    }
+
+    public double getLightScale() {
+        return lightScale.get();
+    }
+
+    public DoubleProperty lightScaleProperty() {
+        return lightScale;
+    }
+
+    public Scale getLightScaleTransform() {
+        return lightScaleTransform;
     }
 }

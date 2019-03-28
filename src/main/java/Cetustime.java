@@ -23,11 +23,12 @@ public class Cetustime {
 
     private static final long CETUS_DATA_EXPIRY_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in ms
 
-    public static final int DAY_LENGTH = 100 * 60 * 1000;              // in ms
-    public static final int NIGHT_LENGTH = 50 * 60 * 1000;             // in ms
-    public static final int CYCLE_LENGTH = DAY_LENGTH + NIGHT_LENGTH;  // in ms
+    public static final long DAY_LENGTH = 100 * 60 * 1000;              // in ms
+    public static final long NIGHT_LENGTH = 50 * 60 * 1000;             // in ms
+    public static final long CYCLE_LENGTH = DAY_LENGTH + NIGHT_LENGTH;  // in ms
 
-    public static final int CYCLES_PER_DAY = (int) ceil(24d * 60 * 60 * 1000 / CYCLE_LENGTH);
+    public static final long CYCLES_PER_DAY = (int) ceil(24d * 60 * 60 * 1000 / CYCLE_LENGTH);
+    public static final long CYCLES_PER_48h = 2 * CYCLES_PER_DAY;
 
     private HashMap<String, String> dataMap;
     private boolean dayEh;
@@ -118,6 +119,7 @@ public class Cetustime {
                 dateUtc.get(Calendar.DAY_OF_MONTH),
                 0, 0, 0
         );
+//        dateMidnightUtc.setTimeInMillis(dateMidnightUtc.getTimeInMillis() - (12 * 60 * 60 * 1000));
 
         long offsetInMillis = expiry.getTimeInMillis() - dateMidnightUtc.getTimeInMillis();
         long cycleStart = dateMidnightUtc.getTimeInMillis() + (offsetInMillis % CYCLE_LENGTH);

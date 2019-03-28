@@ -30,6 +30,7 @@ public class Sunface extends Application {
 
     private GregorianCalendar currentLocalTime;
     private GregorianCalendar offsetLocalTime;
+    private GregorianCalendar timeZonedCalendar;
 
     private double longitude = Sunconfig.DEFAULT_LONGITUDE;
     private double latitude = Sunconfig.DEFAULT_LATITUDE;
@@ -54,6 +55,7 @@ public class Sunface extends Application {
     private Node savedNode;
 
     private int timeZoneOffset;
+    private long timeZoneCorrection;
 
     private boolean maximizedEh = false;
     private boolean alwaysOnTopEh = false;
@@ -90,6 +92,7 @@ public class Sunface extends Application {
         // Init time
         currentLocalTime = new GregorianCalendar();
         offsetLocalTime = new GregorianCalendar();
+        timeZonedCalendar = new GregorianCalendar();
 
         timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
 
@@ -129,10 +132,14 @@ public class Sunface extends Application {
         dialsGroup.getTransforms().add(dialsScale);
 
         dialsScale.xProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.widthProperty().get() / Sunconfig.DIAL_WIDTH), primaryStage.widthProperty()));
+                (primaryStage.widthProperty().get() / Sunconfig.DIAL_WIDTH),
+                primaryStage.widthProperty())
+        );
 
         dialsScale.yProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.heightProperty().get() / Sunconfig.DIAL_HEIGHT), primaryStage.heightProperty()));
+                (primaryStage.heightProperty().get() / Sunconfig.DIAL_HEIGHT),
+                primaryStage.heightProperty())
+        );
 
         dialsScale.zProperty().bind(Bindings.createDoubleBinding(() -> {
             // For Z scale pick smaller value between width and height
@@ -141,7 +148,16 @@ public class Sunface extends Application {
             double stageSize = (stageWidth > stageHeight) ? stageHeight : stageWidth;
             double dialsSize = (Sunconfig.DIAL_WIDTH > Sunconfig.DIAL_HEIGHT) ? Sunconfig.DIAL_HEIGHT : Sunconfig.DIAL_WIDTH;
             return stageSize / dialsSize;
-        }, primaryStage.widthProperty(), primaryStage.heightProperty()));
+        },
+                primaryStage.widthProperty(),
+                primaryStage.heightProperty())
+        );
+
+        // Fix for Z-axis scale not propagating through SubScene in globe
+        sundial.globeLightScalerProperty().bind(Bindings.createDoubleBinding(() ->
+                (primaryStage.widthProperty().get() / Sunconfig.DIAL_WIDTH),
+                primaryStage.widthProperty())
+        );
 
 
         // App icons
@@ -198,7 +214,7 @@ public class Sunface extends Application {
         // Playtime
         KeyFrame keyframeClockTick = new KeyFrame(
                 Duration.millis(fpsSetting),
-                event -> updateCurrentTime(sundial));
+                event -> updateCurrentTime());
 
         Timeline timeline = new Timeline(keyframeClockTick);
         timeline.setCycleCount(Animation.INDEFINITE);
@@ -233,6 +249,9 @@ public class Sunface extends Application {
         // Control GLOBEGRID
         sundial.getControlThingyGlobeGrid().setOnMouseClicked(event -> sundial.toggleGlobeGrid());
 
+        // Control GLOBELINES
+        sundial.getControlThingyGlobeLines().setOnMouseClicked(event -> sundial.toggleGlobeLines());
+
         // Control NIGHT COMPRESSION
         sundial.getControlNightCompression().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getControlNightCompression().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
@@ -245,8 +264,8 @@ public class Sunface extends Application {
         sundial.getDialMarginCircle().setOnMouseDragged(event -> changeWindowPosition(primaryStage, event));
 
         // Circle FRAME
-        sundial.getDialCircleFrame().setOnMousePressed(event -> saveMouse(primaryStage, event));
-        sundial.getDialCircleFrame().setOnMouseReleased(event -> { frameActions(primaryStage, event); killMouse(); });
+        sundial.getDialCircleFrame().setOnMousePressed(event -> { saveMouse(primaryStage, event); globeCheck(); });
+        sundial.getDialCircleFrame().setOnMouseReleased(event -> { frameActions(primaryStage, event); killMouse(); globeCheck(); });
         sundial.getDialCircleFrame().setOnMouseDragged(event -> frameDrag(primaryStage, event) );
 
         // Globe TINYGLOBE
@@ -320,7 +339,7 @@ public class Sunface extends Application {
 
         // *** SHOWTIME ***
 
-        initCurrentTime(sundial);
+        initCurrentTime();
         primaryStage.show();
         timeline.play();
 
@@ -337,15 +356,15 @@ public class Sunface extends Application {
     // ***************************************************************
     // *** Methods ***
 
-    private void initCurrentTime(Sundial sundial) {
-        updateCurrentTime(sundial, true);
+    private void initCurrentTime() {
+        updateCurrentTime(true);
     }
 
-    private void updateCurrentTime(Sundial sundial) {
-        updateCurrentTime(sundial, false);
+    private void updateCurrentTime() {
+        updateCurrentTime(false);
     }
 
-    private void updateCurrentTime(Sundial sundial, boolean initialize) {
+    private void updateCurrentTime(boolean initialize) {
 
         GregorianCalendar newLocalTime = new GregorianCalendar();
 
@@ -363,9 +382,8 @@ public class Sunface extends Application {
         offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis() + offsetSeconds * 1000);
 
         // Update suntime and sundial objects
-        long timeZoneCorrection = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
+        timeZoneCorrection = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
 
-        GregorianCalendar timeZonedCalendar = new GregorianCalendar();
         timeZonedCalendar.setTimeInMillis(offsetLocalTime.getTimeInMillis() + timeZoneCorrection);
 
         GregorianCalendar globalCalendar = new GregorianCalendar();
@@ -411,7 +429,7 @@ public class Sunface extends Application {
             sundial.setHighNoon(highNoonDate);
             sundial.setHorizon(sunriseDate, sunsetDate);
             sundial.setCoordinates(longitude, latitude);
-            sundial.setCetusTime(cetusNightList, timeZonedCalendar);
+            sundial.setCetusTime(cetusNightList, timeZonedCalendar, timeZoneCorrection);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
         }
 
@@ -443,7 +461,7 @@ public class Sunface extends Application {
                 currentLocalTime.get(Calendar.SECOND)
         );
         sundial.setDialFrameWarning(false);
-        initCurrentTime(sundial);
+        initCurrentTime();
     }
 
     private void offsetTimeByEvent(OffsetType offsetType, ScrollEvent event) {
@@ -464,12 +482,7 @@ public class Sunface extends Application {
 
         if (sundial == null || event == null) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-            if (mouseButton.equals(MouseButton.MIDDLE)) {
-                return;
-            }
-        }
+        if (getLastButton().equals(MouseButton.MIDDLE)) { return; }
 
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();
@@ -530,7 +543,7 @@ public class Sunface extends Application {
         if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
         else { sundial.setDialFrameWarning(true); }
 
-        initCurrentTime(sundial);
+        initCurrentTime();
     }
 
     private void resetGlobePosition(Sundial sundial, PositionType type) {
@@ -545,11 +558,11 @@ public class Sunface extends Application {
         }
 
         if (sundial.globeAnimationOnEh) {
-            sundial.getLongitudeTimeline().setOnFinished(event -> initCurrentTime(sundial));
+            sundial.getLongitudeTimeline().setOnFinished(event -> initCurrentTime());
             sundial.rotateGlobeAnimated(longitude, latitude);
         } else {
             sundial.rotateGlobe(longitude, latitude);
-            initCurrentTime(sundial);
+            initCurrentTime();
         }
     }
 
@@ -666,7 +679,7 @@ public class Sunface extends Application {
 
             if (cetusNightList.isEmpty()) { cetusNightList = cetustime.getNightList(offsetLocalTime); }
 
-            sundial.setCetusTime(cetusNightList, offsetLocalTime);
+            sundial.setCetusTime(cetusNightList, timeZonedCalendar, timeZoneCorrection);
             sundial.updateCetusTimer(cetusNightList);
             sundial.setCetusTimeVisibility(true);
 
@@ -837,15 +850,21 @@ public class Sunface extends Application {
 
     // *** Mouse HELPERS
 
+    private void globeCheck() {
+        if (sundial.globeVisibleEh) {
+            if (getLastButton().equals(MouseButton.PRIMARY) || getLastButton().equals(MouseButton.SECONDARY)) {
+                sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_TRANSPARENT_OPACITY);
+            } else {
+                sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_DEFAULT_OPACITY);
+            }
+        }
+    }
+
     private void saveMouse(Stage stage, MouseEvent event) {
 
         killMouse();
 
         if (event != null) {
-
-            if (sundial.globeVisibleEh && !event.isMiddleButtonDown()) {
-                sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_TRANSPARENT_OPACITY);
-            }
 
             mouseButtonList.add(event.getButton());
 
@@ -873,6 +892,14 @@ public class Sunface extends Application {
         return (pickedNode != null && pickedNode.equals(savedNode));
     }
 
+    private MouseButton getLastButton() {
+        if (!mouseButtonList.isEmpty()) {
+            return mouseButtonList.get(mouseButtonList.size() - 1);
+        } else {
+            return MouseButton.NONE;
+        }
+    }
+
 
     // *** Mouse ACTIONS (onMouseRelease)
 
@@ -881,22 +908,16 @@ public class Sunface extends Application {
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
+        // LMB action -> minimize stage
+        if (getLastButton().equals(MouseButton.PRIMARY)) {
+            stage.setIconified(true);
+            return;
+        }
 
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-
-            // LMB action -> minimize stage
-            if (mouseButton.equals(MouseButton.PRIMARY)) {
-                stage.setIconified(true);
-                return;
-            }
-
-            // RMB action -> toggle debug window
-            if (mouseButton.equals(MouseButton.SECONDARY)) {
-                toggleDebugWindow(stage);
-                return;
-            }
-
+        // RMB action -> toggle debug window
+        if (getLastButton().equals(MouseButton.SECONDARY)) {
+            toggleDebugWindow(stage);
+            return;
         }
     }
 
@@ -905,15 +926,10 @@ public class Sunface extends Application {
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
-
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-
-            // MMB action -> reset window size
-            if(mouseButton.equals(MouseButton.MIDDLE)) {
-                resetWindowSize(stage);
-                return;
-            }
+        // MMB action -> reset window size
+        if(getLastButton().equals(MouseButton.MIDDLE)) {
+            resetWindowSize(stage);
+            return;
         }
     }
 
@@ -922,43 +938,31 @@ public class Sunface extends Application {
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
-
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-
-            // MMB action -> reset window size
-            if(mouseButton.equals(MouseButton.MIDDLE)) {
-                sundial.resetNightCompression();
-                return;
-            }
+        // MMB action -> reset window size
+        if(getLastButton().equals(MouseButton.MIDDLE)) {
+            sundial.resetNightCompression();
+            return;
         }
     }
 
     private void frameActions(Stage stage, MouseEvent event) {
 
-        if (sundial.globeVisibleEh) { sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_DEFAULT_OPACITY); }
-
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
+        // LMB action -> update Sunchart
+        if (getLastButton().equals(MouseButton.PRIMARY)) {
+            updateSunchart(sunchart);
+        }
 
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
+        // RMB action -> update Sunchart
+        if (getLastButton().equals(MouseButton.SECONDARY)) {
+            updateSunchart(sunchart);
+        }
 
-            // LMB action -> update Sunchart
-            if (mouseButton.equals(MouseButton.PRIMARY)) {
-                updateSunchart(sunchart);
-            }
-
-            // RMB action -> update Sunchart
-            if (mouseButton.equals(MouseButton.SECONDARY)) {
-                updateSunchart(sunchart);
-            }
-
-            // MMB action -> reset globe coordinates
-            if (mouseButton.equals(MouseButton.MIDDLE)) {
-                resetGlobePosition(sundial, PositionType.BOTH);
-            }
+        // MMB action -> reset globe coordinates
+        if (getLastButton().equals(MouseButton.MIDDLE)) {
+            resetGlobePosition(sundial, PositionType.BOTH);
         }
     }
 
@@ -967,21 +971,16 @@ public class Sunface extends Application {
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
+        // MMB action -> reset time zone to local time zone
+        if (getLastButton().equals(MouseButton.MIDDLE)) {
 
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
+            TimeZone localTimeZone = (new GregorianCalendar()).getTimeZone();
 
-            // MMB action -> reset time zone to local time zone
-            if (mouseButton.equals(MouseButton.MIDDLE)) {
+            timeZoneOffset = localTimeZone.getRawOffset();
+            currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
+            offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
 
-                TimeZone localTimeZone = (new GregorianCalendar()).getTimeZone();
-
-                timeZoneOffset = localTimeZone.getRawOffset();
-                currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
-                offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
-
-                initCurrentTime(sundial);
-            }
+            initCurrentTime();
         }
     }
 
@@ -992,24 +991,19 @@ public class Sunface extends Application {
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
+        // LMB action -> update Sunchart
+        if (getLastButton().equals(MouseButton.PRIMARY)) {
+            updateSunchart(sunchart);
+        }
 
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
+        // RMB action -> update Sunchart
+        if (getLastButton().equals(MouseButton.SECONDARY)) {
+            updateSunchart(sunchart);
+        }
 
-            // LMB action -> update Sunchart
-            if (mouseButton.equals(MouseButton.PRIMARY)) {
-                updateSunchart(sunchart);
-            }
-
-            // RMB action -> update Sunchart
-            if (mouseButton.equals(MouseButton.SECONDARY)) {
-                updateSunchart(sunchart);
-            }
-
-            // MMB action -> reset globe coordinates
-            if (mouseButton.equals(MouseButton.MIDDLE)) {
-                resetGlobePosition(sundial, positionType);
-            }
+        // MMB action -> reset globe coordinates
+        if (getLastButton().equals(MouseButton.MIDDLE)) {
+            resetGlobePosition(sundial, positionType);
         }
     }
 
@@ -1018,15 +1012,10 @@ public class Sunface extends Application {
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
-        if (!mouseButtonList.isEmpty()) {
-
-            MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-
-            // MMB action -> reset time to local time
-            if (mouseButton.equals(MouseButton.MIDDLE)) {
-                resetTime();
-                return;
-            }
+        // MMB action -> reset time to local time
+        if (getLastButton().equals(MouseButton.MIDDLE)) {
+            resetTime();
+            return;
         }
 
         updateSunchart(sunchart);
@@ -1133,11 +1122,7 @@ public class Sunface extends Application {
 
     private void resizeDrag(Stage stage, MouseEvent event) {
 
-        if (!mouseButtonList.isEmpty()) {
-            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
-                return;
-            }
-        }
+        if(getLastButton().equals(MouseButton.MIDDLE)) { return; }
 
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();
@@ -1169,9 +1154,6 @@ public class Sunface extends Application {
             currentScreenMinY = currentScreen.getMinY();
             currentScreenMaxX = currentScreen.getMaxX();
             currentScreenMaxY = currentScreen.getMaxY();
-
-//            maxWidth = currentScreen.getMaxX() - savedWindowPositionX;
-//            maxHeight = currentScreen.getMaxY() - savedWindowPositionY;
 
             maxWidth = currentScreen.getMaxX() - stage.getX();
             maxHeight = currentScreen.getMaxY() - stage.getY();
@@ -1221,8 +1203,7 @@ public class Sunface extends Application {
 
         if (suntimeLocal == null || sundial == null || event == null) { return; }
 
-        MouseButton mouseButton = mouseButtonList.get(mouseButtonList.size() - 1);
-        if (mouseButton == null || mouseButton.equals(MouseButton.MIDDLE)) { return; }
+        if (getLastButton().equals(MouseButton.MIDDLE)) { return; }
 
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();
@@ -1254,9 +1235,7 @@ public class Sunface extends Application {
 
     private void changeWindowPosition(Stage stage, MouseEvent event) {
 
-        if (!mouseButtonList.isEmpty()) {
-            if(!mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.PRIMARY)) { return; }
-        }
+        if(getLastButton().equals(MouseButton.PRIMARY)) { return; }
 
         double winSizeX = stage.getWidth();
         double winSizeY = stage.getHeight();
@@ -1323,11 +1302,7 @@ public class Sunface extends Application {
 
     private void rotateGlobe(Sundial sundial, MouseEvent event) {
 
-        if (!mouseButtonList.isEmpty()) {
-            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
-                return;
-            }
-        }
+        if(getLastButton().equals(MouseButton.MIDDLE)) { return; }
 
         double mouseScreenX = event.getScreenX();
         double mouseScreenY = event.getScreenY();
@@ -1349,7 +1324,7 @@ public class Sunface extends Application {
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
-        initCurrentTime(sundial);
+        initCurrentTime();
         sundial.rotateGlobe(longitude, latitude);
     }
 
@@ -1400,17 +1375,13 @@ public class Sunface extends Application {
             executorService.shutdown();
         }
 
-        initCurrentTime(sundial);
+        initCurrentTime();
         sundial.rotateGlobeAnimated(longitude, latitude);
     }
 
     private void rotateGlobe(Sundial sundial, PositionType positionType, MouseEvent event) {
 
-        if (!mouseButtonList.isEmpty()) {
-            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
-                return;
-            }
-        }
+        if(getLastButton().equals(MouseButton.MIDDLE)) { return; }
 
         double mouseScreenX = event.getScreenX();
         double mouseScreenY = event.getScreenY();
@@ -1441,7 +1412,7 @@ public class Sunface extends Application {
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
-        initCurrentTime(sundial);
+        initCurrentTime();
         sundial.rotateGlobe(longitude, latitude);
     }
 
@@ -1486,16 +1457,14 @@ public class Sunface extends Application {
         currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
         offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
 
-        initCurrentTime(sundial);
+        initCurrentTime();
     }
 
     private void rotateGlobe(Sundial sundial, PositionType type, ScrollEvent event) {
 
-        if (!mouseButtonList.isEmpty()) {
-            if(mouseButtonList.get(mouseButtonList.size() - 1).equals(MouseButton.MIDDLE)) {
-                resetGlobePosition(sundial, type);
-                return;
-            }
+        if(getLastButton().equals(MouseButton.MIDDLE)) {
+            resetGlobePosition(sundial, type);
+            return;
         }
 
         double step = 0;
@@ -1511,7 +1480,7 @@ public class Sunface extends Application {
         if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
         if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
 
-        initCurrentTime(sundial);
+        initCurrentTime();
         sundial.rotateGlobe(longitude, latitude);
     }
 }

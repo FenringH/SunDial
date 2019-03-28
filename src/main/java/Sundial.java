@@ -48,6 +48,7 @@ public class Sundial {
     private DoubleProperty latitude;
     private DoubleProperty tilt;
     private DoubleProperty phase;
+    private DoubleProperty globeLightScaler;
 
 
     // graphical primitives
@@ -114,6 +115,7 @@ public class Sundial {
     private ControlThingy controlThingyNightmode;
     private ControlThingy controlThingyAlwaysOnTop;
     private ControlThingy controlThingyGlobeGrid;
+    private ControlThingy controlThingyGlobeLines;
 
     private Circle tinyGlobeFrame;
     private Group tinyGlobeGroup;
@@ -148,6 +150,7 @@ public class Sundial {
     public boolean nightmodeEh = false;
 
     public BooleanProperty globeGridVisibleEh;
+    public BooleanProperty globeLinesVisibleEh;
 
 
     // Constructor
@@ -229,6 +232,9 @@ public class Sundial {
         globeGridVisibleEh = new SimpleBooleanProperty(false);
         globeGridVisibleEh.addListener((observable, oldValue, newValue) -> {});
 
+        globeLinesVisibleEh = new SimpleBooleanProperty(false);
+        globeLinesVisibleEh.addListener((observable, oldValue, newValue) -> {});
+
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty(0f);
         tilt = new SimpleDoubleProperty(0f);
@@ -238,6 +244,9 @@ public class Sundial {
         latitude.addListener((observable, oldValue, newValue) -> {});
         tilt.addListener((observable, oldValue, newValue) -> {});
         phase.addListener((observable, oldValue, newValue) -> {});
+
+        globeLightScaler = new SimpleDoubleProperty(1f);
+        globeLightScaler.addListener((observable, oldValue, newValue) -> {});
 
         longitudeTimeline = new Timeline();
         latitudeTimeline = new Timeline();
@@ -256,7 +265,7 @@ public class Sundial {
         dialRotateLocalSecond = centerRotate.clone();
 
         // Master globe
-        globeMasterGroup = Suncreator.createMasterGlobe(longitude, latitude, phase, tilt, globeGridVisibleEh);
+        globeMasterGroup = Suncreator.createMasterGlobe(longitude, latitude, phase, tilt, globeLightScaler, globeGridVisibleEh, globeLinesVisibleEh);
         globeMasterGroup.setVisible(false);
 
         // Tiny globe
@@ -382,6 +391,7 @@ public class Sundial {
         controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGTMODE, helpText);
         controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
         controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
+        controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
 
         // Info overlay
         infoText = new Text();
@@ -407,6 +417,7 @@ public class Sundial {
         helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyNightmode));
         helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyAlwaysOnTop));
         helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyGlobeGrid));
+        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyGlobeLines));
         helpMarkers.add(Suncreator.createHelpMarkerGroup(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, controlNightCompression));
 
         helpOverlay = Suncreator.createHelpOverlay(helpMarkers, globeMasterGroup);
@@ -453,6 +464,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(controlThingyNightmode);
         foregroundGroup.getChildren().add(controlThingyAlwaysOnTop);
         foregroundGroup.getChildren().add(controlThingyGlobeGrid);
+        foregroundGroup.getChildren().add(controlThingyGlobeLines);
 
         foregroundGroup.getChildren().add(helpOverlay);
         foregroundGroup.getChildren().add(controlThingyHelp);
@@ -710,7 +722,7 @@ public class Sundial {
         ledOn.set(indexOn, true);
     }
 
-    public void setCetusTime(ArrayList<ArrayList<GregorianCalendar>> nightList, GregorianCalendar calendar) {
+    public void setCetusTime(ArrayList<ArrayList<GregorianCalendar>> nightList, GregorianCalendar calendar, long timeZoneCorrection) {
 
         if (nightList == null || nightList.isEmpty()) { return; }
 
@@ -739,8 +751,11 @@ public class Sundial {
 
             if ((i * 2) + 1 > cetusMarkerAngleListSize) { continue; }
 
-            GregorianCalendar startTime = nightList.get(i).get(0);
-            GregorianCalendar endTime = nightList.get(i).get(1);
+            GregorianCalendar startTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+            startTime.setTimeInMillis(nightList.get(i).get(0).getTimeInMillis() + timeZoneCorrection);
+
+            GregorianCalendar endTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+            endTime.setTimeInMillis(nightList.get(i).get(1).getTimeInMillis() + timeZoneCorrection);
 
             int startTimeDay = startTime.get(Calendar.DAY_OF_YEAR);
             int endTimeDay = endTime.get(Calendar.DAY_OF_YEAR);
@@ -974,6 +989,7 @@ public class Sundial {
         matrixLatitude.setVisible(isVisible);
         matrixTimeZone.setVisible(isVisible);
         controlThingyGlobeGrid.setVisible(isVisible);
+        controlThingyGlobeLines.setVisible(isVisible);
 
         if (tinyGlobeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveOutTimeline.stop(); }
         if (tinyGlobeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveInTimeline.stop(); }
@@ -1144,6 +1160,11 @@ public class Sundial {
         controlThingyGlobeGrid.toggle();
     }
 
+    public void toggleGlobeLines() {
+        globeLinesVisibleEh.setValue(!globeLinesVisibleEh.get());
+        controlThingyGlobeLines.toggle();
+    }
+
 
     // Getterers
     public Group getDialsGroup() {
@@ -1276,5 +1297,17 @@ public class Sundial {
 
     public ControlThingy getControlThingyGlobeGrid() {
         return controlThingyGlobeGrid;
+    }
+
+    public ControlThingy getControlThingyGlobeLines() {
+        return controlThingyGlobeLines;
+    }
+
+    public double getGlobeLightScaler() {
+        return globeLightScaler.get();
+    }
+
+    public DoubleProperty globeLightScalerProperty() {
+        return globeLightScaler;
     }
 }
