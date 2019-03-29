@@ -415,13 +415,16 @@ public class Suncreator {
             Rotate centerRotate,
             ArrayList<Double> cetusMarkerAngleList,
             ArrayList<Rotate> cetusMarkerRotateList,
+            ArrayList<Line> cetusMarkerLineList,
             ArrayList<Arc> cetusMarkerArcList,
             ArrayList<DotMatrix> cetusTimeMatrixList,
             ArrayList<Timeline> cetusMarkerHoverTransitionList) {
 
         Group cetusMarkerGroup = new Group();
+        Group cetusHorizonGroup = new Group();
+        Group cetusArcGroup = new Group();
 
-        for (int i = 0; i <= Cetustime.CYCLES_PER_DAY; i++) {
+        for (int i = 0; i <= Cetustime.CYCLES_PER_48h; i++) {
 
             double startAngle = (i * Cetustime.CYCLE_LENGTH * 360d) / (24d * 60 * 60 * 1000);
             double endAngle = ((i * Cetustime.CYCLE_LENGTH + Cetustime.NIGHT_LENGTH) * 360d) / (24d * 60 * 60 * 1000);
@@ -477,17 +480,10 @@ public class Suncreator {
             nightArc.setStroke(Sunconfig.Color_Of_Void);
             nightArc.setFill(Sunconfig.CETUS_ARC_GRADIENT);
             nightArc.setOpacity(Sunconfig.CETUS_ARC_OPACITY);
-            nightArc.setBlendMode(BlendMode.MULTIPLY);
+//            nightArc.setBlendMode(BlendMode.MULTIPLY);
 
-            cetusMarkerAngleList.add(startAngle);
-            cetusMarkerAngleList.add(endAngle);
-            cetusMarkerRotateList.add(markerLineStartRotate);
-            cetusMarkerRotateList.add(markerLineEndRotate);
-            cetusMarkerArcList.add(nightArc);
-            cetusTimeMatrixList.add(matrixStart);
-            cetusTimeMatrixList.add(matrixEnd);
-
-            cetusMarkerGroup.getChildren().addAll(nightArc, startHorizonGroup, endHorizonGroup);
+            cetusArcGroup.getChildren().addAll(nightArc);
+            cetusHorizonGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
 
             Timeline cetusMarkerTransitionOn = new Timeline();
             cetusMarkerTransitionOn.setCycleCount(1);
@@ -521,13 +517,32 @@ public class Suncreator {
 
             cetusMarkerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
 
-            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOn);
-            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOff);
-
             nightArc.setOnMouseEntered(event -> cetusMarkerTransitionOn.play());
             nightArc.setOnMouseExited(event -> cetusMarkerTransitionOff.play());
 
+            // these are sent back
+            cetusMarkerAngleList.add(startAngle);
+            cetusMarkerAngleList.add(endAngle);
+
+            cetusMarkerRotateList.add(markerLineStartRotate);
+            cetusMarkerRotateList.add(markerLineEndRotate);
+
+            cetusMarkerLineList.add(markerLineStart);
+            cetusMarkerLineList.add(markerLineEnd);
+
+            cetusMarkerArcList.add(nightArc);
+
+            cetusTimeMatrixList.add(matrixStart);
+            cetusTimeMatrixList.add(matrixEnd);
+
+            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOn);
+            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOff);
+
         }
+
+        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
+
+        cetusMarkerGroup.getChildren().addAll(cetusArcGroup, cetusHorizonGroup);
 
         return cetusMarkerGroup;
     }

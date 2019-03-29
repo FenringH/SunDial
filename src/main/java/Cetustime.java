@@ -119,7 +119,7 @@ public class Cetustime {
                 dateUtc.get(Calendar.DAY_OF_MONTH),
                 0, 0, 0
         );
-//        dateMidnightUtc.setTimeInMillis(dateMidnightUtc.getTimeInMillis() - (12 * 60 * 60 * 1000));
+        dateMidnightUtc.setTimeInMillis(dateMidnightUtc.getTimeInMillis() - (12 * 60 * 60 * 1000));
 
         long offsetInMillis = expiry.getTimeInMillis() - dateMidnightUtc.getTimeInMillis();
         long cycleStart = dateMidnightUtc.getTimeInMillis() + (offsetInMillis % CYCLE_LENGTH);
@@ -128,7 +128,7 @@ public class Cetustime {
 
         if (!dayEh) { cycleStart -= NIGHT_LENGTH; }
 
-        for (int i = 0; i <= CYCLES_PER_DAY; i++) {
+        for (int i = 0; i <= CYCLES_PER_48h; i++) {
 
             ArrayList<GregorianCalendar> cycle = new ArrayList<>();
 

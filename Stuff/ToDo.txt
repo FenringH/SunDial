@@ -3,7 +3,7 @@
 
 + redesign minute/second markers, or remove them
 
-- rewrite Sunchart class to explore better performance for chart redraw
++ rewrite Sunchart class to explore better performance for chart redraw
 
 + create new sub class Suncontrols for control surfaces
 
@@ -14,7 +14,7 @@
 - new feature: expands controls to enable cycling through modes on RMB
     - for instance, nighmode LMB for on/off, nightmode RMB to cycle through options
 
-- fix Cetus time display to sync with change of Timezone
++ fix Cetus time display to sync with change of Timezone
 
 
 

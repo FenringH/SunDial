@@ -13,21 +13,23 @@ public class Sunconfig {
 
     // DEFAULTS Sunface
     public final static String A_BEGINNING =
-            "A beginning is a very delicate time." +
-                    "Know then, that is is the year 10191. The known universe is ruled by the Padishah Emperor Shaddam the Fourth, my father. " +
-                    "In this time, the most precious substance in the universe is the spice Melange. " +
-                    "The spice extends life. The spice expands consciousness. " +
-                    "A product of the Spice, the red Sapho juice, stains the lips of the Mentats but allows them to be human computers, " +
-                    "as thinking machines have been outlawed. The spice is vital to space travel. " +
-                    "The Spacing Guild and its navigators, who the spice has mutated over 4000 years, use the orange spice gas, " +
-                    "which gives them the ability to fold space. That is, travel to any part of the universe without moving. " +
-                    "Because the Guild controls all interplanetary travel, they are the highest power in the Universe. " +
-                    "The Spice also plays a very secret role in the Bene Gesserit sisterhood, of which I am a part. " +
-                    "The sisterhood has been interfering with the marriages, and the children thereof, " +
-                    "of the great Houses of the Universe, cleverly intermixing one bloodline with another to form the Kwisatz Haderach, a super being. " +
-                    "They plan to control this super being and use his powers for their own selfish purposes. " +
-                    "The breeding plan has been carried out in a strict manner for 90 generations. " +
-                    "The goal of the super being is in sight.";
+            "A beginning is a very delicate time.\n" +
+            "Know then, that is is the year 10191.\n" +
+            "The known universe is ruled by the Padishah Emperor Shaddam the Fourth, my father.\n" +
+            "In this time, the most precious substance in the universe is the spice Melange.\n" +
+            "The spice extends life. The spice expands consciousness.\n" +
+            "A product of the Spice, the red Sapho juice, stains the lips of the Mentats but allows them to be human computers,\n" +
+            "as thinking machines have been outlawed. The spice is vital to space travel.\n" +
+            "The Spacing Guild and its navigators, who the spice has mutated over 4000 years, use the orange spice gas,\n" +
+            "which gives them the ability to fold space. That is, travel to any part of the universe without moving.\n" +
+            "Because the Guild controls all interplanetary travel, they are the highest power in the Universe.\n" +
+            "The Spice also plays a very secret role in the Bene Gesserit sisterhood, of which I am a part.\n" +
+            "The sisterhood has been interfering with the marriages, and the children thereof,\n" +
+            "of the great Houses of the Universe, cleverly intermixing one bloodline with another\n" +
+            "to form the Kwisatz Haderach, a super being.\n" +
+            "They plan to control this super being and use his powers for their own selfish purposes.\n" +
+            "The breeding plan has been carried out in a strict manner for 90 generations.\n" +
+            "The goal of the super being is in sight.";
 
     public static final String ICON_APP_URL = "icons/sun1.png";
 
@@ -218,7 +220,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
-    public static final double CETUS_MARKER_LENGTH = 50.0d;
+    public static final double CETUS_MARKER_LENGTH = 40.0d;
     public static final double HELP_OVERLAY_ROUND = DIAL_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
     public static final double HELP_MARKER_RADIUS = 4.0d;
@@ -302,9 +304,9 @@ public class Sunconfig {
     public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
     public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X - MARKER_HOUR_LENGTH - CONTROL_GLOBEGRID_RADIUS;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
-    public static final double CETUS_TIMER_OFFSET = 160.0d;
+    public static final double CETUS_TIMER_OFFSET = 170.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
-    public static final double CETUS_HORIZON_OFFSET = 50.0d;
+    public static final double CETUS_HORIZON_OFFSET = 45.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y + 65.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
 
@@ -432,15 +434,15 @@ public class Sunconfig {
     public static final String CONTROL_NIGHTMODE_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_ALWAYSONTOP_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_ALWAYSONTOP_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_GLOBEGRID_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_GLOBEGRID_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_GLOBEGRID_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_GLOBEGRID_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
 
-    public static final String CETUS_MARKER_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64,255, 1.0),  8.0, 0.50, 0, 0);";
-    public static final String CETUS_MARKER_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0),  8.0, 0.50, 0, 0);";
-    public static final String CETUS_MATRIX_SHADOW_DAY   = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
-    public static final String CETUS_MATRIX_SHADOW_NIGHT = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String CETUS_MARKER_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba(192, 48,192, 1.0), 10.0, 0.75, 0, 0);";
+    public static final String CETUS_MARKER_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0), 10.0, 0.75, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW_DAY    = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW_NIGHT  = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
-    public static final String HELP_MARKER_GLOW = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String HELP_MARKER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
 
     public static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
     public static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
@@ -522,8 +524,8 @@ public class Sunconfig {
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.72, Color_Of_Void),
-            new Stop(0.90, Color_Of_CetusArc)
+            new Stop(0.83, Color_Of_Void),
+            new Stop(0.96, Color_Of_CetusArc)
     );
 
     public static final RadialGradient CETUS_ARC_GRADIENT_HOVER = new RadialGradient(

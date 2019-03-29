@@ -72,6 +72,7 @@ public class Sunface extends Application {
     private Cetustime cetustime;
 
     private Sunchart sunchart;
+    private Sunyear sunyear;
 
     private Stage debugWindow;
     private Stage sunchartWindow;
@@ -118,6 +119,7 @@ public class Sunface extends Application {
         cetustime = new Cetustime();
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
+        sunyear = new Sunyear(longitude, latitude, currentLocalTime.get(Calendar.YEAR), timeZoneOffset);
 
 
         // Scene
@@ -190,7 +192,11 @@ public class Sunface extends Application {
 
         // Chart window
         LineChart lineChart = sunchart.getChart();
-        Scene chartScene = new Scene(lineChart, 800, 600);
+        Group sunyearChart = sunyear.getChart();
+
+//        Scene chartScene = new Scene(lineChart, 800, 600);
+        Scene chartScene = new Scene(sunyearChart, sunyearChart.getLayoutBounds().getWidth(), sunyearChart.getLayoutBounds().getHeight());
+        chartScene.setFill(Color.TRANSPARENT);
 
         sunchartWindow = new Stage();
         sunchartWindow.setTitle("Sunchart");
@@ -200,6 +206,7 @@ public class Sunface extends Application {
         sunchartWindow.setWidth(chartScene.getWidth());
         sunchartWindow.setHeight(chartScene.getHeight());
         sunchartWindow.getIcons().add(appIconSun);
+        sunchartWindow.initStyle(StageStyle.TRANSPARENT);
 
 
         // Primary window
@@ -335,6 +342,13 @@ public class Sunface extends Application {
         // Stage PRIMARYSTAGE
         primaryStage.setOnHidden(event -> timeline.pause());
         primaryStage.setOnShown(event -> timeline.play());
+
+        // Group CHARTWINDOW
+        sunyearChart.setOnMouseEntered(event -> sunyearChart.setCursor(Cursor.MOVE));
+        sunyearChart.setOnMouseExited(event -> sunyearChart.setCursor(Cursor.DEFAULT));
+        sunyearChart.setOnMousePressed(event -> saveMouse(sunchartWindow, event));
+        sunyearChart.setOnMouseReleased(event -> killMouse());
+        sunyearChart.setOnMouseDragged(event -> changeWindowPosition(sunchartWindow, event));
 
 
         // *** SHOWTIME ***
@@ -658,6 +672,7 @@ public class Sunface extends Application {
         if (sunchartWindow.isShowing()) {
             sunchartWindow.close();
         } else {
+            sunyear.setSpaceTime(longitude, latitude, offsetLocalTime.get(Calendar.YEAR), timeZoneOffset);
             sunchartWindow.setX(x);
             sunchartWindow.setY(y);
             sunchartWindow.show();
@@ -743,20 +758,26 @@ public class Sunface extends Application {
     private void updateSunchart(Sunchart sunchart) {
 
         if (sunchartWindow.isShowing()) {
-
+            sunyear.setSpaceTime(longitude, latitude, offsetLocalTime.get(Calendar.YEAR), timeZoneOffset);
+        }
+/*
             if (
                     mouseButtonList.isEmpty() &&
                         (
                         longitude != sunchart.getLongitude() ||
                         latitude != sunchart.getLatitude() ||
-                        offsetLocalTime.get(Calendar.YEAR) != sunchart.getYear()
+//                        offsetLocalTime.get(Calendar.YEAR) != sunchart.getYear()
+                        offsetLocalTime.get(Calendar.YEAR) != sunyear.getYear()
                         )
                     ) {
 
-                sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
-                sunchart.updateChartData();
+//                sunchart.setSpacetimePosition(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
+//                sunchart.updateChartData();
+
+                sunyear.setSpaceTime(longitude, latitude, offsetLocalTime.get(Calendar.YEAR));
             }
         }
+*/
     }
 
 
@@ -1127,10 +1148,7 @@ public class Sunface extends Application {
 
     private void checkDragAndDropString(DragEvent event) {
 
-        if (
-                event.getGestureSource() != sundial.getTinyGlobeGroup() &&
-                        event.getDragboard().hasString())
-        {
+        if (event.getGestureSource() != sundial.getTinyGlobeGroup() && event.getDragboard().hasString()) {
             event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
         }
 

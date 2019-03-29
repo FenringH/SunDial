@@ -80,6 +80,7 @@ public class Sundial {
     private Group dialLocalHourGroup;
     private Group dialHighNoonGroup;
     private ArrayList<Arc> cetusMarkerArcList;
+    private ArrayList<Line> cetusMarkerLineList;
 
     private ArrayList<Node> dialLocalSecondLedList;
     private ArrayList<Boolean> dialLocalSecondOn;
@@ -285,6 +286,7 @@ public class Sundial {
 
         // Cetus stuff
         cetusMarkerRotateList = new ArrayList<>();
+        cetusMarkerLineList = new ArrayList<>();
         cetusMarkerArcList = new ArrayList<>();
         cetusMarkerAngleList = new ArrayList<>();
         cetusTimeMatrixList = new ArrayList<>();
@@ -294,6 +296,7 @@ public class Sundial {
                 centerRotate,
                 cetusMarkerAngleList,
                 cetusMarkerRotateList,
+                cetusMarkerLineList,
                 cetusMarkerArcList,
                 cetusTimeMatrixList,
                 cetusMarkerHoverTransitionList
@@ -760,18 +763,29 @@ public class Sundial {
             int startTimeDay = startTime.get(Calendar.DAY_OF_YEAR);
             int endTimeDay = endTime.get(Calendar.DAY_OF_YEAR);
 
+            Line lineStart = cetusMarkerLineList.get(i * 2);
+            Line lineEnd = cetusMarkerLineList.get((i * 2) + 1);
+
+            Arc arc = cetusMarkerArcList.get(i);
+
             if (startTimeDay != currentDay) {
+                lineStart.setVisible(false);
                 startTime = currentDayStart;
                 if (endTimeDay != currentDay) {
                     endTime = currentDayStart;
                 }
+            } else {
+                lineStart.setVisible(true);
             }
 
             if (endTimeDay != currentDay) {
+                lineEnd.setVisible(false);
                 endTime = currentDayEnd;
                 if (startTimeDay != currentDay) {
                     startTime = currentDayEnd;
                 }
+            } else {
+                lineEnd.setVisible(true);
             }
 
             double startAngle = getAbsoluteAngle(startTime);
