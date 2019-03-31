@@ -1,24 +1,19 @@
 import javafx.animation.*;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
 import javafx.util.Duration;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -441,8 +436,8 @@ public class Sundial {
         foregroundGroup.getChildren().add(cetusMarkerGroup);
         foregroundGroup.getChildren().add(dialLocalSecondGroup);
         foregroundGroup.getChildren().add(dialLocalMinuteGroup);
-        foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
+        foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().add(dialHighNoonGroup);
         foregroundGroup.getChildren().add(horizonGroup);
         foregroundGroup.getChildren().add(dialLocalHourGroup);
@@ -698,11 +693,11 @@ public class Sundial {
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
         dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
 
-        updateLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedTransitionList, localTime.get(Calendar.SECOND));
-        updateLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedTransitionList, localTime.get(Calendar.MINUTE));
+        updateSingleLED(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedTransitionList, localTime.get(Calendar.SECOND));
+        updateRowLED(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedTransitionList, localTime.get(Calendar.MINUTE));
     }
 
-    private void updateLEDs(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
+    private void updateSingleLED(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
 
         for (int i = 0; i < ledList.size(); i++) {
 
@@ -718,6 +713,27 @@ public class Sundial {
 
                 ledOn.set(i, false);
             }
+        }
+
+        timelineList.get(indexOn).stop();
+        ledList.get(indexOn).setOpacity(1.0);
+        ledOn.set(indexOn, true);
+    }
+
+    private void updateRowLED(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
+
+        for (int i = 0; i < ledList.size(); i++) {
+
+            if(i <= indexOn) {
+                ledList.get(i).setOpacity(1);
+            } else {
+                if (ledAnimationOnEh) {
+                    timelineList.get(i).play();
+                } else {
+                    ledList.get(i).setOpacity(0);
+                }
+            }
+
         }
 
         timelineList.get(indexOn).stop();
@@ -1094,7 +1110,7 @@ public class Sundial {
         matrixDate.setOpacity(opacity);
         matrixTimeZone.setOpacity(opacity);
 
-        dialLocalHourGroup.setOpacity(opacity);
+        dialLocalHourGroup.setOpacity((opacity < 0.5) ? opacity * 2 : opacity);
         dialLocalMinuteGroup.setOpacity(opacity);
         dialLocalSecondGroup.setOpacity(opacity);
 

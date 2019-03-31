@@ -9,12 +9,24 @@
 
 + create new class with static methods that contains all creators for Sundial class
 
-- new feature: display information about sun elevation at noon
-
-- new feature: expands controls to enable cycling through modes on RMB
-    - for instance, nighmode LMB for on/off, nightmode RMB to cycle through options
+- add display about sun elevation at noon
 
 + fix Cetus time display to sync with change of Timezone
 
+- fix Sunyear chart bug which wrongly normalizes sunrise and sunset times in different timezones
 
+- redesign hour and minute dials
 
+- redesign minute display for better visibility
+
+- add DST toggle
+
+- add Sunyear chart detail information with indicator for "now"
+
+- test performance of Sunyear chart with added styling
+
+- redesign night mode to circle area with darkened/transparent outer control surfaces instead of one large surface
+
+- expand changeWindowSize and changeWindowPosition for general purpose so that it can be used for other "helper" windows
+
+- fix Reset window size to take into account iw window is centered

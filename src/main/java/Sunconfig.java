@@ -192,7 +192,7 @@ public class Sunconfig {
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS;
     public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
-    public static final double LOCALTIME_MINUTE_WIDTH = 12.0d;
+    public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 16.0d;
     public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
     public static final double DAY_ARC_MARGIN = 10.0d;
@@ -267,7 +267,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_OPACITY = 1.00d;
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     public static final double CETUS_ARC_OPACITY = 1.00d;
-    public static final double DAY_TERMINATOR_OPACITY = 0.50d;
+    public static final double DAY_TERMINATOR_OPACITY = 0.90d;
     public static final double DAY_GRIDLINE_OPACITY = 1.00d;
     public static final double HELP_OVERLAY_OPACITY = 0.35d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
@@ -276,7 +276,7 @@ public class Sunconfig {
     public static final double TIMEDATE_TRANSPARENT_OPACITY = 0.20d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
-    public static final double MATRIX_HORIZON_OFFSET = 80.0d;
+    public static final double MATRIX_HORIZON_OFFSET = 83.0d;
     public static final double MATRIX_TIME_OFFSET = 0.0d;
     public static final double MATRIX_DATE_OFFSET = 45.0d;
     public static final double MATRIX_WEEK_OFFSET = 70.0d;
@@ -373,7 +373,7 @@ public class Sunconfig {
     public static final Color Color_Of_TerminatorGlow = new Color(0.00, 0.10, 0.90, 1.00);
 
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
-    public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
+    public static final Color Color_Of_Minutes    = new Color(0.90, 1.00, 0.90, 1.00);
 
     public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
     public static final Color Color_Of_HelpStroke = new Color(0.15, 0.35, 1.00, 1.00);
@@ -408,7 +408,7 @@ public class Sunconfig {
     public static final String HORIZON_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
     public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
     public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 64,255, 64, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOWIER  = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
     public static final String LOCALSECOND_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";

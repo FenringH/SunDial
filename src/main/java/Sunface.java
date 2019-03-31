@@ -543,17 +543,6 @@ public class Sunface extends Application {
             default: {}
         }
 
-/*
-        offsetLocalTime.set(
-                offsetLocalTime.get(Calendar.YEAR) + offsetYear,
-                offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
-                offsetLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
-                offsetLocalTime.get(Calendar.HOUR_OF_DAY) + offsetHour,
-                offsetLocalTime.get(Calendar.MINUTE) + offsetMinute,
-                offsetLocalTime.get(Calendar.SECOND) + offsetSecond
-        );
-*/
-
         offsetLocalTime.set(
                 offsetLocalTime.get(Calendar.YEAR) + offsetYear,
                 offsetLocalTime.get(Calendar.MONTH) + offsetMonth,

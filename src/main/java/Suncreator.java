@@ -292,7 +292,7 @@ public class Suncreator {
         tinyDayTerminatorLine.tiltProperty().bind(tilt);
 
         SubScene tinyDayTerminatorLineScene = new SubScene(tinyDayTerminatorLine, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
-        tinyDayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
+        tinyDayTerminatorLineScene.setBlendMode(BlendMode.ADD);
         tinyDayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_WIDTH));
         tinyDayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
 
@@ -597,6 +597,7 @@ public class Suncreator {
 
             markerGroup.getChildren().add(markerMinuteCircle);
 
+/*
             if (i % 5 == 0) {
                 DotMatrix markerMatrix = new DotMatrix("" + i, Sunconfig.Color_Of_Darkness);
                 markerMatrix.setTranslateX(Sunconfig.CENTER_X - markerMatrix.getLayoutBounds().getWidth() / 2);
@@ -607,8 +608,9 @@ public class Suncreator {
                 markerMatrix.setRotate(rotationAdjust);
                 markerMatrix.setScaleX(Sunconfig.MATRIX_MINUTE_SCALE);
                 markerMatrix.setScaleY(Sunconfig.MATRIX_MINUTE_SCALE);
-//                markerGroup.getChildren().add(markerMatrix);
+                markerGroup.getChildren().add(markerMatrix);
             }
+*/
 
             Rotate markerHourRotate = new Rotate();
             markerHourRotate.setPivotX(Sunconfig.CENTER_X);
@@ -742,9 +744,9 @@ public class Suncreator {
                 // outside
                 - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
                 - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.25,
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
                 0, Sunconfig.MARGIN_Y + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2,
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.25,
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
                 + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
                 + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
 
@@ -769,14 +771,14 @@ public class Suncreator {
     public static Group createDialLocalMinuteGroup(Rotate dialRotateLocalMinute) {
 
         Polygon dialLocalMinutePoly = new Polygon(
-                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, Sunconfig.LOCALTIME_DIAL_LENGTH,
+//                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
+                - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.25, Sunconfig.LOCALTIME_DIAL_LENGTH,
                 - Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
                 0, Sunconfig.LOCALMINUTE_DIAL_OFFSET,
                 + Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
-                + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 2.00, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.50, Sunconfig.LOCALTIME_DIAL_LENGTH
+                + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.25, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                + Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH
         );
         dialLocalMinutePoly.setTranslateX(Sunconfig.CENTER_X);
         dialLocalMinutePoly.setFill(Sunconfig.Color_Of_Void);
@@ -912,7 +914,7 @@ public class Suncreator {
             Group minuteLedGroup = new Group(localMinuteCircle);
             minuteLedGroup.setOpacity(0.0);
             minuteLedGroup.getTransforms().add(localMinuteRotate);
-            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
+//            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
 
             dialLocalSecondLedList.add(secondGroup);
             dialLocalMinuteLedList.add(minuteLedGroup);
