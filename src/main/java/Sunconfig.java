@@ -5,7 +5,6 @@ import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 
 import java.text.DecimalFormat;
-import java.lang.Math;
 
 import static java.lang.Math.*;
 
@@ -173,20 +172,18 @@ public class Sunconfig {
             "\nLMB : move Window";
 
 
-    public static final double DIAL_WIDTH = 440.0d;
-    public static final double DIAL_HEIGHT = 440.0d;
     public static final double MARGIN_X = 25.0d;
     public static final double MARGIN_Y = 25.0d;
     public static final double SCALE_X = 1.0d;
     public static final double SCALE_Y = 1.0d;
-    public static final double CENTER_X = DIAL_WIDTH / 2;
-    public static final double CENTER_Y = DIAL_HEIGHT / 2;
+    public static final double CENTER_X = Sundial.DEFAULT_WIDTH / 2;
+    public static final double CENTER_Y = Sundial.DEFAULT_HEIGHT / 2;
 
     public static final double DOT_RADIUS = 10.0d;
     public static final double SUNTIME_DIAL_LENGTH = 50.0d;
     public static final double HIGHNOON_DIAL_LENGTH = 50.0d;
-    public static final double SUNRISE_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
-    public static final double SUNSET_DIAL_LENGTH = DIAL_HEIGHT / 2 - DOT_RADIUS;
+    public static final double SUNRISE_DIAL_LENGTH = Sundial.DEFAULT_HEIGHT / 2 - DOT_RADIUS;
+    public static final double SUNSET_DIAL_LENGTH = Sundial.DEFAULT_HEIGHT / 2 - DOT_RADIUS;
     public static final double MARKER_HOUR_LENGTH = 20.0d;
     public static final double MARKER_MINUTE_LENGTH = 8.0d;
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
@@ -221,11 +218,11 @@ public class Sunconfig {
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CETUS_MARKER_LENGTH = 40.0d;
-    public static final double HELP_OVERLAY_ROUND = DIAL_WIDTH / 2 + 20.0d;
+    public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
     public static final double HELP_MARKER_RADIUS = 4.0d;
     public static final double HELP_MARKER_MARGIN = 6.0d;
-    public static final double NIGHTMODE_RECTANGLE_ROUND = DIAL_WIDTH / 2 + 20.0d;
+    public static final double NIGHTMODE_RECTANGLE_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d;

@@ -234,28 +234,28 @@ public class Suncreator {
         dayTerminatorGlow.tiltProperty().bind(tilt);
 
 
-        SubScene dayGlobeScene = new SubScene(dayGlobe, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene dayGlobeScene = new SubScene(dayGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayGlobeScene.setBlendMode(BlendMode.ADD);
 
-        SubScene nightGlobeScene = new SubScene(nightGlobe, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene nightGlobeScene = new SubScene(nightGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         nightGlobeScene.setBlendMode(BlendMode.SCREEN);
 
-        SubScene globeGridScene = new SubScene(globeGrid, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene globeGridScene = new SubScene(globeGrid, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         globeGridScene.setBlendMode(BlendMode.SCREEN);
         globeGridScene.setEffect(new GaussianBlur(1));
         globeGridScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
 
-        SubScene globeLinesScene = new SubScene(globeLines, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene globeLinesScene = new SubScene(globeLines, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         globeLinesScene.setBlendMode(BlendMode.SCREEN);
         globeLinesScene.setEffect(new GaussianBlur(1));
         globeLinesScene.setOpacity(Sunconfig.DAY_GRIDLINE_OPACITY);
 
-        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLine, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLine, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
         dayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.GLOBEGRID_LINE_WIDTH));
         dayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
 
-        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlow, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlow, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
         dayTerminatorGlowScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_GLOW_WIDTH));
         dayTerminatorGlowScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
@@ -281,7 +281,7 @@ public class Suncreator {
         tinyGlobe.phaseProperty().bind(phase);
         tinyGlobe.tiltProperty().bind(tilt);
 
-        SubScene tinyGlobeScene = new SubScene(tinyGlobe, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene tinyGlobeScene = new SubScene(tinyGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
 
         Ring tinyDayTerminatorLine = new Ring(Sunconfig.TINYGLOBE_RADIUS, Sunconfig.TINYGLOBE_TERMINATOR_WIDTH, Sunconfig.Color_Of_TerminatorLine, Sunconfig.GLOBE_ROTATE_DURATION);
         tinyDayTerminatorLine.setTranslateX(Sunconfig.CENTER_X);
@@ -291,7 +291,7 @@ public class Suncreator {
         tinyDayTerminatorLine.phaseProperty().bind(phase);
         tinyDayTerminatorLine.tiltProperty().bind(tilt);
 
-        SubScene tinyDayTerminatorLineScene = new SubScene(tinyDayTerminatorLine, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene tinyDayTerminatorLineScene = new SubScene(tinyDayTerminatorLine, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         tinyDayTerminatorLineScene.setBlendMode(BlendMode.ADD);
         tinyDayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_WIDTH));
         tinyDayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
@@ -360,7 +360,7 @@ public class Suncreator {
     }
 
     public static Circle createDialMarginCircle() {
-        Circle dialMarginCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2);
+        Circle dialMarginCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2);
         dialMarginCircle.setFill(Sunconfig.Color_Of_Margin);
         dialMarginCircle.setStroke(Sunconfig.Color_Of_Void);
         dialMarginCircle.setOpacity(Sunconfig.MARGIN_CIRCLE_OPACITY);
@@ -369,18 +369,18 @@ public class Suncreator {
 
     public static SubScene createBackgroundSubScene(Circle dialMarginCircle) {
 
-        Rectangle dialMarginFillBox = new Rectangle(Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT);
+        Rectangle dialMarginFillBox = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
         dialMarginFillBox.setTranslateX(0);
         dialMarginFillBox.setTranslateY(0);
         dialMarginFillBox.setFill(Sunconfig.Color_Of_DaySky);
         dialMarginFillBox.setStroke(Sunconfig.Color_Of_Void);
         dialMarginFillBox.setOpacity(0);
 
-        return new SubScene(new Group(dialMarginFillBox, dialMarginCircle), Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
+        return new SubScene(new Group(dialMarginFillBox, dialMarginCircle), Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.DISABLED);
     }
 
     public static Arc createDialArcNight() {
-        Arc dialArcNight = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2 - Sunconfig.MARGIN_X, Sunconfig.DIAL_HEIGHT / 2 - Sunconfig.MARGIN_Y, 90, 0);
+        Arc dialArcNight = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X, Sundial.DEFAULT_HEIGHT / 2 - Sunconfig.MARGIN_Y, 90, 0);
         dialArcNight.setType(ArcType.ROUND);
         dialArcNight.setStroke(Sunconfig.Color_Of_Void);
         dialArcNight.setFill(Sunconfig.Color_Of_NightSky);
@@ -388,7 +388,7 @@ public class Suncreator {
     }
 
     public static Arc createDialArcMidnight() {
-        Arc dialArcMidnight = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2 - Sunconfig.MARGIN_X, Sunconfig.DIAL_HEIGHT / 2 - Sunconfig.MARGIN_Y, 0, -180);
+        Arc dialArcMidnight = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X, Sundial.DEFAULT_HEIGHT / 2 - Sunconfig.MARGIN_Y, 0, -180);
         dialArcMidnight.setType(ArcType.ROUND);
         dialArcMidnight.setStroke(Sunconfig.Color_Of_Void);
         dialArcMidnight.setFill(Sunconfig.Color_Of_Midnight);
@@ -396,7 +396,7 @@ public class Suncreator {
     }
 
     public static Circle createDialCircleBackground() {
-        Circle dialCircleBackground = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2 - Sunconfig.MARGIN_X);
+        Circle dialCircleBackground = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X);
         dialCircleBackground.setFill(Sunconfig.Color_Of_DaySky);
         dialCircleBackground.setStroke(Sunconfig.Color_Of_Void);
         dialCircleBackground.setStyle(Sunconfig.MATRIX_SHADOW);
@@ -404,7 +404,7 @@ public class Suncreator {
     }
 
     public static Circle createDialCircleFrame() {
-        Circle dialCircleFrame = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2 - Sunconfig.MARGIN_X);
+        Circle dialCircleFrame = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X);
         dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_NOMINAL);
         dialCircleFrame.setStroke(Sunconfig.Color_Of_Void);
         dialCircleFrame.setStrokeWidth(Sunconfig.MARKER_FRAME_STROKE_WIDTH);
@@ -1133,7 +1133,7 @@ public class Suncreator {
 
         Group nightModeOverlay = new Group();
 
-        Rectangle nightModeRectangle = new Rectangle(Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT);
+        Rectangle nightModeRectangle = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
         nightModeRectangle.setArcWidth(Sunconfig.NIGHTMODE_RECTANGLE_ROUND);
         nightModeRectangle.setArcHeight(Sunconfig.NIGHTMODE_RECTANGLE_ROUND);
         nightModeRectangle.setFill(Color.BLACK);
@@ -1218,7 +1218,7 @@ public class Suncreator {
 
         Group helpOverlay = new Group();
 
-        Rectangle helpBackdrop = new Rectangle(Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT);
+        Rectangle helpBackdrop = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
         helpBackdrop.setArcWidth(Sunconfig.HELP_OVERLAY_ROUND);
         helpBackdrop.setArcHeight(Sunconfig.HELP_OVERLAY_ROUND);
         helpBackdrop.setFill(Color.BLACK);
@@ -1227,13 +1227,13 @@ public class Suncreator {
         helpBackdrop.setOpacity(Sunconfig.HELP_OVERLAY_OPACITY);
         helpBackdrop.setMouseTransparent(true);
 
-        Circle helpWindowMarker = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2 - 1);
+        Circle helpWindowMarker = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - 1);
         helpWindowMarker.setFill(Sunconfig.Color_Of_Void);
         helpWindowMarker.setStroke(Color.WHITE);
         helpWindowMarker.setStyle(Sunconfig.HELP_MARKER_GLOW);
         helpWindowMarker.setMouseTransparent(true);
 
-        Circle helpGlobeMarker = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DIAL_WIDTH / 2 - Sunconfig.MARGIN_X);
+        Circle helpGlobeMarker = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X);
         helpGlobeMarker.setFill(Sunconfig.Color_Of_Void);
         helpGlobeMarker.setStroke(Color.WHITE);
         helpGlobeMarker.setStyle(Sunconfig.HELP_MARKER_GLOW);

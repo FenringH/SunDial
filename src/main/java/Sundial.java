@@ -23,6 +23,9 @@ import static java.lang.Math.*;
 
 public class Sundial {
 
+    public static final double DEFAULT_WIDTH = 440.0d;
+    public static final double DEFAULT_HEIGHT = 440.0d;
+
     // variables
     private double sunTimeDialAngle;
     private double highNoonDialAngle;
@@ -471,7 +474,7 @@ public class Sundial {
 
         foregroundGroup.getChildren().add(nightModeOverlay);
 
-        SubScene foregroundScene = new SubScene(foregroundGroup, Sunconfig.DIAL_WIDTH, Sunconfig.DIAL_HEIGHT, true, SceneAntialiasing.DISABLED);
+        SubScene foregroundScene = new SubScene(foregroundGroup, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, SceneAntialiasing.DISABLED);
 
         dialsGroup.getChildren().addAll(backgroundScene, foregroundScene);
         dialsGroup.setScaleX(Sunconfig.SCALE_X);
@@ -557,12 +560,12 @@ public class Sundial {
 
         double deltaX, deltaY;
 
-        if (mouseX + width > Sunconfig.DIAL_WIDTH) {
+        if (mouseX + width > DEFAULT_WIDTH) {
             deltaX = mouseX - (width + Sunconfig.HELP_TEXT_OFFSET);
         } else {
             deltaX = mouseX + Sunconfig.HELP_TEXT_OFFSET;
         }
-        if (mouseY + height > Sunconfig.DIAL_HEIGHT) {
+        if (mouseY + height > DEFAULT_HEIGHT) {
             deltaY = mouseY - (height + Sunconfig.HELP_TEXT_OFFSET);
         } else {
             deltaY = mouseY + Sunconfig.HELP_TEXT_OFFSET;
@@ -570,8 +573,8 @@ public class Sundial {
 
         if (deltaX < 0) { deltaX = 0; }
         if (deltaY < 0) { deltaY = 0; }
-        if (deltaX > Sunconfig.DIAL_WIDTH - width) { deltaX = Sunconfig.DIAL_WIDTH - width; }
-        if (deltaY > Sunconfig.DIAL_HEIGHT - height) { deltaY = Sunconfig.DIAL_HEIGHT - height; }
+        if (deltaX > DEFAULT_WIDTH - width) { deltaX = DEFAULT_WIDTH - width; }
+        if (deltaY > DEFAULT_HEIGHT - height) { deltaY = DEFAULT_HEIGHT - height; }
 
         node.setTranslateX(deltaX);
         node.setTranslateY(deltaY);

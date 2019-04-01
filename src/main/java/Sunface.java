@@ -39,6 +39,7 @@ public class Sunface extends Application {
 
     private enum PositionType {LONGITUDE, LATITUDE, BOTH, GOOGLE_MAPS};
     private enum OffsetType {YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, WEEK};
+    private enum WindowType { PRIMARY, CHART, DEBUG }
 
     private double deltaX;
     private double deltaY;
@@ -134,12 +135,12 @@ public class Sunface extends Application {
         dialsGroup.getTransforms().add(dialsScale);
 
         dialsScale.xProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.widthProperty().get() / Sunconfig.DIAL_WIDTH),
+                (primaryStage.widthProperty().get() / Sundial.DEFAULT_WIDTH),
                 primaryStage.widthProperty())
         );
 
         dialsScale.yProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.heightProperty().get() / Sunconfig.DIAL_HEIGHT),
+                (primaryStage.heightProperty().get() / Sundial.DEFAULT_HEIGHT),
                 primaryStage.heightProperty())
         );
 
@@ -148,7 +149,7 @@ public class Sunface extends Application {
             double stageWidth = primaryStage.widthProperty().get();
             double stageHeight = primaryStage.heightProperty().get();
             double stageSize = (stageWidth > stageHeight) ? stageHeight : stageWidth;
-            double dialsSize = (Sunconfig.DIAL_WIDTH > Sunconfig.DIAL_HEIGHT) ? Sunconfig.DIAL_HEIGHT : Sunconfig.DIAL_WIDTH;
+            double dialsSize = (Sundial.DEFAULT_WIDTH > Sundial.DEFAULT_HEIGHT) ? Sundial.DEFAULT_HEIGHT : Sundial.DEFAULT_WIDTH;
             return stageSize / dialsSize;
         },
                 primaryStage.widthProperty(),
@@ -157,7 +158,7 @@ public class Sunface extends Application {
 
         // Fix for Z-axis scale not propagating through SubScene in globe
         sundial.globeLightScalerProperty().bind(Bindings.createDoubleBinding(() ->
-                (primaryStage.widthProperty().get() / Sunconfig.DIAL_WIDTH),
+                (primaryStage.widthProperty().get() / Sundial.DEFAULT_WIDTH),
                 primaryStage.widthProperty())
         );
 
@@ -208,6 +209,19 @@ public class Sunface extends Application {
         sunchartWindow.getIcons().add(appIconSun);
         sunchartWindow.initStyle(StageStyle.TRANSPARENT);
 
+        Scale chartScale = new Scale();
+        sunyearChart.getTransforms().add(chartScale);
+
+        chartScale.xProperty().bind(Bindings.createDoubleBinding(() ->
+                        (sunchartWindow.widthProperty().get() / sunyear.getDefaultWidth()),
+                sunchartWindow.widthProperty())
+        );
+
+        chartScale.yProperty().bind(Bindings.createDoubleBinding(() ->
+                        (sunchartWindow.heightProperty().get() / sunyear.getDefaultHeight()),
+                sunchartWindow.heightProperty())
+        );
+
 
         // Primary window
         primaryStage.setTitle("Sunface");
@@ -244,8 +258,8 @@ public class Sunface extends Application {
 
         // Control RESIZE
         sundial.getControlThingyResize().setOnMousePressed(event -> saveMouse(primaryStage, event));
-        sundial.getControlThingyResize().setOnMouseReleased(event -> { resizeActions(primaryStage, event); killMouse(); });
-        sundial.getControlThingyResize().setOnMouseDragged(event -> resizeDrag(primaryStage, event));
+        sundial.getControlThingyResize().setOnMouseReleased(event -> { resizeActions(primaryStage, WindowType.PRIMARY, event); killMouse(); });
+        sundial.getControlThingyResize().setOnMouseDragged(event -> resizeDrag(primaryStage, WindowType.PRIMARY, event));
 
         // Control NIGHTMODE
         sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
@@ -344,11 +358,16 @@ public class Sunface extends Application {
         primaryStage.setOnShown(event -> timeline.play());
 
         // Group CHARTWINDOW
-        sunyearChart.setOnMouseEntered(event -> sunyearChart.setCursor(Cursor.MOVE));
-        sunyearChart.setOnMouseExited(event -> sunyearChart.setCursor(Cursor.DEFAULT));
-        sunyearChart.setOnMousePressed(event -> saveMouse(sunchartWindow, event));
-        sunyearChart.setOnMouseReleased(event -> killMouse());
-        sunyearChart.setOnMouseDragged(event -> changeWindowPosition(sunchartWindow, event));
+        sunyear.getChartFrame().setOnMouseEntered(event -> sunyearChart.setCursor(Cursor.MOVE));
+        sunyear.getChartFrame().setOnMouseExited(event -> sunyearChart.setCursor(Cursor.DEFAULT));
+        sunyear.getChartFrame().setOnMousePressed(event -> saveMouse(sunchartWindow, event));
+        sunyear.getChartFrame().setOnMouseReleased(event -> killMouse());
+        sunyear.getChartFrame().setOnMouseDragged(event -> changeWindowPosition(sunchartWindow, event));
+
+//        sunyear.getResizeControlThingy().setOnMousePressed(event -> saveMouse(sunchartWindow, event));
+//        sunyear.getResizeControlThingy().setOnMouseReleased(event -> { resizeActions(sunchartWindow, WindowType.CHART, event); killMouse(); });
+//        sunyear.getResizeControlThingy().setOnMouseDragged(event -> resizeDrag(sunchartWindow, WindowType.CHART, event));
+
 
 
         // *** SHOWTIME ***
@@ -607,9 +626,17 @@ public class Sunface extends Application {
         }
     }
 
-    private void resetWindowSize(Stage stage) {
-        stage.setWidth(sundial.getDialsGroup().getLayoutBounds().getWidth());
-        stage.setHeight(sundial.getDialsGroup().getLayoutBounds().getHeight());
+    private void resetWindowSize(Stage stage, WindowType windowType) {
+
+        if (windowType == WindowType.PRIMARY) {
+            stage.setWidth(sundial.getDialsGroup().getLayoutBounds().getWidth());
+            stage.setHeight(sundial.getDialsGroup().getLayoutBounds().getHeight());
+        }
+
+        if (windowType == WindowType.CHART) {
+            stage.setWidth(sunyear.getDefaultWidth());
+            stage.setWidth(sunyear.getDefaultHeight());
+        }
     }
 
     private Rectangle2D getCurrentScreen(Stage stage) {
@@ -956,14 +983,14 @@ public class Sunface extends Application {
         }
     }
 
-    private void resizeActions(Stage stage, MouseEvent event) {
+    private void resizeActions(Stage stage, WindowType windowType, MouseEvent event) {
 
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
 
         // MMB action -> reset window size
         if(getLastButton().equals(MouseButton.MIDDLE)) {
-            resetWindowSize(stage);
+            resetWindowSize(stage, windowType);
             return;
         }
     }
@@ -1152,9 +1179,19 @@ public class Sunface extends Application {
         event.consume();
     }
 
-    private void resizeDrag(Stage stage, MouseEvent event) {
+    private void resizeDrag(Stage stage, WindowType windowType, MouseEvent event) {
 
         if(getLastButton().equals(MouseButton.MIDDLE)) { return; }
+
+        double aspectRatio = 1;
+
+        if (windowType == WindowType.CHART) {
+            aspectRatio = sunyear.getDefaultWidth() / sunyear.getDefaultHeight();
+        }
+
+        if (windowType == WindowType.PRIMARY) {
+            aspectRatio = Sundial.DEFAULT_WIDTH / Sundial.DEFAULT_HEIGHT;
+        }
 
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();

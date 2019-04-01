@@ -1,5 +1,8 @@
+import javafx.beans.binding.Bindings;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polyline;
@@ -27,6 +30,9 @@ public class Sunyear {
     private final static double MARGIN_Y = 20.0d;
     private final static double ARC_WIDTH = 30.0d;
     private final static double ARC_HEIGHT = 30.0d;
+
+    private double defaultWidth;
+    private double defaultHeight;
 
     private final static LinearGradient SUNRISE_GRADIENT = new LinearGradient(
             0, 0,
@@ -72,11 +78,17 @@ public class Sunyear {
     private ArrayList<Rectangle> sunriseBarList;
     private ArrayList<Rectangle> sunsetBarList;
 
+    private Text mouseTrapText;
+    private Group mouseTrapInfoGroup;
+    private Group mouseTrapBarGroup;
+
     private Text chartTitleText;
 
     private Group dayMarkerLineGroup;
     private Group dayMarkerTextGroup;
 
+    private Group chartFrame;
+    private ControlThingy resizeControlThingy;
     private Group chart;
 
     public Sunyear(double longitude, double latitude, int year, long timeZoneOffset) {
@@ -121,6 +133,9 @@ public class Sunyear {
                 .thankYou();
 
         chart = createChartGroup();
+
+        defaultWidth = chart.getLayoutBounds().getWidth();
+        defaultHeight = chart.getLayoutBounds().getHeight();
     }
 
     private void recalculateDataPoints() {
@@ -246,7 +261,7 @@ public class Sunyear {
         Group chartAxisX = new Group();
         Group chartAxisY = new Group();
         Group chartTitle = new Group();
-        Group chartFrame = new Group();
+        chartFrame = new Group();
 
         double areaWidth = DAYS_IN_YEAR * SPACING_X;
         double areaHeight = HOURS * SPACING_Y;
@@ -255,12 +270,43 @@ public class Sunyear {
 
         Font fontAxis = new Font(12);
         Font fontTitle = new Font(24);
+        Font fontInfo = new Font(14);
+
+        // MOUSE TRAP INFO
+        mouseTrapText = new Text("Spice must flow.");
+        mouseTrapText.setFont(fontInfo);
+        mouseTrapText.setFill(Color.WHITE);
+        mouseTrapText.setStroke(Color.WHITE);
+        mouseTrapText.setX(fontInfo.getSize());
+        mouseTrapText.setY(fontInfo.getSize() + 10);
+
+        Rectangle infoRectangle = new Rectangle(10, 10);
+        infoRectangle.setFill(Color.BLACK);
+        infoRectangle.setStroke(Color.WHITE);
+        infoRectangle.setArcWidth(20);
+        infoRectangle.setArcHeight(20);
+        infoRectangle.setOpacity(0.60);
+
+        infoRectangle.widthProperty().bind(Bindings.createDoubleBinding(() ->
+                        (mouseTrapText.layoutBoundsProperty().get().getWidth() + fontInfo.getSize() + 10),
+                mouseTrapText.layoutBoundsProperty()
+        ));
+
+        infoRectangle.heightProperty().bind(Bindings.createDoubleBinding(() ->
+                        (mouseTrapText.layoutBoundsProperty().get().getHeight() + fontInfo.getSize() + 10),
+                mouseTrapText.layoutBoundsProperty()
+        ));
+
+        mouseTrapInfoGroup = new Group(infoRectangle, mouseTrapText);
+        mouseTrapInfoGroup.setVisible(false);
 
         // AREA
         Rectangle rectangleArea = new Rectangle(areaWidth, areaHeight);
         rectangleArea.setStroke(Sunconfig.Color_Of_Void);
         rectangleArea.setFill(new Color(0.20, 0.10, 0.50, 1.00));
         rectangleArea.setOpacity(0.8);
+
+        mouseTrapBarGroup = new Group();
 
         for (int i = 0; i < DAYS_IN_YEAR; i++) {
 
@@ -279,14 +325,30 @@ public class Sunyear {
 
             sunriseBarList.add(rectangleSunrise);
             sunsetBarList.add(rectangleSunset);
+
+            Rectangle rectangleMouseTrap = new Rectangle(SPACING_X, areaHeight);
+            rectangleMouseTrap.setTranslateX(x);
+            rectangleMouseTrap.setFill(Color.TRANSPARENT);
+            rectangleMouseTrap.setStroke(Color.TRANSPARENT);
+            rectangleMouseTrap.setOpacity(0.60);
+            rectangleMouseTrap.setBlendMode(BlendMode.SCREEN);
+
+            rectangleMouseTrap.setOnMouseEntered(event -> { rectangleMouseTrap.setFill(Color.WHITE); showMouseTrapInfo(event); });
+            rectangleMouseTrap.setOnMouseMoved(event -> moveMouseTrapInfo(event));
+            rectangleMouseTrap.setOnMouseExited(event -> { rectangleMouseTrap.setFill(Color.TRANSPARENT); hideMouseTrapInfo(); });
+
+            mouseTrapBarGroup.getChildren().add(rectangleMouseTrap);
         }
 
         Group barsGroup = new Group();
         barsGroup.getChildren().addAll(sunriseBarList);
         barsGroup.getChildren().addAll(sunsetBarList);
+        barsGroup.getChildren().addAll(mouseTrapBarGroup);
         barsGroup.setOpacity(1);
 
-        chartArea.getChildren().addAll(rectangleArea, barsGroup, /*sunriseLine, sunsetLine, */daylengthLine);
+        daylengthLine.setMouseTransparent(true);
+
+        chartArea.getChildren().addAll(rectangleArea, barsGroup /*,sunriseLine, sunsetLine*/, daylengthLine);
 
         // GRID
         for (int i = 0; i <= HOURS; i++) {
@@ -299,6 +361,7 @@ public class Sunyear {
 
         chartGrid.setOpacity(0.65);
         chartGrid.setBlendMode(BlendMode.SCREEN);
+        chartGrid.setMouseTransparent(true);
 
         gregorianCalendar.set(Calendar.YEAR, year);
         month = 0;
@@ -354,6 +417,7 @@ public class Sunyear {
         axisYTextGroup.setTranslateX(maxWidth);
 
         chartAxisY.getChildren().addAll(axisYRectangle, axisYTextGroup);
+        chartAxisY.setMouseTransparent(true);
 
         // AXIS X
         gregorianCalendar.set(Calendar.YEAR, year);
@@ -386,6 +450,7 @@ public class Sunyear {
         dayMarkerTextGroup.setTranslateX(-fontAxis.getSize());
 
         chartAxisX.getChildren().add(dayMarkerTextGroup);
+        chartAxisX.setMouseTransparent(true);
 
         // TITLE
         String titleString = formatTitle();
@@ -402,6 +467,7 @@ public class Sunyear {
         titleRectangle.setStroke(Color.TRANSPARENT);
 
         chartTitle.getChildren().addAll(titleRectangle, chartTitleText);
+        chartTitle.setMouseTransparent(true);
 
         // ALL GROUPS sans FRAME
         double chartTitleHeight = chartTitle.getLayoutBounds().getHeight() / 2;
@@ -427,7 +493,7 @@ public class Sunyear {
 
         // RESIZE
         Text helpText = new Text("Resize");
-        ControlThingy resizeControlThingy = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
+        resizeControlThingy = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
 
         // FRAME
         double contentWidth = chartContents.getLayoutBounds().getWidth() + MARGIN_X * 2;
@@ -440,15 +506,86 @@ public class Sunyear {
         rectangleFrame.setFill(Color.BLACK);
         rectangleFrame.setOpacity(0.7);
 
-        resizeControlThingy.setPosition(contentWidth - resizeControlThingy.getLayoutBounds().getWidth(),
-                contentHeight -resizeControlThingy.getLayoutBounds().getHeight());
+        resizeControlThingy.setPosition(
+                contentWidth - resizeControlThingy.getLayoutBounds().getWidth() - 5,
+                contentHeight -resizeControlThingy.getLayoutBounds().getHeight() - 5
+        );
 
         chartFrame.getChildren().addAll(rectangleFrame, resizeControlThingy);
 
         chartContents.setTranslateX(MARGIN_X);
         chartContents.setTranslateY(MARGIN_Y);
 
-        return new Group(chartFrame, chartContents);
+        return new Group(chartFrame, chartContents, mouseTrapInfoGroup);
+    }
+
+    private void showMouseTrapInfo(MouseEvent event) {
+
+        int i = 0;
+        int index = 0;
+
+        for (Node bar : mouseTrapBarGroup.getChildren()) {
+            if (!((Rectangle) bar).getFill().equals(Color.TRANSPARENT)) {
+                index = i;
+            }
+            i++;
+        }
+
+        int dayOfYear = index + 1;
+
+        GregorianCalendar gregorianCalendar = new GregorianCalendar(calendar.getTimeZone());
+        gregorianCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+        gregorianCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
+
+        double sunriseTime = sunriseList.get(index);
+        String sunriseString = Sunutil.getShorterTimeLengthString(sunriseTime * 60 * 60);
+
+        double sunsetTime = sunsetList.get(index);
+        String sunsetString = Sunutil.getShorterTimeLengthString(sunsetTime * 60 * 60);
+
+        double daylength = sunsetTime - sunriseTime;
+        String daylengthString = Sunutil.getShorterTimeLengthString(daylength * 60 * 60);
+
+        String info = ""
+                + "Date: " + gregorianCalendar.get(Calendar.DAY_OF_MONTH)
+                + "." + (gregorianCalendar.get(Calendar.MONTH) + 1)
+                + "." + (gregorianCalendar.get(Calendar.YEAR))
+                + "\nSunrise:    " + sunriseString
+                + "\nSunset:     " + sunsetString
+                + "\nDay Length: " + daylengthString
+                ;
+
+        mouseTrapText.setText(info);
+
+        moveMouseTrapInfo(event);
+        mouseTrapInfoGroup.setVisible(true);
+    }
+
+    private void moveMouseTrapInfo(MouseEvent event) {
+
+        double mouseX = event.getSceneX();
+        double mouseY = event.getSceneY();
+
+        double positionX = mouseX + 10;
+        double positionY = mouseY + 10;
+
+        double infoWidth = mouseTrapInfoGroup.getLayoutBounds().getWidth();
+        double infoHeight = mouseTrapInfoGroup.getLayoutBounds().getHeight();
+
+        if (positionX + infoWidth > chart.getLayoutBounds().getWidth()) {
+            positionX = mouseX - (infoWidth + 10);
+        }
+
+        if (positionY + infoHeight > chart.getLayoutBounds().getHeight()) {
+            positionY = mouseY - (infoHeight + 10);
+        }
+
+        mouseTrapInfoGroup.setLayoutX(positionX);
+        mouseTrapInfoGroup.setLayoutY(positionY);
+    }
+
+    private void hideMouseTrapInfo() {
+        mouseTrapInfoGroup.setVisible(false);
     }
 
     private String formatTitle() {
@@ -495,5 +632,21 @@ public class Sunyear {
 
     public long getTimeZoneOffset() {
         return timeZoneOffset;
+    }
+
+    public Group getChartFrame() {
+        return chartFrame;
+    }
+
+    public ControlThingy getResizeControlThingy() {
+        return resizeControlThingy;
+    }
+
+    public double getDefaultWidth() {
+        return defaultWidth;
+    }
+
+    public double getDefaultHeight() {
+        return defaultHeight;
     }
 }
