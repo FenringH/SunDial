@@ -250,5 +250,12 @@ public class ControlThingy extends Group {
         if (triangle != null) { triangle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
     }
 
+    public void setPosition(double x, double y) {
+        this.x = x;
+        this.y = y;
+
+        super.setTranslateX(this.x);
+        super.setTranslateY(this.y);
+    }
 
 }

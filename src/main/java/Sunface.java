@@ -746,7 +746,15 @@ public class Sunface extends Application {
 
     private void updateSunchart(Sunchart sunchart) {
 
-        if (sunchartWindow.isShowing()) {
+        if (sunchartWindow.isShowing() &&
+                (
+                        longitude != sunyear.getLongitude() ||
+                        latitude != sunyear.getLatitude() ||
+                        offsetLocalTime.get(Calendar.YEAR) != sunyear.getYear() ||
+                        timeZoneOffset != sunyear.getTimeZoneOffset()
+                )
+        ) {
+
             sunyear.setSpaceTime(longitude, latitude, offsetLocalTime.get(Calendar.YEAR), timeZoneOffset);
         }
 /*
