@@ -1,5 +1,6 @@
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
@@ -33,7 +34,9 @@ public class ControlThingy extends Group {
     private boolean onEh;
 
     private Circle circle;
+    private Circle overlayCircle;
     private Polygon triangle;
+    private Polygon overlayTriangle;
     private DotMatrix dotMatrix;
 
     public ControlThingy(PleaseBuildControlThingy builder) {
@@ -69,12 +72,22 @@ public class ControlThingy extends Group {
 
         if (type.equals(Type.TRIANGLE)) {
             triangle = createTriangle();
-            super.getChildren().add(triangle);
+            super.getChildren().addAll(triangle);
         }
 
         if (!matrixString.isEmpty()) {
             dotMatrix = createDotMatrix();
             super.getChildren().add(dotMatrix);
+        }
+
+        if (type.equals(Type.CIRCLE)) {
+            overlayCircle = createOverlayCircle();
+            super.getChildren().add(overlayCircle);
+        }
+
+        if (type.equals(Type.TRIANGLE)) {
+            overlayTriangle = createOverlayTriangle();
+            super.getChildren().addAll(overlayTriangle);
         }
 
         super.setTranslateX(x);
@@ -105,6 +118,18 @@ public class ControlThingy extends Group {
         return circle;
     }
 
+    private Circle createOverlayCircle() {
+        Circle circle = new Circle(size);
+        circle.setFill(Color.BLACK);
+        circle.setStroke(Color.BLACK);
+        circle.setStrokeWidth(strokeWidth);
+        circle.setBlendMode(BlendMode.BLUE);
+        circle.setOpacity(1);
+        circle.setMouseTransparent(true);
+        circle.setVisible(false);
+        return circle;
+    }
+
     private Polygon createTriangle() {
         Polygon triangle = new Polygon(
                 size, 0,
@@ -114,6 +139,22 @@ public class ControlThingy extends Group {
         triangle.setFill(colorFill);
         triangle.setStroke(strokeColorOff);
         triangle.setStrokeWidth(strokeWidth);
+        return triangle;
+    }
+
+    private Polygon createOverlayTriangle() {
+        Polygon triangle = new Polygon(
+                size, 0,
+                size, size,
+                0, size
+        );
+        triangle.setFill(Color.BLACK);
+        triangle.setStroke(Color.BLACK);
+        triangle.setStrokeWidth(strokeWidth);
+        triangle.setBlendMode(BlendMode.BLUE);
+        triangle.setOpacity(1);
+        triangle.setMouseTransparent(true);
+        triangle.setVisible(false);
         return triangle;
     }
 
@@ -256,6 +297,25 @@ public class ControlThingy extends Group {
 
         super.setTranslateX(this.x);
         super.setTranslateY(this.y);
+    }
+
+    public void toggleNightMode() {
+
+        if (type.equals(Type.CIRCLE)) {
+            if (overlayCircle.isVisible()) {
+                overlayCircle.setVisible(false);
+            } else {
+                overlayCircle.setVisible(true);
+            }
+        }
+
+        if (type.equals(Type.TRIANGLE)) {
+            if (overlayTriangle.isVisible()) {
+                overlayTriangle.setVisible(false);
+            } else {
+                overlayTriangle.setVisible(true);
+            }
+        }
     }
 
 }

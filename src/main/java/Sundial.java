@@ -115,6 +115,7 @@ public class Sundial {
     private ControlThingy controlThingyAlwaysOnTop;
     private ControlThingy controlThingyGlobeGrid;
     private ControlThingy controlThingyGlobeLines;
+    private Group outerControlsGroup;
 
     private Circle tinyGlobeFrame;
     private Group tinyGlobeGroup;
@@ -437,8 +438,8 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().addAll(dialHourLineMarkerList);
         foregroundGroup.getChildren().add(cetusMarkerGroup);
-        foregroundGroup.getChildren().add(dialLocalSecondGroup);
-        foregroundGroup.getChildren().add(dialLocalMinuteGroup);
+//        foregroundGroup.getChildren().add(dialLocalSecondGroup);
+//        foregroundGroup.getChildren().add(dialLocalMinuteGroup);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
         foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().add(dialHighNoonGroup);
@@ -452,23 +453,37 @@ public class Sundial {
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(matrixHighNoon);
         foregroundGroup.getChildren().add(matrixTimeZone);
-        foregroundGroup.getChildren().add(tinyGlobeGroup);
         foregroundGroup.getChildren().add(matrixTime);
         foregroundGroup.getChildren().add(matrixDate);
         foregroundGroup.getChildren().add(matrixLongitude);
         foregroundGroup.getChildren().add(matrixLatitude);
 
-        foregroundGroup.getChildren().add(controlThingyResize);
-        foregroundGroup.getChildren().add(controlThingyClose);
-        foregroundGroup.getChildren().add(controlThingyMaximize);
-        foregroundGroup.getChildren().add(controlThingyMinimize);
-        foregroundGroup.getChildren().add(controlThingyNightmode);
-        foregroundGroup.getChildren().add(controlThingyAlwaysOnTop);
+        outerControlsGroup = new Group(
+                controlThingyResize,
+                controlThingyClose,
+                controlThingyMaximize,
+                controlThingyMinimize,
+                controlThingyNightmode,
+                controlThingyAlwaysOnTop,
+                controlThingyHelp
+        );
+
+//        foregroundGroup.getChildren().add(controlThingyResize);
+//        foregroundGroup.getChildren().add(controlThingyClose);
+//        foregroundGroup.getChildren().add(controlThingyMaximize);
+//        foregroundGroup.getChildren().add(controlThingyMinimize);
+//        foregroundGroup.getChildren().add(controlThingyNightmode);
+//        foregroundGroup.getChildren().add(controlThingyAlwaysOnTop);
+//        foregroundGroup.getChildren().add(controlThingyHelp);
+
+        foregroundGroup.getChildren().add(outerControlsGroup);
+
         foregroundGroup.getChildren().add(controlThingyGlobeGrid);
         foregroundGroup.getChildren().add(controlThingyGlobeLines);
 
+        foregroundGroup.getChildren().add(tinyGlobeGroup);
+
         foregroundGroup.getChildren().add(helpOverlay);
-        foregroundGroup.getChildren().add(controlThingyHelp);
         foregroundGroup.getChildren().add(helpTextGroup);
         foregroundGroup.getChildren().add(infoTextGroup);
 
@@ -728,6 +743,7 @@ public class Sundial {
         for (int i = 0; i < ledList.size(); i++) {
 
             if(i <= indexOn) {
+                timelineList.get(i).stop();
                 ledList.get(i).setOpacity(1);
             } else {
                 if (ledAnimationOnEh) {
@@ -1113,7 +1129,7 @@ public class Sundial {
         matrixDate.setOpacity(opacity);
         matrixTimeZone.setOpacity(opacity);
 
-        dialLocalHourGroup.setOpacity((opacity < 0.5) ? opacity * 2 : opacity);
+        dialLocalHourGroup.setOpacity((opacity < 0.5) ? 0.7 : opacity);
         dialLocalMinuteGroup.setOpacity(opacity);
         dialLocalSecondGroup.setOpacity(opacity);
 
@@ -1181,6 +1197,12 @@ public class Sundial {
     public void toggleNightmode() {
         nightmodeEh = !nightmodeEh;
         nightModeOverlay.setVisible(nightmodeEh);
+
+//        outerControlsGroup.setOpacity(nightmodeEh ? 0.6 : 1.0);
+        for (Node node : outerControlsGroup.getChildren()) {
+            ((ControlThingy) node).toggleNightMode();
+        }
+
         controlThingyNightmode.toggle();
     }
 

@@ -745,7 +745,7 @@ public class Suncreator {
                 - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
                 - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
                 - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                0, Sunconfig.MARGIN_Y + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2,
+                0, Sunconfig.MARGIN_Y/* + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2*/,
                 + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
                 + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
                 + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
@@ -754,7 +754,7 @@ public class Suncreator {
                 0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40
         );
         dialLocalHourPoly.setTranslateX(Sunconfig.CENTER_X);
-        dialLocalHourPoly.setFill(Sunconfig.Color_Of_Void);
+        dialLocalHourPoly.setFill(new Color(1, 1, 1, 0.2));
         dialLocalHourPoly.setStroke(Color.WHITE);
         dialLocalHourPoly.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
         dialLocalHourPoly.setOpacity(1);
@@ -770,8 +770,17 @@ public class Suncreator {
 
     public static Group createDialLocalMinuteGroup(Rotate dialRotateLocalMinute) {
 
+        Line localMinuteLine = new Line(
+                0, Sunconfig.LOCALTIME_DIAL_LENGTH,
+                0, Sunconfig.LOCALMINUTE_DIAL_OFFSET
+        );
+        localMinuteLine.setTranslateX(Sunconfig.CENTER_X);
+        localMinuteLine.setStroke(Color.WHITE);
+        localMinuteLine.setStrokeWidth(Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH);
+        localMinuteLine.setOpacity(0.6);
+
+/*
         Polygon dialLocalMinutePoly = new Polygon(
-//                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
                 - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH,
                 - Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH * 1.25, Sunconfig.LOCALTIME_DIAL_LENGTH,
                 - Sunconfig.LOCALTIME_MINUTE_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.85,
@@ -785,8 +794,9 @@ public class Suncreator {
         dialLocalMinutePoly.setStroke(Color.WHITE);
         dialLocalMinutePoly.setStrokeWidth(Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH);
         dialLocalMinutePoly.setOpacity(1);
+*/
 
-        Group dialLocalMinuteGroup = new Group(dialLocalMinutePoly);
+        Group dialLocalMinuteGroup = new Group(localMinuteLine);
         dialLocalMinuteGroup.getTransforms().add(dialRotateLocalMinute);
         dialLocalMinuteGroup.setStyle(Sunconfig.LOCALMINUTE_DIAL_GLOW);
         dialLocalMinuteGroup.setMouseTransparent(true);
@@ -803,7 +813,7 @@ public class Suncreator {
         localSecondLine.setTranslateX(Sunconfig.CENTER_X);
         localSecondLine.setStroke(Color.WHITE);
         localSecondLine.setStrokeWidth(Sunconfig.LOCALTIME_MINUTE_STROKE_WIDTH);
-        localSecondLine.setOpacity(0.8);
+        localSecondLine.setOpacity(0.6);
 
         Group dialLocalSecondGroup = new Group(localSecondLine);
         dialLocalSecondGroup.getTransforms().add(dialRotateLocalSecond);
@@ -834,16 +844,6 @@ public class Suncreator {
             localSecond.setStroke(Sunconfig.Color_Of_Void);
             localSecond.setStyle(Sunconfig.LOCALSECOND_GLOW);
             localSecond.setMouseTransparent(true);
-*/
-
-            Circle localSecondCircle = new Circle();
-            localSecondCircle.setRadius(((i % 5) == 0) ? Sunconfig.LOCALSECOND_RADIUS_BIG : Sunconfig.LOCALSECOND_RADIUS_SMOL);
-            localSecondCircle.setTranslateX(Sunconfig.CENTER_X);
-            localSecondCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
-            localSecondCircle.setFill(Sunconfig.Color_Of_Seconds);
-            localSecondCircle.setStroke(Sunconfig.Color_Of_Void);
-            localSecondCircle.setStyle(Sunconfig.LOCALSECOND_GLOW);
-            localSecondCircle.setMouseTransparent(true);
 
             Polygon localSecondPoly = new Polygon(
                     -1, Sunconfig.LOCALMINUTE_POLY_HEIGHT,
@@ -859,6 +859,16 @@ public class Suncreator {
             localSecondPoly.setStroke(Sunconfig.Color_Of_Void);
             localSecondPoly.setStyle(Sunconfig.LOCALSECOND_GLOW);
             localSecondPoly.setMouseTransparent(true);
+*/
+
+            Circle localSecondCircle = new Circle();
+            localSecondCircle.setRadius(((i % 5) == 0) ? Sunconfig.LOCALSECOND_RADIUS_BIG : Sunconfig.LOCALSECOND_RADIUS_SMOL);
+            localSecondCircle.setTranslateX(Sunconfig.CENTER_X);
+            localSecondCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
+            localSecondCircle.setFill(Sunconfig.Color_Of_Seconds);
+            localSecondCircle.setStroke(Sunconfig.Color_Of_Void);
+            localSecondCircle.setStyle(Sunconfig.LOCALSECOND_GLOW);
+            localSecondCircle.setMouseTransparent(true);
 
             Rotate localSecondRotate = new Rotate();
             localSecondRotate.setPivotX(Sunconfig.CENTER_X);
@@ -880,16 +890,6 @@ public class Suncreator {
             localMinute.setStroke(Sunconfig.Color_Of_Void);
             localMinute.setStyle(Sunconfig.LOCALMINUTE_GLOW);
             localMinute.setMouseTransparent(true);
-*/
-
-            Circle localMinuteCircle = new Circle();
-            localMinuteCircle.setRadius(((i % 5) == 0) ? Sunconfig.LOCALSECOND_RADIUS_BIG : Sunconfig.LOCALSECOND_RADIUS_SMOL);
-            localMinuteCircle.setTranslateX(Sunconfig.CENTER_X);
-            localMinuteCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
-            localMinuteCircle.setFill(Sunconfig.Color_Of_Minutes);
-            localMinuteCircle.setStroke(Sunconfig.Color_Of_Void);
-            localMinuteCircle.setStyle(Sunconfig.LOCALMINUTE_GLOW);
-            localMinuteCircle.setMouseTransparent(true);
 
             Polygon localMinutePoly = new Polygon(
                     -1, Sunconfig.LOCALMINUTE_POLY_HEIGHT,
@@ -905,6 +905,16 @@ public class Suncreator {
             localMinutePoly.setStroke(Sunconfig.Color_Of_Void);
             localMinutePoly.setStyle(Sunconfig.LOCALMINUTE_GLOW);
             localMinutePoly.setMouseTransparent(true);
+*/
+
+            Circle localMinuteCircle = new Circle();
+            localMinuteCircle.setRadius(((i % 5) == 0) ? Sunconfig.LOCALSECOND_RADIUS_BIG : Sunconfig.LOCALSECOND_RADIUS_SMOL);
+            localMinuteCircle.setTranslateX(Sunconfig.CENTER_X);
+            localMinuteCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
+            localMinuteCircle.setFill(Sunconfig.Color_Of_Void);
+            localMinuteCircle.setStroke(Sunconfig.Color_Of_Minutes);
+            localMinuteCircle.setStyle(Sunconfig.LOCALMINUTE_GLOW);
+            localMinuteCircle.setMouseTransparent(true);
 
             Rotate localMinuteRotate = new Rotate();
             localMinuteRotate.setPivotX(Sunconfig.CENTER_X);
@@ -1142,7 +1152,14 @@ public class Suncreator {
         nightModeRectangle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);
         nightModeRectangle.setMouseTransparent(true);
 
-        nightModeOverlay.getChildren().addAll(nightModeRectangle);
+        Circle nightModeCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X);
+        nightModeCircle.setFill(Color.BLACK);
+        nightModeCircle.setStroke(Sunconfig.Color_Of_Void);
+        nightModeCircle.setBlendMode(BlendMode.BLUE);
+        nightModeCircle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);
+        nightModeCircle.setMouseTransparent(true);
+
+        nightModeOverlay.getChildren().addAll(nightModeCircle);
         nightModeOverlay.setVisible(false);
 
         return nightModeOverlay;

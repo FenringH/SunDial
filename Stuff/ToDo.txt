@@ -13,7 +13,7 @@
 
 + fix Cetus time display to sync with change of Timezone
 
-- fix Sunyear chart bug which wrongly normalizes sunrise and sunset times in different timezones
++ fix Sunyear chart bug which wrongly normalizes sunrise and sunset times in different timezones
 
 - redesign hour and minute dials
 
@@ -30,3 +30,5 @@
 - expand changeWindowSize and changeWindowPosition for general purpose so that it can be used for other "helper" windows
 
 - fix Reset window size to take into account iw window is centered
+
+- add Copy button on debug window
