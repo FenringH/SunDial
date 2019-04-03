@@ -361,6 +361,9 @@ public class Sunface extends Application {
 
         sunyear.getControlThingyMaximize().setOnMouseClicked(event -> maximizeActions(sunchartWindow, WindowType.CHART));
 
+        sunyear.getControlThingyMinimize().setOnMousePressed(event -> saveMouse(primaryStage, event));
+        sunyear.getControlThingyMinimize().setOnMouseClicked(event -> { minimizeActions(sunchartWindow, event); killMouse(); });
+
 
         // *** SHOWTIME ***
 

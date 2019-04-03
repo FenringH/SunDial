@@ -23,12 +23,12 @@
 
 - add Sunyear chart detail information with indicator for "now"
 
-- test performance of Sunyear chart with added styling
++ test performance of Sunyear chart with added styling
 
-- redesign night mode to circle area with darkened/transparent outer control surfaces instead of one large surface
++ redesign night mode to circle area with darkened/transparent outer control surfaces instead of one large surface
 
-- expand changeWindowSize and changeWindowPosition for general purpose so that it can be used for other "helper" windows
++ expand changeWindowSize and changeWindowPosition for general purpose so that it can be used for other "helper" windows
 
-- fix Reset window size to take into account iw window is centered
+- fix Reset window size to take into account if window is centered
 
-- add Copy button on debug window
+- add Copy button to debug window

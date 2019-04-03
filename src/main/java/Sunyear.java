@@ -1,8 +1,11 @@
 import javafx.beans.binding.Bindings;
+import javafx.event.Event;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polyline;
@@ -13,8 +16,9 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
-import static java.lang.Math.abs;
+import static java.lang.Math.*;
 
 public class Sunyear {
 
@@ -24,12 +28,25 @@ public class Sunyear {
     private final static double SPACING_X = 2.0d;
     private final static double SPACING_Y = 20.0d;
 
+    private final static double AREA_WIDTH = DAYS_IN_YEAR * SPACING_X;
     private final static double AREA_HEIGHT = HOURS * SPACING_Y;
 
     private final static double MARGIN_X = 30.0d;
     private final static double MARGIN_Y = 20.0d;
     private final static double ARC_WIDTH = 30.0d;
     private final static double ARC_HEIGHT = 30.0d;
+
+    private final static double INFO_MARGIN = 10.0d;
+
+    private final static Color Color_Of_Sunrise_Line    = new Color(1.00, 0.50, 0.20, 1.00);
+    private final static Color Color_Of_Sunset_Line     = new Color(0.20, 0.50, 1.00, 1.00);
+    private final static Color Color_Of_Daylength_Line  = new Color(0.30, 0.70, 0.30, 1.00);
+
+    private final static String SUNRISE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64, 0, 1.0),  8.0, 0.60, 0, 0);";
+    private final static String SUNSET_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(0, 64, 255, 1.0),  8.0, 0.60, 0, 0);";
+    private final static String DAYLENGTH_GLOW  = "-fx-effect: dropshadow(three-pass-box, rgba(0, 192, 0, 1.0),  8.0, 0.60, 0, 0);";
+
+    enum InfoType { SUNRISE, SUNSET, DAYLENGTH };
 
     private double defaultWidth;
     private double defaultHeight;
@@ -38,6 +55,9 @@ public class Sunyear {
     private double latitude;
     private int year;
     private long timeZoneOffset;
+
+    private double savedMouseX;
+    private double savedMouseY;
 
     private Suntime suntime;
 
@@ -50,21 +70,34 @@ public class Sunyear {
     private ArrayList<Double> sunsetList;
     private ArrayList<Double> daylengthList;
 
-    private Polyline sunriseLine;
-    private Polyline sunsetLine;
-    private Polyline daylengthLine;
+    private Polyline sunrisePolyline;
+    private Polyline sunsetPolyline;
+    private Polyline daylengthPolyline;
 
-    private Text mouseTrapText;
+    private Group sunriseLineList;
+    private Group sunsetLineList;
+
+    private Text infoTextDate;
+    private Text infoTextSunrise;
+    private Text infoTextSunset;
+    private Text infoTextDaylength;
+
     private Group mouseTrapInfoGroup;
-    private Group mouseTrapBarGroup;
+    private Rectangle mouseTrapBar;
+    private Line mouseTrapSunriseLine;
+    private Line mouseTrapSunsetLine;
+    private Line mouseTrapDaylengthLine;
 
     private Text chartTitleText;
 
     private Group dayMarkerLineGroup;
+    private Group dayMarkerRectangleGroup;
     private Group dayMarkerTextGroup;
+    private Group monthMarkerTextGroup;
 
     private ControlThingy controlThingyResize;
     private ControlThingy controlThingyClose;
+    private ControlThingy controlThingyMinimize;
     private ControlThingy controlThingyMaximize;
 
     private Group chartFrame;
@@ -83,30 +116,6 @@ public class Sunyear {
         sunriseList = new ArrayList<>();
         sunsetList = new ArrayList<>();
         daylengthList = new ArrayList<>();
-
-        sunriseLine = new Polyline();
-//        sunriseLine.setStroke(new Color(1.00, 0.50, 0.20, 1.00));
-        sunriseLine.setStroke(Color.WHITE);
-        sunriseLine.setStrokeWidth(2.0);
-        sunriseLine.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(255, 64, 0, 1.0),  8.0, 0.60, 0, 0);");
-        sunriseLine.setBlendMode(BlendMode.SCREEN);
-
-        sunsetLine = new Polyline();
-//        sunsetLine.setStroke(new Color(0.20, 0.50, 1.00, 1.00));
-        sunsetLine.setStroke(Color.WHITE);
-        sunsetLine.setStrokeWidth(2.0);
-        sunsetLine.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0, 64, 255, 1.0),  8.0, 0.60, 0, 0);");
-        sunsetLine.setBlendMode(BlendMode.SCREEN);
-
-        daylengthLine = new Polyline();
-//        daylengthLine.setStroke(new Color(0.30, 0.70, 0.30, 1.00));
-        daylengthLine.setStroke(Color.WHITE);
-        daylengthLine.setStrokeWidth(2.0);
-        daylengthLine.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0, 192, 0, 1.0),  8.0, 0.60, 0, 0);");
-        daylengthLine.setBlendMode(BlendMode.SCREEN);
-
-        dayMarkerLineGroup = new Group();
-        dayMarkerTextGroup = new Group();
 
         calendar = new GregorianCalendar();
         calendar.set(Calendar.YEAR, this.year);
@@ -141,6 +150,22 @@ public class Sunyear {
 
             gregorianCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
 
+            GregorianCalendar dayStart = new GregorianCalendar(calendar.getTimeZone());
+            dayStart.set(
+                    gregorianCalendar.get(Calendar.YEAR),
+                    gregorianCalendar.get(Calendar.MONTH),
+                    gregorianCalendar.get(Calendar.DAY_OF_MONTH),
+                    0, 0, 0
+            );
+
+            GregorianCalendar dayEnd = new GregorianCalendar(calendar.getTimeZone());
+            dayEnd.set(
+                    gregorianCalendar.get(Calendar.YEAR),
+                    gregorianCalendar.get(Calendar.MONTH),
+                    gregorianCalendar.get(Calendar.DAY_OF_MONTH),
+                    23, 59, 59
+            );
+
             suntime.setObserverTime(gregorianCalendar);
             suntime.setObserverPosition(longitude, latitude);
 
@@ -162,12 +187,46 @@ public class Sunyear {
             GregorianCalendar sunsetDateCorrected = new GregorianCalendar(gregorianCalendar.getTimeZone());
             sunsetDateCorrected.setTimeInMillis(sunsetInMillis);
 
-            double sunriseTime = sunriseDateCorrected.get(Calendar.HOUR_OF_DAY) + sunriseDateCorrected.get(Calendar.MINUTE) / 60d;
-            double sunsetTime = sunsetDateCorrected.get(Calendar.HOUR_OF_DAY) + sunsetDateCorrected.get(Calendar.MINUTE) / 60d;
+            // Constrain values to fit in 24 hour window
+            double sunriseTime =
+                    (
+                            abs(sunriseDateCorrected.get(Calendar.DAY_OF_YEAR) - dayStart.get(Calendar.DAY_OF_YEAR)) * 24
+                                    + sunriseDateCorrected.get(Calendar.HOUR_OF_DAY)
+                                    + sunriseDateCorrected.get(Calendar.MINUTE) / 60d
+                                    + sunriseDateCorrected.get(Calendar.SECOND) / (60d * 60d)
+                    ) % 24;
 
+            double sunsetTime =
+                    (
+                            abs(sunsetDateCorrected.get(Calendar.DAY_OF_YEAR) - dayStart.get(Calendar.DAY_OF_YEAR)) * 24
+                                    + sunsetDateCorrected.get(Calendar.HOUR_OF_DAY)
+                                    + sunsetDateCorrected.get(Calendar.MINUTE) / 60d
+                                    + sunsetDateCorrected.get(Calendar.SECOND) / (60d * 60d)
+                    ) % 24;
+
+
+            if (daylength <= 0) {
+                daylength = 0;
+                sunriseTime = 0;
+                sunsetTime = 0;
+                sunriseDateCorrected = dayStart;
+                sunsetDateCorrected = dayStart;
+            }
+
+            if (daylength >= 24) {
+                daylength = 24;
+                sunriseTime = 0;
+                sunsetTime = 24;
+                sunriseDateCorrected = dayStart;
+                sunsetDateCorrected = dayStart;
+            }
+
+
+            // Store data for textual display
             sunriseDateList.add(sunriseDateCorrected);
             sunsetDateList.add(sunsetDateCorrected);
 
+            // Store data for lines
             sunriseList.add(sunriseTime);
             sunsetList.add(sunsetTime);
             daylengthList.add(daylength);
@@ -176,9 +235,9 @@ public class Sunyear {
 
     private void refreshLines() {
 
-        sunriseLine.getPoints().clear();
-        sunsetLine.getPoints().clear();
-        daylengthLine.getPoints().clear();
+        sunrisePolyline.getPoints().clear();
+        sunsetPolyline.getPoints().clear();
+        daylengthPolyline.getPoints().clear();
 
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.set(Calendar.YEAR, year);
@@ -191,27 +250,26 @@ public class Sunyear {
             double sunset = sunsetList.get(i);
             double daylength = daylengthList.get(i);
 
-            if (daylength <= 0) {
-                daylength = 0;
-                sunrise = 0;
-                sunset = 0;
-            }
-
-            if (daylength >= 24) {
-                daylength = 24;
-                sunrise = 0;
-                sunset = 24;
-            }
-
             double x = i * SPACING_X;
 
             double sunriseY = AREA_HEIGHT - sunrise * SPACING_Y;
             double sunsetY = AREA_HEIGHT - sunset * SPACING_Y;
             double daylengthY = AREA_HEIGHT - daylength * SPACING_Y;
 
-            sunriseLine.getPoints().addAll(x, sunriseY);
-            sunsetLine.getPoints().addAll(x, sunsetY);
-            daylengthLine.getPoints().addAll(x, daylengthY);
+            sunrisePolyline.getPoints().addAll(x, sunriseY);
+            sunsetPolyline.getPoints().addAll(x, sunsetY);
+            daylengthPolyline.getPoints().addAll(x, daylengthY);
+
+/*
+            Line sunriseLine = (Line) sunriseLineList.getChildren().get(i);
+            Line sunsetLine = (Line) sunsetLineList.getChildren().get(i);
+
+            sunriseLine.setTranslateX(x);
+            sunriseLine.setTranslateY(sunriseY);
+
+            sunsetLine.setTranslateX(x);
+            sunsetLine.setTranslateY(sunsetY);
+*/
 
             // adjust chart markers for leap years
             int dayOfYear = i + 1;
@@ -221,15 +279,32 @@ public class Sunyear {
 
             if (dayOfMonth == 1) {
 
-                if (month > dayMarkerLineGroup.getChildren().size() - 1) { continue; }
+                GregorianCalendar endMonthCalendar  = new GregorianCalendar(gregorianCalendar.getTimeZone());
+                endMonthCalendar.set(Calendar.YEAR, gregorianCalendar.get(Calendar.YEAR));
+                endMonthCalendar.set(Calendar.MONTH, month + 1);
+                endMonthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+                endMonthCalendar.setTimeInMillis(endMonthCalendar.getTimeInMillis() - 36 * 60 * 60 * 1000);
 
-                Line line = (Line) dayMarkerLineGroup.getChildren().get(month);
-                Text text = (Text) dayMarkerTextGroup.getChildren().get(month);
+                double endX = endMonthCalendar.get(Calendar.DAY_OF_YEAR) * SPACING_X;
+                double width = endX - x;
 
-                line.setStartX(x);
-                line.setEndX(x);
+                if (month < dayMarkerLineGroup.getChildren().size()) {
+                    dayMarkerLineGroup.getChildren().get(month).setTranslateX(x);
+                }
 
-                text.setX(x);
+                if (month < dayMarkerRectangleGroup.getChildren().size()) {
+                    Rectangle rectangle = (Rectangle) dayMarkerRectangleGroup.getChildren().get(month);
+                    rectangle.setTranslateX(x);
+                    rectangle.setWidth(width);
+                }
+
+                if (month < dayMarkerTextGroup.getChildren().size()) {
+                    dayMarkerTextGroup.getChildren().get(month).setTranslateX(x);
+                }
+
+                if (month < monthMarkerTextGroup.getChildren().size()) {
+                    monthMarkerTextGroup.getChildren().get(month).setTranslateX(x);
+                }
 
                 month++;
             }
@@ -238,16 +313,15 @@ public class Sunyear {
     }
 
     private void showMouseTrapInfo(MouseEvent event) {
+        updateMouseTrapInfo(event);
+        mouseTrapInfoGroup.setVisible(true);
+        mouseTrapBar.setVisible(true);
+        mouseTrapSunriseLine.setVisible(true);
+        mouseTrapSunsetLine.setVisible(true);
+        mouseTrapDaylengthLine.setVisible(true);
+    }
 
-        int i = 0;
-        int index = 0;
-
-        for (Node bar : mouseTrapBarGroup.getChildren()) {
-            if (!((Rectangle) bar).getFill().equals(Color.TRANSPARENT)) {
-                index = i;
-            }
-            i++;
-        }
+    private void changeInfoText(int index) {
 
         int dayOfYear = index + 1;
 
@@ -255,81 +329,121 @@ public class Sunyear {
         gregorianCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
         gregorianCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
 
-        double daylength = daylengthList.get(index);
-
-        GregorianCalendar sunriseDate = sunriseDateList.get(index);
-        String sunriseString = Sunutil.getShortTimeString(sunriseDate);
-
-        GregorianCalendar sunsetDate = sunsetDateList.get(index);
-        String sunsetString = Sunutil.getShortTimeString(sunsetDate);
-
-        String daylengthString = Sunutil.getShortTimeLengthString(daylength * 60 * 60);
-
-        if (daylength <= 0) {
-            daylengthString = "00h00m00s";
-            sunriseString = "00:00:00";
-            sunsetString = "00:00:00";
-        }
-
-        if (daylength >= 24) {
-            daylengthString = "24h00m00s";
-            sunriseString = "00:00:00";
-            sunsetString = "24:00:00";
-        }
-
-        String info = ""
-                + "Date: " + gregorianCalendar.get(Calendar.DAY_OF_MONTH)
+        String dateString = "Date: "
+                + gregorianCalendar.get(Calendar.DAY_OF_MONTH)
                 + "." + (gregorianCalendar.get(Calendar.MONTH) + 1)
                 + "." + (gregorianCalendar.get(Calendar.YEAR))
-                + "\nSunrise: " + sunriseString
-                + "\nSunset: " + sunsetString
-                + "\nDay Length: " + daylengthString
                 ;
 
-        mouseTrapText.setText(info);
+        GregorianCalendar sunriseDate = sunriseDateList.get(index);
+        String sunriseString = "Sunrise: " + Sunutil.getShortTimeString(sunriseDate);
 
-        moveMouseTrapInfo(event);
-        mouseTrapInfoGroup.setVisible(true);
+        GregorianCalendar sunsetDate = sunsetDateList.get(index);
+        String sunsetString = "Sunset: " + Sunutil.getShortTimeString(sunsetDate);
+
+        double daylength = daylengthList.get(index);
+        String daylengthString = "Day length: " + Sunutil.getShortTimeLengthString(daylength * 60 * 60);
+
+        infoTextDate.setText(dateString);
+        infoTextSunrise.setText(sunriseString);
+        infoTextSunset.setText(sunsetString);
+        infoTextDaylength.setText(daylengthString);
     }
 
-    private void moveMouseTrapInfo(MouseEvent event) {
+    public void updateMouseTrapInfo(Event event) {
 
-        int i = 0;
-        int index = 0;
+        double mouseX, mouseY;
 
-        for (Node bar : mouseTrapBarGroup.getChildren()) {
-            if (!((Rectangle) bar).getFill().equals(Color.TRANSPARENT)) {
-                index = i;
-            }
-            i++;
+        if (event instanceof MouseEvent) {
+
+            mouseX = ((MouseEvent) event).getX();
+            mouseY = ((MouseEvent) event).getY();
+
+            savedMouseX = mouseX;
+            savedMouseY = mouseY;
+
+        } else if (event instanceof ScrollEvent) {
+
+            double offsetFactor = (((ScrollEvent) event).getDeltaY() < 0) ? -1 : 1;
+
+            savedMouseX += offsetFactor * SPACING_X;
+
+            mouseX = savedMouseX;
+            mouseY = savedMouseY;
+
+        } else if (event instanceof KeyEvent) {
+
+            int offsetFactor = 0;
+
+            KeyCode keyCode = ((KeyEvent) event).getCode();
+
+            if (keyCode.equals(KeyCode.LEFT)) { offsetFactor = -1; }
+            if (keyCode.equals(KeyCode.RIGHT)) { offsetFactor = 1; }
+
+            savedMouseX += offsetFactor * SPACING_X;
+
+            System.out.println("keyCode = " + keyCode.getName() + " | savedMouseX = " + savedMouseX);
+
+            mouseX = savedMouseX;
+            mouseY = savedMouseY;
+
+        } else {
+            return;
         }
 
-        double barX = mouseTrapBarGroup.getChildren().get(index).getLocalToSceneTransform().getTx();
-        double sceneScale = mouseTrapBarGroup.getChildren().get(index).getLocalToSceneTransform().getMxx();
+        int index = (int) floor(mouseX / SPACING_X);
 
-        double mouseX = event.getX() + (barX / sceneScale);
-        double mouseY = event.getY();
+        if (index < 0 || index > daylengthList.size() - 1) { return; }
 
-        double positionX = mouseX + 10;
-        double positionY = mouseY + 10;
+        changeInfoText(index);
 
         double infoWidth = mouseTrapInfoGroup.getLayoutBounds().getWidth();
         double infoHeight = mouseTrapInfoGroup.getLayoutBounds().getHeight();
 
-        if (positionX + infoWidth > chart.getLayoutBounds().getWidth()) {
-            positionX = mouseX - (infoWidth + 10);
+        double offsetX = infoWidth + 10;
+        double offsetY = infoHeight + 10;
+
+        double positionX = mouseX + 10;
+        double positionY = mouseY + 10;
+
+        if (positionX + infoWidth > AREA_WIDTH) {
+            positionX = mouseX - offsetX;
         }
 
-        if (positionY + infoHeight > chart.getLayoutBounds().getHeight()) {
-            positionY = mouseY - (infoHeight + 10);
+        if (positionY + infoHeight > AREA_HEIGHT) {
+            positionY = mouseY - offsetY;
         }
 
-        mouseTrapInfoGroup.setLayoutX(positionX);
-        mouseTrapInfoGroup.setLayoutY(positionY);
+        double sunrise = sunriseList.get(index);
+        double sunset = sunsetList.get(index);
+        double daylength = daylengthList.get(index);
+
+        double endX = index * SPACING_X;
+        double sunriseY = AREA_HEIGHT - (sunrise * SPACING_Y);
+        double sunsetY = AREA_HEIGHT - (sunset * SPACING_Y);
+        double daylengthY = AREA_HEIGHT - (daylength * SPACING_Y);
+
+        mouseTrapInfoGroup.setTranslateX(positionX);
+        mouseTrapInfoGroup.setTranslateY(positionY);
+
+        mouseTrapBar.setTranslateX(endX);
+
+        mouseTrapSunriseLine.setEndX(endX);
+        mouseTrapSunriseLine.setTranslateY(sunriseY);
+
+        mouseTrapSunsetLine.setEndX(endX);
+        mouseTrapSunsetLine.setTranslateY(sunsetY);
+
+        mouseTrapDaylengthLine.setEndX(endX);
+        mouseTrapDaylengthLine.setTranslateY(daylengthY);
     }
 
     private void hideMouseTrapInfo() {
         mouseTrapInfoGroup.setVisible(false);
+        mouseTrapBar.setVisible(false);
+        mouseTrapSunriseLine.setVisible(false);
+        mouseTrapSunsetLine.setVisible(false);
+        mouseTrapDaylengthLine.setVisible(false);
     }
 
     private String formatTitle() {
@@ -353,10 +467,17 @@ public class Sunyear {
         Group chartAxisX = new Group();
         Group chartAxisY = new Group();
         Group chartTitle = new Group();
-        chartFrame = new Group();
 
-        double areaWidth = DAYS_IN_YEAR * SPACING_X;
-        double areaHeight = HOURS * SPACING_Y;
+        sunriseLineList = new Group();
+        sunsetLineList = new Group();
+
+        chartFrame = new Group();
+        dayMarkerLineGroup = new Group();
+        dayMarkerRectangleGroup = new Group();
+        dayMarkerTextGroup = new Group();
+        monthMarkerTextGroup = new Group();
+
+
         int month;
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
 
@@ -365,12 +486,44 @@ public class Sunyear {
         Font fontInfo = new Font(14);
 
         // MOUSE TRAP INFO
-        mouseTrapText = new Text("Spice must flow.");
-        mouseTrapText.setFont(fontInfo);
-        mouseTrapText.setFill(Color.WHITE);
-        mouseTrapText.setStroke(Color.WHITE);
-        mouseTrapText.setX(fontInfo.getSize());
-        mouseTrapText.setY(fontInfo.getSize() + 10);
+        infoTextDate = new Text("Spice must flow.");
+        infoTextDate.setFont(fontInfo);
+        infoTextDate.setFill(Color.WHITE);
+        infoTextDate.setStroke(Color.WHITE);
+        infoTextDate.setX(fontInfo.getSize());
+        infoTextDate.setY(fontInfo.getSize() + INFO_MARGIN);
+
+        infoTextSunrise = new Text("Spice must flow.");
+        infoTextSunrise.setFont(fontInfo);
+        infoTextSunrise.setFill(Color.WHITE);
+        infoTextSunrise.setStroke(Color.WHITE);
+        infoTextSunrise.setStyle(SUNRISE_GLOW);
+        infoTextSunrise.setX(fontInfo.getSize());
+        infoTextSunrise.setY(fontInfo.getSize() * 3 + INFO_MARGIN);
+        infoTextSunrise.setBlendMode(BlendMode.SCREEN);
+        infoTextSunrise.setOpacity(0.8);
+
+        infoTextSunset = new Text("Spice must flow.");
+        infoTextSunset.setFont(fontInfo);
+        infoTextSunset.setFill(Color.WHITE);
+        infoTextSunset.setStroke(Color.WHITE);
+        infoTextSunset.setStyle(SUNSET_GLOW);
+        infoTextSunset.setX(fontInfo.getSize());
+        infoTextSunset.setY(fontInfo.getSize() * 4.5 + INFO_MARGIN);
+        infoTextSunset.setBlendMode(BlendMode.SCREEN);
+        infoTextSunset.setOpacity(0.8);
+
+        infoTextDaylength = new Text("Spice must flow.");
+        infoTextDaylength.setFont(fontInfo);
+        infoTextDaylength.setFill(Color.WHITE);
+        infoTextDaylength.setStroke(Color.WHITE);
+        infoTextDaylength.setStyle(DAYLENGTH_GLOW);
+        infoTextDaylength.setX(fontInfo.getSize());
+        infoTextDaylength.setY(fontInfo.getSize() * 6 + INFO_MARGIN);
+        infoTextDaylength.setBlendMode(BlendMode.SCREEN);
+        infoTextDaylength.setOpacity(0.8);
+
+        Group infoTextGroup = new Group(infoTextDate, infoTextSunrise, infoTextSunset, infoTextDaylength);
 
         Rectangle infoRectangle = new Rectangle(10, 10);
         infoRectangle.setFill(Color.BLACK);
@@ -381,65 +534,120 @@ public class Sunyear {
         infoRectangle.setOpacity(0.50);
 
         infoRectangle.widthProperty().bind(Bindings.createDoubleBinding(() ->
-                        (mouseTrapText.layoutBoundsProperty().get().getWidth() + fontInfo.getSize() + 10),
-                mouseTrapText.layoutBoundsProperty()
+                        (infoTextGroup.layoutBoundsProperty().get().getWidth() + fontInfo.getSize() + INFO_MARGIN),
+                infoTextGroup.layoutBoundsProperty()
         ));
 
         infoRectangle.heightProperty().bind(Bindings.createDoubleBinding(() ->
-                        (mouseTrapText.layoutBoundsProperty().get().getHeight() + fontInfo.getSize() + 10),
-                mouseTrapText.layoutBoundsProperty()
+                        (infoTextGroup.layoutBoundsProperty().get().getHeight() + fontInfo.getSize() + INFO_MARGIN),
+                infoTextGroup.layoutBoundsProperty()
         ));
 
-        mouseTrapInfoGroup = new Group(infoRectangle, mouseTrapText);
+        mouseTrapInfoGroup = new Group(infoRectangle, infoTextGroup);
         mouseTrapInfoGroup.setVisible(false);
 
         // AREA
-        Rectangle rectangleArea = new Rectangle(areaWidth, areaHeight);
-        rectangleArea.setStroke(Sunconfig.Color_Of_Void);
-        rectangleArea.setFill(Color.BLACK);
-        rectangleArea.setOpacity(0.8);
+        Rectangle areaArea = new Rectangle(AREA_WIDTH, AREA_HEIGHT);
+        areaArea.setStroke(Color.TRANSPARENT);
+        areaArea.setFill(Color.TRANSPARENT);
 
-        mouseTrapBarGroup = new Group();
+        sunrisePolyline = new Polyline();
+        sunrisePolyline.setStroke(Color.WHITE);
+        sunrisePolyline.setStrokeWidth(2.0);
+        sunrisePolyline.setStyle(SUNRISE_GLOW);
+        sunrisePolyline.setBlendMode(BlendMode.SCREEN);
+        sunrisePolyline.setMouseTransparent(true);
 
+/*
         for (int i = 0; i < DAYS_IN_YEAR; i++) {
+            Line sunriseLine = new Line(0, 0, SPACING_X, 0);
+            sunriseLine.setStroke(Color.WHITE);
+            sunriseLine.setStrokeWidth(2.0);
+            sunriseLine.setStyle(SUNRISE_GLOW);
+            sunriseLine.setBlendMode(BlendMode.SCREEN);
+            sunriseLine.setMouseTransparent(true);
+            sunriseLineList.getChildren().add(sunriseLine);
 
-            double x = i * SPACING_X;
-
-            Rectangle rectangleMouseTrap = new Rectangle(SPACING_X, areaHeight);
-            rectangleMouseTrap.setTranslateX(x);
-            rectangleMouseTrap.setFill(Color.TRANSPARENT);
-            rectangleMouseTrap.setStroke(Color.TRANSPARENT);
-            rectangleMouseTrap.setOpacity(0.60);
-            rectangleMouseTrap.setBlendMode(BlendMode.SCREEN);
-
-            rectangleMouseTrap.setOnMouseEntered(event -> { rectangleMouseTrap.setFill(Color.WHITE); showMouseTrapInfo(event); });
-            rectangleMouseTrap.setOnMouseMoved(event -> moveMouseTrapInfo(event));
-            rectangleMouseTrap.setOnMouseExited(event -> { rectangleMouseTrap.setFill(Color.TRANSPARENT); hideMouseTrapInfo(); });
-
-            mouseTrapBarGroup.getChildren().add(rectangleMouseTrap);
+            Line sunsetLine = new Line(0, 0, SPACING_X, 0);
+            sunsetLine.setStroke(Color.WHITE);
+            sunsetLine.setStrokeWidth(2.0);
+            sunsetLine.setStyle(SUNSET_GLOW);
+            sunsetLine.setBlendMode(BlendMode.SCREEN);
+            sunsetLine.setMouseTransparent(true);
+            sunsetLineList.getChildren().add(sunsetLine);
         }
+*/
 
-        sunriseLine.setMouseTransparent(true);
-        sunsetLine.setMouseTransparent(true);
-        daylengthLine.setMouseTransparent(true);
+        sunsetPolyline = new Polyline();
+        sunsetPolyline.setStroke(Color.WHITE);
+        sunsetPolyline.setStrokeWidth(2.0);
+        sunsetPolyline.setStyle(SUNSET_GLOW);
+        sunsetPolyline.setBlendMode(BlendMode.SCREEN);
+        sunsetPolyline.setMouseTransparent(true);
 
-        chartArea.getChildren().addAll(rectangleArea, mouseTrapBarGroup , sunriseLine, sunsetLine, daylengthLine);
+        daylengthPolyline = new Polyline();
+        daylengthPolyline.setStroke(Color.WHITE);
+        daylengthPolyline.setStrokeWidth(2.0);
+        daylengthPolyline.setStyle(DAYLENGTH_GLOW);
+        daylengthPolyline.setBlendMode(BlendMode.SCREEN);
+        daylengthPolyline.setMouseTransparent(true);
+
+        mouseTrapBar = new Rectangle(SPACING_X, AREA_HEIGHT);
+        mouseTrapBar.setTranslateX(0);
+        mouseTrapBar.setFill(Color.WHITE);
+        mouseTrapBar.setStroke(Color.TRANSPARENT);
+        mouseTrapBar.setOpacity(0.80);
+        mouseTrapBar.setBlendMode(BlendMode.DIFFERENCE);
+        mouseTrapBar.setVisible(false);
+        mouseTrapBar.setMouseTransparent(true);
+
+        mouseTrapSunriseLine = new Line(-5, 0, AREA_WIDTH, 0);
+        mouseTrapSunriseLine.setStroke(Color_Of_Sunrise_Line);
+        mouseTrapSunriseLine.setStrokeWidth(1.5);
+        mouseTrapSunriseLine.setOpacity(1);
+        mouseTrapSunriseLine.setVisible(false);
+        mouseTrapSunriseLine.setMouseTransparent(true);
+
+        mouseTrapSunsetLine = new Line(-5, 0, AREA_WIDTH, 0);
+        mouseTrapSunsetLine.setStroke(Color_Of_Sunset_Line);
+        mouseTrapSunsetLine.setStrokeWidth(1.5);
+        mouseTrapSunsetLine.setOpacity(1);
+        mouseTrapSunsetLine.setVisible(false);
+        mouseTrapSunsetLine.setMouseTransparent(true);
+
+        mouseTrapDaylengthLine = new Line(-5, 0, AREA_WIDTH, 0);
+        mouseTrapDaylengthLine.setStroke(Color_Of_Daylength_Line);
+        mouseTrapDaylengthLine.setStrokeWidth(1.5);
+        mouseTrapDaylengthLine.setOpacity(1);
+        mouseTrapDaylengthLine.setVisible(false);
+        mouseTrapDaylengthLine.setMouseTransparent(true);
+
+        chartArea.getChildren().addAll(
+                areaArea,
+                sunrisePolyline,
+                sunsetPolyline,
+//                sunriseLineList,
+//                sunsetLineList,
+                daylengthPolyline,
+                mouseTrapSunriseLine,
+                mouseTrapSunsetLine,
+                mouseTrapDaylengthLine,
+                mouseTrapBar,
+                mouseTrapInfoGroup
+        );
 
         // GRID
         for (int i = 0; i <= HOURS; i++) {
             double y = i * SPACING_Y;
-            Line line = new Line(-5, y, areaWidth, y);
+            Line line = new Line(-5, y, AREA_WIDTH, y);
             line.setStroke(Color.WHITE);
 
             chartGrid.getChildren().add(line);
         }
 
-        chartGrid.setOpacity(0.65);
-        chartGrid.setBlendMode(BlendMode.SCREEN);
-        chartGrid.setMouseTransparent(true);
-
         gregorianCalendar.set(Calendar.YEAR, year);
         month = 0;
+
         for (int i = 0; i < DAYS_IN_YEAR; i++) {
 
             int dayOfYear = i + 1;
@@ -449,19 +657,30 @@ public class Sunyear {
 
             if (dayOfMonth == 1) {
 
-                if (month > 12) { continue; }
+                if (month < 13) {
+                    Line line = new Line(0, 0, 0, AREA_HEIGHT + fontAxis.getSize() + 5);
+                    line.setStroke(Color.WHITE);
 
-                double x = i * SPACING_X;
-                Line line = new Line(x, 0, x, areaHeight + 5);
-                line.setStroke(Color.GRAY);
+                    dayMarkerLineGroup.getChildren().add(line);
+                }
+
+                if (month < 12) {
+
+                    Rectangle rectangle = new Rectangle(30 * SPACING_X, AREA_HEIGHT);
+                    rectangle.setStroke(Color.TRANSPARENT);
+                    rectangle.setFill((month % 2 == 0) ? Color.ORANGE : Color.SKYBLUE);
+                    rectangle.setOpacity(0.5);
+
+                    dayMarkerRectangleGroup.getChildren().add(rectangle);
+                }
 
                 month++;
-
-                dayMarkerLineGroup.getChildren().add(line);
             }
         }
 
-        chartGrid.getChildren().add(dayMarkerLineGroup);
+        chartGrid.getChildren().addAll(dayMarkerRectangleGroup, dayMarkerLineGroup);
+        chartGrid.setOpacity(0.35);
+        chartGrid.setMouseTransparent(true);
 
         // AXIS Y
         double maxWidth = 0;
@@ -496,6 +715,7 @@ public class Sunyear {
 
         // AXIS X
         gregorianCalendar.set(Calendar.YEAR, year);
+
         month = 0;
 
         for (int i = 0; i < DAYS_IN_YEAR; i++) {
@@ -504,27 +724,56 @@ public class Sunyear {
             gregorianCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
 
             int dayOfMonth = gregorianCalendar.get(Calendar.DAY_OF_MONTH);
+            int calendarMonth = gregorianCalendar.get(Calendar.MONTH) + 1;
+
+            if (month > 12) { continue; }
 
             if (dayOfMonth == 1) {
 
-                if (month > 12) { continue; }
+                String dayMarkerString = dayOfMonth + "." + calendarMonth + ".";
 
-                double x = i * SPACING_X;
-                String dayMarkerString = dayOfMonth + "." + (gregorianCalendar.get(Calendar.MONTH) + 1) + ".";
+                Text textDate = new Text(0, fontAxis.getSize() + 5, dayMarkerString);
+                textDate.setFont(fontAxis);
+                textDate.setFill(Color.WHITE);
 
-                Text text = new Text(x, 0, dayMarkerString);
-                text.setFont(fontAxis);
-                text.setFill(Color.WHITE);
+                textDate.setX(-textDate.getLayoutBounds().getWidth() / 2);
+
+                dayMarkerTextGroup.getChildren().add(textDate);
 
                 month++;
+            }
 
-                dayMarkerTextGroup.getChildren().add(text);
+            if (dayOfMonth == 15) {
+
+                String monthString;
+
+                switch (calendarMonth) {
+                    case 1: monthString = "January"; break;
+                    case 2: monthString = "February"; break;
+                    case 3: monthString = "March"; break;
+                    case 4: monthString = "April"; break;
+                    case 5: monthString = "May"; break;
+                    case 6: monthString = "June"; break;
+                    case 7: monthString = "July"; break;
+                    case 8: monthString = "August"; break;
+                    case 9: monthString = "September"; break;
+                    case 10: monthString = "October"; break;
+                    case 11: monthString = "November"; break;
+                    case 12: monthString = "December"; break;
+                    default: monthString = "Bakerary";
+                }
+
+                Text textMonth = new Text(0, 0, monthString);
+                textMonth.setFont(fontAxis);
+                textMonth.setFill(Color.WHITE);
+
+                textMonth.setX(((30 * SPACING_X) - textMonth.getLayoutBounds().getWidth()) / 2);
+
+                monthMarkerTextGroup.getChildren().add(textMonth);
             }
         }
 
-        dayMarkerTextGroup.setTranslateX(-fontAxis.getSize());
-
-        chartAxisX.getChildren().add(dayMarkerTextGroup);
+        chartAxisX.getChildren().addAll(dayMarkerTextGroup, monthMarkerTextGroup);
         chartAxisX.setMouseTransparent(true);
 
         // TITLE
@@ -544,16 +793,38 @@ public class Sunyear {
         chartTitle.getChildren().addAll(titleRectangle, chartTitleText);
         chartTitle.setMouseTransparent(true);
 
+        // MOUSE TRAP
+        Rectangle areaBackground = new Rectangle(AREA_WIDTH, AREA_HEIGHT);
+        areaBackground.setStroke(Color.TRANSPARENT);
+        areaBackground.setFill(Color.BLACK);
+        areaBackground.setOpacity(0.8);
+        areaBackground.setMouseTransparent(true);
+
+        Rectangle areaForeground = new Rectangle(AREA_WIDTH, AREA_HEIGHT);
+        areaForeground.setStroke(Color.TRANSPARENT);
+        areaForeground.setFill(Color.TRANSPARENT);
+
+        areaForeground.setOnMouseEntered(event -> { showMouseTrapInfo(event); });
+        areaForeground.setOnMouseExited(event -> { hideMouseTrapInfo(); });
+        areaForeground.setOnMouseMoved(event -> updateMouseTrapInfo(event));
+        areaForeground.setOnScroll(event -> updateMouseTrapInfo(event));
+
         // ALL GROUPS sans FRAME
         double chartTitleHeight = chartTitle.getLayoutBounds().getHeight() / 2;
         double chartAxisYWidth = chartAxisY.getLayoutBounds().getWidth();
         double chartAreaHeight = chartArea.getLayoutBounds().getHeight();
 
-        chartTitle.setTranslateX(chartAxisYWidth + areaWidth / 2 - chartTitle.getLayoutBounds().getWidth() / 2);
+        chartTitle.setTranslateX(chartAxisYWidth + AREA_WIDTH / 2 - chartTitle.getLayoutBounds().getWidth() / 2);
         chartTitle.setTranslateY(MARGIN_Y * 0.75);
 
         chartArea.setTranslateX(chartAxisYWidth);
         chartArea.setTranslateY(chartTitleHeight);
+
+        areaBackground.setTranslateX(chartAxisYWidth);
+        areaBackground.setTranslateY(chartTitleHeight);
+
+        areaForeground.setTranslateX(chartAxisYWidth);
+        areaForeground.setTranslateY(chartTitleHeight);
 
         chartGrid.setTranslateX(chartAxisYWidth);
         chartGrid.setTranslateY(chartTitleHeight);
@@ -561,10 +832,10 @@ public class Sunyear {
         chartAxisY.setTranslateX(-10);
         chartAxisY.setTranslateY(chartTitleHeight + fontAxis.getSize() * 0.35);
 
-        chartAxisX.setTranslateX(chartAxisYWidth + fontAxis.getSize() * 0.5);
+        chartAxisX.setTranslateX(chartAxisYWidth);
         chartAxisX.setTranslateY(chartAreaHeight + chartTitleHeight + fontAxis.getSize() * 1.5);
 
-        Group chartContents = new Group(chartTitle, chartAxisX, chartAxisY, chartArea, chartGrid);
+        Group chartContents = new Group(areaBackground, chartTitle, chartAxisX, chartAxisY, chartGrid, chartArea, areaForeground);
         chartContents.setTranslateX(MARGIN_X);
         chartContents.setTranslateY(MARGIN_Y);
 
@@ -577,7 +848,7 @@ public class Sunyear {
         rectangleFrame.setArcHeight(ARC_HEIGHT);
         rectangleFrame.setStroke(Sunconfig.Color_Of_Void);
         rectangleFrame.setFill(Color.BLACK);
-        rectangleFrame.setOpacity(0.7);
+        rectangleFrame.setOpacity(0.8);
 
         chartFrame.getChildren().addAll(rectangleFrame);
 
@@ -589,22 +860,29 @@ public class Sunyear {
                 contentHeight - controlThingyResize.getLayoutBounds().getHeight() - 5
         );
 
-        // CONTROL CLOSE
-        controlThingyClose = Suncreator.createControlThingy(Suncreator.ControlThingyType.CLOSE, helpText);
-        controlThingyClose.setPosition(
-                contentWidth - controlThingyClose.getLayoutBounds().getWidth(),
-                controlThingyClose.getLayoutBounds().getHeight() - 5
-        );
-
         // CONTROL MAXIMIZE
         controlThingyMaximize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MAXIMIZE, helpText);
         controlThingyMaximize.setPosition(
-                contentWidth - controlThingyMaximize.getLayoutBounds().getWidth() * 2.5,
+                contentWidth - controlThingyMaximize.getLayoutBounds().getWidth() * 4.5,
                 controlThingyMaximize.getLayoutBounds().getHeight() - 5
         );
 
+        // CONTROL MINIMIZE
+        controlThingyMinimize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MINIMIZE, helpText);
+        controlThingyMinimize.setPosition(
+                contentWidth - controlThingyMinimize.getLayoutBounds().getWidth() * 3,
+                controlThingyMinimize.getLayoutBounds().getHeight() - 5
+        );
+
+        // CONTROL CLOSE
+        controlThingyClose = Suncreator.createControlThingy(Suncreator.ControlThingyType.CLOSE, helpText);
+        controlThingyClose.setPosition(
+                contentWidth - controlThingyClose.getLayoutBounds().getWidth() * 1.5,
+                controlThingyClose.getLayoutBounds().getHeight() - 5
+        );
+
         // CHART GROUP
-        return new Group(chartFrame, chartContents, mouseTrapInfoGroup, controlThingyResize, controlThingyClose, controlThingyMaximize);
+        return new Group(chartFrame, chartContents, controlThingyResize, controlThingyMaximize, controlThingyMinimize, controlThingyClose);
     }
 
 
@@ -660,6 +938,10 @@ public class Sunyear {
 
     public ControlThingy getControlThingyMaximize() {
         return controlThingyMaximize;
+    }
+
+    public ControlThingy getControlThingyMinimize() {
+        return controlThingyMinimize;
     }
 
     public double getDefaultWidth() {

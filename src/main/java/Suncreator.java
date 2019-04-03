@@ -754,7 +754,7 @@ public class Suncreator {
                 0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40
         );
         dialLocalHourPoly.setTranslateX(Sunconfig.CENTER_X);
-        dialLocalHourPoly.setFill(new Color(1, 1, 1, 0.2));
+        dialLocalHourPoly.setFill(new Color(1, 1, 1, 0.1));
         dialLocalHourPoly.setStroke(Color.WHITE);
         dialLocalHourPoly.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
         dialLocalHourPoly.setOpacity(1);
