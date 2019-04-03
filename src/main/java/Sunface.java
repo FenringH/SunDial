@@ -302,13 +302,13 @@ public class Sunface extends Application {
         sundial.getMatrixTimeZone().setOnMouseReleased(event -> { timeZoneActions(sundial, event); killMouse(); });
         sundial.getMatrixTimeZone().setOnScroll(event -> timeZoneScroll(sundial, event));
 
-        sundial.getMatrixLongitude().setOnMousePressed(event -> saveMouse(primaryStage, event));
-        sundial.getMatrixLongitude().setOnMouseReleased(event -> { coordinateActions(primaryStage, PositionType.LONGITUDE, event); killMouse(); });
+        sundial.getMatrixLongitude().setOnMousePressed(event -> { saveMouse(primaryStage, event); globeCheck(); });
+        sundial.getMatrixLongitude().setOnMouseReleased(event -> { coordinateActions(primaryStage, PositionType.LONGITUDE, event); killMouse(); globeCheck(); });
         sundial.getMatrixLongitude().setOnMouseDragged(event -> rotateGlobe(sundial, PositionType.LONGITUDE, event));
         sundial.getMatrixLongitude().setOnScroll(event -> rotateGlobe(sundial, PositionType.LONGITUDE, event));
 
-        sundial.getMatrixLatitude().setOnMousePressed(event -> saveMouse(primaryStage, event));
-        sundial.getMatrixLatitude().setOnMouseReleased(event -> { coordinateActions(primaryStage, PositionType.LATITUDE, event); killMouse(); });
+        sundial.getMatrixLatitude().setOnMousePressed(event -> { saveMouse(primaryStage, event); globeCheck(); });
+        sundial.getMatrixLatitude().setOnMouseReleased(event -> { coordinateActions(primaryStage, PositionType.LATITUDE, event); killMouse(); globeCheck(); });
         sundial.getMatrixLatitude().setOnMouseDragged(event -> rotateGlobe(sundial, PositionType.LATITUDE, event));
         sundial.getMatrixLatitude().setOnScroll(event -> { rotateGlobe(sundial, PositionType.LATITUDE, event); });
 
@@ -427,12 +427,9 @@ public class Sunface extends Application {
         globalCalendar.setTimeInMillis(timeZonedCalendar.getTimeInMillis() - timeZoneCorrection);
 
         suntimeLocal.setObserverTime(timeZonedCalendar);
-        suntimeGlobal.setObserverTime(offsetLocalTime);
+        suntimeGlobal.setObserverTime(globalCalendar);
 
         long newJulianDayNumber = suntimeLocal.getJulianDayNumber();
-
-        double phase = (suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber()) * 360;
-        double tilt = -suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(offsetLocalTime));
 
         String yearString = ("0000" + offsetLocalTime.get(Calendar.YEAR));
         yearString = yearString.substring(yearString.length() - 4);
@@ -453,6 +450,8 @@ public class Sunface extends Application {
         if (newJulianDayNumber != oldJulianDayNumber || initialize) {
 
             suntimeLocal.setObserverPosition(longitude, latitude);
+            suntimeGlobal.setObserverPosition(longitude, latitude);
+
             cetusNightList = cetustime.getNightList(timeZonedCalendar);
 
             double highNoonJulianDate = suntimeLocal.getHighnoonJulianDate();
@@ -473,6 +472,9 @@ public class Sunface extends Application {
         sundial.setLocalTime(offsetLocalTime);
         sundial.updateCetusTimer(cetusNightList);
         sundial.updateDialMarkers();
+
+        double phase = (suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber()) * 360;
+        double tilt = -suntimeGlobal.getRealTimeDeclinationOfTheSun(Suntime.getJulianDate(globalCalendar));
 
         sundial.setGlobeDaylight(phase, tilt);
 
