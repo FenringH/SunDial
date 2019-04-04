@@ -13,10 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.*;
 
 import static java.lang.Math.*;
 
@@ -62,6 +59,7 @@ public class Sunyear {
     private Suntime suntime;
 
     private GregorianCalendar calendar;
+    private GregorianCalendar localDate;
 
     private ArrayList<GregorianCalendar> sunriseDateList;
     private ArrayList<GregorianCalendar> sunsetDateList;
@@ -87,6 +85,7 @@ public class Sunyear {
     private Line mouseTrapSunriseLine;
     private Line mouseTrapSunsetLine;
     private Line mouseTrapDaylengthLine;
+    private Rectangle localDateBar;
 
     private Text chartTitleText;
 
@@ -103,11 +102,11 @@ public class Sunyear {
     private Group chartFrame;
     private Group chart;
 
-    public Sunyear(double longitude, double latitude, int year, long timeZoneOffset) {
+    public Sunyear(double longitude, double latitude, GregorianCalendar date, long timeZoneOffset) {
 
         this.longitude = longitude;
         this.latitude = latitude;
-        this.year = year;
+        this.year = date.get(Calendar.YEAR);
         this.timeZoneOffset = timeZoneOffset;
 
         sunriseDateList = new ArrayList<>();
@@ -119,6 +118,9 @@ public class Sunyear {
 
         calendar = new GregorianCalendar();
         calendar.set(Calendar.YEAR, this.year);
+
+        localDate = new GregorianCalendar(date.getTimeZone());
+        localDate.setTimeInMillis(date.getTimeInMillis());
 
         suntime = new Suntime.PleaseBuildSuntime()
                 .localTime(calendar)
@@ -233,6 +235,16 @@ public class Sunyear {
         }
     }
 
+    private void refreshLocalDateBar() {
+        if (localDate.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)) {
+            int localDateDayOfYear = localDate.get(Calendar.DAY_OF_YEAR) - 1;
+            localDateBar.setTranslateX(localDateDayOfYear * SPACING_X);
+            localDateBar.setVisible(true);
+        } else {
+            localDateBar.setVisible(false);
+        }
+    }
+
     private void refreshLines() {
 
         sunrisePolyline.getPoints().clear();
@@ -241,6 +253,8 @@ public class Sunyear {
 
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.set(Calendar.YEAR, year);
+
+        refreshLocalDateBar();
 
         int month = 0;
 
@@ -592,6 +606,14 @@ public class Sunyear {
         daylengthPolyline.setBlendMode(BlendMode.SCREEN);
         daylengthPolyline.setMouseTransparent(true);
 
+        localDateBar = new Rectangle(SPACING_X, AREA_HEIGHT);
+        localDateBar.setTranslateX(0);
+        localDateBar.setFill(Color.RED);
+        localDateBar.setStroke(Color.TRANSPARENT);
+        localDateBar.setOpacity(0.80);
+        localDateBar.setVisible(true);
+        localDateBar.setMouseTransparent(true);
+
         mouseTrapBar = new Rectangle(SPACING_X, AREA_HEIGHT);
         mouseTrapBar.setTranslateX(0);
         mouseTrapBar.setFill(Color.WHITE);
@@ -624,6 +646,7 @@ public class Sunyear {
 
         chartArea.getChildren().addAll(
                 areaArea,
+                localDateBar,
                 sunrisePolyline,
                 sunsetPolyline,
 //                sunriseLineList,
@@ -889,19 +912,37 @@ public class Sunyear {
     // ***************************************
     // *** PUBLIC ***
 
-    public void setSpaceTime(double longitude, double latitude, int year, long timeZoneOffset) {
+    public void setSpaceTime(double longitude, double latitude, GregorianCalendar date, long timeZoneOffset) {
 
         this.longitude = longitude;
         this.latitude = latitude;
-        this.year = year;
+        this.year = date.get(Calendar.YEAR);
         this.timeZoneOffset = timeZoneOffset;
 
         calendar.set(Calendar.YEAR, year);
+
+        localDate.setTimeZone(date.getTimeZone());
+        localDate.setTimeInMillis(date.getTimeInMillis());
 
         chartTitleText.setText(formatTitle());
 
         recalculateDataPoints();
         refreshLines();
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+        calendar.setTimeZone(timeZone);
+        calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public void setLocalDate(GregorianCalendar localDate) {
+        this.localDate.setTimeZone(localDate.getTimeZone());
+        this.localDate.setTimeInMillis(localDate.getTimeInMillis());
+        refreshLocalDateBar();
+    }
+
+    public GregorianCalendar getLocalDate() {
+        return localDate;
     }
 
     public Group getChart() {
@@ -950,5 +991,9 @@ public class Sunyear {
 
     public double getDefaultHeight() {
         return defaultHeight;
+    }
+
+    public TimeZone getTimeZone() {
+        return calendar.getTimeZone();
     }
 }

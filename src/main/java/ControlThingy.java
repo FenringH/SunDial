@@ -6,9 +6,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 import static java.lang.Math.*;
 
 public class ControlThingy extends Group {
@@ -22,8 +19,10 @@ public class ControlThingy extends Group {
     private Color strokeColorOff, strokeColorOn;
     private Color colorFill;
     private String matrixString;
-    private Color matrixColor;
+    private Color matrixColorOff;
+    private Color matrixColorOn;
     private String matrixShadow;
+    private double matrixScale;
     private String styleShadow, styleGlow;
     private Cursor cursor;
     private String helpTextString;
@@ -52,8 +51,10 @@ public class ControlThingy extends Group {
         this.strokeColorOn = builder.strokeColorOn;
         this.colorFill = builder.colorFill;
         this.matrixString = builder.matrixString;
-        this.matrixColor = builder.matrixColor;
+        this.matrixColorOff = builder.matrixColorOff;
+        this.matrixColorOn = builder.matrixColorOn;
         this.matrixShadow = builder.matrixShadow;
+        this.matrixScale = builder.matrixScale;
         this.styleShadow = builder.styleShadow;
         this.styleGlow = builder.styleGlow;
         this.helpTextString = builder.helpTextString;
@@ -159,9 +160,9 @@ public class ControlThingy extends Group {
     }
 
     private DotMatrix createDotMatrix() {
-        DotMatrix dotMatrix = new DotMatrix(matrixString, matrixColor);
-        dotMatrix.setScaleX(Sunconfig.MATRIX_CONTROLTHINGY_SCALE);
-        dotMatrix.setScaleY(Sunconfig.MATRIX_CONTROLTHINGY_SCALE);
+        DotMatrix dotMatrix = new DotMatrix(matrixString, matrixColorOff);
+        dotMatrix.setScaleX(matrixScale);
+        dotMatrix.setScaleY(matrixScale);
         dotMatrix.setTranslateX(-dotMatrix.getLayoutBounds().getWidth() / 2);
         dotMatrix.setTranslateY(-dotMatrix.getLayoutBounds().getHeight() / 2);
         dotMatrix.setStyle(matrixShadow);
@@ -176,8 +177,10 @@ public class ControlThingy extends Group {
         private double x, y;
         private double strokeWidth;
         private String matrixString;
-        private Color matrixColor;
+        private Color matrixColorOff;
+        private Color matrixColorOn;
         private String matrixShadow;
+        private double matrixScale;
         private String styleShadow, styleGlow;
         private Color strokeColorOff, strokeColorOn;
         private Color colorFill;
@@ -194,8 +197,10 @@ public class ControlThingy extends Group {
             this.x = 0; this.y = 0;
             this.strokeWidth = Sunconfig.CONTROL_THINGY_STROKE_WIDTH;
             this.matrixString = "";
-            this.matrixColor = Color.WHITE;
+            this.matrixColorOff = Color.WHITE;
+            this.matrixColorOn = Color.WHITE;
             this.matrixShadow = Sunconfig.MATRIX_SHADOW;
+            this.matrixScale = Sunconfig.MATRIX_CONTROLTHINGY_SCALE;
             this.styleShadow = Sunconfig.CONTROL_THINGY_SHADOW;
             this.styleGlow = Sunconfig.CONTROL_THINGY_GLOW;
             this.strokeColorOff = Sunconfig.Color_Of_ThingyStroke;
@@ -236,8 +241,20 @@ public class ControlThingy extends Group {
 
         public PleaseBuildControlThingy marker(String matrixString, Color matrixColor, String matrixShadow) {
             this.matrixString = matrixString;
-            this.matrixColor = matrixColor;
+            this.matrixColorOff = matrixColor;
+            this.matrixColorOn = matrixColor;
             this.matrixShadow = matrixShadow;
+            this.matrixScale = Sunconfig.MATRIX_CONTROLTHINGY_SCALE;
+            return this;
+        }
+
+        public PleaseBuildControlThingy markerColorOn(Color color) {
+            this.matrixColorOn = color;
+            return this;
+        }
+
+        public PleaseBuildControlThingy markerScale(double scale) {
+            this.matrixScale = scale;
             return this;
         }
 
@@ -285,10 +302,11 @@ public class ControlThingy extends Group {
     }
 
     // Methods
-    public void toggle() {
+    public void toggleState() {
         onEh = !onEh;
         if (circle != null) { circle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
         if (triangle != null) { triangle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
+        if (dotMatrix != null) { dotMatrix.setFill(onEh ? matrixColorOn : matrixColorOff); }
     }
 
     public void setPosition(double x, double y) {
@@ -318,4 +336,8 @@ public class ControlThingy extends Group {
         }
     }
 
+    // Getterers
+    public boolean getState() {
+        return onEh;
+    }
 }

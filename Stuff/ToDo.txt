@@ -9,19 +9,13 @@
 
 + create new class with static methods that contains all creators for Sundial class
 
-- add display about sun elevation at noon
-
 + fix Cetus time display to sync with change of Timezone
 
 + fix Sunyear chart bug which wrongly normalizes sunrise and sunset times in different timezones
 
-- redesign hour and minute dials
++ add DST toggle
 
-- redesign minute display for better visibility
-
-- add DST toggle
-
-- add Sunyear chart detail information with indicator for "now"
++ add Sunyear chart detail information with indicator for "now"
 
 + test performance of Sunyear chart with added styling
 
@@ -29,6 +23,19 @@
 
 + expand changeWindowSize and changeWindowPosition for general purpose so that it can be used for other "helper" windows
 
-- fix Reset window size to take into account if window is centered
++ fix Reset window size to take into account if window is centered
+
+- fix day/night scaling issue with sphere light
+
+- fix globe textures
+
+- fix mouse hover over whole arc in Cetus time mode
 
 - add Copy button to debug window
+
+- redesign hour and minute dials
+
+- redesign minute display for better visibility
+
+- add display about sun elevation at noon
+

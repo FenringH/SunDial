@@ -171,6 +171,9 @@ public class Sunconfig {
     public static final String HELPTEXT_WINDOW = "WINDOW" +
             "\nLMB : move Window";
 
+    public static final String HELPTEXT_DST = "DAYLIGHT SAVING TIME" +
+            "\nLMB : toggle Daylight Saving Time";
+
 
     public static final double MARGIN_X = 25.0d;
     public static final double MARGIN_Y = 25.0d;
@@ -191,8 +194,8 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 16.0d;
-    public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
-    public static final double DAY_ARC_MARGIN = 10.0d;
+    public static final double DAYLENGTH_ARC_RADIUS = 115.0d;
+    public static final double DAY_ARC_MARGIN = 12.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
     public static final double LOCALMINUTE_POLY_HEIGHT = 20;
     public static final double LOCALMINUTE_WIDTH = 8;
@@ -217,6 +220,8 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
+    public static final double CONTROL_DST_RADIUS = 10.0d;
+    public static final double CONTROL_DST_MATRIX_SCALE = 0.85d;
     public static final double CETUS_MARKER_LENGTH = 40.0d;
     public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
@@ -295,13 +300,14 @@ public class Sunconfig {
     public static final double CONTROL_RESIZE_OFFSET = 137.0d;
     public static final double CONTROL_THINGY_OFFSET = 236.0d;
     public static final double CONTROL_CLOSE_OFFSET = 236.0d;
+    public static final double CONTROL_DST_OFFSET = -30.0d;
     public static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
     public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
-    public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X - MARKER_HOUR_LENGTH - CONTROL_GLOBEGRID_RADIUS;
+    public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X - MARKER_HOUR_LENGTH * 2 - CONTROL_GLOBEGRID_RADIUS;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
-    public static final double CETUS_TIMER_OFFSET = 170.0d;
+    public static final double CETUS_TIMER_OFFSET = 160.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     public static final double CETUS_HORIZON_OFFSET = 45.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y + 65.0d;

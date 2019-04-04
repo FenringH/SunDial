@@ -2,6 +2,8 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -14,6 +16,8 @@ public class Cetustime {
 
     private static final String CETUS_TIME_URL = "https://api.warframestat.us/pc/cetusCycle";
     private static final String DATE_REGEX = "([0-9]*)-([0-9]*)-([0-9]*)T([0-9]*):([0-9]*):([0-9]*)\\.([0-9]*)Z";
+
+    private static final int CONNECTION_TIMEOUT = 20000; // ms
 
     private static final String REQUEST_PROPERTY_KEY = "User-Agent";
     private static final String REQUEST_PROPERTY_VALUE = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
@@ -42,6 +46,7 @@ public class Cetustime {
     private int reloadCounter;
 
     private String result;
+    private String shortResult;
 
     public Cetustime() {
 
@@ -75,6 +80,7 @@ public class Cetustime {
             URL url = new URL(CETUS_TIME_URL);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestProperty(REQUEST_PROPERTY_KEY, REQUEST_PROPERTY_VALUE);
+            connection.setConnectTimeout(CONNECTION_TIMEOUT);
             connection.connect();
 
             String data = readContent(connection);
@@ -88,18 +94,22 @@ public class Cetustime {
             cetusTimeOkEh = true;
             cetusTimeExpiredEh = false;
             result = "Success";
+            shortResult = "Sync with Cetus complete.";
 
             reloadCounter++;
 
+        } catch (SocketTimeoutException e) {
+            cetusTimeOkEh = false;
+            result = "failed with SocketTimeoutException: " + e.getMessage();
+            shortResult = "Connection Timed Out after " + (CONNECTION_TIMEOUT / 1000) + "s";
+        } catch (MalformedURLException e) {
+            cetusTimeOkEh = false;
+            result = "failed with MalformedURLException: " + e.getMessage();
+            shortResult = "Borked Cetus URL";
         } catch (IOException e) {
             cetusTimeOkEh = false;
             result = "failed with IOException: " + e.getMessage();
-        } catch (NullPointerException e) {
-            cetusTimeOkEh = false;
-            result = "failed with NullPointerException: " + e.getMessage();
-        } catch (NumberFormatException e) {
-            cetusTimeOkEh = false;
-            result = "failed with NumberFormatException: " + e.getMessage();
+            shortResult = "Connection Failed";
         }
     }
 
@@ -233,6 +243,10 @@ public class Cetustime {
 
     public String getResult() {
         return result;
+    }
+
+    public String getShortResult() {
+        return shortResult;
     }
 
     public HashMap<String, String> getDataMap() {

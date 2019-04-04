@@ -16,6 +16,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.util.Duration;
+import sun.security.provider.Sun;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,8 @@ public class Suncreator {
         NIGTMODE,
         ALWAYSONTOP,
         GLOBEGRID,
-        GLOBELINES
+        GLOBELINES,
+        DST
     };
 
     public static ControlThingy createControlThingy(ControlThingyType type, Text helpText) {
@@ -44,116 +46,135 @@ public class Suncreator {
         switch (type) {
             case HELP:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_HELP_OFFSET, Sunconfig.CONTROL_HELP_ANGLE)
-                    .size(Sunconfig.CONTROL_HELP_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_HELP_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_ResizeFill)
-                    .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                    .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_DEFAULT, helpText)
-                    .thankYou();
-            break;
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_HELP_OFFSET, Sunconfig.CONTROL_HELP_ANGLE)
+                        .size(Sunconfig.CONTROL_HELP_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_HELP_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_DEFAULT, helpText)
+                        .thankYou();
+                break;
             case RESIZE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .type(ControlThingy.Type.TRIANGLE)
-                    .positionCartesian(Sunconfig.CENTER_X + Sunconfig.CONTROL_RESIZE_OFFSET, Sunconfig.CENTER_Y + Sunconfig.CONTROL_RESIZE_OFFSET)
-                    .size(Sunconfig.CONTROL_RESIZE_SIZE)
-                    .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_RESIZE_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_ResizeFill)
-                    .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
-                    .cursor(Cursor.NW_RESIZE)
-                    .helpText(Sunconfig.HELPTEXT_RESIZE, helpText)
-                    .thankYou();
-            break;
+                        .type(ControlThingy.Type.TRIANGLE)
+                        .positionCartesian(Sunconfig.CENTER_X + Sunconfig.CONTROL_RESIZE_OFFSET, Sunconfig.CENTER_Y + Sunconfig.CONTROL_RESIZE_OFFSET)
+                        .size(Sunconfig.CONTROL_RESIZE_SIZE)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_RESIZE_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.NW_RESIZE)
+                        .helpText(Sunconfig.HELPTEXT_RESIZE, helpText)
+                        .thankYou();
+                break;
             case CLOSE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_CLOSE_OFFSET, Sunconfig.CONTROL_CLOSE_ANGLE)
-                    .size(Sunconfig.CONTROL_CLOSE_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_CloseStroke, Sunconfig.Color_Of_CloseStroke)
-                    .strokeWidth(Sunconfig.CONTROL_CLOSE_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_CloseFill)
-                    .style(Sunconfig.CONTROL_CLOSE_SHADOW, Sunconfig.CONTROL_CLOSE_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_CLOSE, helpText)
-                    .thankYou();
-            break;
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_CLOSE_OFFSET, Sunconfig.CONTROL_CLOSE_ANGLE)
+                        .size(Sunconfig.CONTROL_CLOSE_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_CloseStroke, Sunconfig.Color_Of_CloseStroke)
+                        .strokeWidth(Sunconfig.CONTROL_CLOSE_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_CloseFill)
+                        .style(Sunconfig.CONTROL_CLOSE_SHADOW, Sunconfig.CONTROL_CLOSE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_CLOSE, helpText)
+                        .thankYou();
+                break;
             case MAXIMIZE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_MAXIMIZE_OFFSET, Sunconfig.CONTROL_MAXIMIZE_ANGLE)
-                    .size(Sunconfig.CONTROL_MAXIMIZE_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_MaximizeStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_MAXIMIZE_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_MaximizeFill)
-                    .style(Sunconfig.CONTROL_MAXIMIZE_SHADOW, Sunconfig.CONTROL_MAXIMIZE_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_MAXIMIZE, helpText)
-                    .thankYou();
-            break;
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_MAXIMIZE_OFFSET, Sunconfig.CONTROL_MAXIMIZE_ANGLE)
+                        .size(Sunconfig.CONTROL_MAXIMIZE_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_MaximizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_MAXIMIZE_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_MaximizeFill)
+                        .style(Sunconfig.CONTROL_MAXIMIZE_SHADOW, Sunconfig.CONTROL_MAXIMIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_MAXIMIZE, helpText)
+                        .thankYou();
+                break;
             case MINIMIZE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_MINIMIZE_OFFSET, Sunconfig.CONTROL_MINIMIZE_ANGLE)
-                    .size(Sunconfig.CONTROL_MINIMIZE_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_MinimizeStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_MINIMIZE_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_MinimizeFill)
-                    .style(Sunconfig.CONTROL_MINIMIZE_SHADOW, Sunconfig.CONTROL_MINIMIZE_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_MINIMIZE, helpText)
-                    .thankYou();
-            break;
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_MINIMIZE_OFFSET, Sunconfig.CONTROL_MINIMIZE_ANGLE)
+                        .size(Sunconfig.CONTROL_MINIMIZE_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_MinimizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_MINIMIZE_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_MinimizeFill)
+                        .style(Sunconfig.CONTROL_MINIMIZE_SHADOW, Sunconfig.CONTROL_MINIMIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_MINIMIZE, helpText)
+                        .thankYou();
+                break;
             case NIGTMODE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_NIGHTMODE_OFFSET, Sunconfig.CONTROL_NIGHTMODE_ANGLE)
-                    .size(Sunconfig.CONTROL_NIGHTMODE_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_NightmodeStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_NIGHTMODE_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_NightmodeFill)
-                    .style(Sunconfig.CONTROL_NIGHTMODE_SHADOW, Sunconfig.CONTROL_NIGHTMODE_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_NIGHTMODE, helpText)
-                    .thankYou();
-            break;
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_NIGHTMODE_OFFSET, Sunconfig.CONTROL_NIGHTMODE_ANGLE)
+                        .size(Sunconfig.CONTROL_NIGHTMODE_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_NightmodeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_NIGHTMODE_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_NightmodeFill)
+                        .style(Sunconfig.CONTROL_NIGHTMODE_SHADOW, Sunconfig.CONTROL_NIGHTMODE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_NIGHTMODE, helpText)
+                        .thankYou();
+                break;
             case ALWAYSONTOP:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_ALWAYSONTOP_OFFSET, Sunconfig.CONTROL_ALWAYSONTOP_ANGLE)
-                    .size(Sunconfig.CONTROL_ALWAYSONTOP_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_AlwaysOnTopStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_ALWAYSONTOP_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_AlwaysOnTopFill)
-                    .style(Sunconfig.CONTROL_ALWAYSONTOP_SHADOW, Sunconfig.CONTROL_ALWAYSONTOP_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_ALWAYSONTOP, helpText)
-                    .thankYou();
-                controlThingy.toggle();
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_ALWAYSONTOP_OFFSET, Sunconfig.CONTROL_ALWAYSONTOP_ANGLE)
+                        .size(Sunconfig.CONTROL_ALWAYSONTOP_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_AlwaysOnTopStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_ALWAYSONTOP_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_AlwaysOnTopFill)
+                        .style(Sunconfig.CONTROL_ALWAYSONTOP_SHADOW, Sunconfig.CONTROL_ALWAYSONTOP_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_ALWAYSONTOP, helpText)
+                        .thankYou();
                 break;
             case GLOBEGRID:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                    .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 40)
-                    .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
-                    .colorStroke(Sunconfig.Color_Of_GlobeGridStroke, Color.WHITE)
-                    .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
-                    .colorFill(Sunconfig.Color_Of_GlobeGridFill)
-//                    .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                    .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
-                    .cursor(Cursor.HAND)
-                    .helpText(Sunconfig.HELPTEXT_GLOBEGRID, helpText)
-                    .thankYou();
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 40)
+                        .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_MaximizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_GlobeGridFill)
+                        .marker("G", Sunconfig.Color_Of_MaximizeStroke, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.75)
+                        .markerColorOn(Color.WHITE)
+                        .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_GLOBEGRID, helpText)
+                        .thankYou();
                 controlThingy.setVisible(false);
                 break;
             case GLOBELINES:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 50)
                         .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_GlobeGridStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_MaximizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_GlobeGridFill)
-//                    .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .marker("L", Sunconfig.Color_Of_MaximizeStroke, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.75)
+                        .markerColorOn(Color.WHITE)
                         .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_GLOBELINES, helpText)
+                        .thankYou();
+                controlThingy.setVisible(false);
+                break;
+            case DST:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionCartesian(Sunconfig.CENTER_X, Sunconfig.CENTER_Y + Sunconfig.CONTROL_DST_OFFSET)
+                        .size(Sunconfig.CONTROL_DST_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("DST", Sunconfig.Color_Of_ResizeStroke, Sunconfig.MATRIX_SHADOW)
+                        .markerColorOn(Color.WHITE)
+                        .markerScale(Sunconfig.CONTROL_DST_MATRIX_SCALE)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_DST, helpText)
                         .thankYou();
                 controlThingy.setVisible(false);
                 break;
@@ -481,6 +502,7 @@ public class Suncreator {
             nightArc.setFill(Sunconfig.CETUS_ARC_GRADIENT);
             nightArc.setOpacity(Sunconfig.CETUS_ARC_OPACITY);
 //            nightArc.setBlendMode(BlendMode.MULTIPLY);
+            nightArc.setMouseTransparent(false);
 
             cetusArcGroup.getChildren().addAll(nightArc);
             cetusHorizonGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
@@ -754,7 +776,7 @@ public class Suncreator {
                 0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40
         );
         dialLocalHourPoly.setTranslateX(Sunconfig.CENTER_X);
-        dialLocalHourPoly.setFill(new Color(1, 1, 1, 0.1));
+        dialLocalHourPoly.setFill(new Color(1, 1, 1, 0.0));
         dialLocalHourPoly.setStroke(Color.WHITE);
         dialLocalHourPoly.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
         dialLocalHourPoly.setOpacity(1);
@@ -911,8 +933,8 @@ public class Suncreator {
             localMinuteCircle.setRadius(((i % 5) == 0) ? Sunconfig.LOCALSECOND_RADIUS_BIG : Sunconfig.LOCALSECOND_RADIUS_SMOL);
             localMinuteCircle.setTranslateX(Sunconfig.CENTER_X);
             localMinuteCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
-            localMinuteCircle.setFill(Sunconfig.Color_Of_Void);
-            localMinuteCircle.setStroke(Sunconfig.Color_Of_Minutes);
+            localMinuteCircle.setFill(Sunconfig.Color_Of_Minutes);
+            localMinuteCircle.setStroke(Sunconfig.Color_Of_Void);
             localMinuteCircle.setStyle(Sunconfig.LOCALMINUTE_GLOW);
             localMinuteCircle.setMouseTransparent(true);
 
@@ -1129,7 +1151,7 @@ public class Suncreator {
     }
 
     public static DotMatrix createMatrixTimeZone() {
-        DotMatrix matrixTimeZone = new DotMatrix("GMT+00", Sunconfig.Color_Of_LocalTime);
+        DotMatrix matrixTimeZone = new DotMatrix("UTC+00", Sunconfig.Color_Of_LocalTime);
         matrixTimeZone.setScaleX(Sunconfig.MATRIX_TIMEZONE_SCALE);
         matrixTimeZone.setScaleY(Sunconfig.MATRIX_TIMEZONE_SCALE);
         matrixTimeZone.setLayoutX(Sunconfig.CENTER_X - matrixTimeZone.getLayoutBounds().getWidth() / 2);
