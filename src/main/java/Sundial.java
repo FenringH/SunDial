@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -85,8 +84,9 @@ public class Sundial {
     private ArrayList<Boolean> dialLocalSecondOn;
     private ArrayList<Node> dialLocalMinuteLedList;
     private ArrayList<Boolean> dialLocalMinuteOn;
-    private ArrayList<Timeline> dialLocalSecondLedTransitionList;
-    private ArrayList<Timeline> dialLocalMinuteLedTransitionList;
+    private ArrayList<Timeline> dialLocalSecondLedOffList;
+    private ArrayList<Timeline> dialLocalMinuteLedOffList;
+    private ArrayList<Timeline> dialLocalMinuteLedDimList;
     private ArrayList<Timeline> cetusMarkerHoverTransitionList;
 
     private DotMatrix matrixYear;
@@ -362,16 +362,18 @@ public class Sundial {
         dialLocalSecondOn = new ArrayList<>();
         dialLocalMinuteLedList = new ArrayList<>();
         dialLocalMinuteOn = new ArrayList<>();
-        dialLocalSecondLedTransitionList = new ArrayList<>();
-        dialLocalMinuteLedTransitionList = new ArrayList<>();
+        dialLocalSecondLedOffList = new ArrayList<>();
+        dialLocalMinuteLedOffList = new ArrayList<>();
+        dialLocalMinuteLedDimList = new ArrayList<>();
 
         Suncreator.createLEDs(
                 dialLocalSecondLedList,
                 dialLocalSecondOn,
                 dialLocalMinuteLedList,
                 dialLocalMinuteOn,
-                dialLocalSecondLedTransitionList,
-                dialLocalMinuteLedTransitionList
+                dialLocalSecondLedOffList,
+                dialLocalMinuteLedOffList,
+                dialLocalMinuteLedDimList
         );
 
         dialMinuteMarkers = Suncreator.createDialMinuteMarkers();
@@ -722,11 +724,11 @@ public class Sundial {
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
         dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
 
-        updateSingleLED(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedTransitionList, localTime.get(Calendar.SECOND));
-        updateRowLED(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedTransitionList, localTime.get(Calendar.MINUTE));
+        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
+        updateRowLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, dialLocalMinuteLedDimList, localTime.get(Calendar.MINUTE));
     }
 
-    private void updateSingleLED(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
+    private void updateSingleLEDs(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
 
         for (int i = 0; i < ledList.size(); i++) {
 
@@ -737,7 +739,7 @@ public class Sundial {
                 if (ledAnimationOnEh) {
                     timelineList.get(i).play();
                 } else {
-                    ledList.get(i).setOpacity(0);
+                    ledList.get(i).setOpacity(Sunconfig.SECOND_LED_OFF_OPACITY);
                 }
 
                 ledOn.set(i, false);
@@ -745,32 +747,39 @@ public class Sundial {
         }
 
         timelineList.get(indexOn).stop();
-        ledList.get(indexOn).setOpacity(1.0);
+        ledList.get(indexOn).setOpacity(Sunconfig.SECOND_LED_ON_OPACITY);
         ledOn.set(indexOn, true);
     }
 
-    private void updateRowLED(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
+    private void updateRowLEDs(ArrayList<Node> ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineOffList, ArrayList<Timeline> timelineDimList, int indexOn) {
 
         for (int i = 0; i < ledList.size(); i++) {
 
-            if(i <= indexOn) {
-
-                timelineList.get(i).stop();
-                ledList.get(i).setOpacity(1);
-
-            } else {
+            if(i < indexOn) {
 
                 if (ledAnimationOnEh) {
-                    timelineList.get(i).play();
+                    timelineOffList.get(i).stop();
+                    timelineDimList.get(i).stop();
+                    timelineDimList.get(i).play();
                 } else {
-                    ledList.get(i).setOpacity(0);
+                    ledList.get(i).setOpacity(Sunconfig.MINUTE_LED_DIM_OPACITY);
+                }
+
+            } else if (i > indexOn) {
+
+                if (ledAnimationOnEh) {
+                    timelineOffList.get(i).stop();
+                    timelineDimList.get(i).stop();
+                    timelineOffList.get(i).play();
+                } else {
+                    ledList.get(i).setOpacity(Sunconfig.MINUTE_LED_OFF_OPACITY);
                 }
             }
-
         }
 
-        timelineList.get(indexOn).stop();
-        ledList.get(indexOn).setOpacity(1.0);
+        timelineOffList.get(indexOn).stop();
+        timelineDimList.get(indexOn).stop();
+        ledList.get(indexOn).setOpacity(Sunconfig.MINUTE_LED_ON_OPACITY);
         ledOn.set(indexOn, true);
     }
 
@@ -1010,20 +1019,7 @@ public class Sundial {
     public void setDialFrameWarning(boolean warning) {
 
         this.warning = warning;
-
-        if (this.warning) {
-            if (globeVisibleEh) {
-                dialCircleFrame.setFill(Sunconfig.Color_Of_Void);
-            } else {
-                dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_WARNING);
-            }
-        } else {
-            if (globeVisibleEh) {
-                dialCircleFrame.setFill(Sunconfig.Color_Of_Void);
-            } else {
-                dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_NOMINAL);
-            }
-        }
+        dialCircleFrame.setStroke(this.warning ? Color.ORANGE : Color.TRANSPARENT);
     }
 
     public void setGroupGlow(Group group, String style) {
@@ -1041,6 +1037,7 @@ public class Sundial {
         controlNightCompression.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.Color_Of_LocalTime);
         controlNightCompression.setStroke(visibleEh ? Sunconfig.Color_Of_LocalTime : Sunconfig.Color_Of_Void);
         dialArcNight.setOpacity(visibleEh ? 0 : 1);
+        dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINALISH);
 
         for (Line hourLineMarker : dialHourLineMarkerList) { hourLineMarker.setStroke(visibleEh ? Color.WHITE : Color.BLACK); }
 
@@ -1117,11 +1114,6 @@ public class Sundial {
 
         longitudeTimeline.play();
         latitudeTimeline.play();
-    }
-
-    public void toggleCetusTime() {
-        cetusTimeVisibleEh = !cetusTimeVisibleEh;
-        setCetusTimeVisibility(cetusTimeVisibleEh);
     }
 
     public boolean cetusTimeVisibleEh() {

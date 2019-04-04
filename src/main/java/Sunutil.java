@@ -26,13 +26,13 @@ public class Sunutil {
         return newAngle;
     }
 
-    public static Timeline createTimelineForLED(Node node, int duration) {
+    public static Timeline createTimelineForLED(Node node, double endValue, int duration) {
 
         Timeline timeline = new Timeline();
         timeline.setCycleCount(1);
         timeline.setRate(1);
         timeline.setAutoReverse(false);
-        KeyValue keyValue = new KeyValue(node.opacityProperty(), 0.0, Interpolator.EASE_IN);
+        KeyValue keyValue = new KeyValue(node.opacityProperty(), endValue, Interpolator.EASE_IN);
         KeyFrame keyFrame = new KeyFrame(Duration.millis(duration), keyValue);
         timeline.getKeyFrames().add(keyFrame);
 

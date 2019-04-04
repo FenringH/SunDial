@@ -259,7 +259,7 @@ public class Sunconfig {
     public static final double MARGIN_CIRCLE_OPACITY = 0.85d;
     public static final double TINYGLOBE_DEFAULT_OPACITY = 0.65d;
     public static final double TINYGLOBE_OFFSET_OPACITY = 0.90d;
-    public static final double MARKER_MINUTE_OPACITY = 0.1d;
+    public static final double MARKER_MINUTE_OPACITY = 0.10d;
     public static final double MATRIX_MINUTE_OPACITY = 0.25d;
     public static final double CONTROL_HELP_OPACITY = 1.00d;
     public static final double CONTROL_RESIZE_OPACITY = 1.00d;
@@ -276,6 +276,12 @@ public class Sunconfig {
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
     public static final double TIMEDATE_DEFAULT_OPACITY = 1.00d;
     public static final double TIMEDATE_TRANSPARENT_OPACITY = 0.20d;
+    public static final double MINUTE_LED_OFF_OPACITY = 0.00d;
+    public static final double MINUTE_LED_DIM_OPACITY = 0.50d;
+    public static final double MINUTE_LED_ON_OPACITY = 1.00d;
+    public static final double SECOND_LED_OFF_OPACITY = 0.00d;
+    public static final double SECOND_LED_DIM_OPACITY = 0.50d;
+    public static final double SECOND_LED_ON_OPACITY = 1.00d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
     public static final double MATRIX_HORIZON_OFFSET = 83.0d;
@@ -350,7 +356,8 @@ public class Sunconfig {
     public static final Color Color_Of_Void       = new Color(0.00, 0.00, 0.00, 0.00);
     public static final Color Color_Of_AlmostVoid = new Color(0.00, 0.00, 0.00, 0.35);
 
-    public static final Color Color_Of_Nominal    = new Color(0.00, 0.65, 1.00, 0.35);
+    public static final Color Color_Of_Nominal    = new Color(0.00, 0.60, 1.00, 0.25);
+    public static final Color Color_Of_Nominalish = new Color(0.10, 0.40, 1.00, 0.50);
     public static final Color Color_Of_Warning    = new Color(1.00, 0.65, 0.00, 0.35);
 
     public static final Color Color_Of_DaySky     = new Color(0.50, 0.75, 1.00, 1.00);
@@ -376,7 +383,7 @@ public class Sunconfig {
     public static final Color Color_Of_TerminatorGlow = new Color(0.00, 0.10, 0.90, 1.00);
 
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
-    public static final Color Color_Of_Minutes    = new Color(0.90, 1.00, 0.90, 1.00);
+    public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
 
     public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
     public static final Color Color_Of_HelpStroke = new Color(0.15, 0.35, 1.00, 1.00);
@@ -411,10 +418,10 @@ public class Sunconfig {
     public static final String HORIZON_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
     public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
     public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 64,255, 64, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOWIER  = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
     public static final String LOCALSECOND_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
@@ -457,6 +464,16 @@ public class Sunconfig {
             CycleMethod.NO_CYCLE,
             new Stop(0.75, Color_Of_Void),
             new Stop(1.00, Color_Of_Nominal)
+    );
+
+    public static final RadialGradient FRAME_DIAL_NOMINALISH = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.60, Color_Of_Void),
+            new Stop(0.80, Color_Of_Nominal),
+            new Stop(1.00, Color_Of_Nominalish)
     );
 
     public static final RadialGradient FRAME_DIAL_WARNING = new RadialGradient(

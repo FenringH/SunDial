@@ -426,9 +426,10 @@ public class Suncreator {
 
     public static Circle createDialCircleFrame() {
         Circle dialCircleFrame = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X);
-        dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_NOMINAL);
+        dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_NOMINALISH);
         dialCircleFrame.setStroke(Sunconfig.Color_Of_Void);
         dialCircleFrame.setStrokeWidth(Sunconfig.MARKER_FRAME_STROKE_WIDTH);
+//        dialCircleFrame.setBlendMode(BlendMode.MULTIPLY);
         return dialCircleFrame;
     }
 
@@ -677,6 +678,7 @@ public class Suncreator {
             markerLine.setOpacity(opacity);
             markerLine.getTransforms().add(markerRotate);
             markerLine.setMouseTransparent(true);
+            markerLine.setBlendMode(BlendMode.OVERLAY);
 
             if (i % 4 == 0) {
 
@@ -850,8 +852,9 @@ public class Suncreator {
             ArrayList<Boolean> dialLocalSecondOn,
             ArrayList<Node> dialLocalMinuteLedList,
             ArrayList<Boolean> dialLocalMinuteOn,
-            ArrayList<Timeline> dialLocalSecondLedTransitionList,
-            ArrayList<Timeline> dialLocalMinuteLedTransitionList
+            ArrayList<Timeline> dialLocalSecondLedOffList,
+            ArrayList<Timeline> dialLocalMinuteLedOffList,
+            ArrayList<Timeline> dialLocalMinuteLedDimList
     ) {
 
         for (int i = 0; i < 60; i++) {
@@ -946,7 +949,7 @@ public class Suncreator {
             Group minuteLedGroup = new Group(localMinuteCircle);
             minuteLedGroup.setOpacity(0.0);
             minuteLedGroup.getTransforms().add(localMinuteRotate);
-//            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
+            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
 
             dialLocalSecondLedList.add(secondGroup);
             dialLocalMinuteLedList.add(minuteLedGroup);
@@ -954,8 +957,9 @@ public class Suncreator {
             dialLocalSecondOn.add(false);
             dialLocalMinuteOn.add(false);
 
-            dialLocalSecondLedTransitionList.add(Sunutil.createTimelineForLED(secondGroup, Sunconfig.LED_OPACITY_DURATION));
-            dialLocalMinuteLedTransitionList.add(Sunutil.createTimelineForLED(minuteLedGroup, Sunconfig.LED_OPACITY_DURATION));
+            dialLocalSecondLedOffList.add(Sunutil.createTimelineForLED(secondGroup, Sunconfig.SECOND_LED_OFF_OPACITY, Sunconfig.LED_OPACITY_DURATION));
+            dialLocalMinuteLedOffList.add(Sunutil.createTimelineForLED(minuteLedGroup, Sunconfig.MINUTE_LED_OFF_OPACITY, Sunconfig.LED_OPACITY_DURATION));
+            dialLocalMinuteLedDimList.add(Sunutil.createTimelineForLED(minuteLedGroup, Sunconfig.MINUTE_LED_DIM_OPACITY, Sunconfig.LED_OPACITY_DURATION));
         }
     }
 
