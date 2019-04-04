@@ -687,11 +687,6 @@ public class Sundial {
         }
     }
 
-    public void setSunTime(GregorianCalendar sunTime) {
-        this.sunTime = sunTime;
-        setSunTimeDialAngle(getAbsoluteAngle(this.sunTime));
-    }
-
     public void setHighNoon(GregorianCalendar highNoon) {
         this.highNoon = highNoon;
         setHighNoonDialAngle(getAbsoluteAngle(this.highNoon));
@@ -1036,8 +1031,9 @@ public class Sundial {
 
         controlNightCompression.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.Color_Of_LocalTime);
         controlNightCompression.setStroke(visibleEh ? Sunconfig.Color_Of_LocalTime : Sunconfig.Color_Of_Void);
+
+        dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINAL);
         dialArcNight.setOpacity(visibleEh ? 0 : 1);
-        dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINALISH);
 
         for (Line hourLineMarker : dialHourLineMarkerList) { hourLineMarker.setStroke(visibleEh ? Color.WHITE : Color.BLACK); }
 
@@ -1143,6 +1139,8 @@ public class Sundial {
         controlThingyGlobeLines.setOpacity(opacity);
         controlThingyGlobeGrid.setOpacity(opacity);
         controlThingyDst.setOpacity(opacity);
+
+        dialMinuteMarkers.setVisible(opacity > 0.5);
 
         if (opacity < 0.5) {
 

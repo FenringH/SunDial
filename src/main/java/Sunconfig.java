@@ -275,9 +275,9 @@ public class Sunconfig {
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
     public static final double TIMEDATE_DEFAULT_OPACITY = 1.00d;
-    public static final double TIMEDATE_TRANSPARENT_OPACITY = 0.20d;
+    public static final double TIMEDATE_TRANSPARENT_OPACITY = 0.10d;
     public static final double MINUTE_LED_OFF_OPACITY = 0.00d;
-    public static final double MINUTE_LED_DIM_OPACITY = 0.50d;
+    public static final double MINUTE_LED_DIM_OPACITY = 0.35d;
     public static final double MINUTE_LED_ON_OPACITY = 1.00d;
     public static final double SECOND_LED_OFF_OPACITY = 0.00d;
     public static final double SECOND_LED_DIM_OPACITY = 0.50d;
@@ -356,7 +356,7 @@ public class Sunconfig {
     public static final Color Color_Of_Void       = new Color(0.00, 0.00, 0.00, 0.00);
     public static final Color Color_Of_AlmostVoid = new Color(0.00, 0.00, 0.00, 0.35);
 
-    public static final Color Color_Of_Nominal    = new Color(0.00, 0.60, 1.00, 0.25);
+    public static final Color Color_Of_Nominal    = new Color(0.00, 0.65, 1.00, 0.35);
     public static final Color Color_Of_Nominalish = new Color(0.10, 0.40, 1.00, 0.50);
     public static final Color Color_Of_Warning    = new Color(1.00, 0.65, 0.00, 0.35);
 

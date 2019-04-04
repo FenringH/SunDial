@@ -426,10 +426,9 @@ public class Suncreator {
 
     public static Circle createDialCircleFrame() {
         Circle dialCircleFrame = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X);
-        dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_NOMINALISH);
+        dialCircleFrame.setFill(Sunconfig.FRAME_DIAL_NOMINAL);
         dialCircleFrame.setStroke(Sunconfig.Color_Of_Void);
         dialCircleFrame.setStrokeWidth(Sunconfig.MARKER_FRAME_STROKE_WIDTH);
-//        dialCircleFrame.setBlendMode(BlendMode.MULTIPLY);
         return dialCircleFrame;
     }
 
