@@ -208,9 +208,12 @@ public class Suncreator {
         Globe dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
         dayGlobe.setLayoutY(Sunconfig.CENTER_Y);
-        dayGlobe.setDayLightColor(Color.WHITE);
+        dayGlobe.setDayLightColor(new Color(1.00, 1.00, 0.80, 1.00));
         dayGlobe.setNightLightColor(Color.BLACK);
-        dayGlobe.setAmbientLightColor(Color.BLACK);
+        dayGlobe.setAmbientLightColor(new Color(0.10, 0.20, 0.30, 1.00));
+        dayGlobe.setSpecularColor(new Color(0.75, 0.75, 0.75, 1.00));
+        dayGlobe.setSpecularPower(6);
+        dayGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         dayGlobe.longitudeProperty().bind(longitude);
         dayGlobe.latitudeProperty().bind(latitude);
         dayGlobe.phaseProperty().bind(phase);
@@ -221,12 +224,26 @@ public class Suncreator {
         nightGlobe.setLayoutX(Sunconfig.CENTER_X);
         nightGlobe.setLayoutY(Sunconfig.CENTER_Y);
         nightGlobe.setDayLightColor(Color.BLACK);
-        nightGlobe.setNightLightColor(Color.WHITE);
-        nightGlobe.setAmbientLightColor(Color.BLACK);
+        nightGlobe.setNightLightColor(new Color(0.70, 0.80, 0.90, 1.00));
+        nightGlobe.setAmbientLightColor(new Color(0.75, 0.75, 0.75, 1.00));
+        nightGlobe.setSpecularColor(new Color(0.10, 0.25, 0.40, 1.0));
+        nightGlobe.setSpecularPower(1.85);
+        nightGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         nightGlobe.longitudeProperty().bind(longitude);
         nightGlobe.latitudeProperty().bind(latitude);
         nightGlobe.phaseProperty().bind(phase);
         nightGlobe.tiltProperty().bind(tilt);
+
+        Globe edgesGlobe = new Globe(Sunconfig.GLOBE_EDGE_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
+        edgesGlobe.setLayoutX(Sunconfig.CENTER_X);
+        edgesGlobe.setLayoutY(Sunconfig.CENTER_Y);
+        edgesGlobe.setDayLightColor(Color.BLACK);
+        edgesGlobe.setNightLightColor(Color.BLACK);
+        edgesGlobe.setAmbientLightColor(Color.SKYBLUE);
+        edgesGlobe.longitudeProperty().bind(longitude);
+        edgesGlobe.latitudeProperty().bind(latitude);
+        edgesGlobe.phaseProperty().bind(phase);
+        edgesGlobe.tiltProperty().bind(tilt);
 
         GlobeGrid globeGrid = new GlobeGrid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBEGRID_LINE_WIDTH, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
         globeGrid.setLayoutX(Sunconfig.CENTER_X);
@@ -260,10 +277,13 @@ public class Suncreator {
 
 
         SubScene dayGlobeScene = new SubScene(dayGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
-        dayGlobeScene.setBlendMode(BlendMode.ADD);
+//        dayGlobeScene.setBlendMode(BlendMode.ADD);
 
         SubScene nightGlobeScene = new SubScene(nightGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
-        nightGlobeScene.setBlendMode(BlendMode.SCREEN);
+        nightGlobeScene.setBlendMode(BlendMode.LIGHTEN);
+
+        SubScene edgesGlobeScene = new SubScene(edgesGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
+        edgesGlobeScene.setBlendMode(BlendMode.SCREEN);
 
         SubScene globeGridScene = new SubScene(globeGrid, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         globeGridScene.setBlendMode(BlendMode.SCREEN);
@@ -290,7 +310,7 @@ public class Suncreator {
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
 
-        return new Group(dayGlobeScene, nightGlobeScene, globeGridScene, globeLinesScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
+        return new Group(dayGlobeScene, nightGlobeScene, /*edgesGlobeScene, */globeGridScene, globeLinesScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
     }
 
     public static Group createTinyGlobe(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {

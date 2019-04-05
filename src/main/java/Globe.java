@@ -251,4 +251,16 @@ public class Globe extends Group {
     public Scale getLightScaleTransform() {
         return lightScaleTransform;
     }
+
+    public void setSpecularMap(Image specularMap) {
+        globeMaterial.setSpecularMap(specularMap);
+    }
+
+    public void setSpecularColor(Color color) {
+        globeMaterial.setSpecularColor(color);
+    }
+
+    public void setSpecularPower(double power) {
+        globeMaterial.setSpecularPower(power);
+    }
 }
