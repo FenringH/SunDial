@@ -5,6 +5,7 @@ import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
@@ -126,7 +127,7 @@ public class Globe extends Group {
         Group sphereLatituder = new Group(sphereLongituder);
         sphereLatituder.getTransforms().add(rotateLatitude);
 
-        super.getChildren().add(sphereLatituder);
+        super.getChildren().addAll(sphereLatituder);
 //        super.getTransforms().add(lightScaleTransform);
     }
 

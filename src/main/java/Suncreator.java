@@ -208,7 +208,9 @@ public class Suncreator {
         Globe dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
         dayGlobe.setLayoutY(Sunconfig.CENTER_Y);
-        dayGlobe.setNightLightColor(Color.RED);
+        dayGlobe.setDayLightColor(Color.WHITE);
+        dayGlobe.setNightLightColor(Color.BLACK);
+        dayGlobe.setAmbientLightColor(Color.BLACK);
         dayGlobe.longitudeProperty().bind(longitude);
         dayGlobe.latitudeProperty().bind(latitude);
         dayGlobe.phaseProperty().bind(phase);
@@ -218,7 +220,9 @@ public class Suncreator {
         Globe nightGlobe = new Globe(Sunconfig.GLOBE_NIGHT_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         nightGlobe.setLayoutX(Sunconfig.CENTER_X);
         nightGlobe.setLayoutY(Sunconfig.CENTER_Y);
-        nightGlobe.setAmbientLightColor(Color.WHITE);
+        nightGlobe.setDayLightColor(Color.BLACK);
+        nightGlobe.setNightLightColor(Color.WHITE);
+        nightGlobe.setAmbientLightColor(Color.BLACK);
         nightGlobe.longitudeProperty().bind(longitude);
         nightGlobe.latitudeProperty().bind(latitude);
         nightGlobe.phaseProperty().bind(phase);
@@ -948,7 +952,7 @@ public class Suncreator {
             Group minuteLedGroup = new Group(localMinuteCircle);
             minuteLedGroup.setOpacity(0.0);
             minuteLedGroup.getTransforms().add(localMinuteRotate);
-            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
+//            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
 
             dialLocalSecondLedList.add(secondGroup);
             dialLocalMinuteLedList.add(minuteLedGroup);
@@ -1194,7 +1198,7 @@ public class Suncreator {
 
         helpText.setFont(new Font(12));
         helpText.setStroke(Color.WHITE);
-        helpText.setFill(Sunconfig.Color_Of_Void);
+        helpText.setFill(Color.WHITE);
         helpText.setText(Sunconfig.HELPTEXT_DEFAULT);
         helpText.setTranslateX(5);
         helpText.setTranslateY(15);
@@ -1202,7 +1206,7 @@ public class Suncreator {
         Rectangle helpTextRectangle = new Rectangle(0, 0, 20, 20);
         helpTextRectangle.setArcWidth(10);
         helpTextRectangle.setArcHeight(10);
-        helpTextRectangle.setStroke(Sunconfig.Color_Of_Void);
+        helpTextRectangle.setStroke(Color.WHITE);
         helpTextRectangle.setFill(Color.BLACK);
         helpTextRectangle.setOpacity(0.50);
 
@@ -1226,8 +1230,8 @@ public class Suncreator {
     public static Group createInfoTextGroup(Text infoText) {
 
         infoText.setFont(new Font(12));
-        infoText.setStroke(Color.WHITE);
-        infoText.setFill(Sunconfig.Color_Of_Void);
+        infoText.setStroke(Color.YELLOW);
+        infoText.setFill(Color.YELLOW);
         infoText.setText(Sunconfig.HELPTEXT_DEFAULT);
         infoText.setTranslateX(5);
         infoText.setTranslateY(15);
@@ -1235,7 +1239,7 @@ public class Suncreator {
         Rectangle infoTextRectangle = new Rectangle(0, 0, 20, 20);
         infoTextRectangle.setArcWidth(10);
         infoTextRectangle.setArcHeight(10);
-        infoTextRectangle.setStroke(Sunconfig.Color_Of_Void);
+        infoTextRectangle.setStroke(Color.YELLOW);
         infoTextRectangle.setFill(Color.BLACK);
         infoTextRectangle.setOpacity(0.50);
 

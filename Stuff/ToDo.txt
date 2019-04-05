@@ -31,11 +31,7 @@
 
 - fix mouse hover over whole arc in Cetus time mode
 
-- add Copy button to debug window
-
-- redesign hour and minute dials
-
-- redesign minute display for better visibility
-
 - add display about sun elevation at noon
+
+? add Copy button to debug window
 

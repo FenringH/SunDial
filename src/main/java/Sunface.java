@@ -496,14 +496,7 @@ public class Sunface extends Application {
     }
 
     private void resetTime() {
-        offsetLocalTime.set(
-                currentLocalTime.get(Calendar.YEAR),
-                currentLocalTime.get(Calendar.MONTH),
-                currentLocalTime.get(Calendar.DAY_OF_MONTH),
-                currentLocalTime.get(Calendar.HOUR_OF_DAY),
-                currentLocalTime.get(Calendar.MINUTE),
-                currentLocalTime.get(Calendar.SECOND)
-        );
+        offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis());
         sundial.setDialFrameWarning(false);
         initCurrentTime();
     }
@@ -590,8 +583,11 @@ public class Sunface extends Application {
                 + offsetSecond * 1000
         );
 
-        if (offsetLocalTime.equals(currentLocalTime)) { sundial.setDialFrameWarning(false); }
-        else { sundial.setDialFrameWarning(true); }
+        if (offsetLocalTime.getTimeInMillis() == currentLocalTime.getTimeInMillis()) {
+            sundial.setDialFrameWarning(false);
+        } else {
+            sundial.setDialFrameWarning(true);
+        }
 
         initCurrentTime();
     }
@@ -1142,7 +1138,7 @@ public class Sunface extends Application {
         offsetLocalTime.get(Calendar.HOUR_OF_DAY);
 
 //        int rawOffset= timeZone.getRawOffset();
-//
+
         currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
         offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
 

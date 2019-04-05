@@ -10,6 +10,13 @@ import static java.lang.Math.*;
 
 public class Sunconfig {
 
+    // Resources
+    public static final String DEFAULT_DAY_MAP               = "maps/2k_earth_daymap.jpg";
+    public static final String DEFAULT_NIGHT_MAP             = "maps/2k_earth_nightmap.jpg";
+    public static final String DEFAULT_EDGE_MAP              = "maps/2k_earth_edge_map.jpg";
+    public static final String DEFAULT_SPECULAR_MAP          = "maps/2k_earth_specular_map.jpg";
+
+
     // DEFAULTS Sunface
     public final static String A_BEGINNING =
             "A beginning is a very delicate time.\n" +
@@ -65,8 +72,6 @@ public class Sunconfig {
     public static final double STEP_nightCompression         = 360d / MAX_MARKER;
 
     public static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
-    public static final String DEFAULT_DAY_MAP               = "maps/earth_diffuse_gall-peters_02.jpg";
-    public static final String DEFAULT_NIGHT_MAP             = "maps/earth_night_v1.png";
 
     public static final String HELPTEXT_DEFAULT = "Hover over controllable surfaces" +
             "\nto display available controls.";
@@ -271,7 +276,7 @@ public class Sunconfig {
     public static final double CETUS_ARC_OPACITY = 1.00d;
     public static final double DAY_TERMINATOR_OPACITY = 0.90d;
     public static final double DAY_GRIDLINE_OPACITY = 1.00d;
-    public static final double HELP_OVERLAY_OPACITY = 0.35d;
+    public static final double HELP_OVERLAY_OPACITY = 0.25d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
     public static final double TIMEDATE_DEFAULT_OPACITY = 1.00d;
@@ -355,6 +360,7 @@ public class Sunconfig {
     public static final Color Color_Of_TextBack   = new Color(0.90, 0.90, 0.50, 1.00);
     public static final Color Color_Of_Void       = new Color(0.00, 0.00, 0.00, 0.00);
     public static final Color Color_Of_AlmostVoid = new Color(0.00, 0.00, 0.00, 0.35);
+    public static final Color Color_Of_SemiPro    = new Color(1.00, 1.00, 1.00, 0.50);
 
     public static final Color Color_Of_Nominal    = new Color(0.00, 0.65, 1.00, 0.35);
     public static final Color Color_Of_Nominalish = new Color(0.10, 0.40, 1.00, 0.50);
@@ -365,7 +371,7 @@ public class Sunconfig {
     public static final Color Color_Of_Space      = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky   = new Color(0.50, 0.35, 1.00, 1.00);
     public static final Color Color_Of_Midnight   = new Color(0.00, 0.00, 0.00, 0.20);
-    public static final Color Color_Of_Margin     = new Color(0.15, 0.30, 0.70, 1.00);
+    public static final Color Color_Of_Margin     = new Color(0.10, 0.25, 0.60, 1.00);
 
     public static final Color Color_Of_SunTime    = new Color(1.00, 0.50, 0.00, 1.00);
     public static final Color Color_Of_HighNoon   = new Color(1.00, 1.00, 0.00, 1.00);
@@ -418,7 +424,7 @@ public class Sunconfig {
     public static final String HORIZON_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
     public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
     public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOWIER  = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
     public static final String LOCALSECOND_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
@@ -454,8 +460,10 @@ public class Sunconfig {
 
     public static final String HELP_MARKER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
 
-    public static final Image GLOBE_DAY_IMAGE = new Image(DEFAULT_DAY_MAP,1003, 639, true, false);
-    public static final Image GLOBE_NIGHT_IMAGE = new Image(DEFAULT_NIGHT_MAP,1003, 639, true, false);
+    public static final Image GLOBE_DAY_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_DAY_MAP));
+    public static final Image GLOBE_NIGHT_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_NIGHT_MAP));;
+    public static final Image GLOBE_SPECULAR_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_SPECULAR_MAP));;
+    public static final Image GLOBE_EDGE_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_EDGE_MAP));;
 
     public static final RadialGradient FRAME_DIAL_NOMINAL = new RadialGradient(
             0, 0,

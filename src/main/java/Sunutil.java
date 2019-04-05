@@ -3,14 +3,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.round;
+import static java.lang.Math.*;
 
 public class Sunutil {
 
@@ -146,4 +149,46 @@ public class Sunutil {
         return (division - floor(division)) * b;
     }
 
+    public static WritableImage convertSphericalToCylindricalMapping(Image input) {
+
+        if (input == null) { return null; }
+
+        double H = input.getHeight();
+        double L = input.getHeight();
+
+        int width = (int) floor(input.getWidth());
+        int height = (int) floor(H);
+
+        WritableImage output = new WritableImage(width, height);
+
+        for (int x = 0; x < width; x++) {
+
+            for (int y = 0; y < height; y++) {
+
+                double yS = (L/PI)*asin(2*(y/H) - 1) + L/2;
+                output.getPixelWriter().setColor(x, y, input.getPixelReader().getColor(x, (int) floor(yS)));
+            }
+
+        }
+
+        return output;
+    }
+
+    public static Color averageColor(ArrayList<Color> colorList) {
+
+        int N = colorList.size();
+        double r = 0;
+        double g = 0;
+        double b = 0;
+        double a = 0;
+
+        for (int i = 0; i < N; i++) {
+            r += colorList.get(i).getRed();
+            g += colorList.get(i).getGreen();
+            b += colorList.get(i).getBlue();
+            a += colorList.get(i).getOpacity();
+        }
+
+        return new Color(r/N, g/N, b/N, a/N);
+    }
 }
