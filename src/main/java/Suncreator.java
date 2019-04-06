@@ -209,10 +209,12 @@ public class Suncreator {
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
         dayGlobe.setLayoutY(Sunconfig.CENTER_Y);
         dayGlobe.setDayLightColor(new Color(1.00, 1.00, 0.80, 1.00));
+        dayGlobe.setDayReverseLightColor(new Color(1.00, 0.25, 0.00, 1.00));
         dayGlobe.setNightLightColor(Color.BLACK);
         dayGlobe.setAmbientLightColor(new Color(0.10, 0.20, 0.30, 1.00));
         dayGlobe.setSpecularColor(new Color(0.75, 0.75, 0.75, 1.00));
         dayGlobe.setSpecularPower(6);
+        dayGlobe.setReverseSpecularPower(30);
         dayGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         dayGlobe.longitudeProperty().bind(longitude);
         dayGlobe.latitudeProperty().bind(latitude);
@@ -234,6 +236,7 @@ public class Suncreator {
         nightGlobe.phaseProperty().bind(phase);
         nightGlobe.tiltProperty().bind(tilt);
 
+/*
         Globe edgesGlobe = new Globe(Sunconfig.GLOBE_EDGE_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         edgesGlobe.setLayoutX(Sunconfig.CENTER_X);
         edgesGlobe.setLayoutY(Sunconfig.CENTER_Y);
@@ -244,6 +247,7 @@ public class Suncreator {
         edgesGlobe.latitudeProperty().bind(latitude);
         edgesGlobe.phaseProperty().bind(phase);
         edgesGlobe.tiltProperty().bind(tilt);
+*/
 
         GlobeGrid globeGrid = new GlobeGrid(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBEGRID_LINE_WIDTH, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
         globeGrid.setLayoutX(Sunconfig.CENTER_X);
@@ -277,23 +281,22 @@ public class Suncreator {
 
 
         SubScene dayGlobeScene = new SubScene(dayGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
-//        dayGlobeScene.setBlendMode(BlendMode.ADD);
 
         SubScene nightGlobeScene = new SubScene(nightGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         nightGlobeScene.setBlendMode(BlendMode.LIGHTEN);
 
-        SubScene edgesGlobeScene = new SubScene(edgesGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
-        edgesGlobeScene.setBlendMode(BlendMode.SCREEN);
+//        SubScene edgesGlobeScene = new SubScene(edgesGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
+//        edgesGlobeScene.setBlendMode(BlendMode.SCREEN);
 
         SubScene globeGridScene = new SubScene(globeGrid, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         globeGridScene.setBlendMode(BlendMode.SCREEN);
         globeGridScene.setEffect(new GaussianBlur(1));
-        globeGridScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
+        globeGridScene.setOpacity(Sunconfig.DAY_GRIDLINE_OPACITY);
 
         SubScene globeLinesScene = new SubScene(globeLines, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         globeLinesScene.setBlendMode(BlendMode.SCREEN);
         globeLinesScene.setEffect(new GaussianBlur(1));
-        globeLinesScene.setOpacity(Sunconfig.DAY_GRIDLINE_OPACITY);
+        globeLinesScene.setOpacity(1);
 
         SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLine, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
@@ -310,7 +313,16 @@ public class Suncreator {
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
 
-        return new Group(dayGlobeScene, nightGlobeScene, /*edgesGlobeScene, */globeGridScene, globeLinesScene, dayTerminatorGlowScene, dayTerminatorLineScene, globeAtmosphere);
+        return new Group(
+                dayGlobeScene
+                , nightGlobeScene
+//                , edgesGlobeScene
+                , globeGridScene
+                , globeLinesScene
+                , dayTerminatorGlowScene
+                , dayTerminatorLineScene
+//                , globeAtmosphere
+        );
     }
 
     public static Group createTinyGlobe(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {

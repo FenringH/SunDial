@@ -275,7 +275,7 @@ public class Sunconfig {
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     public static final double CETUS_ARC_OPACITY = 1.00d;
     public static final double DAY_TERMINATOR_OPACITY = 0.90d;
-    public static final double DAY_GRIDLINE_OPACITY = 1.00d;
+    public static final double DAY_GRIDLINE_OPACITY = 0.50d;
     public static final double HELP_OVERLAY_OPACITY = 0.25d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
