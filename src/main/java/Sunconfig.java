@@ -258,7 +258,7 @@ public class Sunconfig {
     public static final double DAY_TERMINATOR_WIDTH = 1.25d;
     public static final double DAY_TERMINATOR_GLOW_WIDTH = 25.00d;
     public static final double TINYGLOBE_TERMINATOR_WIDTH = 1.00d;
-    public static final double GLOBEGRID_LINE_WIDTH = 0.75d;
+    public static final double GLOBEGRID_LINE_WIDTH = 0.50d;
 
     public static final double DAYLENGTH_ARC_OPACITY = 0.65d;
     public static final double MARGIN_CIRCLE_OPACITY = 0.85d;
@@ -275,7 +275,7 @@ public class Sunconfig {
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     public static final double CETUS_ARC_OPACITY = 1.00d;
     public static final double DAY_TERMINATOR_OPACITY = 0.90d;
-    public static final double DAY_GRIDLINE_OPACITY = 0.50d;
+    public static final double DAY_GRIDLINE_OPACITY = 0.25d;
     public static final double HELP_OVERLAY_OPACITY = 0.25d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;

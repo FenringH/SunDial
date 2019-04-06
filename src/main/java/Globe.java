@@ -70,7 +70,6 @@ public class Globe extends Group {
         this.radius = radius;
         this.dayDiffuseMap = dayDiffuseMap;
         this.animationDuration = animationDuration;
-        this.flipEh = false;
 
         lightDistance = this.radius * 100;
 
@@ -87,7 +86,6 @@ public class Globe extends Group {
         rotateLatitude.setAxis(Rotate.X_AXIS);
 
         lightScaleTransform = new Scale();
-
 
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty(0f);
@@ -135,17 +133,27 @@ public class Globe extends Group {
         Group lightPhaser = new Group(lightTilter);
         lightPhaser.getTransforms().add(rotatePhase);
 
-        Group lightScaleGroup = new Group(lightPhaser);
-//        lightScaleGroup.getTransforms().add(lightScaleTransform);
+        Group lightLongituder = new Group(lightPhaser);
+        lightLongituder.getTransforms().add(rotateLongitude);
 
-        Group sphereLongituder = new Group(sphere, lightScaleGroup);
+        Group lightLatituder = new Group(lightLongituder);
+        lightLatituder.getTransforms().add(rotateLatitude);
+
+        Group lightScaleGroup = new Group(lightLatituder);
+        lightScaleGroup.getTransforms().add(lightScaleTransform);
+
+
+        Group sphereLongituder = new Group(sphere);
         sphereLongituder.getTransforms().add(rotateLongitude);
 
         Group sphereLatituder = new Group(sphereLongituder);
         sphereLatituder.getTransforms().add(rotateLatitude);
 
-        super.getChildren().addAll(sphereLatituder);
-//        super.getTransforms().add(lightScaleTransform);
+        Group sphereScaleGroup = new Group(sphereLatituder);
+//        sphereScaleGroup.getTransforms().add(lightScaleTransform);
+
+
+        super.getChildren().addAll(sphereScaleGroup, lightScaleGroup);
     }
 
     private void setRotations(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {

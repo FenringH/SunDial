@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.GaussianBlur;
@@ -235,6 +236,7 @@ public class Suncreator {
         nightGlobe.latitudeProperty().bind(latitude);
         nightGlobe.phaseProperty().bind(phase);
         nightGlobe.tiltProperty().bind(tilt);
+        nightGlobe.lightScaleProperty().bind(lightScale);
 
 /*
         Globe edgesGlobe = new Globe(Sunconfig.GLOBE_EDGE_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
