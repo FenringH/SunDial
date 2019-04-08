@@ -175,7 +175,6 @@ public class Suncreator {
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_DST, helpText)
                         .thankYou();
-//                controlThingy.setVisible(false);
                 break;
             default:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
@@ -828,7 +827,7 @@ public class Suncreator {
             Rotate centerRotate,
             Group dialHourMatrixMarkerGroup,
             ArrayList<DotMatrix> hourMarkerMatrixList,
-            ArrayList<Line> dialHourLineMarkerList,
+            Group dialHourLineMarkerGroup,
             ArrayList<Rotate> dialMarkerRotateList
             ) {
 
@@ -850,7 +849,7 @@ public class Suncreator {
             markerLine.setOpacity(opacity);
             markerLine.getTransforms().add(markerRotate);
             markerLine.setMouseTransparent(true);
-            markerLine.setBlendMode(BlendMode.SOFT_LIGHT);
+//            markerLine.setBlendMode(BlendMode.SOFT_LIGHT);
 
             if (i % 4 == 0) {
 
@@ -877,16 +876,26 @@ public class Suncreator {
                 hourMarkerMatrixList.add(markerMatrix);
             }
 
-            dialHourLineMarkerList.add(markerLine);
+            dialHourLineMarkerGroup.getChildren().add(markerLine);
             dialMarkerRotateList.add(markerRotate);
         }
     }
 
-    public static Circle createDialCircleCenterPoint() {
+    public static Group createDialCircleCenterPoint() {
+
         Circle dialCircleCenterPoint = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, 1);
         dialCircleCenterPoint.setFill(Sunconfig.Color_Of_LocalTime);
         dialCircleCenterPoint.setStroke(Sunconfig.Color_Of_Void);
-        return dialCircleCenterPoint;
+
+        Circle dialCircleCenterFrame = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, 12);
+        dialCircleCenterFrame.setFill(Sunconfig.Color_Of_Void);
+        dialCircleCenterFrame.setStroke(Sunconfig.Color_Of_LocalTime);
+
+        Group group = new Group(dialCircleCenterFrame, dialCircleCenterPoint);
+        group.setMouseTransparent(true);
+        group.setVisible(false);
+
+        return group;
     }
 
     public static Circle createControlNightCompression() {
@@ -933,9 +942,9 @@ public class Suncreator {
         return dialHighNoonGroup;
     }
 
-    public static Group createDialLocalHourGroup(Polygon dialLocalHourPolyShort, Polygon dialLocalHourPolyLong, Rotate dialRotateLocalHour) {
+    public static Group createDialLocalHourGroup(Rotate dialRotateLocalHour) {
 
-        dialLocalHourPolyLong = new Polygon(
+        Polygon dialLocalHourPolyLong = new Polygon(
 
                 // outside
                 - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
@@ -956,19 +965,13 @@ public class Suncreator {
         dialLocalHourPolyLong.setOpacity(1);
         dialLocalHourPolyLong.setVisible(true);
 
-        dialLocalHourPolyShort = new Polygon(
-
-                // outside
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH,
+        Polygon dialLocalHourPolyShort = new Polygon(
+                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH,
                 - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75,
-                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                0, Sunconfig.MARGIN_Y/* + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2*/,
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
+                0, Sunconfig.MARGIN_Y,
                 + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75,
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH,
-
-                // inside
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.40
+                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75
         );
         dialLocalHourPolyShort.setTranslateX(Sunconfig.CENTER_X);
         dialLocalHourPolyShort.setFill(new Color(1, 1, 1, 0.0));
@@ -976,6 +979,12 @@ public class Suncreator {
         dialLocalHourPolyShort.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
         dialLocalHourPolyShort.setOpacity(1);
         dialLocalHourPolyShort.setVisible(false);
+
+        Line dialLocalHourLine = new Line(Sunconfig.CENTER_X, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
+        dialLocalHourLine.setStroke(Color.WHITE);
+        dialLocalHourLine.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
+        dialLocalHourLine.setOpacity(1);
+        dialLocalHourLine.setVisible(false);
 
         Group dialLocalHourGroup = new Group(dialLocalHourPolyLong, dialLocalHourPolyShort);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
@@ -1179,14 +1188,11 @@ public class Suncreator {
         return matrixSunset;
     }
 
-    public static Group createSunriseGroup(Rotate sunriseDialRotate, Line sunriseLine, DotMatrix matrixSunrise) {
+    public static Group createSunriseGroup(Rotate sunriseDialRotate, DotMatrix matrixSunrise) {
 
         Group sunriseGroup = new Group();
 
-        sunriseLine.setStartX(Sunconfig.CENTER_X);
-        sunriseLine.setStartY(Sunconfig.SUNRISE_DIAL_LENGTH);
-        sunriseLine.setEndX(Sunconfig.CENTER_X);
-        sunriseLine.setEndY(Sunconfig.MARGIN_Y);
+        Line sunriseLine = new Line(Sunconfig.CENTER_X, Sunconfig.SUNRISE_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
         sunriseLine.setStroke(Sunconfig.Color_Of_Horizon);
         sunriseLine.setStrokeWidth(Sunconfig.SUNRISE_STROKE_WIDTH);
         sunriseLine.setStyle(Sunconfig.HORIZON_GLOW);
@@ -1197,14 +1203,11 @@ public class Suncreator {
         return sunriseGroup;
     }
 
-    public static Group createSunsetGroup(Rotate sunsetDialRotate, Line sunsetLine, DotMatrix matrixSunset) {
+    public static Group createSunsetGroup(Rotate sunsetDialRotate, DotMatrix matrixSunset) {
 
         Group sunsetGroup = new Group();
 
-        sunsetLine.setStartX(Sunconfig.CENTER_X);
-        sunsetLine.setStartY(Sunconfig.SUNRISE_DIAL_LENGTH);
-        sunsetLine.setEndX(Sunconfig.CENTER_X);
-        sunsetLine.setEndY(Sunconfig.MARGIN_Y);
+        Line sunsetLine = new Line(Sunconfig.CENTER_X, Sunconfig.SUNRISE_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
         sunsetLine.setStroke(Sunconfig.Color_Of_Horizon);
         sunsetLine.setStrokeWidth(Sunconfig.SUNSET_STROKE_WIDTH);
         sunsetLine.setStyle(Sunconfig.HORIZON_GLOW);
@@ -1284,6 +1287,7 @@ public class Suncreator {
         dialArcDayLength.setStrokeWidth(Sunconfig.DAYLENGTH_STROKE_WIDTH);
         dialArcDayLength.setFill(Sunconfig.Color_Of_Void);
         dialArcDayLength.setOpacity(Sunconfig.DAYLENGTH_ARC_OPACITY);
+        dialArcDayLength.setStyle(Sunconfig.MATRIX_SHADOW);
         dialArcDayLength.setMouseTransparent(true);
         return dialArcDayLength;
     }
@@ -1304,7 +1308,7 @@ public class Suncreator {
         matrixLongitude.setScaleX(Sunconfig.MATRIX_LONGITUDE_SCALE);
         matrixLongitude.setScaleY(Sunconfig.MATRIX_LONGITUDE_SCALE);
         matrixLongitude.setLayoutX(Sunconfig.CENTER_X + Sunconfig.MATRIX_LONGITUDE_SLIDE - matrixLongitude.getLayoutBounds().getWidth() / 2);
-        matrixLongitude.setLayoutY(Sunconfig.CENTER_Y + matrixLongitude.getLayoutBounds().getHeight() + Sunconfig.MATRIX_LONGITUDE_OFFSET);
+        matrixLongitude.setLayoutY(Sunconfig.MATRIX_LONGITUDE_OFFSET);
         matrixLongitude.setStyle(Sunconfig.MATRIX_SHADOW);
 
         Rectangle longitudeBackdrop = new Rectangle(
@@ -1326,7 +1330,7 @@ public class Suncreator {
         matrixLatitude.setScaleX(Sunconfig.MATRIX_LATITUDE_SCALE);
         matrixLatitude.setScaleY(Sunconfig.MATRIX_LATITUDE_SCALE);
         matrixLatitude.setLayoutX(Sunconfig.CENTER_X + Sunconfig.MATRIX_LATITUDE_SLIDE - matrixLatitude.getLayoutBounds().getWidth() / 2);
-        matrixLatitude.setLayoutY(Sunconfig.CENTER_Y + matrixLatitude.getLayoutBounds().getHeight() + Sunconfig.MATRIX_LATITUDE_OFFSET);
+        matrixLatitude.setLayoutY(Sunconfig.MATRIX_LATITUDE_OFFSET);
         matrixLatitude.setStyle(Sunconfig.MATRIX_SHADOW);
 
         Rectangle latitudeBackdrop = new Rectangle(
@@ -1347,7 +1351,7 @@ public class Suncreator {
         matrixHighNoon.setScaleX(Sunconfig.MATRIX_HIGHNOON_SCALE);
         matrixHighNoon.setScaleY(Sunconfig.MATRIX_HIGHNOON_SCALE);
         matrixHighNoon.setLayoutX(Sunconfig.CENTER_X - matrixHighNoon.getLayoutBounds().getWidth() / 2);
-        matrixHighNoon.setLayoutY(Sunconfig.CENTER_Y - matrixHighNoon.getLayoutBounds().getHeight() * 1.5d - Sunconfig.DAYLENGTH_ARC_RADIUS * 1.1);
+        matrixHighNoon.setLayoutY(Sunconfig.MARGIN_Y + matrixHighNoon.getLayoutBounds().getHeight() / 2);
         matrixHighNoon.setStyle(Sunconfig.MATRIX_GLOW);
         matrixHighNoon.setMouseTransparent(true);
         matrixHighNoon.setVisible(false);

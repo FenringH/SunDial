@@ -188,7 +188,7 @@ public class Sunconfig {
     public static final double CENTER_Y = Sundial.DEFAULT_HEIGHT / 2;
 
     public static final double DOT_RADIUS_SMOL = 10.0d;
-    public static final double DOT_RADIUS_BIGH = 50.0d;
+    public static final double DOT_RADIUS_BIGH = 100.0d;
     public static final double SUNTIME_DIAL_LENGTH = 50.0d;
     public static final double HIGHNOON_DIAL_LENGTH = 50.0d;
     public static final double SUNRISE_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
@@ -201,10 +201,10 @@ public class Sunconfig {
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double LOCALTIME_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
-    public static final double LOCALTIME_HOUR_SHORT_WIDTH = 12.0d;
+    public static final double LOCALTIME_HOUR_SHORT_WIDTH = 8.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 16.0d;
-    public static final double DAYLENGTH_ARC_RADIUS = 115.0d;
+    public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
     public static final double DAY_ARC_MARGIN = 12.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
     public static final double LOCALMINUTE_POLY_HEIGHT = 20;
@@ -230,7 +230,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
-    public static final double CONTROL_DST_RADIUS = 8.0d;
+    public static final double CONTROL_DST_RADIUS = 10.0d;
     public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
     public static final double CETUS_MARKER_LENGTH = 40.0d;
     public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
@@ -302,8 +302,6 @@ public class Sunconfig {
     public static final double MATRIX_LONGITUDE_SLIDE = 0.0d;
     public static final double MATRIX_LATITUDE_SLIDE = 0.0d;
     public static final double MATRIX_HORIZON_SLIDE = 2.0d;
-    public static final double MATRIX_LONGITUDE_OFFSET = 120.0d;
-    public static final double MATRIX_LATITUDE_OFFSET = 145.0d;
     public static final double COORDINATES_OFFSET = 70.0d;
     public static final double LOCALHOUR_OFFSET = 105.0d;
     public static final double TINYGLOBE_OFFSET = 104.0d;
@@ -329,6 +327,8 @@ public class Sunconfig {
     public static final double CETUS_HORIZON_OFFSET = 45.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y + 65.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
+    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 40;
+    public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 25;
 
     public static final double MATRIX_TIME_SCALE = 3.50d;
     public static final double MATRIX_DATE_SCALE = 1.50d;
