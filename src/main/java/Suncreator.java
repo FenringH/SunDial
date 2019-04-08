@@ -5,11 +5,10 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -17,7 +16,6 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.util.Duration;
-import sun.security.provider.Sun;
 
 import java.util.ArrayList;
 
@@ -177,7 +175,7 @@ public class Suncreator {
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_DST, helpText)
                         .thankYou();
-                controlThingy.setVisible(false);
+//                controlThingy.setVisible(false);
                 break;
             default:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
@@ -206,6 +204,8 @@ public class Suncreator {
             BooleanProperty linesVisibleEh
     ) {
 
+
+        // 3D objects
         Globe dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
         dayGlobe.setLayoutY(Sunconfig.CENTER_Y);
@@ -215,7 +215,7 @@ public class Suncreator {
         dayGlobe.setAmbientLightColor(new Color(0.10, 0.20, 0.30, 1.00));
         dayGlobe.setSpecularColor(new Color(0.75, 0.75, 0.75, 1.00));
         dayGlobe.setSpecularPower(6);
-        dayGlobe.setReverseSpecularPower(30);
+        dayGlobe.setReverseSpecularPower(12);
         dayGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         dayGlobe.longitudeProperty().bind(longitude);
         dayGlobe.latitudeProperty().bind(latitude);
@@ -227,10 +227,12 @@ public class Suncreator {
         nightGlobe.setLayoutX(Sunconfig.CENTER_X);
         nightGlobe.setLayoutY(Sunconfig.CENTER_Y);
         nightGlobe.setDayLightColor(Color.BLACK);
-        nightGlobe.setNightLightColor(new Color(0.70, 0.80, 0.90, 1.00));
+        nightGlobe.setNightLightColor(new Color(0.10, 0.25, 0.40, 1.00));
+        nightGlobe.setNightReverseLightColor(new Color(0.10, 0.50, 1.00, 1.00));
         nightGlobe.setAmbientLightColor(new Color(0.75, 0.75, 0.75, 1.00));
-        nightGlobe.setSpecularColor(new Color(0.10, 0.25, 0.40, 1.0));
+        nightGlobe.setSpecularColor(new Color(1.00, 1.00, 1.00, 1.0));
         nightGlobe.setSpecularPower(1.85);
+        nightGlobe.setReverseSpecularPower(6);
         nightGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         nightGlobe.longitudeProperty().bind(longitude);
         nightGlobe.latitudeProperty().bind(latitude);
@@ -258,7 +260,7 @@ public class Suncreator {
         globeGrid.latitudeProperty().bind(latitude);
         globeGrid.visibleProperty().bind(gridVisibleEh);
 
-        GlobeLines globeLines = new GlobeLines(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, 2, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
+        GlobeLines globeLines = new GlobeLines(Sunconfig.CENTER_X - Sunconfig.MARGIN_X, 1, Color.WHITE, Sunconfig.GLOBE_ROTATE_DURATION);
         globeLines.setLayoutX(Sunconfig.CENTER_X);
         globeLines.setLayoutY(Sunconfig.CENTER_Y);
         globeLines.longitudeProperty().bind(longitude);
@@ -282,10 +284,33 @@ public class Suncreator {
         dayTerminatorGlow.tiltProperty().bind(tilt);
 
 
+        // Cameras (workaround for specular issues with ParallelCamera)
+        PerspectiveCamera dayPerspectiveCamera = new PerspectiveCamera(false);
+        dayPerspectiveCamera.setFieldOfView(0.1);
+
+        PerspectiveCamera nightPerspectiveCamera = new PerspectiveCamera(false);
+        nightPerspectiveCamera.setFieldOfView(0.1);
+
+        PerspectiveCamera gridPerspectiveCamera = new PerspectiveCamera(false);
+        gridPerspectiveCamera.setFieldOfView(0.1);
+
+        PerspectiveCamera linesPerspectiveCamera = new PerspectiveCamera(false);
+        linesPerspectiveCamera.setFieldOfView(0.1);
+
+        PerspectiveCamera terminatorLinePerspectiveCamera = new PerspectiveCamera(false);
+        terminatorLinePerspectiveCamera.setFieldOfView(0.1);
+
+        PerspectiveCamera terminatorGlowPerspectiveCamera = new PerspectiveCamera(false);
+        terminatorGlowPerspectiveCamera.setFieldOfView(0.1);
+
+
+        // Scenes (to flatten 3D and enable layer compositing)
         SubScene dayGlobeScene = new SubScene(dayGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
+        dayGlobeScene.setCamera(dayPerspectiveCamera);
 
         SubScene nightGlobeScene = new SubScene(nightGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         nightGlobeScene.setBlendMode(BlendMode.LIGHTEN);
+        nightGlobeScene.setCamera(nightPerspectiveCamera);
 
 //        SubScene edgesGlobeScene = new SubScene(edgesGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
 //        edgesGlobeScene.setBlendMode(BlendMode.SCREEN);
@@ -294,27 +319,134 @@ public class Suncreator {
         globeGridScene.setBlendMode(BlendMode.SCREEN);
         globeGridScene.setEffect(new GaussianBlur(1));
         globeGridScene.setOpacity(Sunconfig.DAY_GRIDLINE_OPACITY);
+//        globeGridScene.setCamera(gridPerspectiveCamera);
 
         SubScene globeLinesScene = new SubScene(globeLines, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         globeLinesScene.setBlendMode(BlendMode.SCREEN);
         globeLinesScene.setEffect(new GaussianBlur(1));
         globeLinesScene.setOpacity(1);
+        globeLinesScene.setCamera(linesPerspectiveCamera);
 
         SubScene dayTerminatorLineScene = new SubScene(dayTerminatorLine, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorLineScene.setBlendMode(BlendMode.SCREEN);
         dayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.GLOBEGRID_LINE_WIDTH));
-        dayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
+        dayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_LINE_OPACITY);
+        dayTerminatorLineScene.setCamera(terminatorLinePerspectiveCamera);
 
         SubScene dayTerminatorGlowScene = new SubScene(dayTerminatorGlow, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         dayTerminatorGlowScene.setBlendMode(BlendMode.SCREEN);
         dayTerminatorGlowScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_GLOW_WIDTH));
-        dayTerminatorGlowScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
+        dayTerminatorGlowScene.setOpacity(Sunconfig.DAY_TERMINATOR_GLOW_OPACITY);
+        dayTerminatorGlowScene.setCamera(terminatorGlowPerspectiveCamera);
 
-        Circle globeAtmosphere = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X - Sunconfig.MARGIN_X + 2);
-        globeAtmosphere.setFill(Sunconfig.GLOBE_ATMOSPHERE);
+
+        // Atmosphere effect
+        Circle globeAtmosphere = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X - Sunconfig.MARGIN_X + 5);
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
+        globeAtmosphere.setBlendMode(BlendMode.SCREEN);
 
+
+        // Bindings for color changes of atmosphere nad terminator line while changig globe rotation
+        dayTerminatorLine.getRingMaterial().diffuseColorProperty().bind(Bindings.createObjectBinding(() -> {
+
+            double dayLightSceneZ = dayGlobe.getDayLight().localToSceneTransformProperty().get().getTz()
+                    / lightScale.get();
+
+            double ratio = abs(dayLightSceneZ / dayGlobe.getLightDistance());
+            if (ratio > 1) { ratio = 1; }
+
+            double changeFactor = pow(ratio, 3);
+
+            Color sideColor;
+
+            if (dayLightSceneZ > 0) {
+                sideColor = new Color(1.00, 0.35, 0.10, 1.00);
+            } else {
+                sideColor = new Color(0.50, 0.85, 1.00, 1.00);
+            }
+
+            double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+
+            return new Color(r, g, b, 1);
+
+        }, dayGlobe.getDayLight().localToSceneTransformProperty()));
+
+        dayTerminatorGlow.getRingMaterial().diffuseColorProperty().bind(Bindings.createObjectBinding(() -> {
+
+            double dayLightSceneZ = dayGlobe.getDayLight().localToSceneTransformProperty().get().getTz()
+                    / lightScale.get();
+
+            double ratio = abs(dayLightSceneZ / dayGlobe.getLightDistance());
+            if (ratio > 1) { ratio = 1; }
+
+            double changeFactor = pow(ratio, 3);
+
+            Color sideColor;
+
+            if (dayLightSceneZ > 0) {
+                sideColor = new Color(1.00, 0.35, 0.10, 1.00);
+            } else {
+                sideColor = new Color(0.50, 0.85, 1.00, 1.00);
+            }
+
+            double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+
+            return new Color(r, g, b, 1);
+
+        }, dayGlobe.getDayLight().localToSceneTransformProperty()));
+
+        globeAtmosphere.fillProperty().bind(Bindings.createObjectBinding(() -> {
+
+            double dayLightSceneZ = dayGlobe.getDayLight().localToSceneTransformProperty().get().getTz()
+                    / lightScale.get();
+
+            double ratio = abs(dayLightSceneZ / dayGlobe.getLightDistance());
+            if (ratio > 1) { ratio = 1; }
+
+            double changeFactor = pow(ratio, 3);
+
+            ArrayList<Color> colorList = new ArrayList<>();
+
+            for (int i = 0; i < 3; i++) {
+
+                Color sideColor;
+
+                if (dayLightSceneZ > 0) {
+                    sideColor = new Color(1.00, 0.35, 0.10, 1.00);
+                } else {
+                    sideColor = new Color(0.50, 0.85, 1.00, 1.00);
+                }
+
+                double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+                double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+                double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+                double a = (i % 2) * (0.75 * (1 - changeFactor) + 1 * changeFactor);
+
+                Color newColor = new Color(r, g, b, a);
+                colorList.add(newColor);
+            }
+
+            RadialGradient newAtmosphereGradient = new RadialGradient(
+                    0, 0,
+                    Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y + 5,
+                    false,
+                    CycleMethod.NO_CYCLE,
+                    new Stop(0.960, colorList.get(0)),
+                    new Stop(0.975, colorList.get(1)),
+                    new Stop(1.000, colorList.get(2))
+            );
+
+            return newAtmosphereGradient;
+
+        }, dayGlobe.getDayLight().localToSceneTransformProperty()));
+
+
+        // Return final composite
         return new Group(
                 dayGlobeScene
                 , nightGlobeScene
@@ -323,16 +455,19 @@ public class Suncreator {
                 , globeLinesScene
                 , dayTerminatorGlowScene
                 , dayTerminatorLineScene
-//                , globeAtmosphere
+                , globeAtmosphere
         );
     }
 
     public static Group createTinyGlobe(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {
 
         Globe tinyGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.TINYGLOBE_RADIUS, Sunconfig.GLOBE_ROTATE_DURATION);
-        tinyGlobe.setDayLightColor(Sunconfig.Color_Of_TinyDay);
-        tinyGlobe.setNightLightColor(Sunconfig.Color_Of_TinyNight);
+        tinyGlobe.setDayLightColor(Color.WHITE);
+        tinyGlobe.setNightLightColor(Color.RED);
         tinyGlobe.setAmbientLightColor(Sunconfig.Color_Of_TinyAmbient);
+        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
+        tinyGlobe.setSpecularColor(new Color(0.75, 0.75, 0.75, 1.00));
+        tinyGlobe.setSpecularPower(6);
         tinyGlobe.setLayoutX(Sunconfig.CENTER_X);
         tinyGlobe.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
         tinyGlobe.longitudeProperty().bind(longitude);
@@ -353,7 +488,7 @@ public class Suncreator {
         SubScene tinyDayTerminatorLineScene = new SubScene(tinyDayTerminatorLine, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         tinyDayTerminatorLineScene.setBlendMode(BlendMode.ADD);
         tinyDayTerminatorLineScene.setEffect(new GaussianBlur(Sunconfig.DAY_TERMINATOR_WIDTH));
-        tinyDayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_OPACITY);
+        tinyDayTerminatorLineScene.setOpacity(Sunconfig.DAY_TERMINATOR_LINE_OPACITY);
 
         Circle tinyGlobeDot = new Circle(Sunconfig.TINYGLOBE_DOT_RADIUS);
         tinyGlobeDot.setFill(Sunconfig.Color_Of_TinyFrame);
@@ -715,7 +850,7 @@ public class Suncreator {
             markerLine.setOpacity(opacity);
             markerLine.getTransforms().add(markerRotate);
             markerLine.setMouseTransparent(true);
-            markerLine.setBlendMode(BlendMode.OVERLAY);
+            markerLine.setBlendMode(BlendMode.SOFT_LIGHT);
 
             if (i % 4 == 0) {
 
@@ -755,7 +890,7 @@ public class Suncreator {
     }
 
     public static Circle createControlNightCompression() {
-        Circle controlNightCompression = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DOT_RADIUS);
+        Circle controlNightCompression = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DOT_RADIUS_SMOL);
         controlNightCompression.setFill(Sunconfig.Color_Of_LocalTime);
         controlNightCompression.setStroke(Sunconfig.Color_Of_Void);
         controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2);
@@ -798,9 +933,9 @@ public class Suncreator {
         return dialHighNoonGroup;
     }
 
-    public static Group createDialLocalHourGroup(Rotate dialRotateLocalHour) {
+    public static Group createDialLocalHourGroup(Polygon dialLocalHourPolyShort, Polygon dialLocalHourPolyLong, Rotate dialRotateLocalHour) {
 
-        Polygon dialLocalHourPoly = new Polygon(
+        dialLocalHourPolyLong = new Polygon(
 
                 // outside
                 - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
@@ -814,13 +949,35 @@ public class Suncreator {
                 // inside
                 0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40
         );
-        dialLocalHourPoly.setTranslateX(Sunconfig.CENTER_X);
-        dialLocalHourPoly.setFill(new Color(1, 1, 1, 0.0));
-        dialLocalHourPoly.setStroke(Color.WHITE);
-        dialLocalHourPoly.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-        dialLocalHourPoly.setOpacity(1);
+        dialLocalHourPolyLong.setTranslateX(Sunconfig.CENTER_X);
+        dialLocalHourPolyLong.setFill(new Color(1, 1, 1, 0.0));
+        dialLocalHourPolyLong.setStroke(Color.WHITE);
+        dialLocalHourPolyLong.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
+        dialLocalHourPolyLong.setOpacity(1);
+        dialLocalHourPolyLong.setVisible(true);
 
-        Group dialLocalHourGroup = new Group(dialLocalHourPoly);
+        dialLocalHourPolyShort = new Polygon(
+
+                // outside
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH,
+                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75,
+                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH, Sunconfig.MARGIN_Y * 1.5,
+                0, Sunconfig.MARGIN_Y/* + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2*/,
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
+                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75,
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH,
+
+                // inside
+                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.40
+        );
+        dialLocalHourPolyShort.setTranslateX(Sunconfig.CENTER_X);
+        dialLocalHourPolyShort.setFill(new Color(1, 1, 1, 0.0));
+        dialLocalHourPolyShort.setStroke(Color.WHITE);
+        dialLocalHourPolyShort.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
+        dialLocalHourPolyShort.setOpacity(1);
+        dialLocalHourPolyShort.setVisible(false);
+
+        Group dialLocalHourGroup = new Group(dialLocalHourPolyLong, dialLocalHourPolyShort);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
         dialLocalHourGroup.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
         dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
@@ -1022,31 +1179,37 @@ public class Suncreator {
         return matrixSunset;
     }
 
-    public static Group createSunriseGroup(Rotate sunriseDialRotate, DotMatrix matrixSunrise) {
+    public static Group createSunriseGroup(Rotate sunriseDialRotate, Line sunriseLine, DotMatrix matrixSunrise) {
 
         Group sunriseGroup = new Group();
 
-        Line sunriseDial = new Line(Sunconfig.CENTER_X, Sunconfig.SUNRISE_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-        sunriseDial.setStroke(Sunconfig.Color_Of_Horizon);
-        sunriseDial.setStrokeWidth(Sunconfig.SUNRISE_STROKE_WIDTH);
-        sunriseDial.setStyle(Sunconfig.HORIZON_GLOW);
+        sunriseLine.setStartX(Sunconfig.CENTER_X);
+        sunriseLine.setStartY(Sunconfig.SUNRISE_DIAL_LENGTH);
+        sunriseLine.setEndX(Sunconfig.CENTER_X);
+        sunriseLine.setEndY(Sunconfig.MARGIN_Y);
+        sunriseLine.setStroke(Sunconfig.Color_Of_Horizon);
+        sunriseLine.setStrokeWidth(Sunconfig.SUNRISE_STROKE_WIDTH);
+        sunriseLine.setStyle(Sunconfig.HORIZON_GLOW);
 
-        sunriseGroup.getChildren().addAll(sunriseDial, matrixSunrise);
+        sunriseGroup.getChildren().addAll(sunriseLine, matrixSunrise);
         sunriseGroup.getTransforms().add(sunriseDialRotate);
 
         return sunriseGroup;
     }
 
-    public static Group createSunsetGroup(Rotate sunsetDialRotate, DotMatrix matrixSunset) {
+    public static Group createSunsetGroup(Rotate sunsetDialRotate, Line sunsetLine, DotMatrix matrixSunset) {
 
         Group sunsetGroup = new Group();
 
-        Line sunsetDial = new Line(Sunconfig.CENTER_X, Sunconfig.SUNSET_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-        sunsetDial.setStroke(Sunconfig.Color_Of_Horizon);
-        sunsetDial.setStrokeWidth(Sunconfig.SUNSET_STROKE_WIDTH);
-        sunsetDial.setStyle(Sunconfig.HORIZON_GLOW);
+        sunsetLine.setStartX(Sunconfig.CENTER_X);
+        sunsetLine.setStartY(Sunconfig.SUNRISE_DIAL_LENGTH);
+        sunsetLine.setEndX(Sunconfig.CENTER_X);
+        sunsetLine.setEndY(Sunconfig.MARGIN_Y);
+        sunsetLine.setStroke(Sunconfig.Color_Of_Horizon);
+        sunsetLine.setStrokeWidth(Sunconfig.SUNSET_STROKE_WIDTH);
+        sunsetLine.setStyle(Sunconfig.HORIZON_GLOW);
 
-        sunsetGroup.getChildren().addAll(sunsetDial, matrixSunset);
+        sunsetGroup.getChildren().addAll(sunsetLine, matrixSunset);
         sunsetGroup.getTransforms().add(sunsetDialRotate);
 
         return sunsetGroup;

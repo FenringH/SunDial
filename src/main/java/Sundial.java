@@ -68,6 +68,11 @@ public class Sundial {
     private Arc dialArcMidnight;
     private Arc dialArcDayLength;
 
+    private Line dialSunriseLine;
+    private Line dialSunsetLine;
+    private Polygon dialLocalHourPolyLong;
+    private Polygon dialLocalHourPolyShort;
+
     private Circle dialMarginCircle;
     private Circle dialCircleBackground;
     private Circle dialCircleFrame;
@@ -331,17 +336,23 @@ public class Sundial {
         );
 
         // Dials
+        dialLocalHourPolyShort = new Polygon();
+        dialLocalHourPolyLong = new Polygon();
+
         dialHighNoonGroup = Suncreator.creatDialHighNoonGroup(highNoonDialRotate);
-        dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialRotateLocalHour);
+        dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialLocalHourPolyShort, dialLocalHourPolyLong, dialRotateLocalHour);
         dialLocalMinuteGroup = Suncreator.createDialLocalMinuteGroup(dialRotateLocalMinute);
         dialLocalSecondGroup = Suncreator.createDialLocalSecondGroup(dialRotateLocalSecond);
 
         matrixSunrise = Suncreator.createMatrixSunrise();
         matrixSunset = Suncreator.createMatrixSunset();
 
+        dialSunriseLine = new Line();
+        dialSunsetLine = new Line();
+
         horizonGroup = new Group(
-                Suncreator.createSunriseGroup(sunriseDialRotate, matrixSunrise),
-                Suncreator.createSunsetGroup(sunsetDialRotate, matrixSunset)
+                Suncreator.createSunriseGroup(sunriseDialRotate, dialSunriseLine, matrixSunrise),
+                Suncreator.createSunsetGroup(sunsetDialRotate, dialSunsetLine, matrixSunset)
         );
         horizonGroup.setMouseTransparent(true);
 
@@ -1014,7 +1025,12 @@ public class Sundial {
     public void setDialFrameWarning(boolean warning) {
 
         this.warning = warning;
-        dialCircleFrame.setStroke(this.warning ? Color.ORANGE : Color.TRANSPARENT);
+//        dialCircleFrame.setStroke(this.warning ? Color.ORANGE : Color.TRANSPARENT);
+        matrixHour.setFill(this.warning ? Color.YELLOW : Color.WHITE);
+        matrixMinute.setFill(this.warning ? Color.YELLOW : Color.WHITE);
+        matrixDay.setFill(this.warning ? Color.YELLOW : Color.WHITE);
+        matrixMonth.setFill(this.warning ? Color.YELLOW : Color.WHITE);
+        matrixYear.setFill(this.warning ? Color.YELLOW : Color.WHITE);
     }
 
     public void setGroupGlow(Group group, String style) {
@@ -1031,6 +1047,7 @@ public class Sundial {
 
         controlNightCompression.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.Color_Of_LocalTime);
         controlNightCompression.setStroke(visibleEh ? Sunconfig.Color_Of_LocalTime : Sunconfig.Color_Of_Void);
+        controlNightCompression.setRadius(visibleEh ? Sunconfig.DOT_RADIUS_BIGH : Sunconfig.DOT_RADIUS_SMOL);
 
         dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINAL);
         dialArcNight.setOpacity(visibleEh ? 0 : 1);
@@ -1046,7 +1063,7 @@ public class Sundial {
         matrixTimeZone.setVisible(visibleEh);
         controlThingyGlobeGrid.setVisible(visibleEh);
         controlThingyGlobeLines.setVisible(visibleEh);
-        controlThingyDst.setVisible(visibleEh);
+//        controlThingyDst.setVisible(visibleEh);
 
         if (tinyGlobeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveOutTimeline.stop(); }
         if (tinyGlobeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveInTimeline.stop(); }
@@ -1057,6 +1074,30 @@ public class Sundial {
         else {
             tinyGlobeMoveInTimeline.play();
         }
+
+
+        // Transforms
+        matrixTime.setScaleX(visibleEh ? Sunconfig.MATRIX_TIME_SCALE / 2 : Sunconfig.MATRIX_TIME_SCALE);
+        matrixTime.setScaleY(visibleEh ? Sunconfig.MATRIX_TIME_SCALE / 2 : Sunconfig.MATRIX_TIME_SCALE);
+        matrixTime.setTranslateX(visibleEh ? -100 : 0);
+        matrixTime.setTranslateY(visibleEh ? 30 : 0);
+
+        matrixTimeZone.setScaleX(visibleEh ? Sunconfig.MATRIX_TIMEZONE_SCALE / 2 : Sunconfig.MATRIX_TIMEZONE_SCALE);
+        matrixTimeZone.setScaleY(visibleEh ? Sunconfig.MATRIX_TIMEZONE_SCALE / 2 : Sunconfig.MATRIX_TIMEZONE_SCALE);
+        matrixTimeZone.setTranslateX(visibleEh ? -100 : 0);
+
+        controlThingyDst.setTranslateX(visibleEh ? -100 : 0);
+        controlThingyDst.setTranslateY(visibleEh ? 10 : Sunconfig.CONTROL_DST_OFFSET);
+
+        matrixDate.setScaleX(visibleEh ? Sunconfig.MATRIX_DATE_SCALE / 2 : Sunconfig.MATRIX_DATE_SCALE);
+        matrixDate.setScaleY(visibleEh ? Sunconfig.MATRIX_DATE_SCALE / 2 : Sunconfig.MATRIX_DATE_SCALE);
+        matrixDate.setTranslateX(visibleEh ? 100 : 0);
+
+        dialSunriseLine.setStartY(visibleEh ? Sunconfig.SUNRISE_DIAL_SHORT_LENGTH : Sunconfig.SUNRISE_DIAL_LENGTH);
+        dialSunsetLine.setStartY(visibleEh ? Sunconfig.SUNSET_DIAL_SHORT_LENGTH : Sunconfig.SUNSET_DIAL_LENGTH);
+
+        dialLocalHourPolyShort.setVisible(visibleEh);
+        dialLocalHourPolyLong.setVisible(!visibleEh);
 
         setDialFrameWarning(warning);
     }

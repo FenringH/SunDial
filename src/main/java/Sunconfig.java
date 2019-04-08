@@ -187,16 +187,21 @@ public class Sunconfig {
     public static final double CENTER_X = Sundial.DEFAULT_WIDTH / 2;
     public static final double CENTER_Y = Sundial.DEFAULT_HEIGHT / 2;
 
-    public static final double DOT_RADIUS = 10.0d;
+    public static final double DOT_RADIUS_SMOL = 10.0d;
+    public static final double DOT_RADIUS_BIGH = 50.0d;
     public static final double SUNTIME_DIAL_LENGTH = 50.0d;
     public static final double HIGHNOON_DIAL_LENGTH = 50.0d;
-    public static final double SUNRISE_DIAL_LENGTH = Sundial.DEFAULT_HEIGHT / 2 - DOT_RADIUS;
-    public static final double SUNSET_DIAL_LENGTH = Sundial.DEFAULT_HEIGHT / 2 - DOT_RADIUS;
+    public static final double SUNRISE_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
+    public static final double SUNSET_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
+    public static final double SUNRISE_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
+    public static final double SUNSET_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double MARKER_HOUR_LENGTH = 20.0d;
     public static final double MARKER_MINUTE_LENGTH = 8.0d;
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
-    public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS;
+    public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
+    public static final double LOCALTIME_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
+    public static final double LOCALTIME_HOUR_SHORT_WIDTH = 12.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 16.0d;
     public static final double DAYLENGTH_ARC_RADIUS = 115.0d;
@@ -225,15 +230,15 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
-    public static final double CONTROL_DST_RADIUS = 10.0d;
-    public static final double CONTROL_DST_MATRIX_SCALE = 0.85d;
+    public static final double CONTROL_DST_RADIUS = 8.0d;
+    public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
     public static final double CETUS_MARKER_LENGTH = 40.0d;
     public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
     public static final double HELP_MARKER_RADIUS = 4.0d;
     public static final double HELP_MARKER_MARGIN = 6.0d;
     public static final double NIGHTMODE_RECTANGLE_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
-    public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS;
+    public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
@@ -256,7 +261,7 @@ public class Sunconfig {
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
     public static final double DAY_TERMINATOR_WIDTH = 1.25d;
-    public static final double DAY_TERMINATOR_GLOW_WIDTH = 25.00d;
+    public static final double DAY_TERMINATOR_GLOW_WIDTH = 12.00d;
     public static final double TINYGLOBE_TERMINATOR_WIDTH = 1.00d;
     public static final double GLOBEGRID_LINE_WIDTH = 0.50d;
 
@@ -274,7 +279,8 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_OPACITY = 1.00d;
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     public static final double CETUS_ARC_OPACITY = 1.00d;
-    public static final double DAY_TERMINATOR_OPACITY = 0.90d;
+    public static final double DAY_TERMINATOR_GLOW_OPACITY = 0.35d;
+    public static final double DAY_TERMINATOR_LINE_OPACITY = 0.90d;
     public static final double DAY_GRIDLINE_OPACITY = 0.25d;
     public static final double HELP_OVERLAY_OPACITY = 0.25d;
     public static final double NIGHTMODE_RECTANGLE_OPACITY = 0.80d;
@@ -311,7 +317,7 @@ public class Sunconfig {
     public static final double CONTROL_RESIZE_OFFSET = 137.0d;
     public static final double CONTROL_THINGY_OFFSET = 236.0d;
     public static final double CONTROL_CLOSE_OFFSET = 236.0d;
-    public static final double CONTROL_DST_OFFSET = -30.0d;
+    public static final double CONTROL_DST_OFFSET = -35.0d;
     public static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
@@ -567,13 +573,12 @@ public class Sunconfig {
 
     public static final RadialGradient GLOBE_ATMOSPHERE = new RadialGradient(
             0, 0,
-            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y + 4,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y + 5,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.950, Color_Of_Void),
-            new Stop(0.980, Color_Of_Atmosphere),
-            new Stop(0.990, Color.SKYBLUE),
-            new Stop(1.000, Color_Of_Space)
+            new Stop(0.960, new Color(1, 1, 1, 0)),
+            new Stop(0.980, new Color(1, 1, 1, 1)),
+            new Stop(1.000, new Color(1, 1, 1, 0))
     );
 
 }

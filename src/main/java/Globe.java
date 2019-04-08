@@ -2,6 +2,7 @@ import javafx.animation.*;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
+import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -27,10 +28,11 @@ public class Globe extends Group {
     private PhongMaterial globeMaterial;
 
     private Color dayLightColor;
+    private Color dayReverseLightColor;
     private Color nightLightColor;
+    private Color nightReverseLightColor;
     private Color ambientLightColor;
 
-    private Color dayReverseLightColor;
     private double specularPower;
     private double reverseSpecularPower;
 
@@ -150,7 +152,6 @@ public class Globe extends Group {
         sphereLatituder.getTransforms().add(rotateLatitude);
 
         Group sphereScaleGroup = new Group(sphereLatituder);
-//        sphereScaleGroup.getTransforms().add(lightScaleTransform);
 
 
         super.getChildren().addAll(sphereScaleGroup, lightScaleGroup);
@@ -163,39 +164,42 @@ public class Globe extends Group {
         rotatePhase.setAngle(phase.get());
         rotateTilt.setAngle(tilt.get());
 
-        if (dayReverseLightColor == null) { return; }
+        changeReverseLighting(dayLight, dayLightColor, dayReverseLightColor, specularPower, reverseSpecularPower);
+        changeReverseLighting(nightLight, nightLightColor, nightReverseLightColor, specularPower, reverseSpecularPower);
+    }
 
-        double dayLightSceneX = dayLight.getLocalToSceneTransform().getTx();
-        double dayLightSceneY = dayLight.getLocalToSceneTransform().getTy();
-        double dayLightSceneZ = dayLight.getLocalToSceneTransform().getTz();
+    private void changeReverseLighting(PointLight light, Color color, Color reverseColor, double power, double reversePower) {
+
+        if (reverseColor == null) { return; }
+
+        double dayLightSceneX = light.getLocalToSceneTransform().getTx();
+        double dayLightSceneY = light.getLocalToSceneTransform().getTy();
+        double dayLightSceneZ = light.getLocalToSceneTransform().getTz();
 
         if (dayLightSceneZ > 0) {
 
             double changeFactor = pow((sqrt(pow(dayLightSceneX, 2) + pow(dayLightSceneY, 2)) / lightDistance), 0.5);
+
             if (changeFactor > 1) { changeFactor = 1; }
 
-            if (changeFactor == 0) {
-                dayLight.setColor(dayReverseLightColor);
-            } else {
+            double r = color.getRed() * changeFactor + reverseColor.getRed() * (1 - changeFactor);
+            double g = color.getGreen() * changeFactor + reverseColor.getGreen() * (1 - changeFactor);
+            double b = color.getBlue() * changeFactor + reverseColor.getBlue() * (1 - changeFactor);
+            double a = color.getOpacity() * changeFactor + reverseColor.getOpacity() * (1 - changeFactor);
 
-                double r = dayLightColor.getRed() * changeFactor + dayReverseLightColor.getRed() * (1 - changeFactor);
-                double g = dayLightColor.getGreen() * changeFactor + dayReverseLightColor.getGreen() * (1 - changeFactor);
-                double b = dayLightColor.getBlue() * changeFactor + dayReverseLightColor.getBlue() * (1 - changeFactor);
-                double a = dayLightColor.getOpacity() * changeFactor + dayReverseLightColor.getOpacity() * (1 - changeFactor);
+            Color intermediateColor = new Color(r, g, b, a);
+            double intermidiateSpecularPower = power * changeFactor + reversePower * (1 - changeFactor);
 
-                Color intermediateColor = new Color(r, g, b, a);
-                double intermidiateSpecularPower = specularPower * changeFactor + reverseSpecularPower * (1 - changeFactor);
+            light.setColor(intermediateColor);
+            globeMaterial.setSpecularPower(intermidiateSpecularPower);
 
-                dayLight.setColor(intermediateColor);
-                globeMaterial.setSpecularPower(intermidiateSpecularPower);
-            }
         } else {
-            dayLight.setColor(dayLightColor);
-            globeMaterial.setSpecularPower(specularPower);
+            light.setColor(color);
+            globeMaterial.setSpecularPower(power);
         }
     }
 
-    // PUBLIC
+    // SETTLERS
 
     public void setDayDiffuseMap(Image map) {
         dayDiffuseMap = map;
@@ -221,6 +225,31 @@ public class Globe extends Group {
         this.dayReverseLightColor = dayReverseLightColor;
     }
 
+    public void setNightReverseLightColor(Color nightReverseLightColor) {
+        this.nightReverseLightColor = nightReverseLightColor;
+    }
+
+    public void setSpecularMap(Image specularMap) {
+        this.daySpecularMap = specularMap;
+        globeMaterial.setSpecularMap(specularMap);
+    }
+
+    public void setSpecularColor(Color color) {
+        globeMaterial.setSpecularColor(color);
+    }
+
+    public void setSpecularPower(double power) {
+        this.specularPower = power;
+        this.reverseSpecularPower = power;
+        globeMaterial.setSpecularPower(power);
+    }
+
+    public void setReverseSpecularPower(double power) {
+        this.reverseSpecularPower = power;
+    }
+
+
+    // GETTERERS
     public Sphere getSphere() {
         return sphere;
     }
@@ -285,22 +314,7 @@ public class Globe extends Group {
         return lightScaleTransform;
     }
 
-    public void setSpecularMap(Image specularMap) {
-        this.daySpecularMap = specularMap;
-        globeMaterial.setSpecularMap(specularMap);
+    public double getLightDistance() {
+        return lightDistance;
     }
-
-    public void setSpecularColor(Color color) {
-        globeMaterial.setSpecularColor(color);
-    }
-
-    public void setSpecularPower(double power) {
-        this.specularPower = power;
-        globeMaterial.setSpecularPower(power);
-    }
-
-    public void setReverseSpecularPower(double power) {
-        this.reverseSpecularPower = power;
-    }
-
 }

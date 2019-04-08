@@ -160,6 +160,14 @@ public class Ring extends Group {
         rotateTilt.setAngle(this.tilt.get());
     }
 
+    public void setColor(Color color) {
+        ringMaterial.setDiffuseColor(color);
+    }
+
+    public PhongMaterial getRingMaterial() {
+        return ringMaterial;
+    }
+
     public double getLongitude() {
         return longitude.get();
     }

@@ -92,8 +92,8 @@ public class GlobeLines extends Group {
         ringMaterial.setDiffuseColor(color);
 
         PhongMaterial equatorMaterial = new PhongMaterial(Color.WHITE);
-        PhongMaterial tropicMaterial = new PhongMaterial(new Color(1.00, 0.50, 0.15, 1.00));
-        PhongMaterial polarMaterial = new PhongMaterial(new Color(0.15, 0.50, 1.00, 1.00));
+        PhongMaterial tropicMaterial = new PhongMaterial(new Color(1.00, 0.35, 0.10, 1.00));
+        PhongMaterial polarMaterial = new PhongMaterial(new Color(0.25, 0.65, 1.00, 1.00));
         PhongMaterial darkMaterial = new PhongMaterial(Color.BLACK);
 
         Cylinder equatorCylinder = new Cylinder(radius * cos(toRadians(0)), width, DIVISIONS);

@@ -25,9 +25,9 @@
 
 + fix Reset window size to take into account if window is centered
 
-- fix day/night scaling issue with sphere light
++ fix day/night scaling issue with sphere light
 
-- fix globe textures
++ fix globe textures
 
 - fix mouse hover over whole arc in Cetus time mode
 
