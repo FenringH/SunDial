@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.GaussianBlur;
@@ -163,7 +164,7 @@ public class Suncreator {
                 break;
             case DST:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                        .positionCartesian(Sunconfig.CENTER_X, Sunconfig.CENTER_Y + Sunconfig.CONTROL_DST_OFFSET)
+                        .positionCartesian(Sunconfig.CONTROL_DST_OFFSET_X, Sunconfig.CONTROL_DST_OFFSET_Y)
                         .size(Sunconfig.CONTROL_DST_RADIUS)
                         .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
@@ -208,11 +209,11 @@ public class Suncreator {
         Globe dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
         dayGlobe.setLayoutY(Sunconfig.CENTER_Y);
-        dayGlobe.setDayLightColor(new Color(1.00, 1.00, 0.80, 1.00));
-        dayGlobe.setDayReverseLightColor(new Color(1.00, 0.25, 0.00, 1.00));
+        dayGlobe.setDayLightColor(Sunconfig.Color_Of_DayDay);
+        dayGlobe.setDayReverseLightColor(Sunconfig.Color_Of_DayReverse);
         dayGlobe.setNightLightColor(Color.BLACK);
-        dayGlobe.setAmbientLightColor(new Color(0.10, 0.20, 0.30, 1.00));
-        dayGlobe.setSpecularColor(new Color(0.75, 0.75, 0.75, 1.00));
+        dayGlobe.setAmbientLightColor(Sunconfig.Color_Of_DayAmbient);
+        dayGlobe.setSpecularColor(Sunconfig.Color_Of_DaySpecular);
         dayGlobe.setSpecularPower(6);
         dayGlobe.setReverseSpecularPower(12);
         dayGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
@@ -226,10 +227,10 @@ public class Suncreator {
         nightGlobe.setLayoutX(Sunconfig.CENTER_X);
         nightGlobe.setLayoutY(Sunconfig.CENTER_Y);
         nightGlobe.setDayLightColor(Color.BLACK);
-        nightGlobe.setNightLightColor(new Color(0.10, 0.25, 0.40, 1.00));
-        nightGlobe.setNightReverseLightColor(new Color(0.10, 0.50, 1.00, 1.00));
-        nightGlobe.setAmbientLightColor(new Color(0.75, 0.75, 0.75, 1.00));
-        nightGlobe.setSpecularColor(new Color(1.00, 1.00, 1.00, 1.0));
+        nightGlobe.setNightLightColor(Sunconfig.Color_Of_NightNight);
+        nightGlobe.setNightReverseLightColor(Sunconfig.Color_Of_NightReverse);
+        nightGlobe.setAmbientLightColor(Sunconfig.Color_Of_NightAmbient);
+        nightGlobe.setSpecularColor(Sunconfig.Color_Of_NightSpecular);
         nightGlobe.setSpecularPower(1.85);
         nightGlobe.setReverseSpecularPower(6);
         nightGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
@@ -340,7 +341,9 @@ public class Suncreator {
 
 
         // Atmosphere effect
-        Circle globeAtmosphere = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X - Sunconfig.MARGIN_X + 5);
+        double atmosphereRadius = Sunconfig.CENTER_X - Sunconfig.MARGIN_X + 5;
+
+        Circle globeAtmosphere = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, atmosphereRadius);
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
         globeAtmosphere.setBlendMode(BlendMode.SCREEN);
@@ -360,14 +363,14 @@ public class Suncreator {
             Color sideColor;
 
             if (dayLightSceneZ > 0) {
-                sideColor = new Color(1.00, 0.35, 0.10, 1.00);
+                sideColor = Sunconfig.Color_Of_AtmosphereNight;
             } else {
-                sideColor = new Color(0.50, 0.85, 1.00, 1.00);
+                sideColor = Sunconfig.Color_Of_AtmosphereDay;
             }
 
-            double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
-            double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
-            double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+            double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
 
             return new Color(r, g, b, 1);
 
@@ -386,14 +389,14 @@ public class Suncreator {
             Color sideColor;
 
             if (dayLightSceneZ > 0) {
-                sideColor = new Color(1.00, 0.35, 0.10, 1.00);
+                sideColor = Sunconfig.Color_Of_AtmosphereNight;
             } else {
-                sideColor = new Color(0.50, 0.85, 1.00, 1.00);
+                sideColor = Sunconfig.Color_Of_AtmosphereDay;
             }
 
-            double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
-            double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
-            double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+            double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
 
             return new Color(r, g, b, 1);
 
@@ -416,31 +419,30 @@ public class Suncreator {
                 Color sideColor;
 
                 if (dayLightSceneZ > 0) {
-                    sideColor = new Color(1.00, 0.35, 0.10, 1.00);
+                    sideColor = Sunconfig.Color_Of_AtmosphereNight;
                 } else {
-                    sideColor = new Color(0.50, 0.85, 1.00, 1.00);
+                    sideColor = Sunconfig.Color_Of_AtmosphereDay;
                 }
 
-                double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
-                double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
-                double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+                double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+                double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+                double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
                 double a = (i % 2) * (0.75 * (1 - changeFactor) + 1 * changeFactor);
 
                 Color newColor = new Color(r, g, b, a);
                 colorList.add(newColor);
             }
 
-            RadialGradient newAtmosphereGradient = new RadialGradient(
+            return new RadialGradient(
                     0, 0,
-                    Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y + 5,
+                    Sunconfig.CENTER_X, Sunconfig.CENTER_Y,
+                    atmosphereRadius,
                     false,
                     CycleMethod.NO_CYCLE,
                     new Stop(0.960, colorList.get(0)),
                     new Stop(0.975, colorList.get(1)),
                     new Stop(1.000, colorList.get(2))
             );
-
-            return newAtmosphereGradient;
 
         }, dayGlobe.getDayLight().localToSceneTransformProperty()));
 
@@ -500,17 +502,19 @@ public class Suncreator {
         return tinyGlobeGroup;
     }
 
-    public static Circle createTinyGlobeFrame() {
+    public static Group createTinyGlobeFrame() {
 
-        Circle tinyGlobeFrame = new Circle(Sunconfig.TINYGLOBE_RADIUS);
-        tinyGlobeFrame.setFill(Sunconfig.Color_Of_Void);
-        tinyGlobeFrame.setStroke(Sunconfig.Color_Of_TinyFrame);
-        tinyGlobeFrame.setStrokeWidth(Sunconfig.TINYGLOBE_FRAME_STROKE_WIDTH);
-        tinyGlobeFrame.setStyle(Sunconfig.MATRIX_SHADOW);
-        tinyGlobeFrame.setTranslateX(Sunconfig.CENTER_X);
-        tinyGlobeFrame.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
+        Circle circle = new Circle(Sunconfig.TINYGLOBE_RADIUS);
+        circle.setFill(Sunconfig.Color_Of_Void);
+        circle.setStroke(Sunconfig.Color_Of_TinyFrame);
+        circle.setStrokeWidth(Sunconfig.TINYGLOBE_FRAME_STROKE_WIDTH);
 
-        return tinyGlobeFrame;
+        Group group = new Group(circle);
+        group.setTranslateX(Sunconfig.CENTER_X);
+        group.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
+        group.setStyle(Sunconfig.MATRIX_SHADOW);
+
+        return group;
     }
 
     public static Timeline createTinyGlobeTimeline(TimelineDirection timelineDirection, Group tinyGlobe, Scale tinyGlobeScale) {
@@ -833,12 +837,20 @@ public class Suncreator {
 
         for(int i = 0; i < Sunconfig.MAX_MARKER; i++) {
 
-            double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
             double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH;
-            double opacity = 0.35d;
 
-            if (i % 2 == 0) { lineLength = Sunconfig.MARKER_HOUR_LENGTH * (0.75d); opacity = 0.5d;}
-            if (i % 4 == 0) { lineLength = Sunconfig.MARKER_HOUR_LENGTH; opacity = 1.0d; }
+            double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
+            double opacity = 0.25d;
+
+            if (i % 2 == 0) {
+                lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
+                opacity = 0.375d;
+            }
+
+            if (i % 4 == 0) {
+                lineLength = Sunconfig.MARKER_HOUR_LENGTH;
+                opacity = 0.5d;
+            }
 
             Rotate markerRotate = centerRotate.clone();
             markerRotate.setAngle(Sunutil.getNightCompressionAngle(i * 360d / 96d, nightCompression));
@@ -898,15 +910,21 @@ public class Suncreator {
         return group;
     }
 
-    public static Circle createControlNightCompression() {
-        Circle controlNightCompression = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DOT_RADIUS_SMOL);
-        controlNightCompression.setFill(Sunconfig.Color_Of_LocalTime);
-        controlNightCompression.setStroke(Sunconfig.Color_Of_Void);
-        controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2);
-        return controlNightCompression;
+    public static Group createControlNightCompression() {
+
+        Circle circle = new Circle(Sunconfig.DOT_RADIUS_SMOL, Sunconfig.DOT_RADIUS_SMOL, Sunconfig.DOT_RADIUS_SMOL);
+        circle.setFill(Sunconfig.Color_Of_LocalTime);
+        circle.setStroke(Sunconfig.Color_Of_Void);
+
+        Group group = new Group(circle);
+        group.setLayoutX(Sunconfig.CENTER_X - Sunconfig.DOT_RADIUS_SMOL);
+        group.setLayoutY(Sunconfig.CENTER_Y - Sunconfig.DOT_RADIUS_SMOL);
+        group.setStyle(Sunconfig.MATRIX_SHADOW2);
+
+        return group;
     }
 
-    public static Group creatDialHighNoonGroup(Rotate highNoonDialRotate) {
+    public static Group createDialHighNoonGroup(Rotate highNoonDialRotate) {
 
         Group dialHighNoonGroup = new Group();
 
@@ -1490,64 +1508,95 @@ public class Suncreator {
         helpOverlay.getChildren().addAll(helpBackdrop, helpWindowMarker, helpGlobeMarker);
         helpOverlay.getChildren().addAll(helpMarkers);
         helpOverlay.setVisible(false);
+        helpOverlay.setMouseTransparent(true);
 
         return helpOverlay;
     }
 
-    public static Group createHelpMarker(double centerX, double centerY, Node node) {
+    public static Group createHelpMarker(Node node) {
 
-        double sizeX = node.getLocalToSceneTransform().getMxx() * node.getLayoutBounds().getWidth() + Sunconfig.HELP_MARKER_MARGIN;
-        double sizeY = node.getLocalToSceneTransform().getMyy() * node.getLayoutBounds().getHeight() + Sunconfig.HELP_MARKER_MARGIN;
+        ObservableList<Transform> transformList = node.getTransforms();
 
-        Rectangle rectangle = new Rectangle(sizeX, sizeY);
+        Rectangle rectangle = new Rectangle();
         rectangle.setArcWidth(Sunconfig.HELP_MARKER_ROUND);
         rectangle.setArcHeight(Sunconfig.HELP_MARKER_ROUND);
         rectangle.setFill(Sunconfig.Color_Of_Void);
         rectangle.setStroke(Color.WHITE);
         rectangle.setStyle(Sunconfig.HELP_MARKER_GLOW);
-        rectangle.setTranslateX(-rectangle.getWidth() / 2);
-        rectangle.setTranslateY(-rectangle.getHeight() / 2);
 
         Circle circle = new Circle(Sunconfig.HELP_MARKER_RADIUS);
         circle.setFill(Sunconfig.Color_Of_Void);
         circle.setStroke(Color.WHITE);
         circle.setStyle(Sunconfig.HELP_MARKER_GLOW);
 
-        Group marker = new Group(rectangle, circle);
-        marker.setMouseTransparent(true);
+        Group group = new Group();
 
-        marker.setTranslateX(centerX);
-        marker.setTranslateY(centerY);
+        if (!transformList.isEmpty()) {
 
-        marker.visibleProperty().bind(node.visibleProperty());
+            double x = node.getLocalToSceneTransform().getMxx() * node.getLayoutBounds().getMinX()
+                    + node.getLocalToSceneTransform().getTx();
 
-        return marker;
-    }
+            double y = node.getLocalToSceneTransform().getMyy() * node.getLayoutBounds().getMinY()
+                    + node.getLocalToSceneTransform().getTy();
 
-    public static Group createHelpMarkerGroup(double offsetX, double offsetY, Node node) {
+            double width = node.getLocalToSceneTransform().getMxx() * node.getLayoutBounds().getWidth();
+            double height = node.getLocalToSceneTransform().getMyy() * node.getLayoutBounds().getHeight();
 
-        Group markerGroup = new Group(createHelpMarker(offsetX, offsetY, node));
+            rectangle.setX(x);
+            rectangle.setY(y);
+            rectangle.setWidth(width);
+            rectangle.setHeight(height);
 
-        markerGroup.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
-            double t = node.localToSceneTransformProperty().get().getTx();
-            return t;
-        }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
+            circle.setCenterX(x + width / 2);
+            circle.setCenterY(y + width / 2);
 
-        markerGroup.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
-            double t = node.localToSceneTransformProperty().get().getTy();
-            return t;
-        }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
+            group.getTransforms().addAll(transformList);
 
-        return markerGroup;
-    }
+        } else {
 
-    public static Group createHelpMarkerGroup(double offsetX, double offsetY, Node node, Transform transform) {
+            rectangle.xProperty().bind(Bindings.createDoubleBinding(() -> {
+                return node.localToSceneTransformProperty().get().getMxx() * node.layoutBoundsProperty().get().getMinX()
+                        + node.localToSceneTransformProperty().get().getTx()
+                        - Sunconfig.HELP_MARKER_MARGIN / 2;
+            }, node.layoutBoundsProperty(), node.localToSceneTransformProperty()));
 
-        Group markerGroup = new Group(createHelpMarker(offsetX, offsetY, node));
+            rectangle.yProperty().bind(Bindings.createDoubleBinding(() -> {
+                return node.localToSceneTransformProperty().get().getMyy() * node.layoutBoundsProperty().get().getMinY()
+                        + node.localToSceneTransformProperty().get().getTy()
+                        - Sunconfig.HELP_MARKER_MARGIN / 2;
+            }, node.layoutBoundsProperty(), node.localToSceneTransformProperty()));
 
-        if (transform != null) {
-            markerGroup.getTransforms().add(transform);
+            rectangle.widthProperty().bind(Bindings.createDoubleBinding(() -> {
+                return node.localToSceneTransformProperty().get().getMxx() * node.layoutBoundsProperty().get().getWidth()
+                        + Sunconfig.HELP_MARKER_MARGIN;
+            }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
+
+            rectangle.heightProperty().bind(Bindings.createDoubleBinding(() -> {
+                return node.localToSceneTransformProperty().get().getMyy() * node.layoutBoundsProperty().get().getHeight()
+                        + Sunconfig.HELP_MARKER_MARGIN;
+            }, node.localToSceneTransformProperty(), node.layoutBoundsProperty()));
+
+
+            circle.centerXProperty().bind(Bindings.createDoubleBinding(() -> {
+                return node.localToSceneTransformProperty().get().getMxx() * node.layoutBoundsProperty().get().getMinX()
+                        + node.localToSceneTransformProperty().get().getTx()
+                        + node.localToSceneTransformProperty().get().getMxx() * node.layoutBoundsProperty().get().getWidth() / 2;
+            }, node.layoutBoundsProperty(), node.localToSceneTransformProperty()));
+
+            circle.centerYProperty().bind(Bindings.createDoubleBinding(() -> {
+                return node.localToSceneTransformProperty().get().getMyy() * node.layoutBoundsProperty().get().getMinY()
+                        + node.localToSceneTransformProperty().get().getTy()
+                        + node.localToSceneTransformProperty().get().getMyy() * node.layoutBoundsProperty().get().getHeight() / 2;
+            }, node.layoutBoundsProperty(), node.localToSceneTransformProperty()));
+
         }
-        return markerGroup;
+
+        rectangle.visibleProperty().bind(node.visibleProperty());
+        circle.visibleProperty().bind(node.visibleProperty());
+
+        group.getChildren().addAll(rectangle, circle);
+
+        return group;
     }
+
 }

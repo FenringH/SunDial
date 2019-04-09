@@ -71,7 +71,7 @@ public class Sundial {
     private Circle dialMarginCircle;
     private Circle dialCircleBackground;
     private Circle dialCircleFrame;
-    private Circle controlNightCompression;
+    private Group controlNightCompression;
     private Group dialCircleCenterPoint;
     private Group dialLocalSecondGroup;
     private Group dialLocalMinuteGroup;
@@ -119,7 +119,7 @@ public class Sundial {
     private ControlThingy controlThingyDst;
     private Group outerControlsGroup;
 
-    private Circle tinyGlobeFrame;
+    private Group tinyGlobeFrame;
     private Group tinyGlobeGroup;
     private Group globeMasterGroup;
     private Scale tinyGlobeScale;
@@ -324,7 +324,6 @@ public class Sundial {
         hourMarkerMatrixList = new ArrayList<>();
 
         dialHourLineMarkerGroup = new Group();
-        dialHourLineMarkerGroup.setOpacity(0.75);
 
         Suncreator.createDialHourMarkers(
                 nightCompression,
@@ -336,7 +335,7 @@ public class Sundial {
         );
 
         // Dials
-        dialHighNoonGroup = Suncreator.creatDialHighNoonGroup(highNoonDialRotate);
+        dialHighNoonGroup = Suncreator.createDialHighNoonGroup(highNoonDialRotate);
         dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialRotateLocalHour);
         dialLocalMinuteGroup = Suncreator.createDialLocalMinuteGroup(dialRotateLocalMinute);
         dialLocalSecondGroup = Suncreator.createDialLocalSecondGroup(dialRotateLocalSecond);
@@ -417,34 +416,34 @@ public class Sundial {
 
         // Help overlay
         helpMarkers = new ArrayList<>();
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(Sunconfig.CENTER_X, Sunconfig.HIGHNOON_DIAL_LENGTH / 2, dialHighNoonGroup, highNoonDialRotate));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixDayLength), getCenterY(matrixDayLength), matrixDayLength));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixHour), getCenterY(matrixHour), matrixHour));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixMinute), getCenterY(matrixMinute), matrixMinute));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixDay), getCenterY(matrixDay), matrixDay));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixMonth), getCenterY(matrixMonth), matrixMonth));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixYear), getCenterY(matrixYear), matrixYear));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixTimeZone), getCenterY(matrixTimeZone), matrixTimeZone));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixLongitude), getCenterY(matrixLongitude), matrixLongitude));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(getCenterX(matrixLatitude), getCenterY(matrixLatitude), matrixLatitude));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, tinyGlobeFrame));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(Sunconfig.CONTROL_RESIZE_SIZE * 0.666, Sunconfig.CONTROL_RESIZE_SIZE * 0.666, controlThingyResize));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyMaximize));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyMinimize));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyClose));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyNightmode));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyAlwaysOnTop));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyGlobeGrid));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyGlobeLines));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(0, 0, controlThingyDst));
-        helpMarkers.add(Suncreator.createHelpMarkerGroup(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, controlNightCompression));
+        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixDayLength));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixHour));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixMinute));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixDay));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixMonth));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixYear));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixTimeZone));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixLongitude));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixLatitude));
+        helpMarkers.add(Suncreator.createHelpMarker(tinyGlobeFrame));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyResize));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMaximize));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMinimize));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyClose));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyNightmode));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst));
+        helpMarkers.add(Suncreator.createHelpMarker(controlNightCompression));
 
         helpOverlay = Suncreator.createHelpOverlay(helpMarkers, globeMasterGroup);
         helpTextGroup = Suncreator.createHelpTextGroup(helpText);
 
 
         // LAYERS
-        masterTimeGroup = new Group(controlNightCompression, matrixDate, matrixTime, controlThingyDst, matrixTimeZone);
+        masterTimeGroup = new Group(controlNightCompression, matrixDate, matrixTime, controlThingyDst);
         masterCoordinatesGroup = new Group(matrixLongitude, matrixLatitude);
 
         SubScene backgroundScene = Suncreator.createBackgroundSubScene(dialMarginCircle);
@@ -458,8 +457,6 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().addAll(dialHourLineMarkerGroup);
         foregroundGroup.getChildren().add(cetusMarkerGroup);
-//        foregroundGroup.getChildren().add(dialLocalSecondGroup);
-//        foregroundGroup.getChildren().add(dialLocalMinuteGroup);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
         foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().add(dialHighNoonGroup);
@@ -471,10 +468,8 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialArcDayLength);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(matrixHighNoon);
-//        foregroundGroup.getChildren().add(matrixTimeZone);
-//        foregroundGroup.getChildren().add(matrixTime);
-//        foregroundGroup.getChildren().add(matrixDate);
-        foregroundGroup.getChildren().add(masterTimeGroup);
+       foregroundGroup.getChildren().add(masterTimeGroup);
+        foregroundGroup.getChildren().add(matrixTimeZone);
         foregroundGroup.getChildren().add(masterCoordinatesGroup);
 
         outerControlsGroup = new Group(
@@ -1034,6 +1029,10 @@ public class Sundial {
         dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINAL);
         dialArcNight.setOpacity(visibleEh ? 0 : 1);
 
+        dialArcDayLength.setOpacity(visibleEh ? Sunconfig.DAYLENGTH_ARC_OPACITY / 2 : Sunconfig.DAYLENGTH_ARC_OPACITY);
+        dialArcDayLength.setStrokeWidth(visibleEh ? Sunconfig.DAYLENGTH_STROKE_WIDTH / 2 : Sunconfig.DAYLENGTH_STROKE_WIDTH);
+        matrixDayLength.setOpacity(visibleEh ? 0.65 : 1);
+
         for (Node hourLineMarker : dialHourLineMarkerGroup.getChildren()) {
             ((Line) hourLineMarker).setStroke(visibleEh ? Color.WHITE : Color.BLACK);
         }
@@ -1135,8 +1134,6 @@ public class Sundial {
 
         cetusMarkerGroup.setVisible(visibleEh);
         cetusTimer.setVisible(visibleEh);
-
-        tinyGlobeFrame.setStroke(cetusTimeVisibleEh ? Sunconfig.Color_Of_CetusFrame : Sunconfig.Color_Of_TinyFrame);
     }
 
     public void setTimeDisplayOpacity(double opacity) {
@@ -1265,7 +1262,7 @@ public class Sundial {
         return dialsGroup;
     }
 
-    public Circle getControlNightCompression() {
+    public Group getControlNightCompression() {
         return controlNightCompression;
     }
 

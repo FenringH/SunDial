@@ -308,14 +308,13 @@ public class Sunconfig {
     public static final double TINYGLOBE_SLIDE = 5.0d;
     public static final double LOCALMINUTE_OFFSET = 50.0d;
     public static final double LOCALSECOND_OFFSET = 50.0d;
-    public static final double LOCALMINUTE_CIRCLE_OFFSET = 55.0d;
+    public static final double LOCALMINUTE_CIRCLE_OFFSET = 52.0d;
     public static final double LOCALMINUTE_DIAL_OFFSET = LOCALMINUTE_CIRCLE_OFFSET + 10.0d;
     public static final double MATRIX_MINUTE_OFFSET = 70.0d;
     public static final double CONTROL_HELP_OFFSET = 236.0d;
     public static final double CONTROL_RESIZE_OFFSET = 137.0d;
     public static final double CONTROL_THINGY_OFFSET = 236.0d;
     public static final double CONTROL_CLOSE_OFFSET = 236.0d;
-    public static final double CONTROL_DST_OFFSET = -35.0d;
     public static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
@@ -329,6 +328,9 @@ public class Sunconfig {
     public static final double HELP_TEXT_OFFSET = 10.0d;
     public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 40;
     public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 25;
+    public static final double CONTROL_DST_OFFSET_X = CENTER_X;
+    public static final double CONTROL_DST_OFFSET_Y = CENTER_Y - 35.0d;
+    public static final double MATRIX_DAYLENGTH_OFFSET = CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS * 0.95;
 
     public static final double MATRIX_TIME_SCALE = 3.50d;
     public static final double MATRIX_DATE_SCALE = 1.50d;
@@ -421,6 +423,21 @@ public class Sunconfig {
     public static final Color Color_Of_CetusArc    = new Color(0.90, 0.25, 1.00, 1.00);
     public static final Color Color_Of_CetusDay    = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusNight  = new Color(0.90, 0.70, 1.00, 1.00);
+
+    public static final Color Color_Of_DayDay           = new Color(1.00, 1.00, 0.80, 1.00);
+    public static final Color Color_Of_DayReverse       = new Color(1.00, 0.25, 0.00, 1.00);
+    public static final Color Color_Of_DayAmbient       = new Color(0.10, 0.20, 0.30, 1.00);
+    public static final Color Color_Of_DaySpecular      = new Color(0.75, 0.75, 0.75, 1.00);
+
+    public static final Color Color_Of_NightNight       = new Color(0.10, 0.25, 0.40, 1.00);
+    public static final Color Color_Of_NightReverse     = new Color(0.10, 0.50, 1.00, 1.00);
+    public static final Color Color_Of_NightAmbient     = new Color(0.75, 0.75, 0.75, 1.00);
+    public static final Color Color_Of_NightSpecular    = new Color(1.00, 1.00, 1.00, 1.00);
+
+    public static final Color Color_Of_AtmosphereDay    = new Color(0.50, 0.85, 1.00, 1.00);
+    public static final Color Color_Of_AtmosphereNight  = new Color(1.00, 0.35, 0.10, 1.00);
+    public static final Color Color_Of_AtmosphereMid    = new Color(0.25, 0.50, 1.00, 1.00);
+
 
     public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_GLOW2            = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
@@ -577,7 +594,7 @@ public class Sunconfig {
             false,
             CycleMethod.NO_CYCLE,
             new Stop(0.960, new Color(1, 1, 1, 0)),
-            new Stop(0.980, new Color(1, 1, 1, 1)),
+            new Stop(0.975, new Color(1, 1, 1, 1)),
             new Stop(1.000, new Color(1, 1, 1, 0))
     );
 
