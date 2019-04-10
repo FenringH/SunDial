@@ -19,6 +19,7 @@ import javafx.scene.transform.Transform;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import static java.lang.Math.*;
 
@@ -132,15 +133,15 @@ public class Suncreator {
                 break;
             case GLOBEGRID:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 40)
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 40 + 180)
                         .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_MaximizeStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
-                        .colorFill(Sunconfig.Color_Of_GlobeGridFill)
-                        .marker("G", Sunconfig.Color_Of_MaximizeStroke, Sunconfig.MATRIX_SHADOW)
-                        .markerScale(0.75)
-                        .markerColorOn(Color.WHITE)
-                        .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("G", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.85)
+//                        .markerColorOn(Color.WHITE)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_GLOBEGRID, helpText)
                         .thankYou();
@@ -148,15 +149,15 @@ public class Suncreator {
                 break;
             case GLOBELINES:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 50)
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 50 + 180)
                         .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_MaximizeStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
-                        .colorFill(Sunconfig.Color_Of_GlobeGridFill)
-                        .marker("L", Sunconfig.Color_Of_MaximizeStroke, Sunconfig.MATRIX_SHADOW)
-                        .markerScale(0.75)
-                        .markerColorOn(Color.WHITE)
-                        .style(Sunconfig.CONTROL_GLOBEGRID_SHADOW, Sunconfig.CONTROL_GLOBEGRID_GLOW)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("L", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.85)
+//                        .markerColorOn(Color.WHITE)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_GLOBELINES, helpText)
                         .thankYou();
@@ -167,9 +168,9 @@ public class Suncreator {
                         .positionCartesian(Sunconfig.CONTROL_DST_OFFSET_X, Sunconfig.CONTROL_DST_OFFSET_Y)
                         .size(Sunconfig.CONTROL_DST_RADIUS)
                         .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
-                        .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
+                        .strokeWidth(Sunconfig.CONTROL_DST_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
-                        .marker("DST", Sunconfig.Color_Of_ResizeStroke, Sunconfig.MATRIX_SHADOW)
+//                        .marker("DST", Sunconfig.Color_Of_ResizeStroke, Sunconfig.MATRIX_SHADOW)
                         .markerColorOn(Color.WHITE)
                         .markerScale(Sunconfig.CONTROL_DST_MATRIX_SCALE)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
@@ -517,6 +518,31 @@ public class Suncreator {
         return group;
     }
 
+    public static Timeline createGlobeTimeline(TimelineDirection timelineDirection, Group group) {
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        double opacity;
+
+        if (timelineDirection.equals(TimelineDirection.IN)) {
+            opacity = 0;
+            timeline.setOnFinished(event -> group.setVisible(false));
+        } else {
+            opacity = 1;
+            timeline.setOnFinished(event -> group.setVisible(true));
+        }
+
+        KeyValue keyValueOpacity = new KeyValue(group.opacityProperty(), opacity, Interpolator.EASE_OUT);
+        KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueOpacity);
+
+        timeline.getKeyFrames().addAll(keyFrameOpacity);
+
+        return timeline;
+    }
+
     public static Timeline createTinyGlobeTimeline(TimelineDirection timelineDirection, Group tinyGlobe, Scale tinyGlobeScale) {
 
         double slideX, slideY, scale, opacity;
@@ -552,6 +578,80 @@ public class Suncreator {
         KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueOpacity);
 
         timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY, keyFrameOpacity);
+
+        return timeline;
+    }
+
+    public static Timeline createTimeAndDateTimeline(TimelineDirection timelineDirection, Group group) {
+
+        double slideX, slideY, scale;
+
+        if (timelineDirection.equals(TimelineDirection.IN)) {
+            slideX = 0;
+            slideY = 0;
+            scale = 1;
+        } else {
+            slideX = 0;
+            slideY = 115;
+            scale = 0.65;
+        }
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        KeyValue keyValueSlideX = new KeyValue(group.translateXProperty(), slideX, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameSlideX = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueSlideX);
+
+        KeyValue keyValueSlideY = new KeyValue(group.translateYProperty(), slideY, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameSlideY = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueSlideY);
+
+        KeyValue keyValueScaleX = new KeyValue(group.scaleXProperty(), scale, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleX = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueScaleX);
+
+        KeyValue keyValueScaleY = new KeyValue(group.scaleYProperty(), scale, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleY = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueScaleY);
+
+        timeline.getKeyFrames().addAll(keyFrameSlideX, keyFrameSlideY, keyFrameScaleX, keyFrameScaleY);
+
+        return timeline;
+    }
+
+    public static Timeline createCoordinatesTimeline(TimelineDirection timelineDirection, Group group) {
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        double slideX, slideY, opacity;
+        Interpolator interpolator;
+
+        if (timelineDirection.equals(TimelineDirection.IN)) {
+            slideX = 0;
+            slideY = 150;
+            opacity = 0;
+            interpolator = Interpolator.EASE_OUT;
+            timeline.setOnFinished(event -> group.setVisible(false));
+        } else {
+            slideX = 0;
+            slideY = 0;
+            opacity = 1;
+            interpolator = Interpolator.EASE_IN;
+            timeline.setOnFinished(event -> group.setVisible(true));
+        }
+
+        KeyValue keyValueSlideX = new KeyValue(group.translateXProperty(), slideX, interpolator);
+        KeyFrame keyFrameSlideX = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueSlideX);
+
+        KeyValue keyValueSlideY = new KeyValue(group.translateYProperty(), slideY, interpolator);
+        KeyFrame keyFrameSlideY = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueSlideY);
+
+        KeyValue keyValueOpacity = new KeyValue(group.opacityProperty(), opacity, interpolator);
+        KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueOpacity);
+
+        timeline.getKeyFrames().addAll(keyFrameOpacity, keyFrameSlideX, keyFrameSlideY);
 
         return timeline;
     }
@@ -905,7 +1005,6 @@ public class Suncreator {
 
         Group group = new Group(dialCircleCenterFrame, dialCircleCenterPoint);
         group.setMouseTransparent(true);
-        group.setVisible(false);
 
         return group;
     }
@@ -1337,7 +1436,6 @@ public class Suncreator {
         longitudeBackdrop.setOpacity(0);
 
         matrixLongitude.getChildren().add(longitudeBackdrop);
-        matrixLongitude.setVisible(false);
 
         return matrixLongitude;
     }
@@ -1359,7 +1457,6 @@ public class Suncreator {
         latitudeBackdrop.setOpacity(0);
 
         matrixLatitude.getChildren().add(latitudeBackdrop);
-        matrixLatitude.setVisible(false);
 
         return matrixLatitude;
     }
@@ -1383,7 +1480,8 @@ public class Suncreator {
         matrixTimeZone.setLayoutX(Sunconfig.CENTER_X - matrixTimeZone.getLayoutBounds().getWidth() / 2);
         matrixTimeZone.setLayoutY(Sunconfig.MATRIX_TIMEZONE_OFFSET);
         matrixTimeZone.setStyle(Sunconfig.MATRIX_SHADOW);
-        matrixTimeZone.setVisible(false);
+        matrixTimeZone.setOpacity(Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
+//        matrixTimeZone.setVisible(false);
         return matrixTimeZone;
     }
 
@@ -1483,15 +1581,55 @@ public class Suncreator {
 
         Group helpOverlay = new Group();
 
-        Rectangle helpBackdrop = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
-        helpBackdrop.setArcWidth(Sunconfig.HELP_OVERLAY_ROUND);
-        helpBackdrop.setArcHeight(Sunconfig.HELP_OVERLAY_ROUND);
-        helpBackdrop.setFill(Color.BLACK);
-        helpBackdrop.setStroke(Sunconfig.Color_Of_Void);
-        helpBackdrop.setBlendMode(BlendMode.MULTIPLY);
-        helpBackdrop.setOpacity(Sunconfig.HELP_OVERLAY_OPACITY);
-        helpBackdrop.setMouseTransparent(true);
+        Group backdropGroup = new Group();
 
+        Rectangle backdropFrame = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
+        backdropFrame.setArcWidth(Sunconfig.HELP_OVERLAY_ROUND);
+        backdropFrame.setArcHeight(Sunconfig.HELP_OVERLAY_ROUND);
+        backdropFrame.setFill(Color.BLACK);
+        backdropFrame.setStroke(Sunconfig.Color_Of_Void);
+
+        backdropGroup.getChildren().add(backdropFrame);
+
+        for (Group markerGroup : helpMarkers) {
+
+            Rectangle markerRectangle = (Rectangle) markerGroup.getChildren().get(0);
+
+            Rectangle backdropCutout = new Rectangle();
+            backdropCutout.setArcWidth(markerRectangle.getArcWidth());
+            backdropCutout.setArcHeight(markerRectangle.getArcHeight());
+            backdropCutout.setFill(Color.WHITE);
+            backdropCutout.setStroke(Color.TRANSPARENT);
+
+            Collection<Transform> markerTransforms = markerGroup.getTransforms();
+            if (!markerTransforms.isEmpty()) {
+
+                backdropCutout.setX(markerRectangle.getX());
+                backdropCutout.setY(markerRectangle.getY());
+                backdropCutout.setWidth(markerRectangle.getWidth());
+                backdropCutout.setHeight(markerRectangle.getHeight());
+
+                backdropCutout.getTransforms().addAll(markerTransforms);
+
+            } else {
+
+                backdropCutout.xProperty().bind(markerRectangle.xProperty());
+                backdropCutout.yProperty().bind(markerRectangle.yProperty());
+                backdropCutout.widthProperty().bind(markerRectangle.widthProperty());
+                backdropCutout.heightProperty().bind(markerRectangle.heightProperty());
+            }
+
+            backdropCutout.visibleProperty().bind((markerRectangle.visibleProperty()));
+
+            backdropGroup.getChildren().add(backdropCutout);
+        }
+
+        backdropGroup.setBlendMode(BlendMode.MULTIPLY);
+        backdropGroup.setOpacity(Sunconfig.HELP_OVERLAY_OPACITY);
+        backdropGroup.setMouseTransparent(true);
+
+
+        // Value added services :P
         Circle helpWindowMarker = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - 1);
         helpWindowMarker.setFill(Sunconfig.Color_Of_Void);
         helpWindowMarker.setStroke(Color.WHITE);
@@ -1505,7 +1643,7 @@ public class Suncreator {
         helpGlobeMarker.setMouseTransparent(true);
         helpGlobeMarker.visibleProperty().bind(globeMasterGroup.visibleProperty());
 
-        helpOverlay.getChildren().addAll(helpBackdrop, helpWindowMarker, helpGlobeMarker);
+        helpOverlay.getChildren().addAll(backdropGroup, helpWindowMarker, helpGlobeMarker);
         helpOverlay.getChildren().addAll(helpMarkers);
         helpOverlay.setVisible(false);
         helpOverlay.setMouseTransparent(true);
@@ -1513,7 +1651,7 @@ public class Suncreator {
         return helpOverlay;
     }
 
-    public static Group createHelpMarker(Node node) {
+    public static Group createHelpMarker(Node node, BooleanProperty visibilityProperty) {
 
         ObservableList<Transform> transformList = node.getTransforms();
 
@@ -1591,8 +1729,14 @@ public class Suncreator {
 
         }
 
-        rectangle.visibleProperty().bind(node.visibleProperty());
-        circle.visibleProperty().bind(node.visibleProperty());
+        if (visibilityProperty != null) {
+            rectangle.visibleProperty().bind(visibilityProperty);
+            circle.visibleProperty().bind(visibilityProperty);
+
+        } else {
+            rectangle.visibleProperty().bind(node.visibleProperty());
+            circle.visibleProperty().bind(node.visibleProperty());
+        }
 
         group.getChildren().addAll(rectangle, circle);
 

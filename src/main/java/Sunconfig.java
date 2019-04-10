@@ -73,111 +73,113 @@ public class Sunconfig {
 
     public static final String DEFAULT_localTimeText         = "MMM DDD dd hh:mm:ss ZZZ YYYY";
 
-    public static final String HELPTEXT_DEFAULT = "Hover over controllable surfaces" +
+    public static final String HELPTEXT_DEFAULT = "Hover over highlighted surface" +
             "\nto display available controls.";
 
     public static final String HELPTEXT_HORIZON = "DAY LENGTH" +
-            "\nLMB : toggle Year-Chart";
+            "\n LMB : toggle Year-Chart";
 
     public static final String HELPTEXT_NIGHTCOMPRESSION = "NIGHT COMPRESSION" +
-            "\nLMB + drag : change Night-Compression (slow)" +
-            "\nRMB + drag : change Night-Compression\u0165 (fast)" +
-            "\nSCROLL : change Night-Compression\u0165 (fine)" +
-            "\nMMB : reset Night-Compression\u0165";
+            "\n LMB + drag : change Night-Compression (slow)" +
+            "\n RMB + drag : change Night-Compression\u0165 (fast)" +
+            "\n SCROLL : change Night-Compression\u0165 (fine)" +
+            "\n MMB : reset Night-Compression\u0165";
 
     public static final String HELPTEXT_HOUR = "HOURS" +
-            "\nLMB + drag : change Hours (slow)" +
-            "\nRMB + drag : change Hours (fast)" +
-            "\nSCROLL : change Hours (fine)" +
-            "\nMMB : reset Time and Date";
+            "\n LMB + drag : change Hours (slow)" +
+            "\n RMB + drag : change Hours (fast)" +
+            "\n SCROLL : change Hours (fine)" +
+            "\n MMB : reset Time and Date";
 
     public static final String HELPTEXT_MINUTE = "MINUTES" +
-            "\nLMB + drag : change Minutes (slow)" +
-            "\nRMB + drag : change Minutes (fast)" +
-            "\nSCROLL : change Minutes (fine)" +
-            "\nMMB : reset Time and Date";
+            "\n LMB + drag : change Minutes (slow)" +
+            "\n RMB + drag : change Minutes (fast)" +
+            "\n SCROLL : change Minutes (fine)" +
+            "\n MMB : reset Time and Date";
 
     public static final String HELPTEXT_DAY = "DAY" +
-            "\nLMB + drag : change Day (slow)" +
-            "\nRMB + drag : change Day (fast)" +
-            "\nSCROLL : change Day (fine)" +
-            "\nMMB : reset Time and Date";
+            "\n LMB + drag : change Day (slow)" +
+            "\n RMB + drag : change Day (fast)" +
+            "\n SCROLL : change Day (fine)" +
+            "\n MMB : reset Time and Date";
 
     public static final String HELPTEXT_MONTH = "MONTH" +
-            "\nLMB + drag : change Month (slow)" +
-            "\nRMB + drag : change Month (fast)" +
-            "\nSCROLL : change Month (fine)" +
-            "\nMMB : reset Time and Date";
+            "\n LMB + drag : change Month (slow)" +
+            "\n RMB + drag : change Month (fast)" +
+            "\n SCROLL : change Month (fine)" +
+            "\n MMB : reset Time and Date";
 
     public static final String HELPTEXT_YEAR = "YEAR" +
-            "\nLMB + drag : change Year (slow)" +
-            "\nRMB + drag : change Year (fast)" +
-            "\nSCROLL : change Year (fine)" +
-            "\nMMB : reset Time and Date";
+            "\n LMB + drag : change Year (slow)" +
+            "\n RMB + drag : change Year (fast)" +
+            "\n SCROLL : change Year (fine)" +
+            "\n MMB : reset Time and Date";
 
     public static final String HELPTEXT_LONGITUDE = "LONGITUDE" +
-            "\nLMB + drag : change Longitude (fast)" +
-            "\nRMB + drag : change Longitude (slow)" +
-            "\nSCROLL : change Longitude (fine)" +
-            "\nMMB : reset Longitude";
+            "\n LMB + drag : change Longitude (fast)" +
+            "\n RMB + drag : change Longitude (slow)" +
+            "\n SCROLL : change Longitude (fine)" +
+            "\n MMB : reset Longitude";
+
     public static final String HELPTEXT_LATITUDE = "LATITUDE" +
-            "\nLMB + drag : change Latitude (fast)" +
-            "\nRMB + drag : change Latitude (slow)" +
-            "\nSCROLL : change Latitude (fine)" +
-            "\nMMB : reset Latitude";
+            "\n LMB + drag : change Latitude (fast)" +
+            "\n RMB + drag : change Latitude (slow)" +
+            "\n SCROLL : change Latitude (fine)" +
+            "\n MMB : reset Latitude";
 
     public static final String HELPTEXT_TIMEZONE = "TIME ZONE" +
-            "\nSCROLL : change Time Zone" +
-            "\nMMB : reset Time Zone";
+            "\n SCROLL : change Time Zone" +
+            "\n MMB : reset Time Zone";
 
     public static final String HELPTEXT_CLOSE = "CLOSE" +
-            "\nLMB : Close application";
+            "\n LMB : Close application";
 
     public static final String HELPTEXT_MINIMIZE = "MINIMIZE" +
-            "\nLMB : Minimize application" +
-            "\nRMB : toggle Debug window";
+            "\n LMB : Minimize application" +
+            "\n RMB : toggle Debug window";
 
     public static final String HELPTEXT_MAXIMIZE = "MAXIMIZE" +
-            "\nLMB : Maximize application";
+            "\n LMB : Maximize application";
 
     public static final String HELPTEXT_RESIZE = "RESIZE" +
-            "\nLMB + drag : Resize window (squared)" +
-            "\nRMB + drag : Resize window" +
-            "\nMMB : Reset window size";
+            "\n LMB + drag : Resize window (squared)" +
+            "\n RMB + drag : Resize window" +
+            "\n MMB : Reset window size";
 
     public static final String HELPTEXT_NIGHTMODE = "NIGHT-MODE" +
-            "\nLMB : toggle Night-mode";
+            "\n LMB : toggle Night-mode";
 
     public static final String HELPTEXT_ALWAYSONTOP = "ALWAYS-ON-TOP" +
-            "\nLMB : toggle Always-On-Top";
+            "\n LMB : toggle Always-On-Top";
 
     public static final String HELPTEXT_HIGHNOON = "HIGH NOON" +
-            "\nHOVER : show High Noon time" +
-            "\nLMB : toggle Animations";
+            "\n HOVER : show High Noon time" +
+            "\n LMB : toggle Animations";
 
     public static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
-            "\nLMB : toggle Globe-mode" +
-            "\nRMB : toggle Cetus time" +
-            "\nMMB : reset Coordinates to DEFAULT" +
-            "\nDRAG-DROP : drag and drop GoogleMaps url ..." +
-            "\n... to set DEFAULT Coordinates";
+            "\n LMB : toggle Globe-mode" +
+            "\n RMB : toggle Cetus time" +
+            "\n MMB : reset Coordinates to DEFAULT" +
+            "\n DRAG-DROP : drag and drop GoogleMaps url ..." +
+            "\n  ... to set DEFAULT Coordinates";
 
     public static final String HELPTEXT_GLOBEGRID = "GLOBE GRID" +
-            "\nLMB : toggle Parallels and Meridians";
+            "\n LMB : toggle Parallels and Meridians";
 
     public static final String HELPTEXT_GLOBELINES = "GLOBE LINES" +
-            "\nLMB : toggle Equator, Tropic and Polar circles";
+            "\n LMB : toggle Equator, Tropic and Polar circles";
 
     public static final String HELPTEXT_GLOBE = "GLOBE" +
-            "\nLMB : rotate Globe (fast)" +
-            "\nRMB : rotate Globe (slow)" +
-            "\nMMB : reset Coordinates";
+            "\n LMB : rotate Globe (fast)" +
+            "\n RMB : rotate Globe (slow)" +
+            "\n MMB : reset Coordinates";
 
     public static final String HELPTEXT_WINDOW = "WINDOW" +
-            "\nLMB : move Window";
+            "\n LMB : move Window";
 
     public static final String HELPTEXT_DST = "DAYLIGHT SAVING TIME" +
-            "\nLMB : toggle Daylight Saving Time";
+            "\n LMB : toggle Daylight Saving Time" +
+            "\n" + HELPTEXT_NIGHTCOMPRESSION;
 
 
     public static final double MARGIN_X = 25.0d;
@@ -259,6 +261,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 3.0d;
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
+    public static final double CONTROL_DST_STROKE_WIDTH = 3.0d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
     public static final double DAY_TERMINATOR_WIDTH = 1.25d;
     public static final double DAY_TERMINATOR_GLOW_WIDTH = 12.00d;
@@ -293,6 +296,8 @@ public class Sunconfig {
     public static final double SECOND_LED_OFF_OPACITY = 0.00d;
     public static final double SECOND_LED_DIM_OPACITY = 0.50d;
     public static final double SECOND_LED_ON_OPACITY = 1.00d;
+    public static final double MATRIX_TIMEZONE_DEFAULT_OPACITY = 0.65d;
+    public static final double MATRIX_TIMEZONE_GLOBE_OPACITY = 1.00d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
     public static final double MATRIX_HORIZON_OFFSET = 83.0d;
@@ -319,17 +324,17 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
     public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
-    public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X - MARKER_HOUR_LENGTH * 2 - CONTROL_GLOBEGRID_RADIUS;
+    public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X/* - MARKER_HOUR_LENGTH * 2*/ - CONTROL_GLOBEGRID_RADIUS;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
     public static final double CETUS_TIMER_OFFSET = 160.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     public static final double CETUS_HORIZON_OFFSET = 45.0d;
-    public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y + 65.0d;
+    public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 45.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
-    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 40;
-    public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 25;
+    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 45;
+    public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 20;
     public static final double CONTROL_DST_OFFSET_X = CENTER_X;
-    public static final double CONTROL_DST_OFFSET_Y = CENTER_Y - 35.0d;
+    public static final double CONTROL_DST_OFFSET_Y = CENTER_Y;
     public static final double MATRIX_DAYLENGTH_OFFSET = CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS * 0.95;
 
     public static final double MATRIX_TIME_SCALE = 3.50d;
@@ -337,15 +342,15 @@ public class Sunconfig {
     public static final double MATRIX_WEEK_SCALE = 1.00d;
     public static final double MATRIX_HORIZON_SCALE = 1.00d;
     public static final double MATRIX_DAYLENGTH_SCALE = 1.00d;
-    public static final double MATRIX_LONGITUDE_SCALE = 1.25d;
-    public static final double MATRIX_LATITUDE_SCALE = 1.25d;
+    public static final double MATRIX_LONGITUDE_SCALE = 1.10d;
+    public static final double MATRIX_LATITUDE_SCALE = 1.10d;
     public static final double MATRIX_HOUR_SCALE = 1.00d;
     public static final double MATRIX_MINUTE_SCALE = 0.75d;
     public static final double TINYGLOBE_DOWNSCALE = 0.80d;
     public static final double CETUS_TIMER_SCALE = 1.00d;
     public static final double CETUS_TIMEREADER_SCALE = 0.75d;
     public static final double CETUS_HORIZON_SCALE = 0.75d;
-    public static final double MATRIX_TIMEZONE_SCALE = 1.25d;
+    public static final double MATRIX_TIMEZONE_SCALE = 1.10d;
     public static final double MATRIX_HIGHNOON_SCALE = 1.00d;
     public static final double MATRIX_CONTROLTHINGY_SCALE = 1.25d;
 
@@ -360,6 +365,7 @@ public class Sunconfig {
     public static final int LED_OPACITY_DURATION = 350;
     public static final int GLOBE_ROTATE_DURATION = 750;
     public static final int TINY_GLOBE_DURATION = 350;
+    public static final int TIMEANDDATE_DURATION = 350;
     public static final int CETUS_MARKER_DURATION = 150;
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
@@ -431,7 +437,7 @@ public class Sunconfig {
 
     public static final Color Color_Of_NightNight       = new Color(0.10, 0.25, 0.40, 1.00);
     public static final Color Color_Of_NightReverse     = new Color(0.10, 0.50, 1.00, 1.00);
-    public static final Color Color_Of_NightAmbient     = new Color(0.75, 0.75, 0.75, 1.00);
+    public static final Color Color_Of_NightAmbient     = new Color(0.95, 0.95, 0.95, 1.00);
     public static final Color Color_Of_NightSpecular    = new Color(1.00, 1.00, 1.00, 1.00);
 
     public static final Color Color_Of_AtmosphereDay    = new Color(0.50, 0.85, 1.00, 1.00);
@@ -439,49 +445,49 @@ public class Sunconfig {
     public static final Color Color_Of_AtmosphereMid    = new Color(0.25, 0.50, 1.00, 1.00);
 
 
-    public static final String MATRIX_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  5.0, 0.60, 0, 0);";
-    public static final String MATRIX_GLOW2            = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String MATRIX_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  5.0, 0.60, 0, 0);";
-    public static final String MATRIX_SHADOW2          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String MATRIX_BLOCK            = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String HORIZON_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
-    public static final String LOCALTIME_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
-    public static final String LOCALSECOND_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255, 32, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALHOUR_DIAL_GLOWIER  = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
-    public static final String LOCALSECOND_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
-    public static final String LOCALMINUTE_DIAL_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
-    public static final String LOCALHOUR_DIAL_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
+    public static final String MATRIX_GLOW                  = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  5.0, 0.60, 0, 0);";
+    public static final String MATRIX_GLOW2                 = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String MATRIX_SHADOW                = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  5.0, 0.60, 0, 0);";
+    public static final String MATRIX_SHADOW2               = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String MATRIX_BLOCK                 = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String HORIZON_GLOW                 = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
+    public static final String LOCALTIME_SHADOW             = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
+    public static final String LOCALSECOND_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255, 32, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALHOUR_DIAL_GLOWIER       = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
+    public static final String LOCALSECOND_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALMINUTE_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
+    public static final String LOCALHOUR_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
 
-    public static final String HORIZON_HOVER_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
-    public static final String TERMINATOR_LINE_GLOW    = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String HORIZON_HOVER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
+    public static final String TERMINATOR_LINE_GLOW         = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
 
-    public static final String CONTROL_THINGY_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_THINGY_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_HELP_SHADOW_OFF    = "-fx-effect: dropshadow(three-pass-box, rgba( 16, 32,128, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_HELP_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_HELP_SHADOW_ON     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_RESIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_RESIZE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_CLOSE_SHADOW       = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_CLOSE_GLOW         = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MAXIMIZE_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MAXIMIZE_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MINIMIZE_SHADOW    = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_MINIMIZE_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_NIGHTMODE_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba(112, 32,112, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_NIGHTMODE_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_ALWAYSONTOP_SHADOW = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_ALWAYSONTOP_GLOW   = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_GLOBEGRID_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_GLOBEGRID_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_THINGY_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_THINGY_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_SHADOW_OFF      = "-fx-effect: dropshadow(three-pass-box, rgba( 16, 32,128, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_HELP_SHADOW_ON       = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_RESIZE_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_RESIZE_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_CLOSE_SHADOW         = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_CLOSE_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MAXIMIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MAXIMIZE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MINIMIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_MINIMIZE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_NIGHTMODE_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba(112, 32,112, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_NIGHTMODE_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_ALWAYSONTOP_SHADOW   = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_ALWAYSONTOP_GLOW     = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_GLOBEGRID_SHADOW     = "-fx-effect: dropshadow(three-pass-box, rgba( 64, 64, 64, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_GLOBEGRID_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
 
-    public static final String CETUS_MARKER_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba(192, 48,192, 1.0), 10.0, 0.75, 0, 0);";
-    public static final String CETUS_MARKER_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0), 10.0, 0.75, 0, 0);";
-    public static final String CETUS_MATRIX_SHADOW_DAY    = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
-    public static final String CETUS_MATRIX_SHADOW_NIGHT  = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String CETUS_MARKER_SHADOW          = "-fx-effect: dropshadow(three-pass-box, rgba(192, 48,192, 1.0), 10.0, 0.75, 0, 0);";
+    public static final String CETUS_MARKER_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0), 10.0, 0.75, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW_DAY      = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String CETUS_MATRIX_SHADOW_NIGHT    = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
-    public static final String HELP_MARKER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String HELP_MARKER_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
 
     public static final Image GLOBE_DAY_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_DAY_MAP));
     public static final Image GLOBE_NIGHT_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_NIGHT_MAP));;

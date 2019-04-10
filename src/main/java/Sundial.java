@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -142,6 +143,12 @@ public class Sundial {
     private Timeline longitudeTimeline;
     private Timeline latitudeTimeline;
     private Timeline infoTextOpacityTimeline;
+    private Timeline timeAndDateMoveOutTimeline;
+    private Timeline timeAndDateMoveInTimeline;
+    private Timeline coordinatesMoveOutTimeline;
+    private Timeline coordinatesMoveInTimeline;
+    private Timeline globeMoveOutTimeline;
+    private Timeline globeMoveInTimeline;
 
     private Text helpText;
     private Group helpTextGroup;
@@ -278,6 +285,10 @@ public class Sundial {
         // Master globe
         globeMasterGroup = Suncreator.createMasterGlobe(longitude, latitude, phase, tilt, globeLightScaler, globeGridVisibleEh, globeLinesVisibleEh);
         globeMasterGroup.setVisible(false);
+        globeMasterGroup.setOpacity(0);
+
+        globeMoveOutTimeline = Suncreator.createGlobeTimeline(Suncreator.TimelineDirection.OUT, globeMasterGroup);
+        globeMoveInTimeline = Suncreator.createGlobeTimeline(Suncreator.TimelineDirection.IN, globeMasterGroup);
 
         // Tiny globe
         tinyGlobeGroup = Suncreator.createTinyGlobe(longitude, latitude, phase, tilt);
@@ -349,7 +360,33 @@ public class Sundial {
         );
         horizonGroup.setMouseTransparent(true);
 
+        // Control thingies
+        controlThingyHelp = Suncreator.createControlThingy(Suncreator.ControlThingyType.HELP, helpText);
+        controlThingyResize = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
+        controlThingyClose = Suncreator.createControlThingy(Suncreator.ControlThingyType.CLOSE, helpText);
+        controlThingyMaximize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MAXIMIZE, helpText);
+        controlThingyMinimize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MINIMIZE, helpText);
+        controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGTMODE, helpText);
+        controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
+
+        outerControlsGroup = new Group(
+                controlThingyResize,
+                controlThingyClose,
+                controlThingyMaximize,
+                controlThingyMinimize,
+                controlThingyNightmode,
+                controlThingyAlwaysOnTop,
+                controlThingyHelp
+        );
+
+        controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
+        controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
+        controlThingyDst = Suncreator.createControlThingy(Suncreator.ControlThingyType.DST, helpText);
+
         // Time and Date
+        controlNightCompression = Suncreator.createControlNightCompression();
+        matrixTimeZone = Suncreator.createMatrixTimeZone();
+
         matrixDay = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixMonth = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixYear = new DotMatrix("0000", Sunconfig.Color_Of_LocalTime);
@@ -360,6 +397,11 @@ public class Sundial {
         matrixMinute = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixSecond = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixTime = Suncreator.createMatrixTime(matrixHour, matrixMinute, matrixSecond);
+
+        masterTimeGroup = new Group(controlNightCompression, matrixTimeZone, matrixDate, matrixTime, controlThingyDst);
+
+        timeAndDateMoveOutTimeline = Suncreator.createTimeAndDateTimeline(Suncreator.TimelineDirection.OUT, masterTimeGroup);
+        timeAndDateMoveInTimeline = Suncreator.createTimeAndDateTimeline(Suncreator.TimelineDirection.IN, masterTimeGroup);
 
         // LEDs with minutes and seconds markers
         dialLocalSecondLedList = new ArrayList<>();
@@ -382,6 +424,18 @@ public class Sundial {
 
         dialMinuteMarkers = Suncreator.createDialMinuteMarkers();
 
+        // Coordinates group
+        matrixLongitude = Suncreator.createMatrixLongitude();
+        matrixLatitude = Suncreator.createMatrixLatitude();
+
+        masterCoordinatesGroup = new Group(matrixLongitude, matrixLatitude);
+        masterCoordinatesGroup.setOpacity(0);
+        masterCoordinatesGroup.setVisible(false);
+        masterCoordinatesGroup.setTranslateY(150);
+
+        coordinatesMoveOutTimeline = Suncreator.createCoordinatesTimeline(Suncreator.TimelineDirection.OUT, masterCoordinatesGroup);
+        coordinatesMoveInTimeline = Suncreator.createCoordinatesTimeline(Suncreator.TimelineDirection.IN, masterCoordinatesGroup);
+
         // Other stuff
         dialMarginCircle = Suncreator.createDialMarginCircle();
         dialArcNight = Suncreator.createDialArcNight();
@@ -389,26 +443,10 @@ public class Sundial {
         dialCircleBackground = Suncreator.createDialCircleBackground();
         dialCircleFrame = Suncreator.createDialCircleFrame();
         dialCircleCenterPoint = Suncreator.createDialCircleCenterPoint();
-        controlNightCompression = Suncreator.createControlNightCompression();
         dialArcDayLength = Suncreator.createDialArcDayLength();
         matrixDayLength = Suncreator.createMatrixDayLength();
-        matrixLongitude = Suncreator.createMatrixLongitude();
-        matrixLatitude = Suncreator.createMatrixLatitude();
         matrixHighNoon = Suncreator.createMatrixHighNoon();
-        matrixTimeZone = Suncreator.createMatrixTimeZone();
         nightModeOverlay = Suncreator.createNightModeOverlay();
-
-        // Control thingies
-        controlThingyHelp = Suncreator.createControlThingy(Suncreator.ControlThingyType.HELP, helpText);
-        controlThingyResize = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
-        controlThingyClose = Suncreator.createControlThingy(Suncreator.ControlThingyType.CLOSE, helpText);
-        controlThingyMaximize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MAXIMIZE, helpText);
-        controlThingyMinimize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MINIMIZE, helpText);
-        controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGTMODE, helpText);
-        controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
-        controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
-        controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
-        controlThingyDst = Suncreator.createControlThingy(Suncreator.ControlThingyType.DST, helpText);
 
         // Info overlay
         infoText = new Text();
@@ -416,43 +454,39 @@ public class Sundial {
 
         // Help overlay
         helpMarkers = new ArrayList<>();
-        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixDayLength));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixHour));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixMinute));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixDay));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixMonth));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixYear));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixTimeZone));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixLongitude));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixLatitude));
-        helpMarkers.add(Suncreator.createHelpMarker(tinyGlobeFrame));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyResize));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMaximize));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMinimize));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyClose));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyNightmode));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst));
-        helpMarkers.add(Suncreator.createHelpMarker(controlNightCompression));
+        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixDayLength, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixHour, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixMinute, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixDay, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixMonth, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixYear, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixTimeZone, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixLongitude, masterCoordinatesGroup.visibleProperty()));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixLatitude, masterCoordinatesGroup.visibleProperty()));
+        helpMarkers.add(Suncreator.createHelpMarker(tinyGlobeFrame, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyResize, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMaximize, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMinimize, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyClose, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyNightmode, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst, null));
 
         helpOverlay = Suncreator.createHelpOverlay(helpMarkers, globeMasterGroup);
         helpTextGroup = Suncreator.createHelpTextGroup(helpText);
 
 
         // LAYERS
-        masterTimeGroup = new Group(controlNightCompression, matrixDate, matrixTime, controlThingyDst);
-        masterCoordinatesGroup = new Group(matrixLongitude, matrixLatitude);
-
         SubScene backgroundScene = Suncreator.createBackgroundSubScene(dialMarginCircle);
 
         Group foregroundGroup = new Group();
-        foregroundGroup.getChildren().add(globeMasterGroup);
         foregroundGroup.getChildren().add(dialCircleBackground);
         foregroundGroup.getChildren().add(dialArcNight);
         foregroundGroup.getChildren().add(dialArcMidnight);
+        foregroundGroup.getChildren().add(globeMasterGroup);
         foregroundGroup.getChildren().add(dialMinuteMarkers);
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().addAll(dialHourLineMarkerGroup);
@@ -468,30 +502,15 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialArcDayLength);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(matrixHighNoon);
-       foregroundGroup.getChildren().add(masterTimeGroup);
-        foregroundGroup.getChildren().add(matrixTimeZone);
+        foregroundGroup.getChildren().add(masterTimeGroup);
         foregroundGroup.getChildren().add(masterCoordinatesGroup);
-
-        outerControlsGroup = new Group(
-                controlThingyResize,
-                controlThingyClose,
-                controlThingyMaximize,
-                controlThingyMinimize,
-                controlThingyNightmode,
-                controlThingyAlwaysOnTop,
-                controlThingyHelp
-        );
-
         foregroundGroup.getChildren().add(outerControlsGroup);
         foregroundGroup.getChildren().add(controlThingyGlobeGrid);
         foregroundGroup.getChildren().add(controlThingyGlobeLines);
-
         foregroundGroup.getChildren().add(tinyGlobeGroup);
-
         foregroundGroup.getChildren().add(helpOverlay);
         foregroundGroup.getChildren().add(helpTextGroup);
         foregroundGroup.getChildren().add(infoTextGroup);
-
         foregroundGroup.getChildren().add(nightModeOverlay);
 
         SubScene foregroundScene = new SubScene(foregroundGroup, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, SceneAntialiasing.DISABLED);
@@ -502,8 +521,8 @@ public class Sundial {
 
 
         // EVENTS
-        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW2); });
-        controlNightCompression.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2); });
+//        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW2); });
+//        controlNightCompression.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2); });
 
         matrixYear.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_YEAR); matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, Sunconfig.MATRIX_GLOW); });
         matrixYear.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixYear.setCursor(Cursor.DEFAULT); setGroupGlow(matrixYear, Sunconfig.MATRIX_SHADOW); });
@@ -1021,49 +1040,57 @@ public class Sundial {
 
     public void setGlobeVisibility(boolean visibleEh) {
 
-        int tinyGlobeMoveRate = globeAnimationOnEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
+        if (visibleEh) {
+            masterCoordinatesGroup.setVisible(true);
+            globeMasterGroup.setVisible(true);
+        }
 
-        tinyGlobeMoveOutTimeline.setRate(tinyGlobeMoveRate);
-        tinyGlobeMoveInTimeline.setRate(tinyGlobeMoveRate);
+        int animationRate = globeAnimationOnEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
 
+        tinyGlobeMoveOutTimeline.setRate(animationRate);
+        tinyGlobeMoveInTimeline.setRate(animationRate);
+        timeAndDateMoveOutTimeline.setRate(animationRate);
+        timeAndDateMoveInTimeline.setRate(animationRate);
+        coordinatesMoveOutTimeline.setRate(animationRate);
+        coordinatesMoveInTimeline.setRate(animationRate);
+        globeMoveOutTimeline.setRate(animationRate);
+        globeMoveInTimeline.setRate(animationRate);
+
+        if (tinyGlobeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveOutTimeline.stop(); }
+        if (tinyGlobeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveInTimeline.stop(); }
+        if (timeAndDateMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { timeAndDateMoveOutTimeline.stop(); }
+        if (timeAndDateMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { timeAndDateMoveInTimeline.stop(); }
+        if (coordinatesMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { coordinatesMoveOutTimeline.stop(); }
+        if (coordinatesMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { coordinatesMoveInTimeline.stop(); }
+        if (globeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { globeMoveOutTimeline.stop(); }
+        if (globeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { globeMoveInTimeline.stop(); }
+
+        if (visibleEh) {
+            tinyGlobeMoveOutTimeline.play();
+            timeAndDateMoveOutTimeline.play();
+            coordinatesMoveOutTimeline.play();
+            globeMoveOutTimeline.play();
+        }
+        else {
+            tinyGlobeMoveInTimeline.play();
+            timeAndDateMoveInTimeline.play();
+            coordinatesMoveInTimeline.play();
+            globeMoveInTimeline.play();
+        }
+
+        controlThingyGlobeGrid.setVisible(visibleEh);
+        controlThingyGlobeLines.setVisible(visibleEh);
         dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINAL);
-        dialArcNight.setOpacity(visibleEh ? 0 : 1);
-
         dialArcDayLength.setOpacity(visibleEh ? Sunconfig.DAYLENGTH_ARC_OPACITY / 2 : Sunconfig.DAYLENGTH_ARC_OPACITY);
         dialArcDayLength.setStrokeWidth(visibleEh ? Sunconfig.DAYLENGTH_STROKE_WIDTH / 2 : Sunconfig.DAYLENGTH_STROKE_WIDTH);
         matrixDayLength.setOpacity(visibleEh ? 0.65 : 1);
+        matrixTimeZone.setOpacity(visibleEh ? Sunconfig.MATRIX_TIMEZONE_GLOBE_OPACITY : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
         for (Node hourLineMarker : dialHourLineMarkerGroup.getChildren()) {
             ((Line) hourLineMarker).setStroke(visibleEh ? Color.WHITE : Color.BLACK);
         }
 
-        dialArcMidnight.setVisible(!visibleEh);
-        dialCircleBackground.setVisible(!visibleEh);
-
-        globeMasterGroup.setVisible(visibleEh);
-        matrixLongitude.setVisible(visibleEh);
-        matrixLatitude.setVisible(visibleEh);
-        matrixTimeZone.setVisible(visibleEh);
-        controlThingyGlobeGrid.setVisible(visibleEh);
-        controlThingyGlobeLines.setVisible(visibleEh);
-        dialCircleCenterPoint.setVisible(visibleEh);
-
-        if (tinyGlobeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveOutTimeline.stop(); }
-        if (tinyGlobeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveInTimeline.stop(); }
-
-        if (visibleEh) {
-            tinyGlobeMoveOutTimeline.play();
-        }
-        else {
-            tinyGlobeMoveInTimeline.play();
-        }
-
-
         // Transforms
-        masterTimeGroup.setScaleX(visibleEh ? 0.65 : 1);
-        masterTimeGroup.setScaleY(visibleEh ? 0.65 : 1);
-        masterTimeGroup.setTranslateY(visibleEh ? 115 : 0);
-
         ((Line) ((Group) horizonGroup.getChildren().get(0)).getChildren().get(0)).setStartY(visibleEh ? Sunconfig.SUNRISE_DIAL_SHORT_LENGTH : Sunconfig.SUNRISE_DIAL_LENGTH);
         ((Line) ((Group) horizonGroup.getChildren().get(1)).getChildren().get(0)).setStartY(visibleEh ? Sunconfig.SUNSET_DIAL_SHORT_LENGTH : Sunconfig.SUNSET_DIAL_LENGTH);
 
@@ -1215,16 +1242,13 @@ public class Sundial {
     }
 
     public void toggleNightmode() {
+
         nightmodeEh = !nightmodeEh;
         nightModeOverlay.setVisible(nightmodeEh);
 
-//        outerControlsGroup.setOpacity(nightmodeEh ? 0.6 : 1.0);
         for (Node node : outerControlsGroup.getChildren()) {
             ((ControlThingy) node).toggleNightMode();
         }
-
-//        tinyGlobeFrame.setFill(nightmodeEh ? Color.BLACK : Sunconfig.Color_Of_Void);
-//        tinyGlobeFrame.setBlendMode(nightmodeEh ? BlendMode.BLUE : BlendMode.SRC_OVER);
 
         controlThingyNightmode.toggleState();
     }

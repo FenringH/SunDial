@@ -281,12 +281,16 @@ public class Sunface extends Application {
 
         sundial.getControlThingyGlobeLines().setOnMouseClicked(event -> sundial.toggleGlobeLines());
 
-        sundial.getControlThingyDst().setOnMouseClicked(event -> toggleDst());
+//        sundial.getControlThingyDst().setOnMouseClicked(event -> toggleDst());
+        sundial.getControlThingyDst().setOnMousePressed(event -> saveMouse(primaryStage, event));
+        sundial.getControlThingyDst().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
+        sundial.getControlThingyDst().setOnMouseDragged(event -> nightCompressionDrag(sundial, event));
+        sundial.getControlThingyDst().setOnScroll(event -> nightCompressionDrag(sundial, event));
 
-        sundial.getControlNightCompression().setOnMousePressed(event -> saveMouse(primaryStage, event));
-        sundial.getControlNightCompression().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
-        sundial.getControlNightCompression().setOnMouseDragged(event -> nightCompressionDrag(sundial, event));
-        sundial.getControlNightCompression().setOnScroll(event -> nightCompressionDrag(sundial, event));
+//        sundial.getControlNightCompression().setOnMousePressed(event -> saveMouse(primaryStage, event));
+//        sundial.getControlNightCompression().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
+//        sundial.getControlNightCompression().setOnMouseDragged(event -> nightCompressionDrag(sundial, event));
+//        sundial.getControlNightCompression().setOnScroll(event -> nightCompressionDrag(sundial, event));
 
         sundial.getDialMarginCircle().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getDialMarginCircle().setOnMouseReleased(event -> { /* NO ACTIONS */ killMouse(); });
@@ -1032,6 +1036,12 @@ public class Sunface extends Application {
 
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
+
+        // LMB action -> toggleDST
+        if(getLastButton().equals(MouseButton.PRIMARY)) {
+            toggleDst();
+            return;
+        }
 
         // MMB action -> reset window size
         if(getLastButton().equals(MouseButton.MIDDLE)) {
