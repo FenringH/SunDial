@@ -149,6 +149,10 @@ public class Sundial {
     private Timeline coordinatesMoveInTimeline;
     private Timeline globeMoveOutTimeline;
     private Timeline globeMoveInTimeline;
+    private Timeline horizonMoveOutTimeline;
+    private Timeline horizonMoveInTimeline;
+    private Timeline dialHourMoveOutTimeline;
+    private Timeline dialHourMoveInTimeline;
 
     private Text helpText;
     private Group helpTextGroup;
@@ -360,6 +364,9 @@ public class Sundial {
         );
         horizonGroup.setMouseTransparent(true);
 
+        horizonMoveOutTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.OUT, horizonGroup);
+        horizonMoveInTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.IN, horizonGroup);
+
         // Control thingies
         controlThingyHelp = Suncreator.createControlThingy(Suncreator.ControlThingyType.HELP, helpText);
         controlThingyResize = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
@@ -454,26 +461,26 @@ public class Sundial {
 
         // Help overlay
         helpMarkers = new ArrayList<>();
-        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixDayLength, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixHour, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixMinute, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixDay, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixMonth, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixYear, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixTimeZone, null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixLongitude, masterCoordinatesGroup.visibleProperty()));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixLatitude, masterCoordinatesGroup.visibleProperty()));
-        helpMarkers.add(Suncreator.createHelpMarker(tinyGlobeFrame, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyResize, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMaximize, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMinimize, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyClose, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyNightmode, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null));
-        helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst, null));
+        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup, null,  null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixDayLength, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixHour, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixMinute, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixDay, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixMonth, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixYear, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixTimeZone, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixLongitude, masterCoordinatesGroup.visibleProperty(), masterCoordinatesGroup.opacityProperty()));
+        helpMarkers.add(Suncreator.createHelpMarker(matrixLatitude, masterCoordinatesGroup.visibleProperty(), masterCoordinatesGroup.opacityProperty()));
+        helpMarkers.add(Suncreator.createHelpMarker(tinyGlobeFrame, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyResize, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMaximize, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyMinimize, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyClose, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyNightmode, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst, null, null));
 
         helpOverlay = Suncreator.createHelpOverlay(helpMarkers, globeMasterGroup);
         helpTextGroup = Suncreator.createHelpTextGroup(helpText);
@@ -1047,6 +1054,8 @@ public class Sundial {
 
         int animationRate = globeAnimationOnEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
 
+        MorphingPolygon dialLocalHourMorphingPolygon = (MorphingPolygon) dialLocalHourGroup.getChildren().get(0);
+
         tinyGlobeMoveOutTimeline.setRate(animationRate);
         tinyGlobeMoveInTimeline.setRate(animationRate);
         timeAndDateMoveOutTimeline.setRate(animationRate);
@@ -1055,49 +1064,53 @@ public class Sundial {
         coordinatesMoveInTimeline.setRate(animationRate);
         globeMoveOutTimeline.setRate(animationRate);
         globeMoveInTimeline.setRate(animationRate);
+        horizonMoveOutTimeline.setRate(animationRate);
+        horizonMoveInTimeline.setRate(animationRate);
+        dialLocalHourMorphingPolygon.setRate(animationRate);
 
-        if (tinyGlobeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveOutTimeline.stop(); }
-        if (tinyGlobeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { tinyGlobeMoveInTimeline.stop(); }
-        if (timeAndDateMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { timeAndDateMoveOutTimeline.stop(); }
-        if (timeAndDateMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { timeAndDateMoveInTimeline.stop(); }
-        if (coordinatesMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { coordinatesMoveOutTimeline.stop(); }
-        if (coordinatesMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { coordinatesMoveInTimeline.stop(); }
-        if (globeMoveOutTimeline.getStatus().equals(Animation.Status.RUNNING)) { globeMoveOutTimeline.stop(); }
-        if (globeMoveInTimeline.getStatus().equals(Animation.Status.RUNNING)) { globeMoveInTimeline.stop(); }
+        tinyGlobeMoveOutTimeline.stop();
+        tinyGlobeMoveInTimeline.stop();
+        timeAndDateMoveOutTimeline.stop();
+        timeAndDateMoveInTimeline.stop();
+        coordinatesMoveOutTimeline.stop();
+        coordinatesMoveInTimeline.stop();
+        globeMoveOutTimeline.stop();
+        globeMoveInTimeline.stop();
+        horizonMoveOutTimeline.stop();
+        horizonMoveInTimeline.stop();
+        dialLocalHourMorphingPolygon.stopOut();
+        dialLocalHourMorphingPolygon.stopIn();
 
         if (visibleEh) {
             tinyGlobeMoveOutTimeline.play();
             timeAndDateMoveOutTimeline.play();
             coordinatesMoveOutTimeline.play();
             globeMoveOutTimeline.play();
+            horizonMoveOutTimeline.play();
+            dialLocalHourMorphingPolygon.playOut();
         }
         else {
             tinyGlobeMoveInTimeline.play();
             timeAndDateMoveInTimeline.play();
             coordinatesMoveInTimeline.play();
             globeMoveInTimeline.play();
+            horizonMoveInTimeline.play();
+            dialLocalHourMorphingPolygon.playIn();
         }
 
         controlThingyGlobeGrid.setVisible(visibleEh);
         controlThingyGlobeLines.setVisible(visibleEh);
-        dialCircleFrame.setFill(visibleEh ? Sunconfig.Color_Of_Void : Sunconfig.FRAME_DIAL_NOMINAL);
+
         dialArcDayLength.setOpacity(visibleEh ? Sunconfig.DAYLENGTH_ARC_OPACITY / 2 : Sunconfig.DAYLENGTH_ARC_OPACITY);
         dialArcDayLength.setStrokeWidth(visibleEh ? Sunconfig.DAYLENGTH_STROKE_WIDTH / 2 : Sunconfig.DAYLENGTH_STROKE_WIDTH);
         matrixDayLength.setOpacity(visibleEh ? 0.65 : 1);
+
         matrixTimeZone.setOpacity(visibleEh ? Sunconfig.MATRIX_TIMEZONE_GLOBE_OPACITY : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
         for (Node hourLineMarker : dialHourLineMarkerGroup.getChildren()) {
             ((Line) hourLineMarker).setStroke(visibleEh ? Color.WHITE : Color.BLACK);
         }
 
-        // Transforms
-        ((Line) ((Group) horizonGroup.getChildren().get(0)).getChildren().get(0)).setStartY(visibleEh ? Sunconfig.SUNRISE_DIAL_SHORT_LENGTH : Sunconfig.SUNRISE_DIAL_LENGTH);
-        ((Line) ((Group) horizonGroup.getChildren().get(1)).getChildren().get(0)).setStartY(visibleEh ? Sunconfig.SUNSET_DIAL_SHORT_LENGTH : Sunconfig.SUNSET_DIAL_LENGTH);
-
-        dialLocalHourGroup.getChildren().get(0).setVisible(!visibleEh);
-        dialLocalHourGroup.getChildren().get(1).setVisible(visibleEh);
-
-        setDialFrameWarning(warning);
     }
 
     public void setCoordinates(double longitude, double latitude) {

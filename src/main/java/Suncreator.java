@@ -582,6 +582,36 @@ public class Suncreator {
         return timeline;
     }
 
+    public static Timeline createHorizonTimeline(TimelineDirection timelineDirection, Group group) {
+
+        double startY;
+
+        Line sunriseLine = (Line) ((Group)group.getChildren().get(0)).getChildren().get(0);
+        Line sunsetLine = (Line) ((Group)group.getChildren().get(1)).getChildren().get(0);
+
+        if (timelineDirection.equals(TimelineDirection.IN)) {
+            startY = Sunconfig.SUNRISE_DIAL_LENGTH;
+        } else {
+            startY = Sunconfig.SUNRISE_DIAL_SHORT_LENGTH;
+        }
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        KeyValue keyValueSunriseStartY = new KeyValue(sunriseLine.startYProperty(), startY, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameSunriseStartY = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueSunriseStartY);
+
+        KeyValue keyValueSunsetStartY = new KeyValue(sunsetLine.startYProperty(), startY, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameSunsetStartY = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueSunsetStartY);
+
+
+        timeline.getKeyFrames().addAll(keyFrameSunriseStartY, keyFrameSunsetStartY);
+
+        return timeline;
+    }
+
     public static Timeline createTimeAndDateTimeline(TimelineDirection timelineDirection, Group group) {
 
         double slideX, slideY, scale;
@@ -1062,18 +1092,14 @@ public class Suncreator {
     public static Group createDialLocalHourGroup(Rotate dialRotateLocalHour) {
 
         Polygon dialLocalHourPolyLong = new Polygon(
-
-                // outside
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
-                - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                0, Sunconfig.MARGIN_Y/* + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2*/,
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75,
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH,
-
-                // inside
-                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40
+                0, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.40, // 1
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH, // 2
+                - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75, // 3
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 4
+                0, Sunconfig.MARGIN_Y, // 5
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 6
+                + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75, // 7
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH // 8
         );
         dialLocalHourPolyLong.setTranslateX(Sunconfig.CENTER_X);
         dialLocalHourPolyLong.setFill(new Color(1, 1, 1, 0.0));
@@ -1083,12 +1109,14 @@ public class Suncreator {
         dialLocalHourPolyLong.setVisible(true);
 
         Polygon dialLocalHourPolyShort = new Polygon(
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH,
-                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75,
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                0, Sunconfig.MARGIN_Y,
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5,
-                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75
+                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
+                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 2
+                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 3 = 2
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 4
+                0, Sunconfig.MARGIN_Y, // 5
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 6
+                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 7
+                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75 // 8 = 7
         );
         dialLocalHourPolyShort.setTranslateX(Sunconfig.CENTER_X);
         dialLocalHourPolyShort.setFill(new Color(1, 1, 1, 0.0));
@@ -1097,13 +1125,14 @@ public class Suncreator {
         dialLocalHourPolyShort.setOpacity(1);
         dialLocalHourPolyShort.setVisible(false);
 
-        Line dialLocalHourLine = new Line(Sunconfig.CENTER_X, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-        dialLocalHourLine.setStroke(Color.WHITE);
-        dialLocalHourLine.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-        dialLocalHourLine.setOpacity(1);
-        dialLocalHourLine.setVisible(false);
+        MorphingPolygon morphingPolygon = new MorphingPolygon(dialLocalHourPolyLong.getPoints(), dialLocalHourPolyShort.getPoints(), Sunconfig.TIMEANDDATE_DURATION, Interpolator.EASE_BOTH);
+        morphingPolygon.setTranslateX(Sunconfig.CENTER_X);
+        morphingPolygon.setFill(new Color(1, 1, 1, 0.0));
+        morphingPolygon.setStroke(Color.WHITE);
+        morphingPolygon.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
+        morphingPolygon.setOpacity(1);
 
-        Group dialLocalHourGroup = new Group(dialLocalHourPolyLong, dialLocalHourPolyShort);
+        Group dialLocalHourGroup = new Group(morphingPolygon/*dialLocalHourPolyLong, dialLocalHourPolyShort*/);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
         dialLocalHourGroup.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
         dialLocalHourGroup.setBlendMode(BlendMode.SCREEN);
@@ -1651,7 +1680,7 @@ public class Suncreator {
         return helpOverlay;
     }
 
-    public static Group createHelpMarker(Node node, BooleanProperty visibilityProperty) {
+    public static Group createHelpMarker(Node node, BooleanProperty visibilityProperty, DoubleProperty opacityProperty) {
 
         ObservableList<Transform> transformList = node.getTransforms();
 
@@ -1732,10 +1761,17 @@ public class Suncreator {
         if (visibilityProperty != null) {
             rectangle.visibleProperty().bind(visibilityProperty);
             circle.visibleProperty().bind(visibilityProperty);
-
         } else {
             rectangle.visibleProperty().bind(node.visibleProperty());
             circle.visibleProperty().bind(node.visibleProperty());
+        }
+
+        if (visibilityProperty != null) {
+            rectangle.opacityProperty().bind(opacityProperty);
+            circle.opacityProperty().bind(opacityProperty);
+        } else {
+            rectangle.opacityProperty().bind(node.opacityProperty());
+            circle.opacityProperty().bind(node.opacityProperty());
         }
 
         group.getChildren().addAll(rectangle, circle);
