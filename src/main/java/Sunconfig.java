@@ -234,7 +234,7 @@ public class Sunconfig {
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CONTROL_DST_RADIUS = 10.0d;
     public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
-    public static final double CETUS_MARKER_LENGTH = 40.0d;
+    public static final double CETUS_MARKER_LENGTH = 21.0d;
     public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
     public static final double HELP_MARKER_RADIUS = 4.0d;
@@ -326,7 +326,7 @@ public class Sunconfig {
     public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
     public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X/* - MARKER_HOUR_LENGTH * 2*/ - CONTROL_GLOBEGRID_RADIUS;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
-    public static final double CETUS_TIMER_OFFSET = 160.0d;
+    public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     public static final double CETUS_HORIZON_OFFSET = 45.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 45.0d;
@@ -581,8 +581,8 @@ public class Sunconfig {
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.83, Color_Of_Void),
-            new Stop(0.96, Color_Of_CetusArc)
+            new Stop(0.87, Color_Of_Void),
+            new Stop(0.95, Color_Of_CetusArc)
     );
 
     public static final RadialGradient CETUS_ARC_GRADIENT_HOVER = new RadialGradient(

@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -162,7 +161,7 @@ public class Sundial {
     public boolean globeVisibleEh = false;
     private boolean cetusTimeVisibleEh = false;
     public boolean ledAnimationOnEh = true;
-    public boolean globeAnimationOnEh = true;
+    public boolean globeAnimationEh = true;
     public boolean helpEh = false;
     public boolean nightmodeEh = false;
 
@@ -1052,7 +1051,7 @@ public class Sundial {
             globeMasterGroup.setVisible(true);
         }
 
-        int animationRate = globeAnimationOnEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
+        int animationRate = globeAnimationEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
 
         MorphingPolygon dialLocalHourMorphingPolygon = (MorphingPolygon) dialLocalHourGroup.getChildren().get(0);
 
@@ -1232,7 +1231,7 @@ public class Sundial {
     public void toggleAnimation() {
 
         ledAnimationOnEh = !ledAnimationOnEh;
-        globeAnimationOnEh = !globeAnimationOnEh;
+        globeAnimationEh = !globeAnimationEh;
 
         for (Timeline timeline : cetusMarkerHoverTransitionList) {
             if (ledAnimationOnEh) {

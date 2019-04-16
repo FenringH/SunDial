@@ -205,7 +205,6 @@ public class Suncreator {
             BooleanProperty linesVisibleEh
     ) {
 
-
         // 3D objects
         Globe dayGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.GLOBE_ROTATE_DURATION);
         dayGlobe.setLayoutX(Sunconfig.CENTER_X);
@@ -347,10 +346,10 @@ public class Suncreator {
         Circle globeAtmosphere = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, atmosphereRadius);
         globeAtmosphere.setStroke(Sunconfig.Color_Of_Void);
         globeAtmosphere.setMouseTransparent(true);
-        globeAtmosphere.setBlendMode(BlendMode.SCREEN);
+//        globeAtmosphere.setBlendMode(BlendMode.SCREEN);
 
 
-        // Bindings for color changes of atmosphere nad terminator line while changig globe rotation
+        // Bindings for color changes of atmosphere nad terminator line while changing globe rotation
         dayTerminatorLine.getRingMaterial().diffuseColorProperty().bind(Bindings.createObjectBinding(() -> {
 
             double dayLightSceneZ = dayGlobe.getDayLight().localToSceneTransformProperty().get().getTz()
@@ -464,12 +463,14 @@ public class Suncreator {
     public static Group createTinyGlobe(DoubleProperty longitude, DoubleProperty latitude, DoubleProperty phase, DoubleProperty tilt) {
 
         Globe tinyGlobe = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.TINYGLOBE_RADIUS, Sunconfig.GLOBE_ROTATE_DURATION);
-        tinyGlobe.setDayLightColor(Color.WHITE);
-        tinyGlobe.setNightLightColor(Color.RED);
-        tinyGlobe.setAmbientLightColor(Sunconfig.Color_Of_TinyAmbient);
-        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
-        tinyGlobe.setSpecularColor(new Color(0.75, 0.75, 0.75, 1.00));
+        tinyGlobe.setDayLightColor(Sunconfig.Color_Of_DayDay);
+        tinyGlobe.setDayReverseLightColor(Sunconfig.Color_Of_DayReverse);
+        tinyGlobe.setNightLightColor(Color.BLACK);
+        tinyGlobe.setAmbientLightColor(Sunconfig.Color_Of_DayAmbient);
+        tinyGlobe.setSpecularColor(Sunconfig.Color_Of_DaySpecular);
         tinyGlobe.setSpecularPower(6);
+        tinyGlobe.setReverseSpecularPower(12);
+        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         tinyGlobe.setLayoutX(Sunconfig.CENTER_X);
         tinyGlobe.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
         tinyGlobe.longitudeProperty().bind(longitude);
@@ -478,6 +479,20 @@ public class Suncreator {
         tinyGlobe.tiltProperty().bind(tilt);
 
         SubScene tinyGlobeScene = new SubScene(tinyGlobe, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        Globe tinyGlobeNight = new Globe(Sunconfig.GLOBE_DAY_IMAGE, Sunconfig.TINYGLOBE_RADIUS, Sunconfig.GLOBE_ROTATE_DURATION);
+        tinyGlobeNight.setDayLightColor(Color.BLACK);
+        tinyGlobeNight.setAmbientLightColor(Sunconfig.Color_Of_TinyAmbient);
+        tinyGlobeNight.setNightLightColor(Color.RED);
+        tinyGlobeNight.setLayoutX(Sunconfig.CENTER_X);
+        tinyGlobeNight.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
+        tinyGlobeNight.longitudeProperty().bind(longitude);
+        tinyGlobeNight.latitudeProperty().bind(latitude);
+        tinyGlobeNight.phaseProperty().bind(phase);
+        tinyGlobeNight.tiltProperty().bind(tilt);
+
+        SubScene tinyGlobeNightScene = new SubScene(tinyGlobeNight, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
+        tinyGlobeNightScene.setBlendMode(BlendMode.LIGHTEN);
 
         Ring tinyDayTerminatorLine = new Ring(Sunconfig.TINYGLOBE_RADIUS, Sunconfig.TINYGLOBE_TERMINATOR_WIDTH, Sunconfig.Color_Of_TerminatorLine, Sunconfig.GLOBE_ROTATE_DURATION);
         tinyDayTerminatorLine.setTranslateX(Sunconfig.CENTER_X);
@@ -498,7 +513,7 @@ public class Suncreator {
         tinyGlobeDot.setTranslateX(Sunconfig.CENTER_X);
         tinyGlobeDot.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
 
-        Group tinyGlobeGroup = new Group(tinyGlobeScene, tinyDayTerminatorLineScene, tinyGlobeDot);
+        Group tinyGlobeGroup = new Group(tinyGlobeScene, tinyGlobeNightScene, tinyDayTerminatorLineScene, tinyGlobeDot);
 
         return tinyGlobeGroup;
     }
@@ -813,6 +828,7 @@ public class Suncreator {
             cetusArcGroup.getChildren().addAll(nightArc);
             cetusHorizonGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
 
+            // Animations
             Timeline cetusMarkerTransitionOn = new Timeline();
             cetusMarkerTransitionOn.setCycleCount(1);
             cetusMarkerTransitionOn.setRate(1);
@@ -822,9 +838,9 @@ public class Suncreator {
             KeyFrame keyFrameStartOpacityOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueStartOpacityOn);
             KeyValue keyValueEndOpacityOn = new KeyValue(matrixEnd.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
             KeyFrame keyFrameEndOpacityOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueEndOpacityOn);
-            KeyValue keyValueLineStartOn = new KeyValue(markerLineStart.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH * 2, Interpolator.EASE_BOTH);
+            KeyValue keyValueLineStartOn = new KeyValue(markerLineStart.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH * 4, Interpolator.EASE_BOTH);
             KeyFrame keyFrameLineStartOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueLineStartOn);
-            KeyValue keyValueLineEndOn = new KeyValue(markerLineEnd.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH * 2, Interpolator.EASE_BOTH);
+            KeyValue keyValueLineEndOn = new KeyValue(markerLineEnd.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH * 4, Interpolator.EASE_BOTH);
             KeyFrame keyFrameLineEndOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueLineEndOn);
 
             cetusMarkerTransitionOn.getKeyFrames().addAll(keyFrameStartOpacityOn, keyFrameEndOpacityOn, keyFrameLineStartOn, keyFrameLineEndOn);
@@ -845,8 +861,28 @@ public class Suncreator {
 
             cetusMarkerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
 
-            nightArc.setOnMouseEntered(event -> cetusMarkerTransitionOn.play());
-            nightArc.setOnMouseExited(event -> cetusMarkerTransitionOff.play());
+            nightArc.fillProperty().bind(Bindings.createObjectBinding(() -> {
+                double stop1 = 0.87 - (3 * 0.13 * matrixStart.opacityProperty().get());
+                double stop2 = 0.95 - (3 * 0.05 * matrixStart.opacityProperty().get());
+                return new RadialGradient(
+                        0, 0,
+                        Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y,
+                        false,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(stop1, Sunconfig.Color_Of_Void),
+                        new Stop(stop2, Sunconfig.Color_Of_CetusArc)
+                );
+            }, matrixStart.opacityProperty()));
+
+            // Events
+            nightArc.setOnMouseEntered(event -> {
+                cetusMarkerTransitionOff.stop();
+                cetusMarkerTransitionOn.play();
+            });
+            nightArc.setOnMouseExited(event -> {
+                cetusMarkerTransitionOn.stop();
+                cetusMarkerTransitionOff.play();
+            });
 
             // these are sent back
             cetusMarkerAngleList.add(startAngle);
@@ -1670,8 +1706,9 @@ public class Suncreator {
         helpGlobeMarker.setStroke(Color.WHITE);
         helpGlobeMarker.setStyle(Sunconfig.HELP_MARKER_GLOW);
         helpGlobeMarker.setMouseTransparent(true);
-        helpGlobeMarker.visibleProperty().bind(globeMasterGroup.visibleProperty());
 
+
+        // Full help overlay with cutouts and markers
         helpOverlay.getChildren().addAll(backdropGroup, helpWindowMarker, helpGlobeMarker);
         helpOverlay.getChildren().addAll(helpMarkers);
         helpOverlay.setVisible(false);

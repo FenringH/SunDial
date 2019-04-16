@@ -607,7 +607,7 @@ public class Sunface extends Application {
             latitude = customLatitude;
         }
 
-        if (sundial.globeAnimationOnEh) {
+        if (sundial.globeAnimationEh) {
             sundial.getLongitudeTimeline().setOnFinished(event -> initCurrentTime());
             sundial.rotateGlobeAnimated(longitude, latitude);
         } else {
