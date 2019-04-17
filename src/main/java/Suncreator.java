@@ -37,7 +37,8 @@ public class Suncreator {
         ALWAYSONTOP,
         GLOBEGRID,
         GLOBELINES,
-        DST
+        DST,
+        ANIMATION
     };
 
     public static ControlThingy createControlThingy(ControlThingyType type, Text helpText) {
@@ -57,6 +58,19 @@ public class Suncreator {
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_DEFAULT, helpText)
                         .thankYou();
+                break;
+            case ANIMATION:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_ANIMATION_OFFSET, Sunconfig.CONTROL_ANIMATION_ANGLE)
+                        .size(Sunconfig.CONTROL_ANIMATION_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_ANIMATION_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_ANIMATION, helpText)
+                        .thankYou();
+                controlThingy.toggleState();
                 break;
             case RESIZE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()

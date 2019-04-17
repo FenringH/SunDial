@@ -153,8 +153,7 @@ public class Sunconfig {
             "\n LMB : toggle Always-On-Top";
 
     public static final String HELPTEXT_HIGHNOON = "HIGH NOON" +
-            "\n HOVER : show High Noon time" +
-            "\n LMB : toggle Animations";
+            "\n HOVER : toggle High Noon time";
 
     public static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
             "\n LMB : toggle Globe-mode" +
@@ -176,6 +175,9 @@ public class Sunconfig {
 
     public static final String HELPTEXT_WINDOW = "WINDOW" +
             "\n LMB : move Window";
+
+    public static final String HELPTEXT_ANIMATION = "ANIMATION" +
+            "\n LMB : toggle Animation";
 
     public static final String HELPTEXT_DST = "DAYLIGHT SAVING TIME" +
             "\n LMB : toggle Daylight Saving Time" +
@@ -231,9 +233,9 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_RADIUS = 10.0d;
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
+    public static final double CONTROL_ANIMATION_RADIUS = 6.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CONTROL_DST_RADIUS = 10.0d;
-    public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
     public static final double CETUS_MARKER_LENGTH = 21.0d;
     public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
@@ -241,6 +243,7 @@ public class Sunconfig {
     public static final double HELP_MARKER_MARGIN = 6.0d;
     public static final double NIGHTMODE_RECTANGLE_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
+    public static final double SUNHIGHNOON_RADIUS = 130;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
@@ -260,6 +263,7 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 3.0d;
+    public static final double CONTROL_ANIMATION_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_DST_STROKE_WIDTH = 3.0d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
@@ -324,6 +328,7 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
     public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
+    public static final double CONTROL_ANIMATION_OFFSET = 236.0d;
     public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X/* - MARKER_HOUR_LENGTH * 2*/ - CONTROL_GLOBEGRID_RADIUS;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
     public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
@@ -331,7 +336,7 @@ public class Sunconfig {
     public static final double CETUS_HORIZON_OFFSET = 45.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 45.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
-    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 45;
+    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 25;
     public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 20;
     public static final double CONTROL_DST_OFFSET_X = CENTER_X;
     public static final double CONTROL_DST_OFFSET_Y = CENTER_Y;
@@ -353,6 +358,8 @@ public class Sunconfig {
     public static final double MATRIX_TIMEZONE_SCALE = 1.10d;
     public static final double MATRIX_HIGHNOON_SCALE = 1.00d;
     public static final double MATRIX_CONTROLTHINGY_SCALE = 1.25d;
+    public static final double MATRIX_SUNHIGHNOON_SCALE = 1.00d;
+    public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
 
     public static final double CONTROL_CLOSE_ANGLE = 37.0d;
     public static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
@@ -360,6 +367,7 @@ public class Sunconfig {
     public static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MAXIMIZE_ANGLE;
     public static final double CONTROL_NIGHTMODE_ANGLE = 180 - CONTROL_CLOSE_ANGLE;
     public static final double CONTROL_ALWAYSONTOP_ANGLE = 180 - CONTROL_MINIMIZE_ANGLE;
+    public static final double CONTROL_ANIMATION_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 8;
     public static final double CONTROL_GLOBEGRID_ANGLE = CONTROL_MINIMIZE_ANGLE;
 
     public static final int LED_OPACITY_DURATION = 350;

@@ -281,16 +281,12 @@ public class Sunface extends Application {
 
         sundial.getControlThingyGlobeLines().setOnMouseClicked(event -> sundial.toggleGlobeLines());
 
-//        sundial.getControlThingyDst().setOnMouseClicked(event -> toggleDst());
+        sundial.getControlThingyAnimation().setOnMouseClicked(event -> sundial.toggleAnimation());
+
         sundial.getControlThingyDst().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getControlThingyDst().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
         sundial.getControlThingyDst().setOnMouseDragged(event -> nightCompressionDrag(sundial, event));
         sundial.getControlThingyDst().setOnScroll(event -> nightCompressionDrag(sundial, event));
-
-//        sundial.getControlNightCompression().setOnMousePressed(event -> saveMouse(primaryStage, event));
-//        sundial.getControlNightCompression().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
-//        sundial.getControlNightCompression().setOnMouseDragged(event -> nightCompressionDrag(sundial, event));
-//        sundial.getControlNightCompression().setOnScroll(event -> nightCompressionDrag(sundial, event));
 
         sundial.getDialMarginCircle().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getDialMarginCircle().setOnMouseReleased(event -> { /* NO ACTIONS */ killMouse(); });
@@ -350,7 +346,7 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTimeByEvent(OffsetType.WEEK, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTimeByEvent(OffsetType.WEEK, event));
 
-        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleAnimation());
+        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleSunHighNoon());
 
         sundial.getMatrixDayLength().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
 
@@ -469,11 +465,13 @@ public class Sunface extends Application {
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, offsetLocalTime.getTimeZone());
 
-            sundial.setHighNoon(highNoonDate);
+            double noonAngle = latitude - suntimeGlobal.getRealTimeDeclinationOfTheSun(newJulianDayNumber - 0.5);
+
             sundial.setHorizon(sunriseDate, sunsetDate);
             sundial.setCoordinates(longitude, latitude);
             sundial.setCetusTime(cetusNightList, timeZonedCalendar, timeZoneCorrection);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
+            sundial.setHighNoon(highNoonDate, noonAngle);
 
             sunyear.setLocalDate(offsetLocalTime);
         }
@@ -607,7 +605,8 @@ public class Sunface extends Application {
             latitude = customLatitude;
         }
 
-        if (sundial.globeAnimationEh) {
+
+        if (sundial.getGlobeAnimationEh()) {
             sundial.getLongitudeTimeline().setOnFinished(event -> initCurrentTime());
             sundial.rotateGlobeAnimated(longitude, latitude);
         } else {
@@ -950,7 +949,7 @@ public class Sunface extends Application {
     // *** Mouse HELPERS
 
     private void globeCheck() {
-        if (sundial.globeVisibleEh) {
+        if (sundial.getGlobeVisibleEh()) {
             if (getLastButton().equals(MouseButton.PRIMARY) || getLastButton().equals(MouseButton.SECONDARY)) {
                 sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_TRANSPARENT_OPACITY);
             } else {
@@ -1091,7 +1090,7 @@ public class Sunface extends Application {
 
     private void coordinateActions(Stage stage, PositionType positionType, MouseEvent event) {
 
-        if (sundial.globeVisibleEh) { sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_DEFAULT_OPACITY); }
+        if (sundial.getGlobeVisibleEh()) { sundial.setTimeDisplayOpacity(Sunconfig.TIMEDATE_DEFAULT_OPACITY); }
 
         // Do no action if mouse left original control surface (node)
         if (!sameNodeEh(event)) { return; }
@@ -1391,7 +1390,7 @@ public class Sunface extends Application {
 
     private void frameDrag(Stage stage, MouseEvent event) {
 
-        if (sundial.globeVisibleEh) {
+        if (sundial.getGlobeVisibleEh()) {
             rotateGlobe(sundial, event);
         } else {
             changeWindowPosition(stage, event);

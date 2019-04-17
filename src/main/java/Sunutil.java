@@ -129,7 +129,7 @@ public class Sunutil {
         String coordinateString = coordinateFormat.format(coordinate);
 
         String whole = "   " + coordinateString.replace("-", "").split("[.,]")[0];
-        whole = whole.substring(whole.length() - 3, whole.length());
+        whole = whole.substring(whole.length() - 3);
 
         String decimal = coordinateString.split("[.,]")[1].substring(0, 2);
 
