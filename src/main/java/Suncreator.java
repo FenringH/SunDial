@@ -38,7 +38,8 @@ public class Suncreator {
         GLOBEGRID,
         GLOBELINES,
         DST,
-        ANIMATION
+        ANIMATION,
+        CHART
     };
 
     public static ControlThingy createControlThingy(ControlThingyType type, Text helpText) {
@@ -56,7 +57,21 @@ public class Suncreator {
                         .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
-                        .helpText(Sunconfig.HELPTEXT_DEFAULT, helpText)
+                        .helpText(Sunconfig.HELPTEXT_HELP, helpText)
+                        .thankYou();
+                break;
+            case CHART:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_CHART_OFFSET, Sunconfig.CONTROL_CHART_ANGLE)
+                        .size(Sunconfig.CONTROL_CHART_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_CHART_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("Y", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.50)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_CHART, helpText)
                         .thankYou();
                 break;
             case ANIMATION:
@@ -66,11 +81,12 @@ public class Suncreator {
                         .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_ANIMATION_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("A", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.50)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_ANIMATION, helpText)
                         .thankYou();
-                controlThingy.toggleState();
                 break;
             case RESIZE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
@@ -711,6 +727,37 @@ public class Suncreator {
         KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueOpacity);
 
         timeline.getKeyFrames().addAll(keyFrameOpacity, keyFrameSlideX, keyFrameSlideY);
+
+        return timeline;
+    }
+
+    public static Timeline createHighNoonTimeline(TimelineDirection timelineDirection, Group group, Scale scaleTransform) {
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        double scale, opacity;
+
+        if (timelineDirection.equals(TimelineDirection.IN)) {
+            scale = 1;
+            opacity = 1;
+        } else {
+            scale = Sunconfig.HIGHNOON_DOWN_SCALE;
+            opacity = Sunconfig.HIGHNOON_DOWN_OPACITY;
+        }
+
+        KeyValue keyValueOpacity = new KeyValue(group.opacityProperty(), opacity, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueOpacity);
+
+        KeyValue keyValueScaleX = new KeyValue(scaleTransform.xProperty(), scale, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleX = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueScaleX);
+
+        KeyValue keyValueScaleY = new KeyValue(scaleTransform.yProperty(), scale, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameScaleY = new KeyFrame(Duration.millis(Sunconfig.TIMEANDDATE_DURATION), keyValueScaleY);
+
+        timeline.getKeyFrames().addAll(keyFrameOpacity, keyFrameScaleX, keyFrameScaleY);
 
         return timeline;
     }
@@ -1495,6 +1542,7 @@ public class Suncreator {
         matrixDayLength.setLayoutX(Sunconfig.CENTER_X - matrixDayLength.getLayoutBounds().getWidth() / 2);
         matrixDayLength.setLayoutY(Sunconfig.CENTER_Y + matrixDayLength.getLayoutBounds().getHeight() - Sunconfig.DAYLENGTH_ARC_RADIUS * 0.95);
         matrixDayLength.setStyle(Sunconfig.LOCALTIME_SHADOW);
+        matrixDayLength.setMouseTransparent(true);
         return matrixDayLength;
     }
 

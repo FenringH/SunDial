@@ -1,3 +1,5 @@
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.effect.BlendMode;
@@ -37,6 +39,7 @@ public class ControlThingy extends Group {
     private Polygon triangle;
     private Polygon overlayTriangle;
     private DotMatrix dotMatrix;
+    private BooleanProperty stateProperty;
 
     public ControlThingy(PleaseBuildControlThingy builder) {
 
@@ -64,6 +67,9 @@ public class ControlThingy extends Group {
 
         this.cycle = 0;
         this.onEh = false;
+
+        this.stateProperty = new SimpleBooleanProperty(this.onEh);
+        this.stateProperty.addListener((observable, oldValue, newValue) -> changeState(this.stateProperty.get()));
 
 
         if (type.equals(Type.CIRCLE)) {
@@ -302,11 +308,16 @@ public class ControlThingy extends Group {
     }
 
     // Methods
-    public void toggleState() {
-        onEh = !onEh;
+    public void changeState(boolean state) {
+        onEh = state;
         if (circle != null) { circle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
         if (triangle != null) { triangle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
         if (dotMatrix != null) { dotMatrix.setFill(onEh ? matrixColorOn : matrixColorOff); }
+    }
+
+    public void toggleState() {
+        onEh = !onEh;
+        changeState(onEh);
     }
 
     public void setPosition(double x, double y) {
@@ -339,5 +350,9 @@ public class ControlThingy extends Group {
     // Getterers
     public boolean getState() {
         return onEh;
+    }
+
+    public BooleanProperty stateProperty() {
+        return stateProperty;
     }
 }

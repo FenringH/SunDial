@@ -191,4 +191,19 @@ public class Sunutil {
 
         return new Color(r/N, g/N, b/N, a/N);
     }
+
+    public static long rotateTimeZoneOffset(long timeZoneOffset) {
+
+        long result = timeZoneOffset;
+
+        if (result > (12 * 60 * 60 * 1000)) {
+            result = -11 * 60 * 60 * 1000;
+        }
+
+        if (result <= (-12 * 60 * 60 * 1000)) {
+            result =  12 * 60 * 60 * 1000;
+        }
+
+        return result;
+    }
 }

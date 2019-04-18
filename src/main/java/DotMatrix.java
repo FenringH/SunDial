@@ -45,6 +45,8 @@ public class DotMatrix extends Group {
     final private static long MATRIX_U =           0b01110_10001_10001_10001_10001_10001_10001L;
     final private static long MATRIX_C =           0b01110_10001_10000_10000_10000_10001_01110L;
     final private static long MATRIX_L =           0b11111_10000_10000_10000_10000_10000_10000L;
+    final private static long MATRIX_Y =           0b00100_00100_00100_01010_10001_10001_10001L;
+    final private static long MATRIX_A =           0b10001_10001_11111_10001_10001_01010_00100L;
     final private static long MATRIX_SPACE =       0b00000_00000_00000_00000_00000_00000_00000L;
     final private static long MATRIX_DASH =        0b00000_00000_00000_11111_00000_00000_00000L;
     final private static long MATRIX_PLUS =        0b00000_00100_00100_11111_00100_00100_00000L;
@@ -166,6 +168,8 @@ public class DotMatrix extends Group {
                 case 'U': charCode = MATRIX_U; break;
                 case 'C': charCode = MATRIX_C; break;
                 case 'L': charCode = MATRIX_L; break;
+                case 'Y': charCode = MATRIX_Y; break;
+                case 'A': charCode = MATRIX_A; break;
                 case ' ': charCode = MATRIX_SPACE; break;
                 case '-': charCode = MATRIX_DASH; break;
                 case '+': charCode = MATRIX_PLUS; break;

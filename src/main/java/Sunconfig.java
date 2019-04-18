@@ -81,9 +81,9 @@ public class Sunconfig {
 
     public static final String HELPTEXT_NIGHTCOMPRESSION = "NIGHT COMPRESSION" +
             "\n LMB + drag : change Night-Compression (slow)" +
-            "\n RMB + drag : change Night-Compression\u0165 (fast)" +
-            "\n SCROLL : change Night-Compression\u0165 (fine)" +
-            "\n MMB : reset Night-Compression\u0165";
+            "\n RMB + drag : change Night-Compression (fast)" +
+            "\n SCROLL : change Night-Compression (fine)" +
+            "\n MMB : reset Night-Compression";
 
     public static final String HELPTEXT_HOUR = "HOURS" +
             "\n LMB + drag : change Hours (slow)" +
@@ -179,6 +179,12 @@ public class Sunconfig {
     public static final String HELPTEXT_ANIMATION = "ANIMATION" +
             "\n LMB : toggle Animation";
 
+    public static final String HELPTEXT_CHART = "YEAR CHART" +
+            "\n LMB : toggle Year Chart window";
+
+    public static final String HELPTEXT_HELP = "HALP!!!" +
+            "\n LMB : toggle Help Overlay";
+
     public static final String HELPTEXT_DST = "DAYLIGHT SAVING TIME" +
             "\n LMB : toggle Daylight Saving Time" +
             "\n" + HELPTEXT_NIGHTCOMPRESSION;
@@ -234,6 +240,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
     public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
     public static final double CONTROL_ANIMATION_RADIUS = 6.0d;
+    public static final double CONTROL_CHART_RADIUS = 6.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CONTROL_DST_RADIUS = 10.0d;
     public static final double CETUS_MARKER_LENGTH = 21.0d;
@@ -264,6 +271,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 3.0d;
     public static final double CONTROL_ANIMATION_STROKE_WIDTH = 2.0d;
+    public static final double CONTROL_CHART_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_DST_STROKE_WIDTH = 3.0d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
@@ -302,6 +310,7 @@ public class Sunconfig {
     public static final double SECOND_LED_ON_OPACITY = 1.00d;
     public static final double MATRIX_TIMEZONE_DEFAULT_OPACITY = 0.65d;
     public static final double MATRIX_TIMEZONE_GLOBE_OPACITY = 1.00d;
+    public static final double HIGHNOON_DOWN_OPACITY = 0.65d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
     public static final double MATRIX_HORIZON_OFFSET = 83.0d;
@@ -328,7 +337,8 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
     public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
-    public static final double CONTROL_ANIMATION_OFFSET = 236.0d;
+    public static final double CONTROL_ANIMATION_OFFSET = 232.0d;
+    public static final double CONTROL_CHART_OFFSET = 232.0d;
     public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X/* - MARKER_HOUR_LENGTH * 2*/ - CONTROL_GLOBEGRID_RADIUS;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
     public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
@@ -359,16 +369,17 @@ public class Sunconfig {
     public static final double MATRIX_HIGHNOON_SCALE = 1.00d;
     public static final double MATRIX_CONTROLTHINGY_SCALE = 1.25d;
     public static final double MATRIX_SUNHIGHNOON_SCALE = 1.00d;
+    public static final double HIGHNOON_DOWN_SCALE = 0.825d;
     public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
 
-    public static final double CONTROL_CLOSE_ANGLE = 37.0d;
-    public static final double CONTROL_MAXIMIZE_ANGLE = 53.0d;
     public static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
-    public static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MAXIMIZE_ANGLE;
-    public static final double CONTROL_NIGHTMODE_ANGLE = 180 - CONTROL_CLOSE_ANGLE;
+    public static final double CONTROL_CLOSE_ANGLE = CONTROL_MINIMIZE_ANGLE - 8;
+    public static final double CONTROL_MAXIMIZE_ANGLE = CONTROL_MINIMIZE_ANGLE + 8;
     public static final double CONTROL_ALWAYSONTOP_ANGLE = 180 - CONTROL_MINIMIZE_ANGLE;
-    public static final double CONTROL_ANIMATION_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 8;
-    public static final double CONTROL_GLOBEGRID_ANGLE = CONTROL_MINIMIZE_ANGLE;
+    public static final double CONTROL_HELP_ANGLE = CONTROL_ALWAYSONTOP_ANGLE - 8;
+    public static final double CONTROL_NIGHTMODE_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 8;
+    public static final double CONTROL_ANIMATION_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 14;
+    public static final double CONTROL_CHART_ANGLE = CONTROL_ANIMATION_ANGLE + 5;
 
     public static final int LED_OPACITY_DURATION = 350;
     public static final int GLOBE_ROTATE_DURATION = 750;
@@ -431,6 +442,7 @@ public class Sunconfig {
     public static final Color Color_Of_GlobeGridStroke = new Color(0.90, 0.40, 0.20, 1.00);
     public static final Color Color_Of_ThingyFill = new Color(0.35, 0.35, 0.35, 0.20);
     public static final Color Color_Of_ThingyStroke = new Color(0.75, 0.75, 0.75, 1.00);
+    public static final Color Color_Of_AnimationOn = new Color(1.00, 0.65, 0.35, 1.00);
 
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
     public static final Color Color_Of_CetusFrame  = new Color(0.85, 0.60, 0.95, 1.00);

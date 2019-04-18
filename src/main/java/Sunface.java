@@ -234,6 +234,8 @@ public class Sunface extends Application {
                 sunchartWindow.heightProperty())
         );
 
+        sundial.getControlThingyChart().stateProperty().bind(sunchartWindow.showingProperty());
+
 
         // Primary window
         primaryStage.setTitle("Sunface");
@@ -282,6 +284,8 @@ public class Sunface extends Application {
         sundial.getControlThingyGlobeLines().setOnMouseClicked(event -> sundial.toggleGlobeLines());
 
         sundial.getControlThingyAnimation().setOnMouseClicked(event -> sundial.toggleAnimation());
+
+        sundial.getControlThingyChart().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
 
         sundial.getControlThingyDst().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getControlThingyDst().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
@@ -348,7 +352,7 @@ public class Sunface extends Application {
 
         sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleSunHighNoon());
 
-        sundial.getMatrixDayLength().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
+//        sundial.getMatrixDayLength().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
 
         // CHART WINDOW
         sunyear.getChartFrame().setOnMouseEntered(event -> sunyearChart.setCursor(Cursor.MOVE));
@@ -1601,13 +1605,7 @@ public class Sunface extends Application {
         }
         else { return; }
 
-        if (timeZoneOffset > (12 * 60 * 60 * 1000)) {
-            timeZoneOffset = -11 * 60 * 60 * 1000;
-        }
-
-        if (timeZoneOffset <= (-12 * 60 * 60 * 1000)) {
-            timeZoneOffset =  12 * 60 * 60 * 1000;
-        }
+        timeZoneOffset = (int) Sunutil.rotateTimeZoneOffset(timeZoneOffset);
 
         currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
         offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);

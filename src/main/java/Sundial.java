@@ -1,10 +1,12 @@
 import javafx.animation.*;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -118,6 +120,7 @@ public class Sundial {
     private ControlThingy controlThingyNightmode;
     private ControlThingy controlThingyAlwaysOnTop;
     private ControlThingy controlThingyAnimation;
+    private ControlThingy controlThingyChart;
     private ControlThingy controlThingyGlobeGrid;
     private ControlThingy controlThingyGlobeLines;
     private ControlThingy controlThingyDst;
@@ -154,8 +157,8 @@ public class Sundial {
     private Timeline globeMoveInTimeline;
     private Timeline horizonMoveOutTimeline;
     private Timeline horizonMoveInTimeline;
-    private Timeline dialHourMoveOutTimeline;
-    private Timeline dialHourMoveInTimeline;
+    private Timeline highNoonMoveOutTimeline;
+    private Timeline highNoonMoveInTimeline;
 
     private Text helpText;
     private Group helpTextGroup;
@@ -172,6 +175,7 @@ public class Sundial {
 
     private BooleanProperty globeGridVisibleEh;
     private BooleanProperty globeLinesVisibleEh;
+    private BooleanProperty animationProperty;
 
 
     // Constructor
@@ -255,6 +259,9 @@ public class Sundial {
 
         globeLinesVisibleEh = new SimpleBooleanProperty(false);
         globeLinesVisibleEh.addListener((observable, oldValue, newValue) -> {});
+
+        animationProperty = new SimpleBooleanProperty(true);
+        animationProperty.addListener((observable, oldValue, newValue) -> changeAnimation(animationProperty.get()));
 
         longitude = new SimpleDoubleProperty(0f);
         latitude = new SimpleDoubleProperty(0f);
@@ -379,11 +386,11 @@ public class Sundial {
                 , Sunconfig.MATRIX_SUNHIGHNOON_SCALE
                 , highNoonDialRotate
         );
-        sunHighNoon.setArcLook(Color.YELLOW, 1, Sunconfig.MATRIX_GLOW);
+        sunHighNoon.setArcLook(Color.YELLOW, 1, Sunconfig.MATRIX_GLOW, BlendMode.SRC_OVER);
         sunHighNoon.setHorizonLook(Sunconfig.Color_Of_Horizon, Sunconfig.SUNRISE_STROKE_WIDTH, Sunconfig.HORIZON_GLOW);
-        sunHighNoon.setSunLineLook(Sunconfig.Color_Of_Horizon, Sunconfig.SUNRISE_STROKE_WIDTH, Sunconfig.MATRIX_GLOW);
+        sunHighNoon.setSunLineLook(Sunconfig.Color_Of_Horizon, Sunconfig.SUNRISE_STROKE_WIDTH, Sunconfig.MATRIX_GLOW, BlendMode.SCREEN);
         sunHighNoon.setMarkerLook(Color.WHITE, 1, Sunconfig.MATRIX_SHADOW);
-        sunHighNoon.setSunDotLook(Color.LIGHTYELLOW, Sunconfig.MATRIX_GLOW);
+        sunHighNoon.setSunDotLook(Color.LIGHTYELLOW, Sunconfig.MATRIX_GLOW2, BlendMode.SRC_OVER);
         sunHighNoon.setMatrixTimeLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_GLOW);
         sunHighNoon.setMatrixAngleLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
         sunHighNoon.setMatrixDayLengthLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
@@ -395,6 +402,9 @@ public class Sundial {
 
         sunHighNoon.getTransforms().add(sunHighNoonScale);
 
+        highNoonMoveOutTimeline = Suncreator.createHighNoonTimeline(Suncreator.TimelineDirection.OUT, sunHighNoon, sunHighNoonScale);
+        highNoonMoveInTimeline = Suncreator.createHighNoonTimeline(Suncreator.TimelineDirection.IN, sunHighNoon, sunHighNoonScale);
+
         // Control thingies
         controlThingyHelp = Suncreator.createControlThingy(Suncreator.ControlThingyType.HELP, helpText);
         controlThingyResize = Suncreator.createControlThingy(Suncreator.ControlThingyType.RESIZE, helpText);
@@ -404,6 +414,7 @@ public class Sundial {
         controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGTMODE, helpText);
         controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
         controlThingyAnimation = Suncreator.createControlThingy(Suncreator.ControlThingyType.ANIMATION, helpText);
+        controlThingyChart = Suncreator.createControlThingy(Suncreator.ControlThingyType.CHART, helpText);
 
         outerControlsGroup = new Group(
                 controlThingyResize,
@@ -413,12 +424,15 @@ public class Sundial {
                 controlThingyNightmode,
                 controlThingyAlwaysOnTop,
                 controlThingyAnimation,
+                controlThingyChart,
                 controlThingyHelp
         );
 
         controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
         controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
         controlThingyDst = Suncreator.createControlThingy(Suncreator.ControlThingyType.DST, helpText);
+
+        controlThingyAnimation.stateProperty().bind(animationProperty);
 
         // Time and Date
         controlNightCompression = Suncreator.createControlNightCompression();
@@ -492,7 +506,6 @@ public class Sundial {
         // Help overlay
         helpMarkers = new ArrayList<>();
         helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup, null,  null));
-        helpMarkers.add(Suncreator.createHelpMarker(matrixDayLength, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(matrixHour, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(matrixMinute, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(matrixDay, null, null));
@@ -509,6 +522,8 @@ public class Sundial {
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyNightmode, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyAnimation, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyChart, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyHelp, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst, null, null));
@@ -595,8 +610,8 @@ public class Sundial {
         dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(globeVisibleEh ? Sunconfig.HELPTEXT_GLOBE : Sunconfig.HELPTEXT_WINDOW); dialCircleFrame.setCursor(globeVisibleEh ? Cursor.OPEN_HAND : Cursor.MOVE); });
         dialCircleFrame.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialCircleFrame.setCursor(Cursor.DEFAULT); });
 
-        matrixDayLength.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HORIZON); matrixDayLength.setCursor(Cursor.HAND); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_GLOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_GLOW); });
-        matrixDayLength.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixDayLength.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_SHADOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_SHADOW); });
+//        matrixDayLength.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HORIZON); matrixDayLength.setCursor(Cursor.HAND); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_GLOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_GLOW); });
+//        matrixDayLength.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixDayLength.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_SHADOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_SHADOW); });
 
         dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); setGroupGlow(dialHighNoonGroup, Sunconfig.MATRIX_GLOW2); });
         dialHighNoonGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialHighNoonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(dialHighNoonGroup, Sunconfig.MATRIX_GLOW); });
@@ -1107,6 +1122,8 @@ public class Sundial {
         horizonMoveOutTimeline.setRate(animationRate);
         horizonMoveInTimeline.setRate(animationRate);
         dialLocalHourMorphingPolygon.setRate(animationRate);
+        highNoonMoveOutTimeline.setRate(animationRate);
+        highNoonMoveInTimeline.setRate(animationRate);
 
         tinyGlobeMoveOutTimeline.stop();
         tinyGlobeMoveInTimeline.stop();
@@ -1120,6 +1137,8 @@ public class Sundial {
         horizonMoveInTimeline.stop();
         dialLocalHourMorphingPolygon.stopOut();
         dialLocalHourMorphingPolygon.stopIn();
+        highNoonMoveOutTimeline.stop();
+        highNoonMoveInTimeline.stop();
 
         if (visibleEh) {
             tinyGlobeMoveOutTimeline.play();
@@ -1128,6 +1147,7 @@ public class Sundial {
             globeMoveOutTimeline.play();
             horizonMoveOutTimeline.play();
             dialLocalHourMorphingPolygon.playOut();
+            highNoonMoveOutTimeline.play();
         }
         else {
             tinyGlobeMoveInTimeline.play();
@@ -1136,6 +1156,7 @@ public class Sundial {
             globeMoveInTimeline.play();
             horizonMoveInTimeline.play();
             dialLocalHourMorphingPolygon.playIn();
+            highNoonMoveInTimeline.play();
         }
 
         controlThingyGlobeGrid.setVisible(visibleEh);
@@ -1145,8 +1166,8 @@ public class Sundial {
         dialArcDayLength.setStrokeWidth(visibleEh ? Sunconfig.DAYLENGTH_STROKE_WIDTH / 2 : Sunconfig.DAYLENGTH_STROKE_WIDTH);
         matrixDayLength.setOpacity(visibleEh ? 0.65 : 1);
 
-        sunHighNoonScale.setX(visibleEh ? 0.85 : 1);
-        sunHighNoonScale.setY(visibleEh ? 0.85 : 1);
+//        sunHighNoonScale.setX(visibleEh ? 0.85 : 1);
+//        sunHighNoonScale.setY(visibleEh ? 0.85 : 1);
 
         matrixTimeZone.setOpacity(visibleEh ? Sunconfig.MATRIX_TIMEZONE_GLOBE_OPACITY : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
@@ -1220,7 +1241,7 @@ public class Sundial {
         matrixDate.setOpacity(opacity);
         matrixTimeZone.setOpacity(opacity);
 
-        sunHighNoon.setOpacity((opacity < 0.5) ? 0.65 : opacity);
+//        sunHighNoon.setOpacity((opacity < 0.5) ? 0.65 : opacity);
         dialLocalHourGroup.setOpacity((opacity < 0.5) ? 0.7 : opacity);
         dialLocalMinuteGroup.setOpacity(opacity);
         dialLocalSecondGroup.setOpacity(opacity);
@@ -1256,6 +1277,8 @@ public class Sundial {
 
         long timeZoneOffset = timeZone.getOffset(localTime.getTimeInMillis());
 
+        timeZoneOffset = (int) Sunutil.rotateTimeZoneOffset(timeZoneOffset);
+
         String timeZoneNumberString = "00" + abs(timeZoneOffset / (1000 * 60 * 60));
         timeZoneNumberString = timeZoneNumberString.substring(timeZoneNumberString.length() - 2);
 
@@ -1269,9 +1292,14 @@ public class Sundial {
     }
 
     public void toggleAnimation() {
+        animationProperty.set(!animationProperty.get());
+        changeAnimation(animationProperty.get());
+    }
 
-        ledAnimationOnEh = !ledAnimationOnEh;
-        globeAnimationEh = !globeAnimationEh;
+    public void changeAnimation(boolean animation) {
+
+        ledAnimationOnEh = animation;
+        globeAnimationEh = animation;
 
         for (Timeline timeline : cetusMarkerHoverTransitionList) {
             if (ledAnimationOnEh) {
@@ -1280,8 +1308,6 @@ public class Sundial {
                 timeline.setRate(Sunconfig.CETUS_MARKER_DURATION);
             }
         }
-
-        controlThingyAnimation.toggleState();
     }
 
     public void toggleHelp() {
@@ -1425,10 +1451,6 @@ public class Sundial {
         return dialMarginCircle;
     }
 
-    public ControlThingy getControlThingyResize() {
-        return controlThingyResize;
-    }
-
     public DotMatrix getMatrixDayLength() {
         return matrixDayLength;
     }
@@ -1439,6 +1461,10 @@ public class Sundial {
 
     public DotMatrix getMatrixLatitude() {
         return matrixLatitude;
+    }
+
+    public ControlThingy getControlThingyResize() {
+        return controlThingyResize;
     }
 
     public ControlThingy getControlThingyClose() {
@@ -1463,6 +1489,10 @@ public class Sundial {
 
     public ControlThingy getControlThingyAnimation() {
         return controlThingyAnimation;
+    }
+
+    public ControlThingy getControlThingyChart() {
+        return controlThingyChart;
     }
 
     public ControlThingy getControlThingyDst() {

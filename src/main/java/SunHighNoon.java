@@ -1,5 +1,6 @@
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
@@ -73,19 +74,19 @@ public class SunHighNoon extends Group {
         matrixTime.setScaleX(matrixScale);
         matrixTime.setScaleY(matrixScale);
         matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() / 2);
-        matrixTime.setTranslateY(centerY - radius - matrixTime.getLayoutBounds().getHeight() * 1.5);
+        matrixTime.setTranslateY(centerY - radius - matrixTime.getLayoutBounds().getHeight() * 1.75);
 
         matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
         matrixAngle.setScaleX(matrixScale);
         matrixAngle.setScaleY(matrixScale);
-        matrixAngle.setTranslateX(centerX + radius * 0.25);
-        matrixAngle.setTranslateY(centerY - radius - matrixAngle.getLayoutBounds().getHeight() / 2);
+        matrixAngle.setTranslateX(centerX + marginX);
+        matrixAngle.setTranslateY(centerY - radius + matrixAngle.getLayoutBounds().getHeight() / 2);
 
         matrixDayLength = new DotMatrix("00h00m00s", DAYLENGTH_COLOR);
         matrixDayLength.setScaleX(matrixScale * 0.85);
         matrixDayLength.setScaleY(matrixScale * 0.85);
-        matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() - marginX);
-        matrixDayLength.setTranslateY(centerY - radius + matrixDayLength.getLayoutBounds().getHeight());
+        matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() - marginX * 1.5);
+        matrixDayLength.setTranslateY(centerY - radius + matrixDayLength.getLayoutBounds().getHeight() / 2);
 
         markerGroup = new Group();
 
@@ -102,7 +103,7 @@ public class SunHighNoon extends Group {
             markerGroup.getChildren().add(line);
         }
 
-        super.getChildren().addAll(markerGroup, horizonLine, sunLine, arc, sunDot, matrixTime, matrixAngle, matrixDayLength);
+        super.getChildren().addAll(sunLine, markerGroup, horizonLine, arc, sunDot, matrixTime, matrixAngle, matrixDayLength);
         super.getTransforms().add(rotate);
         super.setMouseTransparent(true);
     }
@@ -126,7 +127,7 @@ public class SunHighNoon extends Group {
         arc.setRadiusY(dY);
         sunDot.setCenterY(centerY - dY);
 //        matrixTime.setTranslateY(centerY - matrixTime.getLayoutBounds().getHeight() - dY - marginY);
-        matrixAngle.setTranslateY(centerY - matrixAngle.getLayoutBounds().getHeight() / 2 - dY);
+        matrixAngle.setTranslateY(centerY - dY - matrixAngle.getLayoutBounds().getHeight() / 2);
 //        matrixDayLength.setTranslateY(centerY + matrixTime.getLayoutBounds().getHeight() - dY + marginY);
 
         Rotate rotate = (Rotate) super.getTransforms().get(0);
@@ -135,15 +136,15 @@ public class SunHighNoon extends Group {
             matrixAngle.setRotate(180);
             matrixDayLength.setRotate(180);
 //            matrixTime.setTranslateX(centerX + marginX);
-            matrixAngle.setTranslateX(centerX - matrixAngle.getLayoutBounds().getWidth() - marginX);
-            matrixDayLength.setTranslateX(centerX + marginX);
+//            matrixAngle.setTranslateX(centerX - matrixAngle.getLayoutBounds().getWidth() - marginX);
+//            matrixDayLength.setTranslateX(centerX + marginX);
         } else {
             matrixTime.setRotate(0);
             matrixAngle.setRotate(0);
             matrixDayLength.setRotate(0);
 //            matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() - marginX);
-            matrixAngle.setTranslateX(centerX + radius * 0.25);
-            matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() - marginX);
+//            matrixAngle.setTranslateX(centerX + radius * 0.25);
+//            matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() - marginX);
         }
 
         long clampedDayLength = (dayLength >= DAY_SECONDS) ? DAY_SECONDS : dayLength;
@@ -161,10 +162,11 @@ public class SunHighNoon extends Group {
     }
 
 
-    public void setArcLook(Color color, double width, String style) {
+    public void setArcLook(Color color, double width, String style, BlendMode blendMode) {
         arc.setStroke(color);
         arc.setStrokeWidth(width);
         arc.setStyle(style);
+        arc.setBlendMode(blendMode);
     }
 
     public void setHorizonLook(Color color, double width, String style) {
@@ -173,15 +175,17 @@ public class SunHighNoon extends Group {
         horizonLine.setStyle(style);
     }
 
-    public void setSunLineLook(Color color, double width, String style) {
+    public void setSunLineLook(Color color, double width, String style, BlendMode blendMode) {
         sunLine.setStroke(color);
         sunLine.setStrokeWidth(width);
         sunLine.setStyle(style);
+        sunLine.setBlendMode(blendMode);
     }
 
-    public void setSunDotLook(Color color, String style) {
+    public void setSunDotLook(Color color, String style, BlendMode blendMode) {
         sunDot.setFill(color);
         sunDot.setStyle(style);
+        sunDot.setBlendMode(blendMode);
     }
 
     public void setMarkerLook(Color color, double width, String style) {
