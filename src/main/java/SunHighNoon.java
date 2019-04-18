@@ -79,7 +79,7 @@ public class SunHighNoon extends Group {
         matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
         matrixAngle.setScaleX(matrixScale);
         matrixAngle.setScaleY(matrixScale);
-        matrixAngle.setTranslateX(centerX + marginX);
+        matrixAngle.setTranslateX(centerX + marginX * 1.5);
         matrixAngle.setTranslateY(centerY - radius + matrixAngle.getLayoutBounds().getHeight() / 2);
 
         matrixDayLength = new DotMatrix("00h00m00s", DAYLENGTH_COLOR);
@@ -127,7 +127,7 @@ public class SunHighNoon extends Group {
         arc.setRadiusY(dY);
         sunDot.setCenterY(centerY - dY);
 //        matrixTime.setTranslateY(centerY - matrixTime.getLayoutBounds().getHeight() - dY - marginY);
-        matrixAngle.setTranslateY(centerY - dY - matrixAngle.getLayoutBounds().getHeight() / 2);
+        matrixAngle.setTranslateY(centerY - dY / 2 - radius / 2 - matrixAngle.getLayoutBounds().getHeight() / 2);
 //        matrixDayLength.setTranslateY(centerY + matrixTime.getLayoutBounds().getHeight() - dY + marginY);
 
         Rotate rotate = (Rotate) super.getTransforms().get(0);

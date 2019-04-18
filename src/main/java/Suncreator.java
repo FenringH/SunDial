@@ -1224,7 +1224,7 @@ public class Suncreator {
 
         MorphingPolygon morphingPolygon = new MorphingPolygon(dialLocalHourPolyLong.getPoints(), dialLocalHourPolyShort.getPoints(), Sunconfig.TIMEANDDATE_DURATION, Interpolator.EASE_BOTH);
         morphingPolygon.setTranslateX(Sunconfig.CENTER_X);
-        morphingPolygon.setFill(new Color(1, 1, 1, 0.0));
+        morphingPolygon.setFill(new Color(1, 1, 1, 0.1));
         morphingPolygon.setStroke(Color.WHITE);
         morphingPolygon.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
         morphingPolygon.setOpacity(1);

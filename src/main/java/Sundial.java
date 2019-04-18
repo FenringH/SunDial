@@ -1250,8 +1250,6 @@ public class Sundial {
         dialLocalMinuteGroup.setOpacity(opacity);
         dialLocalSecondGroup.setOpacity(opacity);
 
-        controlThingyGlobeLines.setOpacity(opacity);
-        controlThingyGlobeGrid.setOpacity(opacity);
         controlThingyDst.setOpacity(opacity);
         controlNightCompression.setOpacity(opacity);
 
