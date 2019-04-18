@@ -3,6 +3,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
 
 import java.text.DecimalFormat;
 
@@ -16,6 +17,10 @@ public class Sunconfig {
     public static final String DEFAULT_EDGE_MAP              = "maps/2k_earth_edge_map.jpg";
     public static final String DEFAULT_SPECULAR_MAP          = "maps/2k_earth_specular_map.jpg";
 
+    public static final String DEFAULT_FONT_COURIER_PRIME_CODE          = "fonts/Courier Prime Code.ttf";
+
+    public static final Font FONT_DEBUG = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 14);
+    public static final Font FONT_CHART_INFO = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 16);
 
     // DEFAULTS Sunface
     public final static String A_BEGINNING =
@@ -79,11 +84,11 @@ public class Sunconfig {
     public static final String HELPTEXT_HORIZON = "DAY LENGTH" +
             "\n LMB : toggle Year-Chart";
 
-    public static final String HELPTEXT_NIGHTCOMPRESSION = "NIGHT COMPRESSION" +
-            "\n LMB + drag : change Night-Compression (slow)" +
-            "\n RMB + drag : change Night-Compression (fast)" +
-            "\n SCROLL : change Night-Compression (fine)" +
-            "\n MMB : reset Night-Compression";
+    public static final String HELPTEXT_NIGHTCOMPRESSION = "NIGHT COMPRESSION\u2122" +
+            "\n LMB + drag : change Night-Compression\u2122 (slow)" +
+            "\n RMB + drag : change Night-Compression\u2122 (fast)" +
+            "\n SCROLL : change Night-Compression\u2122 (fine)" +
+            "\n MMB : reset Night-Compression\u2122";
 
     public static final String HELPTEXT_HOUR = "HOURS" +
             "\n LMB + drag : change Hours (slow)" +
@@ -147,7 +152,7 @@ public class Sunconfig {
             "\n MMB : Reset window size";
 
     public static final String HELPTEXT_NIGHTMODE = "NIGHT-MODE" +
-            "\n LMB : toggle Night-mode";
+            "\n LMB : toggle Night-mode\u2122";
 
     public static final String HELPTEXT_ALWAYSONTOP = "ALWAYS-ON-TOP" +
             "\n LMB : toggle Always-On-Top";
@@ -156,7 +161,7 @@ public class Sunconfig {
             "\n HOVER : toggle High Noon time";
 
     public static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
-            "\n LMB : toggle Globe-mode" +
+            "\n LMB : toggle Globe-mode\u2122" +
             "\n RMB : toggle Cetus time" +
             "\n MMB : reset Coordinates to DEFAULT" +
             "\n DRAG-DROP : drag and drop GoogleMaps url ..." +
@@ -180,14 +185,14 @@ public class Sunconfig {
             "\n LMB : toggle Animation";
 
     public static final String HELPTEXT_CHART = "YEAR CHART" +
-            "\n LMB : toggle Year Chart window";
+            "\n LMB : toggle Year Chart\u2122 window";
 
-    public static final String HELPTEXT_HELP = "HALP!!!" +
-            "\n LMB : toggle Help Overlay";
+    public static final String HELPTEXT_HELP = "HALP !!!" +
+            "\n LMB : toggle Help Overlay\u2122";
 
     public static final String HELPTEXT_DST = "DAYLIGHT SAVING TIME" +
             "\n LMB : toggle Daylight Saving Time" +
-            "\n" + HELPTEXT_NIGHTCOMPRESSION;
+            "\n\n" + HELPTEXT_NIGHTCOMPRESSION;
 
 
     public static final double MARGIN_X = 25.0d;
@@ -237,10 +242,10 @@ public class Sunconfig {
     public static final double CONTROL_CLOSE_RADIUS = 10.0d;
     public static final double CONTROL_MAXIMIZE_RADIUS = 10.0d;
     public static final double CONTROL_MINIMIZE_RADIUS = 10.0d;
-    public static final double CONTROL_NIGHTMODE_RADIUS = 10.0d;
-    public static final double CONTROL_ALWAYSONTOP_RADIUS = 10.0d;
-    public static final double CONTROL_ANIMATION_RADIUS = 6.0d;
-    public static final double CONTROL_CHART_RADIUS = 6.0d;
+    public static final double CONTROL_NIGHTMODE_RADIUS = 7.0d;
+    public static final double CONTROL_ALWAYSONTOP_RADIUS = 7.0d;
+    public static final double CONTROL_ANIMATION_RADIUS = 7.0d;
+    public static final double CONTROL_CHART_RADIUS = 7.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CONTROL_DST_RADIUS = 10.0d;
     public static final double CETUS_MARKER_LENGTH = 21.0d;
@@ -268,8 +273,8 @@ public class Sunconfig {
     public static final double CONTROL_CLOSE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_MAXIMIZE_STROKE_WIDTH = 3.00d;
     public static final double CONTROL_MINIMIZE_STROKE_WIDTH = 3.00d;
-    public static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 3.00d;
-    public static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 3.0d;
+    public static final double CONTROL_NIGHTMODE_STROKE_WIDTH = 2.00d;
+    public static final double CONTROL_ALWAYSONTOP_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_ANIMATION_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_CHART_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
@@ -335,11 +340,11 @@ public class Sunconfig {
     public static final double CONTROL_CLOSE_OFFSET = 236.0d;
     public static final double CONTROL_MAXIMIZE_OFFSET = 236.0d;
     public static final double CONTROL_MINIMIZE_OFFSET = 236.0d;
-    public static final double CONTROL_NIGHTMODE_OFFSET = 236.0d;
-    public static final double CONTROL_ALWAYSONTOP_OFFSET = 236.0d;
+    public static final double CONTROL_NIGHTMODE_OFFSET = 232.0d;
+    public static final double CONTROL_ALWAYSONTOP_OFFSET = 232.0d;
     public static final double CONTROL_ANIMATION_OFFSET = 232.0d;
     public static final double CONTROL_CHART_OFFSET = 232.0d;
-    public static final double CONTROL_GLOBEGRID_OFFSET = CENTER_X - MARGIN_X/* - MARKER_HOUR_LENGTH * 2*/ - CONTROL_GLOBEGRID_RADIUS;
+    public static final double CONTROL_GLOBEGRID_OFFSET = 232.0d;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
     public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
@@ -375,11 +380,13 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
     public static final double CONTROL_CLOSE_ANGLE = CONTROL_MINIMIZE_ANGLE - 8;
     public static final double CONTROL_MAXIMIZE_ANGLE = CONTROL_MINIMIZE_ANGLE + 8;
-    public static final double CONTROL_ALWAYSONTOP_ANGLE = 180 - CONTROL_MINIMIZE_ANGLE;
-    public static final double CONTROL_HELP_ANGLE = CONTROL_ALWAYSONTOP_ANGLE - 8;
-    public static final double CONTROL_NIGHTMODE_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 8;
-    public static final double CONTROL_ANIMATION_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 14;
-    public static final double CONTROL_CHART_ANGLE = CONTROL_ANIMATION_ANGLE + 5;
+    public static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MAXIMIZE_ANGLE;
+    public static final double CONTROL_ALWAYSONTOP_ANGLE = CONTROL_HELP_ANGLE + 7;
+    public static final double CONTROL_NIGHTMODE_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 6;
+    public static final double CONTROL_ANIMATION_ANGLE = CONTROL_NIGHTMODE_ANGLE + 6;
+    public static final double CONTROL_CHART_ANGLE = CONTROL_ANIMATION_ANGLE + 6;
+    public static final double CONTROL_GLOBE_LINES_ANGLE = 56d + 180d;
+    public static final double CONTROL_GLOBE_GRID_ANGLE = CONTROL_GLOBE_LINES_ANGLE + 6;
 
     public static final int LED_OPACITY_DURATION = 350;
     public static final int GLOBE_ROTATE_DURATION = 750;
@@ -478,6 +485,7 @@ public class Sunconfig {
     public static final String LOCALSECOND_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
+    public static final String LOCALNOON_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.75, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
     public static final String TERMINATOR_LINE_GLOW         = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
@@ -490,7 +498,7 @@ public class Sunconfig {
     public static final String CONTROL_RESIZE_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_RESIZE_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_CLOSE_SHADOW         = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_CLOSE_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
+    public static final String CONTROL_CLOSE_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0, 64, 1.0),  8.0, 0.65, 0, 0);";
     public static final String CONTROL_MAXIMIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_MAXIMIZE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_MINIMIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";

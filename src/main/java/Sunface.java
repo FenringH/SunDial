@@ -4,10 +4,13 @@ import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -79,6 +82,8 @@ public class Sunface extends Application {
     private Stage debugWindow;
     private Stage sunchartWindow;
 
+    private Clipboard clipboard;
+
     private ArrayList<ArrayList<GregorianCalendar>> cetusNightList;
 
     private ArrayList<MouseButton> mouseButtonList = new ArrayList<>();
@@ -91,6 +96,8 @@ public class Sunface extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        clipboard = Clipboard.getSystemClipboard();
 
         // Init time
         currentLocalTime = new GregorianCalendar();
@@ -178,17 +185,24 @@ public class Sunface extends Application {
 
 
         // Debug window
+        Button copyButton = new Button("Copy text to clipboard");
+        copyButton.setMinHeight(26);
+        copyButton.setOnMouseClicked(event -> sendTextToClipboard(debugTextArea.getText()));
+
         debugTextArea = new TextArea();
+        debugTextArea.setFont(Sunconfig.FONT_DEBUG);
         debugTextArea.setMinWidth(600);
         debugTextArea.setMinHeight(800);
         debugTextArea.setEditable(false);
         debugTextArea.setWrapText(true);
         debugTextArea.setText(Sunconfig.A_BEGINNING);
+        debugTextArea.setTranslateY(28);
 
         Group debugGroup = new Group();
-        debugGroup.getChildren().add(debugTextArea);
+        debugGroup.getChildren().addAll(debugTextArea, copyButton);
 
-        Scene debugScene = new Scene(debugGroup, debugGroup.getLayoutBounds().getWidth(), debugGroup.getLayoutBounds().getHeight());
+        Scene debugScene = new Scene(debugGroup, debugGroup.getLayoutBounds().getWidth() + 6, debugGroup.getLayoutBounds().getHeight() + 2 + 28);
+        debugScene.setFill(Color.LIGHTSKYBLUE);
 
         debugWindow = new Stage();
         debugWindow.setTitle("Debug window");
@@ -197,7 +211,7 @@ public class Sunface extends Application {
         debugWindow.setHeight(debugScene.getHeight());
         debugWindow.setX(0);
         debugWindow.setY(0);
-        debugWindow.setResizable(true);
+        debugWindow.setResizable(false);
         debugWindow.getIcons().add(appIconSun);
 
 
@@ -285,7 +299,7 @@ public class Sunface extends Application {
 
         sundial.getControlThingyAnimation().setOnMouseClicked(event -> sundial.toggleAnimation());
 
-        sundial.getControlThingyChart().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
+        sundial.getControlThingyChart().setOnMouseClicked(event -> toggleSunchartWindow());
 
         sundial.getControlThingyDst().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getControlThingyDst().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
@@ -376,7 +390,9 @@ public class Sunface extends Application {
         // *** SHOWTIME ***
 
         initCurrentTime();
+
         primaryStage.show();
+
         timeline.play();
 
         saveMouse(primaryStage, null);
@@ -394,6 +410,13 @@ public class Sunface extends Application {
         maximizedEh.put(WindowType.PRIMARY, false);
         maximizedEh.put(WindowType.CHART, false);
 
+        Rectangle2D currentScreen = getCurrentScreen(primaryStage);
+        if (currentScreen != null) {
+            debugWindow.setX(currentScreen.getMinX());
+            debugWindow.setY(currentScreen.getMinY());
+            sunchartWindow.setX(currentScreen.getMinX());
+            sunchartWindow.setY(currentScreen.getMinY());
+        }
     }
 
 
@@ -499,6 +522,12 @@ public class Sunface extends Application {
 
         updateSunchart(sunchart);
         updateDebugWindow(sundial);
+    }
+
+    private void sendTextToClipboard(String string) {
+        ClipboardContent content = new ClipboardContent();
+        content.putString(string);
+        clipboard.setContent(content);
     }
 
     private void resetTime() {
@@ -699,41 +728,19 @@ public class Sunface extends Application {
 
     private void toggleDebugWindow(Stage stage) {
 
-        double x, y;
-
-        Rectangle2D currentScreen = getCurrentScreen(stage);
-        if (currentScreen == null) { x = 0; y = 0; }
-        else {
-            x = currentScreen.getMinX();
-            y = currentScreen.getMinY();
-        }
-
         if (debugWindow.isShowing()) {
             debugWindow.close();
         } else {
-            debugWindow.setX(x);
-            debugWindow.setY(y);
             debugWindow.show();
         }
     }
 
-    private void toggleSunchartWindow(Stage stage) {
-
-        double x, y;
-
-        Rectangle2D currentScreen = getCurrentScreen(stage);
-        if (currentScreen == null) { x = 0; y = 0; }
-        else {
-            x = currentScreen.getMinX();
-            y = currentScreen.getMinY();
-        }
+    private void toggleSunchartWindow() {
 
         if (sunchartWindow.isShowing()) {
             sunchartWindow.close();
         } else {
             sunyear.setSpaceTime(longitude, latitude, offsetLocalTime, timeZoneOffset);
-            sunchartWindow.setX(x);
-            sunchartWindow.setY(y);
             sunchartWindow.show();
         }
     }
@@ -895,11 +902,12 @@ public class Sunface extends Application {
                 ;
 
         String debugText = ""
-                + "Day[9] date              : " + offsetLocalTime.getTime().toString() + "\n"
-                + "Day[9] day of the year   : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR) + "\n"
-                + "Day[9] Julian Date       : " + Sunconfig.julianDateFormat.format(julianDate) + " (UTC)" + "\n"
-                + "Day[9] Gregorian Date    : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString() + "\n"
-                + "Day[9] Julian Day Number : " + julianDayNumber + "\n"
+                + "Local time               : " + offsetLocalTime.getTime().toString() + "\n"
+                + "Day of the year          : " + offsetLocalTime.get(Calendar.DAY_OF_YEAR) + "\n"
+                + "Julian Date              : " + Sunconfig.julianDateFormat.format(julianDate) + " (UTC)" + "\n"
+                + "Gregorian Date           : " + Suntime.getCalendarDate(julianDate, offsetLocalTime.getTimeZone()).getTime().toString() + "\n"
+                + "Julian Day Number        : " + julianDayNumber + "\n"
+                + "\n"
                 + "Longitude                : " + longitude + "\n"
                 + "Latitude                 : " + latitude + "\n"
                 + "TimeZone String          : " + timeZoneString + "\n"
@@ -919,13 +927,6 @@ public class Sunface extends Application {
                 + "localHourAngle           = " + suntimeLocal.getLocalHourAngle() + "\n"
                 + "localHourAngle dividend  = " + dividend + "\n"
                 + "localHourAngle divisor   = " + divisor + "\n"
-//                + "Tx =  " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getTx() + "\n"
-//                + "Ty =  " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getTy() + "\n"
-//                + "Mxx = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMxx() + "\n"
-//                + "Mxy = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMxy() + "\n"
-//                + "Myx = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMyx() + "\n"
-//                + "Myy = " + sundial.getDialHighNoonGroup().getLocalToParentTransform().getMyy() + "\n"
-//                + "Cetus nightList = " + cetusNightListString + "\n"
                 + "\n"
                 + "Cetus okEh = " + cetustime.cetusTimeOkEh() + "\n"
                 + "Cetus result = " + cetustime.getResult() + "\n"

@@ -11,6 +11,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
@@ -433,6 +434,10 @@ public class Sundial {
         controlThingyDst = Suncreator.createControlThingy(Suncreator.ControlThingyType.DST, helpText);
 
         controlThingyAnimation.stateProperty().bind(animationProperty);
+        controlThingyGlobeGrid.visibleProperty().bind(globeMasterGroup.visibleProperty());
+        controlThingyGlobeGrid.opacityProperty().bind(globeMasterGroup.opacityProperty());
+        controlThingyGlobeLines.visibleProperty().bind(globeMasterGroup.visibleProperty());
+        controlThingyGlobeLines.opacityProperty().bind(globeMasterGroup.opacityProperty());
 
         // Time and Date
         controlNightCompression = Suncreator.createControlNightCompression();
@@ -498,6 +503,11 @@ public class Sundial {
         matrixDayLength = Suncreator.createMatrixDayLength();
         matrixHighNoon = Suncreator.createMatrixHighNoon();
         nightModeOverlay = Suncreator.createNightModeOverlay();
+
+        dialCircleFrame.opacityProperty().bind(Bindings.createDoubleBinding(() ->
+                (1 - globeMasterGroup.opacityProperty().get()),
+                globeMasterGroup.opacityProperty())
+        );
 
         // Info overlay
         infoText = new Text();
@@ -613,7 +623,7 @@ public class Sundial {
 //        matrixDayLength.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HORIZON); matrixDayLength.setCursor(Cursor.HAND); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_GLOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_GLOW); });
 //        matrixDayLength.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixDayLength.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_SHADOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_SHADOW); });
 
-        dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); setGroupGlow(dialHighNoonGroup, Sunconfig.MATRIX_GLOW2); });
+        dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); setGroupGlow(dialHighNoonGroup, Sunconfig.LOCALNOON_DIAL_GLOW); });
         dialHighNoonGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialHighNoonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(dialHighNoonGroup, Sunconfig.MATRIX_GLOW); });
 
         matrixTimeZone.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_TIMEZONE); matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(Sunconfig.MATRIX_GLOW); });
@@ -1159,15 +1169,9 @@ public class Sundial {
             highNoonMoveInTimeline.play();
         }
 
-        controlThingyGlobeGrid.setVisible(visibleEh);
-        controlThingyGlobeLines.setVisible(visibleEh);
-
         dialArcDayLength.setOpacity(visibleEh ? Sunconfig.DAYLENGTH_ARC_OPACITY / 2 : Sunconfig.DAYLENGTH_ARC_OPACITY);
         dialArcDayLength.setStrokeWidth(visibleEh ? Sunconfig.DAYLENGTH_STROKE_WIDTH / 2 : Sunconfig.DAYLENGTH_STROKE_WIDTH);
         matrixDayLength.setOpacity(visibleEh ? 0.65 : 1);
-
-//        sunHighNoonScale.setX(visibleEh ? 0.85 : 1);
-//        sunHighNoonScale.setY(visibleEh ? 0.85 : 1);
 
         matrixTimeZone.setOpacity(visibleEh ? Sunconfig.MATRIX_TIMEZONE_GLOBE_OPACITY : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 

@@ -343,20 +343,20 @@ public class Sunyear {
         gregorianCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
         gregorianCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
 
-        String dateString = "Date: "
+        String dateString       = "Date       : "
                 + gregorianCalendar.get(Calendar.DAY_OF_MONTH)
                 + "." + (gregorianCalendar.get(Calendar.MONTH) + 1)
                 + "." + (gregorianCalendar.get(Calendar.YEAR))
                 ;
 
         GregorianCalendar sunriseDate = sunriseDateList.get(index);
-        String sunriseString = "Sunrise: " + Sunutil.getShortTimeString(sunriseDate);
+        String sunriseString    = "Sunrise    : " + Sunutil.getShortTimeString(sunriseDate);
 
         GregorianCalendar sunsetDate = sunsetDateList.get(index);
-        String sunsetString = "Sunset: " + Sunutil.getShortTimeString(sunsetDate);
+        String sunsetString     = "Sunset     : " + Sunutil.getShortTimeString(sunsetDate);
 
         double daylength = daylengthList.get(index);
-        String daylengthString = "Day length: " + Sunutil.getShortTimeLengthString(daylength * 60 * 60);
+        String daylengthString  = "Day length : " + Sunutil.getShortTimeLengthString(daylength * 60 * 60);
 
         infoTextDate.setText(dateString);
         infoTextSunrise.setText(sunriseString);
@@ -395,8 +395,6 @@ public class Sunyear {
             if (keyCode.equals(KeyCode.RIGHT)) { offsetFactor = 1; }
 
             savedMouseX += offsetFactor * SPACING_X;
-
-            System.out.println("keyCode = " + keyCode.getName() + " | savedMouseX = " + savedMouseX);
 
             mouseX = savedMouseX;
             mouseY = savedMouseY;
@@ -497,23 +495,23 @@ public class Sunyear {
 
         Font fontAxis = new Font(12);
         Font fontTitle = new Font(24);
-        Font fontInfo = new Font(14);
+        Font fontInfo = Sunconfig.FONT_CHART_INFO;
 
         // MOUSE TRAP INFO
         infoTextDate = new Text("Spice must flow.");
         infoTextDate.setFont(fontInfo);
         infoTextDate.setFill(Color.WHITE);
         infoTextDate.setStroke(Color.WHITE);
-        infoTextDate.setX(fontInfo.getSize());
-        infoTextDate.setY(fontInfo.getSize() + INFO_MARGIN);
+        infoTextDate.setX(INFO_MARGIN);
+        infoTextDate.setY(fontInfo.getSize() * 0.5 + INFO_MARGIN);
 
         infoTextSunrise = new Text("Spice must flow.");
         infoTextSunrise.setFont(fontInfo);
         infoTextSunrise.setFill(Color.WHITE);
         infoTextSunrise.setStroke(Color.WHITE);
         infoTextSunrise.setStyle(SUNRISE_GLOW);
-        infoTextSunrise.setX(fontInfo.getSize());
-        infoTextSunrise.setY(fontInfo.getSize() * 3 + INFO_MARGIN);
+        infoTextSunrise.setX(INFO_MARGIN);
+        infoTextSunrise.setY(fontInfo.getSize() * 4 + INFO_MARGIN);
         infoTextSunrise.setBlendMode(BlendMode.SCREEN);
         infoTextSunrise.setOpacity(0.8);
 
@@ -522,8 +520,8 @@ public class Sunyear {
         infoTextSunset.setFill(Color.WHITE);
         infoTextSunset.setStroke(Color.WHITE);
         infoTextSunset.setStyle(SUNSET_GLOW);
-        infoTextSunset.setX(fontInfo.getSize());
-        infoTextSunset.setY(fontInfo.getSize() * 4.5 + INFO_MARGIN);
+        infoTextSunset.setX(INFO_MARGIN);
+        infoTextSunset.setY(fontInfo.getSize() * 2 + INFO_MARGIN);
         infoTextSunset.setBlendMode(BlendMode.SCREEN);
         infoTextSunset.setOpacity(0.8);
 
@@ -532,8 +530,8 @@ public class Sunyear {
         infoTextDaylength.setFill(Color.WHITE);
         infoTextDaylength.setStroke(Color.WHITE);
         infoTextDaylength.setStyle(DAYLENGTH_GLOW);
-        infoTextDaylength.setX(fontInfo.getSize());
-        infoTextDaylength.setY(fontInfo.getSize() * 6 + INFO_MARGIN);
+        infoTextDaylength.setX(INFO_MARGIN);
+        infoTextDaylength.setY(fontInfo.getSize() * 3 + INFO_MARGIN);
         infoTextDaylength.setBlendMode(BlendMode.SCREEN);
         infoTextDaylength.setOpacity(0.8);
 
@@ -548,12 +546,12 @@ public class Sunyear {
         infoRectangle.setOpacity(0.50);
 
         infoRectangle.widthProperty().bind(Bindings.createDoubleBinding(() ->
-                        (infoTextGroup.layoutBoundsProperty().get().getWidth() + fontInfo.getSize() + INFO_MARGIN),
+                        (infoTextGroup.layoutBoundsProperty().get().getWidth()/* + fontInfo.getSize()*/ + INFO_MARGIN),
                 infoTextGroup.layoutBoundsProperty()
         ));
 
         infoRectangle.heightProperty().bind(Bindings.createDoubleBinding(() ->
-                        (infoTextGroup.layoutBoundsProperty().get().getHeight() + fontInfo.getSize() + INFO_MARGIN),
+                        (infoTextGroup.layoutBoundsProperty().get().getHeight()/* + fontInfo.getSize()*/ + INFO_MARGIN),
                 infoTextGroup.layoutBoundsProperty()
         ));
 

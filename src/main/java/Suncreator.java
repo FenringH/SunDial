@@ -163,7 +163,7 @@ public class Suncreator {
                 break;
             case GLOBEGRID:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 40 + 180)
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, Sunconfig.CONTROL_GLOBE_GRID_ANGLE)
                         .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
                         .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
@@ -179,7 +179,7 @@ public class Suncreator {
                 break;
             case GLOBELINES:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
-                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, 50 + 180)
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_GLOBEGRID_OFFSET, Sunconfig.CONTROL_GLOBE_LINES_ANGLE)
                         .size(Sunconfig.CONTROL_GLOBEGRID_RADIUS)
                         .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_GLOBEGRID_STROKE_WIDTH)
@@ -1873,7 +1873,7 @@ public class Suncreator {
             circle.opacityProperty().bind(node.opacityProperty());
         }
 
-        group.getChildren().addAll(rectangle, circle);
+        group.getChildren().addAll(rectangle/*, circle*/);
 
         return group;
     }
