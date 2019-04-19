@@ -1064,31 +1064,53 @@ public class Suncreator {
 
         for(int i = 0; i < Sunconfig.MAX_MARKER; i++) {
 
-            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH;
-
+            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.50;
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
-            double opacity = 0.25d;
+            double lineOpacity = 1.0d;
+            Color lineColor = Sunconfig.Color_Of_HourMarkerQwrt;
 
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
-                opacity = 0.375d;
+                lineOpacity = 1.0d;
+                lineColor = Sunconfig.Color_Of_HourMarkerHalf;
+                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.75;
             }
 
             if (i % 4 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH;
-                opacity = 0.5d;
+                lineOpacity = 1.0d;
+                lineColor = Sunconfig.Color_Of_HourMarkerFull;
+                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH;
             }
 
             Rotate markerRotate = centerRotate.clone();
             markerRotate.setAngle(Sunutil.getNightCompressionAngle(i * 360d / 96d, nightCompression));
 
-            Line markerLine = new Line(Sunconfig.CENTER_X, lineLength  + Sunconfig.MARGIN_Y, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y + 1);
-            markerLine.setStroke(Sunconfig.Color_Of_Darkness);
+            Polygon markerPoly = new Polygon(
+                    0, lineLength,
+                    -Sunconfig.MARKER_HOUR_STROKE_WIDTH, 0,
+                    0, -lineLength / 4,
+                    Sunconfig.MARKER_HOUR_STROKE_WIDTH, 0
+            );
+            markerPoly.setTranslateX(Sunconfig.CENTER_X);
+            markerPoly.setTranslateY(Sunconfig.MARGIN_Y);
+            markerPoly.setStroke(Sunconfig.Color_Of_HourMarkerStroke);
+            markerPoly.setStrokeWidth(strokeWidth);
+            markerPoly.setFill(lineColor);
+            markerPoly.setOpacity(lineOpacity / 2);
+            markerPoly.setMouseTransparent(true);
+
+            Line markerLine = new Line(0, lineLength, 0, -lineLength / 4);
+            markerLine.setTranslateX(Sunconfig.CENTER_X);
+            markerLine.setTranslateY(Sunconfig.MARGIN_Y);
+            markerLine.setStroke(lineColor);
             markerLine.setStrokeWidth(strokeWidth);
-            markerLine.setOpacity(opacity);
-            markerLine.getTransforms().add(markerRotate);
+            markerLine.setOpacity(lineOpacity / 2);
             markerLine.setMouseTransparent(true);
-//            markerLine.setBlendMode(BlendMode.SOFT_LIGHT);
+
+            Group markerGroup = new Group(markerPoly, markerLine);
+            markerGroup.getTransforms().add(markerRotate);
+//            markerGroup.setStyle(Sunconfig.HOUR_MARKER_SHADOW);
 
             if (i % 4 == 0) {
 
@@ -1115,9 +1137,10 @@ public class Suncreator {
                 hourMarkerMatrixList.add(markerMatrix);
             }
 
-            dialHourLineMarkerGroup.getChildren().add(markerLine);
+            dialHourLineMarkerGroup.getChildren().addAll(markerGroup);
             dialMarkerRotateList.add(markerRotate);
         }
+
     }
 
     public static Group createDialCircleCenterPoint() {

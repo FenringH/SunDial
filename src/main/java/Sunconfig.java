@@ -264,7 +264,7 @@ public class Sunconfig {
     public static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
     public static final double SUNRISE_STROKE_WIDTH = 1.00d;
     public static final double SUNSET_STROKE_WIDTH = 1.00d;
-    public static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
+    public static final double MARKER_HOUR_STROKE_WIDTH = 1.50d;
     public static final double MARKER_FRAME_STROKE_WIDTH = 2.00d;
     public static final double TINYGLOBE_FRAME_STROKE_WIDTH = 2.00d;
     public static final double CONTROL_THINGY_STROKE_WIDTH = 3.00d;
@@ -315,7 +315,7 @@ public class Sunconfig {
     public static final double SECOND_LED_ON_OPACITY = 1.00d;
     public static final double MATRIX_TIMEZONE_DEFAULT_OPACITY = 0.65d;
     public static final double MATRIX_TIMEZONE_GLOBE_OPACITY = 1.00d;
-    public static final double HIGHNOON_DOWN_OPACITY = 0.65d;
+    public static final double HIGHNOON_DOWN_OPACITY = 0.75d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
     public static final double MATRIX_HORIZON_OFFSET = 83.0d;
@@ -471,6 +471,11 @@ public class Sunconfig {
     public static final Color Color_Of_AtmosphereNight  = new Color(1.00, 0.35, 0.10, 1.00);
     public static final Color Color_Of_AtmosphereMid    = new Color(0.25, 0.50, 1.00, 1.00);
 
+    public static final Color Color_Of_HourMarkerFull    = new Color(1.00, 0.65, 0.00, 1.00);
+    public static final Color Color_Of_HourMarkerHalf    = new Color(0.20, 1.00, 0.20, 1.00);
+    public static final Color Color_Of_HourMarkerQwrt    = new Color(0.15, 0.90, 0.15, 1.00);
+    public static final Color Color_Of_HourMarkerStroke  = new Color(0.15, 0.30, 0.60, 0.50);
+
 
     public static final String MATRIX_GLOW                  = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_GLOW2                 = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
@@ -485,7 +490,7 @@ public class Sunconfig {
     public static final String LOCALSECOND_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
-    public static final String LOCALNOON_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.75, 0, 0);";
+    public static final String LOCALNOON_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 15.0, 0.65, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";
     public static final String TERMINATOR_LINE_GLOW         = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 10.0, 0.50, 0, 0);";
@@ -516,6 +521,8 @@ public class Sunconfig {
     public static final String CETUS_MATRIX_SHADOW_NIGHT    = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
 
     public static final String HELP_MARKER_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
+
+    public static final String HOUR_MARKER_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 0.5),  4.0, 0.50, 0, 0);";
 
     public static final Image GLOBE_DAY_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_DAY_MAP));
     public static final Image GLOBE_NIGHT_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_NIGHT_MAP));;
