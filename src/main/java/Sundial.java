@@ -11,7 +11,6 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
@@ -165,6 +164,8 @@ public class Sundial {
     private Group helpTextGroup;
     private Text infoText;
     private Group infoTextGroup;
+    private Text miroText;
+    private Group miroTextGroup;
 
     private boolean globeVisibleEh = false;
     private boolean cetusTimeVisibleEh = false;
@@ -412,7 +413,7 @@ public class Sundial {
         controlThingyClose = Suncreator.createControlThingy(Suncreator.ControlThingyType.CLOSE, helpText);
         controlThingyMaximize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MAXIMIZE, helpText);
         controlThingyMinimize = Suncreator.createControlThingy(Suncreator.ControlThingyType.MINIMIZE, helpText);
-        controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGTMODE, helpText);
+        controlThingyNightmode = Suncreator.createControlThingy(Suncreator.ControlThingyType.NIGHTMODE, helpText);
         controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
         controlThingyAnimation = Suncreator.createControlThingy(Suncreator.ControlThingyType.ANIMATION, helpText);
         controlThingyChart = Suncreator.createControlThingy(Suncreator.ControlThingyType.CHART, helpText);
@@ -553,8 +554,12 @@ public class Sundial {
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst, null, null));
 
-        helpOverlay = Suncreator.createHelpOverlay(helpMarkers, globeMasterGroup);
+        helpOverlay = Suncreator.createHelpOverlay(helpMarkers);
         helpTextGroup = Suncreator.createHelpTextGroup(helpText);
+
+        miroText = new Text();
+        miroTextGroup = Suncreator.createMiroTextGroup(miroText);
+        miroTextGroup.visibleProperty().bind(helpOverlay.visibleProperty());
 
 
         // LAYERS
@@ -587,6 +592,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(controlThingyGlobeLines);
         foregroundGroup.getChildren().add(tinyGlobeGroup);
         foregroundGroup.getChildren().add(helpOverlay);
+        foregroundGroup.getChildren().add(miroTextGroup);
         foregroundGroup.getChildren().add(helpTextGroup);
         foregroundGroup.getChildren().add(infoTextGroup);
         foregroundGroup.getChildren().add(nightModeOverlay);
@@ -643,6 +649,9 @@ public class Sundial {
 
         matrixTimeZone.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_TIMEZONE); matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(Sunconfig.MATRIX_GLOW); });
         matrixTimeZone.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixTimeZone.setCursor(Cursor.DEFAULT); matrixTimeZone.setStyle(Sunconfig.MATRIX_SHADOW); });
+
+        miroTextGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_MIRO); miroTextGroup.setCursor(Cursor.HAND); miroText.setUnderline(true); });
+        miroTextGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); miroTextGroup.setCursor(Cursor.DEFAULT); miroText.setUnderline(false); });
 
         dialsGroup.setOnMouseMoved(event -> {
             if (helpTextGroup.isVisible()) { moveGroup(helpTextGroup, event); }
@@ -1191,20 +1200,20 @@ public class Sundial {
 //
 //        matrixTimeZone.setOpacity(visibleEh ? Sunconfig.MATRIX_TIMEZONE_GLOBE_OPACITY : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
-/*
+        int i = 0;
         for (Node hourMarkerGroup : dialHourLineMarkerGroup.getChildren()) {
             if (hourMarkerGroup instanceof Group) {
                 for (Node markerPoly : ((Group) hourMarkerGroup).getChildren()) {
                     if (markerPoly instanceof Polygon) {
                         ((Polygon) markerPoly).setFill(visibleEh ? Color.WHITE : Color.BLACK);
                     }
-                    if (markerPoly instanceof Line) {
+                    if (markerPoly instanceof Line && (i % 4 != 0)) {
                         ((Line) markerPoly).setStroke(visibleEh ? Color.WHITE : Color.BLACK);
                     }
                 }
             }
+            i++;
         }
-*/
 
     }
 
@@ -1270,7 +1279,7 @@ public class Sundial {
 
         matrixTime.setOpacity(opacity);
         matrixDate.setOpacity(opacity);
-        matrixTimeZone.setOpacity(opacity);
+        matrixTimeZone.setOpacity((opacity < 0.5) ? opacity : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
 //        sunHighNoon.setOpacity((opacity < 0.5) ? 0.65 : opacity);
         dialLocalHourGroup.setOpacity((opacity < 0.5) ? 0.7 : opacity);
@@ -1586,5 +1595,9 @@ public class Sundial {
 
     public Timeline getInfoTextOpacityTimeline() {
         return infoTextOpacityTimeline;
+    }
+
+    public Group getMiroTextGroup() {
+        return miroTextGroup;
     }
 }

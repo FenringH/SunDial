@@ -17,6 +17,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.util.Duration;
+import org.w3c.dom.css.Rect;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +34,7 @@ public class Suncreator {
         CLOSE,
         MAXIMIZE,
         MINIMIZE,
-        NIGTMODE,
+        NIGHTMODE,
         ALWAYSONTOP,
         GLOBEGRID,
         GLOBELINES,
@@ -51,7 +52,7 @@ public class Suncreator {
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_HELP_OFFSET, Sunconfig.CONTROL_HELP_ANGLE)
                         .size(Sunconfig.CONTROL_HELP_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_HelpStroke_Off, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_HELP_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
                         .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
@@ -64,7 +65,7 @@ public class Suncreator {
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_CHART_OFFSET, Sunconfig.CONTROL_CHART_ANGLE)
                         .size(Sunconfig.CONTROL_CHART_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_ChartStroke_Off, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_CHART_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
                         .marker("Y", Color.WHITE, Sunconfig.MATRIX_SHADOW)
@@ -137,14 +138,16 @@ public class Suncreator {
                         .helpText(Sunconfig.HELPTEXT_MINIMIZE, helpText)
                         .thankYou();
                 break;
-            case NIGTMODE:
+            case NIGHTMODE:
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_NIGHTMODE_OFFSET, Sunconfig.CONTROL_NIGHTMODE_ANGLE)
                         .size(Sunconfig.CONTROL_NIGHTMODE_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_NightmodeStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_NIGHTMODE_STROKE_WIDTH)
-                        .colorFill(Sunconfig.Color_Of_NightmodeFill)
-                        .style(Sunconfig.CONTROL_NIGHTMODE_SHADOW, Sunconfig.CONTROL_NIGHTMODE_GLOW)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("N", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.50)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_NIGHTMODE, helpText)
                         .thankYou();
@@ -153,10 +156,12 @@ public class Suncreator {
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_ALWAYSONTOP_OFFSET, Sunconfig.CONTROL_ALWAYSONTOP_ANGLE)
                         .size(Sunconfig.CONTROL_ALWAYSONTOP_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_AlwaysOnTopStroke, Color.WHITE)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_ALWAYSONTOP_STROKE_WIDTH)
-                        .colorFill(Sunconfig.Color_Of_AlwaysOnTopFill)
-                        .style(Sunconfig.CONTROL_ALWAYSONTOP_SHADOW, Sunconfig.CONTROL_ALWAYSONTOP_GLOW)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("T", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.50)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_ALWAYSONTOP, helpText)
                         .thankYou();
@@ -497,10 +502,10 @@ public class Suncreator {
         tinyGlobe.setDayReverseLightColor(Sunconfig.Color_Of_DayReverse);
         tinyGlobe.setNightLightColor(Color.BLACK);
         tinyGlobe.setAmbientLightColor(Sunconfig.Color_Of_DayAmbient);
-        tinyGlobe.setSpecularColor(Sunconfig.Color_Of_DaySpecular);
-        tinyGlobe.setSpecularPower(6);
-        tinyGlobe.setReverseSpecularPower(12);
-        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
+//        tinyGlobe.setSpecularColor(Sunconfig.Color_Of_DaySpecular);
+//        tinyGlobe.setSpecularPower(6);
+//        tinyGlobe.setReverseSpecularPower(12);
+//        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         tinyGlobe.setLayoutX(Sunconfig.CENTER_X);
         tinyGlobe.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
         tinyGlobe.longitudeProperty().bind(longitude);
@@ -524,6 +529,22 @@ public class Suncreator {
         SubScene tinyGlobeNightScene = new SubScene(tinyGlobeNight, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
         tinyGlobeNightScene.setBlendMode(BlendMode.LIGHTEN);
 
+/*
+        Globe tinyGlobeEdges = new Globe(Sunconfig.GLOBE_EDGE_IMAGE, Sunconfig.TINYGLOBE_RADIUS, Sunconfig.GLOBE_ROTATE_DURATION);
+        tinyGlobeEdges.setDayLightColor(Color.BLACK);
+        tinyGlobeEdges.setNightLightColor(Color.BLACK);
+        tinyGlobeEdges.setAmbientLightColor(Color.WHITE);
+        tinyGlobeEdges.setLayoutX(Sunconfig.CENTER_X);
+        tinyGlobeEdges.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
+        tinyGlobeEdges.longitudeProperty().bind(longitude);
+        tinyGlobeEdges.latitudeProperty().bind(latitude);
+        tinyGlobeEdges.phaseProperty().bind(phase);
+        tinyGlobeEdges.tiltProperty().bind(tilt);
+
+        SubScene tinyGlobeEdgesScene = new SubScene(tinyGlobeEdges, Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.BALANCED);
+        tinyGlobeEdgesScene.setBlendMode(BlendMode.ADD);
+*/
+
         Ring tinyDayTerminatorLine = new Ring(Sunconfig.TINYGLOBE_RADIUS, Sunconfig.TINYGLOBE_TERMINATOR_WIDTH, Sunconfig.Color_Of_TerminatorLine, Sunconfig.GLOBE_ROTATE_DURATION);
         tinyDayTerminatorLine.setTranslateX(Sunconfig.CENTER_X);
         tinyDayTerminatorLine.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
@@ -543,7 +564,7 @@ public class Suncreator {
         tinyGlobeDot.setTranslateX(Sunconfig.CENTER_X);
         tinyGlobeDot.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
 
-        Group tinyGlobeGroup = new Group(tinyGlobeScene, tinyGlobeNightScene, tinyDayTerminatorLineScene, tinyGlobeDot);
+        Group tinyGlobeGroup = new Group(tinyGlobeScene, tinyGlobeNightScene, /*tinyGlobeEdgesScene,*/ tinyDayTerminatorLineScene, tinyGlobeDot);
 
         return tinyGlobeGroup;
     }
@@ -1066,13 +1087,13 @@ public class Suncreator {
 
             double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.50;
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
-            double lineOpacity = 1.0d;
-            Color lineColor = Sunconfig.Color_Of_HourMarkerQwrt;
+            double lineOpacity = 0.50d;
+            Color lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
 
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
-                lineOpacity = 1.0d;
-                lineColor = Sunconfig.Color_Of_HourMarkerHalf;
+                lineOpacity = 0.75d;
+                lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
                 strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.75;
             }
 
@@ -1080,7 +1101,7 @@ public class Suncreator {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH;
                 lineOpacity = 1.0d;
                 lineColor = Sunconfig.Color_Of_HourMarkerFull;
-                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH;
+                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             }
 
             Rotate markerRotate = centerRotate.clone();
@@ -1100,15 +1121,15 @@ public class Suncreator {
             markerPoly.setOpacity(lineOpacity / 2);
             markerPoly.setMouseTransparent(true);
 
-            Line markerLine = new Line(0, lineLength, 0, -lineLength / 4);
+            Line markerLine = new Line(0, lineLength, 0, 0);
             markerLine.setTranslateX(Sunconfig.CENTER_X);
             markerLine.setTranslateY(Sunconfig.MARGIN_Y);
             markerLine.setStroke(lineColor);
             markerLine.setStrokeWidth(strokeWidth);
-            markerLine.setOpacity(lineOpacity / 2);
+            markerLine.setOpacity(lineOpacity);
             markerLine.setMouseTransparent(true);
 
-            Group markerGroup = new Group(markerPoly, markerLine);
+            Group markerGroup = new Group(/*markerPoly, */markerLine);
             markerGroup.getTransforms().add(markerRotate);
 //            markerGroup.setStyle(Sunconfig.HOUR_MARKER_SHADOW);
 
@@ -1221,12 +1242,17 @@ public class Suncreator {
                 + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75, // 7
                 + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH * 2, Sunconfig.LOCALTIME_DIAL_LENGTH // 8
         );
-        dialLocalHourPolyLong.setTranslateX(Sunconfig.CENTER_X);
-        dialLocalHourPolyLong.setFill(new Color(1, 1, 1, 0.0));
-        dialLocalHourPolyLong.setStroke(Color.WHITE);
-        dialLocalHourPolyLong.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-        dialLocalHourPolyLong.setOpacity(1);
-        dialLocalHourPolyLong.setVisible(true);
+
+        Polygon dialLocalHourPolyMid = new Polygon(
+                0, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH + Sunconfig.LOCALSECOND_RADIUS_BIG * 2, // 1
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_MID_LENGTH * 1.35, // 2
+                - Sunconfig.LOCALTIME_HOUR_MID_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_MID_LENGTH, // 3
+                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 4
+                0, Sunconfig.MARGIN_Y, // 5
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 6
+                + Sunconfig.LOCALTIME_HOUR_MID_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_MID_LENGTH, // 7
+                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_MID_LENGTH * 1.35 // 8
+        );
 
         Polygon dialLocalHourPolyShort = new Polygon(
                 0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
@@ -1238,14 +1264,8 @@ public class Suncreator {
                 + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 7
                 + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75 // 8 = 7
         );
-        dialLocalHourPolyShort.setTranslateX(Sunconfig.CENTER_X);
-        dialLocalHourPolyShort.setFill(new Color(1, 1, 1, 0.0));
-        dialLocalHourPolyShort.setStroke(Color.WHITE);
-        dialLocalHourPolyShort.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-        dialLocalHourPolyShort.setOpacity(1);
-        dialLocalHourPolyShort.setVisible(false);
 
-        MorphingPolygon morphingPolygon = new MorphingPolygon(dialLocalHourPolyLong.getPoints(), dialLocalHourPolyShort.getPoints(), Sunconfig.TIMEANDDATE_DURATION, Interpolator.EASE_BOTH);
+        MorphingPolygon morphingPolygon = new MorphingPolygon(dialLocalHourPolyMid.getPoints(), dialLocalHourPolyShort.getPoints(), Sunconfig.TIMEANDDATE_DURATION, Interpolator.EASE_BOTH);
         morphingPolygon.setTranslateX(Sunconfig.CENTER_X);
         morphingPolygon.setFill(new Color(1, 1, 1, 0.1));
         morphingPolygon.setStroke(Color.WHITE);
@@ -1727,7 +1747,7 @@ public class Suncreator {
         return infoTextGroup;
     }
 
-    public static Group createHelpOverlay(ArrayList<Group> helpMarkers, Group globeMasterGroup) {
+    public static Group createHelpOverlay(ArrayList<Group> helpMarkers) {
 
         Group helpOverlay = new Group();
 
@@ -1738,6 +1758,7 @@ public class Suncreator {
         backdropFrame.setArcHeight(Sunconfig.HELP_OVERLAY_ROUND);
         backdropFrame.setFill(Color.BLACK);
         backdropFrame.setStroke(Sunconfig.Color_Of_Void);
+        backdropFrame.setMouseTransparent(true);
 
         backdropGroup.getChildren().add(backdropFrame);
 
@@ -1750,6 +1771,7 @@ public class Suncreator {
             backdropCutout.setArcHeight(markerRectangle.getArcHeight());
             backdropCutout.setFill(Color.WHITE);
             backdropCutout.setStroke(Color.TRANSPARENT);
+            backdropCutout.setMouseTransparent(true);
 
             Collection<Transform> markerTransforms = markerGroup.getTransforms();
             if (!markerTransforms.isEmpty()) {
@@ -1779,7 +1801,7 @@ public class Suncreator {
         backdropGroup.setMouseTransparent(true);
 
 
-        // Value added services :P
+        // Value Added Services
         Circle helpWindowMarker = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - 1);
         helpWindowMarker.setFill(Sunconfig.Color_Of_Void);
         helpWindowMarker.setStroke(Color.WHITE);
@@ -1792,7 +1814,6 @@ public class Suncreator {
         helpGlobeMarker.setStyle(Sunconfig.HELP_MARKER_GLOW);
         helpGlobeMarker.setMouseTransparent(true);
 
-
         // Full help overlay with cutouts and markers
         helpOverlay.getChildren().addAll(backdropGroup, helpWindowMarker, helpGlobeMarker);
         helpOverlay.getChildren().addAll(helpMarkers);
@@ -1800,6 +1821,27 @@ public class Suncreator {
         helpOverlay.setMouseTransparent(true);
 
         return helpOverlay;
+    }
+
+    public static Group createMiroTextGroup(Text text) {
+
+        text.setText(Sunconfig.MIRO_TEXT);
+        text.setFont(Sunconfig.FONT_MINI);
+        text.setFill(Color.WHITE);
+        text.setStyle(Sunconfig.HELP_MARKER_GLOW);
+
+        text.setX(Sunconfig.CENTER_X - text.getLayoutBounds().getWidth() / 2);
+        text.setY(Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y - Sunconfig.MARKER_HOUR_LENGTH);
+
+        Rectangle rectangle = new Rectangle();
+        rectangle.setX(text.getX());
+        rectangle.setY(text.getY() - text.getLayoutBounds().getHeight());
+        rectangle.setWidth(text.getLayoutBounds().getWidth());
+        rectangle.setHeight(text.getLayoutBounds().getHeight());
+        rectangle.setFill(Color.TRANSPARENT);
+        rectangle.setStroke(Color.TRANSPARENT);
+
+        return new Group(text, rectangle);
     }
 
     public static Group createHelpMarker(Node node, BooleanProperty visibilityProperty, DoubleProperty opacityProperty) {

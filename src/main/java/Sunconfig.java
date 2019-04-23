@@ -21,6 +21,10 @@ public class Sunconfig {
 
     public static final Font FONT_DEBUG = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 14);
     public static final Font FONT_CHART_INFO = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 16);
+    public static final Font FONT_MINI = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 8);
+
+    public static final String MIRO_URL = "http://www.behance.net/Fenring";
+    public static final String MIRO_TEXT = "Created by Miroslav Hundak, 2019.";
 
     // DEFAULTS Sunface
     public final static String A_BEGINNING =
@@ -194,6 +198,7 @@ public class Sunconfig {
             "\n LMB : toggle Daylight Saving Time" +
             "\n\n" + HELPTEXT_NIGHTCOMPRESSION;
 
+    public static final String HELPTEXT_MIRO = "Open web page in browser...";
 
     public static final double MARGIN_X = 25.0d;
     public static final double MARGIN_Y = 25.0d;
@@ -215,8 +220,10 @@ public class Sunconfig {
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double LOCALTIME_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
+    public static final double LOCALTIME_DIAL_MID_LENGTH = Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS;
     public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
     public static final double LOCALTIME_HOUR_SHORT_WIDTH = 8.0d;
+    public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 16.0d;
     public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
@@ -423,7 +430,7 @@ public class Sunconfig {
 
     public static final Color Color_Of_TinyDay      = new Color(0.65, 0.65,0.65, 1.00);
     public static final Color Color_Of_TinyNight    = new Color(0.65, 0.00, 0.00, 1.00);
-    public static final Color Color_Of_TinyAmbient  = new Color(0.35, 0.35,0.35, 1.00);
+    public static final Color Color_Of_TinyAmbient  = new Color(0.50, 0.50,0.50, 1.00);
 
     public static final Color Color_Of_TerminatorLine = new Color(0.25, 0.50, 1.00, 1.00);
     public static final Color Color_Of_TerminatorGlow = new Color(0.00, 0.10, 0.90, 1.00);
@@ -432,7 +439,10 @@ public class Sunconfig {
     public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
 
     public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
-    public static final Color Color_Of_HelpStroke = new Color(0.15, 0.35, 1.00, 1.00);
+    public static final Color Color_Of_HelpStroke_Off = new Color(1.00, 0.35, 0.10, 1.00);
+    public static final Color Color_Of_HelpStroke_On = new Color(1.00, 0.65, 0.00, 1.00);
+    public static final Color Color_Of_ChartStroke_Off = new Color(0.00, 0.90, 0.10, 1.00);
+    public static final Color Color_Of_ChartStroke_On = new Color(0.00, 1.00, 0.00, 1.00);
     public static final Color Color_Of_ResizeFill   = new Color(0.25, 0.50, 1.00, 0.20);
     public static final Color Color_Of_ResizeStroke = new Color(0.50, 0.75, 1.00, 1.00);
     public static final Color Color_Of_CloseFill    = new Color(1.00, 0.25, 0.25, 0.20);
@@ -471,7 +481,7 @@ public class Sunconfig {
     public static final Color Color_Of_AtmosphereNight  = new Color(1.00, 0.35, 0.10, 1.00);
     public static final Color Color_Of_AtmosphereMid    = new Color(0.25, 0.50, 1.00, 1.00);
 
-    public static final Color Color_Of_HourMarkerFull    = new Color(1.00, 0.65, 0.00, 1.00);
+    public static final Color Color_Of_HourMarkerFull    = new Color(1.00, 0.30, 0.00, 1.00);
     public static final Color Color_Of_HourMarkerHalf    = new Color(0.20, 1.00, 0.20, 1.00);
     public static final Color Color_Of_HourMarkerQwrt    = new Color(0.15, 0.90, 0.15, 1.00);
     public static final Color Color_Of_HourMarkerStroke  = new Color(0.15, 0.30, 0.60, 0.50);
@@ -503,7 +513,7 @@ public class Sunconfig {
     public static final String CONTROL_RESIZE_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_RESIZE_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_CLOSE_SHADOW         = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32, 32, 1.0),  4.0, 0.50, 0, 0);";
-    public static final String CONTROL_CLOSE_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0, 64, 1.0),  8.0, 0.65, 0, 0);";
+    public static final String CONTROL_CLOSE_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_MAXIMIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_MAXIMIZE_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
     public static final String CONTROL_MINIMIZE_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba(112,112, 32, 1.0),  4.0, 0.50, 0, 0);";

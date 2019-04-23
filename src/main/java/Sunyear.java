@@ -309,7 +309,7 @@ public class Sunyear {
                 if (month < dayMarkerRectangleGroup.getChildren().size()) {
                     Rectangle rectangle = (Rectangle) dayMarkerRectangleGroup.getChildren().get(month);
                     rectangle.setTranslateX(x);
-                    rectangle.setWidth(width);
+                    rectangle.setWidth(width + SPACING_X);
                 }
 
                 if (month < dayMarkerTextGroup.getChildren().size()) {
@@ -343,11 +343,7 @@ public class Sunyear {
         gregorianCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
         gregorianCalendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
 
-        String dateString       = "Date       : "
-                + gregorianCalendar.get(Calendar.DAY_OF_MONTH)
-                + "." + (gregorianCalendar.get(Calendar.MONTH) + 1)
-                + "." + (gregorianCalendar.get(Calendar.YEAR))
-                ;
+        String dateString       = "Date       : " + Sunutil.getShortDateString(gregorianCalendar);
 
         GregorianCalendar sunriseDate = sunriseDateList.get(index);
         String sunriseString    = "Sunrise    : " + Sunutil.getShortTimeString(sunriseDate);
@@ -546,12 +542,12 @@ public class Sunyear {
         infoRectangle.setOpacity(0.50);
 
         infoRectangle.widthProperty().bind(Bindings.createDoubleBinding(() ->
-                        (infoTextGroup.layoutBoundsProperty().get().getWidth()/* + fontInfo.getSize()*/ + INFO_MARGIN),
+                        (infoTextGroup.layoutBoundsProperty().get().getWidth()/* + fontInfo.getSize()*/ + INFO_MARGIN / 2),
                 infoTextGroup.layoutBoundsProperty()
         ));
 
         infoRectangle.heightProperty().bind(Bindings.createDoubleBinding(() ->
-                        (infoTextGroup.layoutBoundsProperty().get().getHeight()/* + fontInfo.getSize()*/ + INFO_MARGIN),
+                        (infoTextGroup.layoutBoundsProperty().get().getHeight()/* + fontInfo.getSize()*/ + INFO_MARGIN / 2),
                 infoTextGroup.layoutBoundsProperty()
         ));
 

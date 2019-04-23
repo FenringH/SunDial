@@ -105,6 +105,19 @@ public class Sunutil {
         return hoursString + "h" + minutesString + "m" + secondsString + "s";
     }
 
+    public static String getShortDateString(GregorianCalendar calendar) {
+
+        String dayString = "00" + calendar.get(Calendar.DAY_OF_MONTH);
+        String monthString = "00" + (calendar.get(Calendar.MONTH) + 1);
+        String yearString = "0000" + calendar.get(Calendar.YEAR);
+
+        dayString = dayString.substring(dayString.length() - 2);
+        monthString = monthString.substring(monthString.length() - 2);
+        yearString = yearString.substring(yearString.length() - 4);
+
+        return dayString + "." + monthString + "." + yearString + ".";
+    }
+
     public static String getShorterTimeLengthString(double inputSeconds) {
 
         double precisionHours = inputSeconds / (60 * 60);

@@ -126,38 +126,36 @@ public class SunHighNoon extends Group {
 
         arc.setRadiusY(dY);
         sunDot.setCenterY(centerY - dY);
-//        matrixTime.setTranslateY(centerY - matrixTime.getLayoutBounds().getHeight() - dY - marginY);
         matrixAngle.setTranslateY(centerY - dY / 2 - radius / 2 - matrixAngle.getLayoutBounds().getHeight() / 2);
-//        matrixDayLength.setTranslateY(centerY + matrixTime.getLayoutBounds().getHeight() - dY + marginY);
 
         Rotate rotate = (Rotate) super.getTransforms().get(0);
         if (rotate.getAngle() > 90 && rotate.getAngle() < 270) {
             matrixTime.setRotate(180);
             matrixAngle.setRotate(180);
             matrixDayLength.setRotate(180);
-//            matrixTime.setTranslateX(centerX + marginX);
-//            matrixAngle.setTranslateX(centerX - matrixAngle.getLayoutBounds().getWidth() - marginX);
-//            matrixDayLength.setTranslateX(centerX + marginX);
         } else {
             matrixTime.setRotate(0);
             matrixAngle.setRotate(0);
             matrixDayLength.setRotate(0);
-//            matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() - marginX);
-//            matrixAngle.setTranslateX(centerX + radius * 0.25);
-//            matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() - marginX);
         }
 
         long clampedDayLength = (dayLength >= DAY_SECONDS) ? DAY_SECONDS : dayLength;
 
-        double arcLength = (clampedDayLength / (double) DAY_SECONDS) * 360;
-        double arcStart = 90 - arcLength / 2;
+//        double arcLength = (clampedDayLength / (double) DAY_SECONDS) * 360;
+//        double arcStart = 90 - arcLength / 2;
+//
+//        arc.setStartAngle(arcStart);
+//        arc.setLength(arcLength);
+//        arc.setRadiusY(dY);
 
-        arc.setStartAngle(arcStart);
-        arc.setLength(arcLength);
+//        double hY = (dY * -cos(toRadians(arcLength / 2)));
+//
+//        arc.setCenterY(Sunconfig.CENTER_Y - hY);
+//        arc.setRadiusY(dY - hY);
+//
+//        matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
 
-        matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
-
-        horizonLine.setTranslateY(dY * (-cos(toRadians(arcLength / 2))));
+//        horizonLine.setTranslateY(dY * (-cos(toRadians(arcLength / 2))));
 
     }
 

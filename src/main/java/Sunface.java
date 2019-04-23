@@ -1,7 +1,10 @@
+import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
+import com.sun.javafx.application.HostServicesDelegate;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.Cursor;
@@ -10,7 +13,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -366,7 +368,7 @@ public class Sunface extends Application {
 
         sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleSunHighNoon());
 
-//        sundial.getMatrixDayLength().setOnMouseClicked(event -> toggleSunchartWindow(primaryStage));
+        sundial.getMiroTextGroup().setOnMouseClicked(event -> openBrowser(event, Sunconfig.MIRO_URL));
 
         // CHART WINDOW
         sunyear.getChartFrame().setOnMouseEntered(event -> sunyearChart.setCursor(Cursor.MOVE));
@@ -522,6 +524,18 @@ public class Sunface extends Application {
 
         updateSunchart(sunchart);
         updateDebugWindow(sundial);
+    }
+
+    public void openBrowser(Event event, String uri) {
+
+        try {
+            HostServicesDelegate hostServices = HostServicesFactory.getInstance(this);
+            hostServices.showDocument(uri);
+        } catch (Exception e) {
+            sundial.getInfoText().setText("Error opening web browser.");
+            showInfoText();
+            hideInfoTextWithDelay();
+        }
     }
 
     private void sendTextToClipboard(String string) {
