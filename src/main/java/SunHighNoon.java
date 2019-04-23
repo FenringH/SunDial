@@ -110,8 +110,6 @@ public class SunHighNoon extends Group {
 
     public void setParameters(GregorianCalendar noonTime, double angle, long dayLength) {
 
-        matrixTime.setString(Sunutil.getShortTimeString(noonTime));
-
         this.angle = (abs(angle) >= 90) ? 90 : abs(angle);
 
         String poleSuffix = (angle > 0) ? "S" : "N";
@@ -121,8 +119,6 @@ public class SunHighNoon extends Group {
         angleString = angleString.substring(angleString.length() - 6);
 
         double dY = ((90 - this.angle) / 90d) * radius;
-
-        matrixAngle.setString(angleString);
 
         arc.setRadiusY(dY);
         sunDot.setCenterY(centerY - dY);
@@ -141,21 +137,25 @@ public class SunHighNoon extends Group {
 
         long clampedDayLength = (dayLength >= DAY_SECONDS) ? DAY_SECONDS : dayLength;
 
-//        double arcLength = (clampedDayLength / (double) DAY_SECONDS) * 360;
-//        double arcStart = 90 - arcLength / 2;
-//
-//        arc.setStartAngle(arcStart);
-//        arc.setLength(arcLength);
-//        arc.setRadiusY(dY);
+        matrixAngle.setString(angleString);
+        matrixTime.setString(Sunutil.getShortTimeString(noonTime));
+        matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
 
-//        double hY = (dY * -cos(toRadians(arcLength / 2)));
-//
-//        arc.setCenterY(Sunconfig.CENTER_Y - hY);
-//        arc.setRadiusY(dY - hY);
-//
-//        matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
+/*
+        double arcLength = (clampedDayLength / (double) DAY_SECONDS) * 360;
+        double arcStart = 90 - arcLength / 2;
 
-//        horizonLine.setTranslateY(dY * (-cos(toRadians(arcLength / 2))));
+        arc.setStartAngle(arcStart);
+        arc.setLength(arcLength);
+        arc.setRadiusY(dY);
+
+        double hY = (dY * -cos(toRadians(arcLength / 2)));
+
+        arc.setCenterY(Sunconfig.CENTER_Y - hY);
+        arc.setRadiusY(dY - hY);
+
+        horizonLine.setTranslateY(dY * (-cos(toRadians(arcLength / 2))));
+*/
 
     }
 

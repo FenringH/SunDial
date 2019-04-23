@@ -1117,7 +1117,7 @@ public class Sundial {
     public void setDialFrameWarning(boolean warning) {
 
         this.warning = warning;
-//        dialCircleFrame.setStroke(this.warning ? Color.ORANGE : Color.TRANSPARENT);
+
         matrixHour.setFill(this.warning ? Color.YELLOW : Color.WHITE);
         matrixMinute.setFill(this.warning ? Color.YELLOW : Color.WHITE);
         matrixDay.setFill(this.warning ? Color.YELLOW : Color.WHITE);
@@ -1193,12 +1193,6 @@ public class Sundial {
             dialLocalHourMorphingPolygon.playIn();
             highNoonMoveInTimeline.play();
         }
-
-//        dialArcDayLength.setOpacity(visibleEh ? Sunconfig.DAYLENGTH_ARC_OPACITY / 2 : Sunconfig.DAYLENGTH_ARC_OPACITY);
-//        dialArcDayLength.setStrokeWidth(visibleEh ? Sunconfig.DAYLENGTH_STROKE_WIDTH / 2 : Sunconfig.DAYLENGTH_STROKE_WIDTH);
-//        matrixDayLength.setOpacity(visibleEh ? 0.65 : 1);
-//
-//        matrixTimeZone.setOpacity(visibleEh ? Sunconfig.MATRIX_TIMEZONE_GLOBE_OPACITY : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
         int i = 0;
         for (Node hourMarkerGroup : dialHourLineMarkerGroup.getChildren()) {
@@ -1281,7 +1275,6 @@ public class Sundial {
         matrixDate.setOpacity(opacity);
         matrixTimeZone.setOpacity((opacity < 0.5) ? opacity : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
 
-//        sunHighNoon.setOpacity((opacity < 0.5) ? 0.65 : opacity);
         dialLocalHourGroup.setOpacity((opacity < 0.5) ? 0.7 : opacity);
         dialLocalMinuteGroup.setOpacity(opacity);
         dialLocalSecondGroup.setOpacity(opacity);

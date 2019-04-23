@@ -1085,21 +1085,21 @@ public class Suncreator {
 
         for(int i = 0; i < Sunconfig.MAX_MARKER; i++) {
 
-            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.50;
+            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.70;
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
             double lineOpacity = 0.50d;
             Color lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
 
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
-                lineOpacity = 0.75d;
+                lineOpacity = 0.65d;
                 lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
-                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.75;
+                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.80;
             }
 
             if (i % 4 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH;
-                lineOpacity = 1.0d;
+                lineOpacity = 0.85d;
                 lineColor = Sunconfig.Color_Of_HourMarkerFull;
                 strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             }
@@ -1121,7 +1121,7 @@ public class Suncreator {
             markerPoly.setOpacity(lineOpacity / 2);
             markerPoly.setMouseTransparent(true);
 
-            Line markerLine = new Line(0, lineLength, 0, 0);
+            Line markerLine = new Line(0, lineLength, 0, 1);
             markerLine.setTranslateX(Sunconfig.CENTER_X);
             markerLine.setTranslateY(Sunconfig.MARGIN_Y);
             markerLine.setStroke(lineColor);

@@ -271,7 +271,7 @@ public class Sunconfig {
     public static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
     public static final double SUNRISE_STROKE_WIDTH = 1.00d;
     public static final double SUNSET_STROKE_WIDTH = 1.00d;
-    public static final double MARKER_HOUR_STROKE_WIDTH = 1.50d;
+    public static final double MARKER_HOUR_STROKE_WIDTH = 1.25d;
     public static final double MARKER_FRAME_STROKE_WIDTH = 2.00d;
     public static final double TINYGLOBE_FRAME_STROKE_WIDTH = 2.00d;
     public static final double CONTROL_THINGY_STROKE_WIDTH = 3.00d;
