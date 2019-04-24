@@ -1,15 +1,15 @@
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.SceneAntialiasing;
+import javafx.scene.SubScene;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import static java.lang.Math.*;
@@ -44,7 +44,7 @@ public class ControlThingy extends Group {
     private Polygon overlayTriangle;
     private DotMatrix dotMatrix;
     private Image image;
-    private ImageView imageBox;
+    private SubScene imageBox;
     private double imageScale;
 
     private BooleanProperty stateProperty;
@@ -81,15 +81,18 @@ public class ControlThingy extends Group {
         this.stateProperty = new SimpleBooleanProperty(this.onEh);
         this.stateProperty.addListener((observable, oldValue, newValue) -> changeState(this.stateProperty.get()));
 
-
-        if (type.equals(Type.CIRCLE)) {
-            circle = createCircle();
-            super.getChildren().add(circle);
-        }
-
-        if (type.equals(Type.TRIANGLE)) {
-            triangle = createTriangle();
-            super.getChildren().addAll(triangle);
+        switch (type) {
+            case CIRCLE:
+                circle = createCircle();
+                overlayCircle = createOverlayCircle();
+                super.getChildren().addAll(circle, overlayCircle);
+                break;
+            case TRIANGLE:
+                triangle = createTriangle();
+                overlayTriangle = createOverlayTriangle();
+                super.getChildren().addAll(triangle, overlayTriangle);
+                break;
+            default: {}
         }
 
         if (!matrixString.isEmpty()) {
@@ -97,18 +100,8 @@ public class ControlThingy extends Group {
             super.getChildren().add(dotMatrix);
         }
 
-        if (type.equals(Type.CIRCLE)) {
-            overlayCircle = createOverlayCircle();
-            super.getChildren().add(overlayCircle);
-        }
-
-        if (type.equals(Type.TRIANGLE)) {
-            overlayTriangle = createOverlayTriangle();
-            super.getChildren().addAll(overlayTriangle);
-        }
-
         if (image != null) {
-            imageBox = createImageView();
+            imageBox = createImageBox();
             super.getChildren().add(imageBox);
         }
 
@@ -132,11 +125,14 @@ public class ControlThingy extends Group {
 
     }
 
-    private ImageView createImageView() {
+    private SubScene createImageBox() {
         ImageView imageView = new ImageView(image);
-        imageView.setScaleX(((size * 2) / image.getWidth()) * imageScale);
-        imageView.setScaleY(((size * 2) / image.getHeight()) * imageScale);
-        return imageView;
+        SubScene imageScene = new SubScene(new Group(imageView), image.getWidth(), image.getHeight(), true, SceneAntialiasing.BALANCED);
+        imageScene.setTranslateX(-image.getWidth() / 2);
+        imageScene.setTranslateY(-image.getHeight() / 2);
+        imageScene.setScaleX(((size * 2) / image.getWidth()) * imageScale);
+        imageScene.setScaleY(((size * 2) / image.getHeight()) * imageScale);
+        return imageScene;
     }
 
     private Circle createCircle() {

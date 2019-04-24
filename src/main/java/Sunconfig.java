@@ -25,10 +25,10 @@ public class Sunconfig {
     public static final String DEFAULT_LOGO_OSTRON           = "icons/Ostron.png";
     public static final String DEFAULT_LOGO_SOLARIS_UNITED   = "icons/SolarisUnited.png";
 
-    public static final Image LOGO_OSTRON = new Image(DEFAULT_LOGO_OSTRON);
-    public static final Image LOGO_SOLARIS_UNITED = new Image(DEFAULT_LOGO_SOLARIS_UNITED);
+    public static final Image LOGO_OSTRON = new Image(DEFAULT_LOGO_OSTRON, 64, 64, true, true);
+    public static final Image LOGO_SOLARIS_UNITED = new Image(DEFAULT_LOGO_SOLARIS_UNITED, 64, 64, true, true);
 
-    public static final String DEFAULT_FONT_COURIER_PRIME_CODE          = "fonts/Courier Prime Code.ttf";
+    public static final String DEFAULT_FONT_COURIER_PRIME_CODE = "fonts/Courier Prime Code.ttf";
 
     public static final Font FONT_DEBUG = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 14);
     public static final Font FONT_CHART_INFO = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 16);
