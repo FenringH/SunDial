@@ -65,6 +65,8 @@ public class Sundial {
     private ArrayList<Rotate> dialMarkerRotateList;
     private ArrayList<Rotate> cetusMarkerRotateList;
     private ArrayList<Double> cetusMarkerAngleList;
+    private ArrayList<Rotate> orbVallisMarkerRotateList;
+    private ArrayList<Double> orbVallisMarkerAngleList;
     private Scale sunHighNoonScale;
 
     private Arc dialArcNight;
@@ -82,6 +84,8 @@ public class Sundial {
     private Group dialHighNoonGroup;
     private ArrayList<Arc> cetusMarkerArcList;
     private ArrayList<Line> cetusMarkerLineList;
+    private ArrayList<Arc> orbVallisMarkerArcList;
+    private ArrayList<Line> orbVallisMarkerLineList;
 
     private ArrayList<Node> dialLocalSecondLedList;
     private ArrayList<Boolean> dialLocalSecondOn;
@@ -91,6 +95,7 @@ public class Sundial {
     private ArrayList<Timeline> dialLocalMinuteLedOffList;
     private ArrayList<Timeline> dialLocalMinuteLedDimList;
     private ArrayList<Timeline> cetusMarkerHoverTransitionList;
+    private ArrayList<Timeline> orbVallisMarkerHoverTransitionList;
 
     private DotMatrix matrixYear;
     private DotMatrix matrixMonth;
@@ -108,6 +113,8 @@ public class Sundial {
     private ArrayList<DotMatrix> hourMarkerMatrixList;
     private DotMatrix cetusTimer;
     private ArrayList<DotMatrix> cetusTimeMatrixList;
+    private DotMatrix orbVallisTimer;
+    private ArrayList<DotMatrix> orbVallisTimeMatrixList;
     private DotMatrix matrixTimeZone;
 
     private SunHighNoon sunHighNoon;
@@ -132,6 +139,7 @@ public class Sundial {
     private Scale tinyGlobeScale;
     private Group horizonGroup;
     private Group cetusMarkerGroup;
+    private Group orbVallisMarkerGroup;
     private Group matrixTime;
     private Group matrixDate;
     private Group helpOverlay;
@@ -169,6 +177,7 @@ public class Sundial {
 
     private boolean globeVisibleEh = false;
     private boolean cetusTimeVisibleEh = false;
+    private boolean orbVallisTimeVisibleEh = false;
     private boolean ledAnimationOnEh = true;
     private boolean globeAnimationEh = true;
     private boolean helpEh = false;
@@ -330,7 +339,8 @@ public class Sundial {
         cetusTimeMatrixList = new ArrayList<>();
         cetusMarkerHoverTransitionList = new ArrayList<>();
 
-        cetusMarkerGroup = Suncreator.createCetusMarkerGroup(
+        cetusMarkerGroup = Suncreator.createKriegsrahmenZeitMarkerGroup(
+                KriegsrahmenZeit.Location.CETUS,
                 centerRotate,
                 cetusMarkerAngleList,
                 cetusMarkerRotateList,
@@ -343,6 +353,46 @@ public class Sundial {
         cetusTimer = Suncreator.createCetusTimer();
 
         setCetusTimeVisibility(cetusTimeVisibleEh);
+
+        // Orb Vallis stuff
+        orbVallisMarkerRotateList = new ArrayList<>();
+        orbVallisMarkerLineList = new ArrayList<>();
+        orbVallisMarkerArcList = new ArrayList<>();
+        orbVallisMarkerAngleList = new ArrayList<>();
+        orbVallisTimeMatrixList = new ArrayList<>();
+        orbVallisMarkerHoverTransitionList = new ArrayList<>();
+
+        orbVallisMarkerGroup = Suncreator.createKriegsrahmenZeitMarkerGroup(
+                KriegsrahmenZeit.Location.ORB_VALLIS,
+                centerRotate,
+                orbVallisMarkerAngleList,
+                orbVallisMarkerRotateList,
+                orbVallisMarkerLineList,
+                orbVallisMarkerArcList,
+                orbVallisTimeMatrixList,
+                orbVallisMarkerHoverTransitionList
+        );
+
+        orbVallisTimer = Suncreator.createOrbVallisTimer();
+
+        setOrbVallisTimeVisibility(orbVallisTimeVisibleEh);
+
+        // Bind timer position to adversary's visibility
+        cetusTimer.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
+            double deltaX = 0;
+            if (orbVallisTimer.visibleProperty().get()) {
+                deltaX = -cetusTimer.getLayoutBounds().getWidth() / 2 - 5;
+            }
+            return deltaX;
+        }, orbVallisTimer.visibleProperty()));
+
+        orbVallisTimer.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
+            double deltaX = 0;
+            if (cetusTimer.visibleProperty().get()) {
+                deltaX = orbVallisTimer.getLayoutBounds().getWidth()/ 2 + 5;
+            }
+            return deltaX;
+        }, cetusTimer.visibleProperty()));
 
         // Hour markers
         dialHourMatrixMarkerGroup = new Group();
@@ -573,6 +623,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialMinuteMarkers);
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().add(cetusMarkerGroup);
+        foregroundGroup.getChildren().add(orbVallisMarkerGroup);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
         foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().add(sunHighNoon);
@@ -584,6 +635,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialHourMatrixMarkerGroup);
         foregroundGroup.getChildren().add(dialCircleCenterPoint);
         foregroundGroup.getChildren().add(cetusTimer);
+        foregroundGroup.getChildren().add(orbVallisTimer);
         foregroundGroup.getChildren().add(matrixDayLength);
         foregroundGroup.getChildren().add(masterTimeGroup);
         foregroundGroup.getChildren().add(masterCoordinatesGroup);
@@ -635,8 +687,8 @@ public class Sundial {
         tinyGlobeFrame.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_TINYGLOBE); tinyGlobeFrame.setCursor(Cursor.HAND); tinyGlobeFrame.setStyle(Sunconfig.MATRIX_GLOW); });
         tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(Sunconfig.MATRIX_SHADOW); });
 
-        dialMarginCircle.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_WINDOW); dialMarginCircle.setCursor(Cursor.MOVE); });
-        dialMarginCircle.setOnMouseExited(event -> {  helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialMarginCircle.setCursor(Cursor.DEFAULT); });
+        dialMarginCircle.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_WINDOW); dialMarginCircle.setCursor(Cursor.MOVE); dialMarginCircle.setFill(Sunconfig.Color_Of_Margin_Hover); });
+        dialMarginCircle.setOnMouseExited(event -> {  helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialMarginCircle.setCursor(Cursor.DEFAULT); dialMarginCircle.setFill(Sunconfig.Color_Of_Margin); });
 
         dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(globeVisibleEh ? Sunconfig.HELPTEXT_GLOBE : Sunconfig.HELPTEXT_WINDOW); dialCircleFrame.setCursor(globeVisibleEh ? Cursor.OPEN_HAND : Cursor.MOVE); });
         dialCircleFrame.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialCircleFrame.setCursor(Cursor.DEFAULT); });
@@ -762,26 +814,59 @@ public class Sundial {
         updateDialMarkers();
     }
 
-    public void updateCetusTimer(ArrayList<ArrayList<GregorianCalendar>> nightList) {
+    public void updateCetusTimer(ArrayList<ArrayList<GregorianCalendar>> cycleList) {
+        updateKriegsrahmenTimer(KriegsrahmenZeit.Location.CETUS, cycleList);
+    }
+
+    public void updateOrbVallisTimer(ArrayList<ArrayList<GregorianCalendar>> cycleList) {
+        updateKriegsrahmenTimer(KriegsrahmenZeit.Location.ORB_VALLIS, cycleList);
+    }
+
+    public void updateKriegsrahmenTimer(
+            KriegsrahmenZeit.Location location,
+            ArrayList<ArrayList<GregorianCalendar>> cycleList
+    ) {
+
+        DotMatrix dotMatrix;
+        Color mainColor, lastColor;
+        String mainStyle, lastStyle;
+
+        switch (location) {
+            case CETUS:
+                dotMatrix = cetusTimer;
+                mainColor = Sunconfig.Color_Of_CetusNight;
+                lastColor = Sunconfig.Color_Of_CetusDay;
+                mainStyle = Sunconfig.CETUS_MATRIX_SHADOW_NIGHT;
+                lastStyle = Sunconfig.CETUS_MATRIX_SHADOW_DAY;
+                break;
+            case ORB_VALLIS:
+                dotMatrix = orbVallisTimer;
+                mainColor = Sunconfig.Color_Of_OrbVallisWarm;
+                lastColor = Sunconfig.Color_Of_OrbVallisCold;
+                mainStyle = Sunconfig.ORBVALLIS_MATRIX_SHADOW_WARM;
+                lastStyle = Sunconfig.ORBVALLIS_MATRIX_SHADOW_COLD;
+                break;
+            default: return;
+        }
 
         long offsetTime = 0;
 
         int i = 0;
-        while (offsetTime <= 0 && (i / 2) < nightList.size()) {
-            int nightIndex = i / 2;
-            int nightStep = i % 2;
-            offsetTime = nightList.get(nightIndex).get(nightStep).getTimeInMillis() - localTime.getTimeInMillis();
+        while (offsetTime <= 0 && (i / 2) < cycleList.size()) {
+            int cycleIndex = i / 2;
+            int cyclePhase = i % 2;
+            offsetTime = cycleList.get(cycleIndex).get(cyclePhase).getTimeInMillis() - localTime.getTimeInMillis();
             i++;
         }
 
-        cetusTimer.setString(Sunutil.getShortTimeLengthString(offsetTime / 1000d).substring(1));
+        dotMatrix.setString(Sunutil.getShortTimeLengthString(offsetTime / 1000d).substring(1));
 
         if (i % 2 == 0) {
-            cetusTimer.setFill(Sunconfig.Color_Of_CetusNight);
-            cetusTimer.setStyle(Sunconfig.CETUS_MATRIX_SHADOW_NIGHT);
+            dotMatrix.setFill(mainColor);
+            dotMatrix.setStyle(mainStyle);
         } else {
-            cetusTimer.setFill(Sunconfig.Color_Of_CetusDay);
-            cetusTimer.setStyle(Sunconfig.CETUS_MATRIX_SHADOW_DAY);
+            dotMatrix.setFill(lastColor);
+            dotMatrix.setStyle(lastStyle);
         }
     }
 
@@ -881,12 +966,54 @@ public class Sundial {
         ledOn.set(indexOn, true);
     }
 
-    public void setCetusTime(ArrayList<ArrayList<GregorianCalendar>> nightList, GregorianCalendar calendar, long timeZoneCorrection) {
+    public void setCetusTime(
+            ArrayList<ArrayList<GregorianCalendar>> cycleList,
+            GregorianCalendar calendar,
+            long timeZoneCorrection)
+    {
+        setKriegsrahmenZeit(KriegsrahmenZeit.Location.CETUS, cycleList, calendar, timeZoneCorrection);
+    }
 
-        if (nightList == null || nightList.isEmpty()) { return; }
+    public void setOrbVallisTime(
+            ArrayList<ArrayList<GregorianCalendar>> cycleList,
+            GregorianCalendar calendar,
+            long timeZoneCorrection)
+    {
+        setKriegsrahmenZeit(KriegsrahmenZeit.Location.ORB_VALLIS, cycleList, calendar, timeZoneCorrection);
+    }
 
-        int cetusMarkerAngleListSize = cetusMarkerAngleList.size();
-        int nightListSize = nightList.size();
+    public void setKriegsrahmenZeit(
+            KriegsrahmenZeit.Location location,
+            ArrayList<ArrayList<GregorianCalendar>> cycleList,
+            GregorianCalendar calendar,
+            long timeZoneCorrection)
+    {
+
+        if (cycleList == null || cycleList.isEmpty()) { return; }
+
+        ArrayList<Double> angleList;
+        ArrayList<Line> lineList;
+        ArrayList<Arc> arcList;
+        ArrayList<DotMatrix> matrixList;
+
+        switch (location) {
+            case CETUS:
+                angleList = cetusMarkerAngleList;
+                lineList = cetusMarkerLineList;
+                arcList = cetusMarkerArcList;
+                matrixList = cetusTimeMatrixList;
+                break;
+            case ORB_VALLIS:
+                angleList = orbVallisMarkerAngleList;
+                lineList = orbVallisMarkerLineList;
+                arcList = orbVallisMarkerArcList;
+                matrixList = orbVallisTimeMatrixList;
+                break;
+            default: return;
+        }
+
+        int angleListSize = angleList.size();
+        int cycleListSize = cycleList.size();
 
         GregorianCalendar localTimeUtc = (GregorianCalendar) calendar.clone();
         localTimeUtc.get(Calendar.HOUR_OF_DAY);
@@ -906,23 +1033,23 @@ public class Sundial {
         GregorianCalendar currentDayEnd = (GregorianCalendar) currentDayStart.clone();
         currentDayEnd.set(Calendar.DAY_OF_YEAR, localTimeUtc.get(Calendar.DAY_OF_YEAR) + 1);
 
-        for (int i = 0; i < nightListSize; i++) {
+        for (int i = 0; i < cycleListSize; i++) {
 
-            if ((i * 2) + 1 > cetusMarkerAngleListSize) { continue; }
+            if ((i * 2) + 1 > angleListSize) { continue; }
 
             GregorianCalendar startTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-            startTime.setTimeInMillis(nightList.get(i).get(0).getTimeInMillis() + timeZoneCorrection);
+            startTime.setTimeInMillis(cycleList.get(i).get(0).getTimeInMillis() + timeZoneCorrection);
 
             GregorianCalendar endTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-            endTime.setTimeInMillis(nightList.get(i).get(1).getTimeInMillis() + timeZoneCorrection);
+            endTime.setTimeInMillis(cycleList.get(i).get(1).getTimeInMillis() + timeZoneCorrection);
 
             int startTimeDay = startTime.get(Calendar.DAY_OF_YEAR);
             int endTimeDay = endTime.get(Calendar.DAY_OF_YEAR);
 
-            Line lineStart = cetusMarkerLineList.get(i * 2);
-            Line lineEnd = cetusMarkerLineList.get((i * 2) + 1);
+            Line lineStart = lineList.get(i * 2);
+            Line lineEnd = lineList.get((i * 2) + 1);
 
-            Arc arc = cetusMarkerArcList.get(i);
+            Arc arc = arcList.get(i);
 
             if (startTimeDay != currentDay) {
                 lineStart.setVisible(false);
@@ -947,11 +1074,11 @@ public class Sundial {
             double startAngle = getAbsoluteAngle(startTime);
             double endAngle = getAbsoluteAngle(endTime);
 
-            cetusMarkerAngleList.set((i * 2), startAngle);
-            cetusMarkerAngleList.set((i * 2) + 1, endAngle);
+            angleList.set((i * 2), startAngle);
+            angleList.set((i * 2) + 1, endAngle);
 
-            DotMatrix matrixStart = cetusTimeMatrixList.get(i * 2);
-            DotMatrix matrixEnd = cetusTimeMatrixList.get((i * 2) + 1);
+            DotMatrix matrixStart = matrixList.get(i * 2);
+            DotMatrix matrixEnd = matrixList.get((i * 2) + 1);
 
             matrixStart.setString(Sunutil.getShorterTimeString(startTime));
             matrixEnd.setString(Sunutil.getShorterTimeString(endTime));
@@ -1112,6 +1239,27 @@ public class Sundial {
             cetusMarkerArcList.get(i).setStartAngle(90 - adjustedStartAngle);
             cetusMarkerArcList.get(i).setLength(length);
         }
+
+        int orbVallisMarkerRotateListSize = orbVallisMarkerRotateList.size();
+        for (int i = 0; i < orbVallisMarkerRotateListSize; i++) {
+            orbVallisMarkerRotateList.get(i).setAngle(Sunutil.getNightCompressionAngle(orbVallisMarkerAngleList.get(i), nightCompression));
+        }
+
+        int orbVallisMarkerArcListSize = orbVallisMarkerArcList.size();
+        for  (int i = 0; i < orbVallisMarkerArcListSize; i++) {
+
+            double startAngle = orbVallisMarkerAngleList.get(i * 2);
+            double endAngle = orbVallisMarkerAngleList.get(i * 2 + 1);
+
+            double adjustedStartAngle = Sunutil.getNightCompressionAngle(startAngle, nightCompression);
+            double adjustedEndAngle = Sunutil.getNightCompressionAngle(endAngle, nightCompression);
+
+            double length = adjustedStartAngle - adjustedEndAngle;
+            if (length > 0) { length = -1 * ((360 - adjustedStartAngle) + adjustedEndAngle); }
+
+            orbVallisMarkerArcList.get(i).setStartAngle(90 - adjustedStartAngle);
+            orbVallisMarkerArcList.get(i).setLength(length);
+        }
     }
 
     public void setDialFrameWarning(boolean warning) {
@@ -1257,16 +1405,29 @@ public class Sundial {
         latitudeTimeline.play();
     }
 
-    public boolean cetusTimeVisibleEh() {
-        return cetusTimeVisibleEh;
+    public void setKriegsrahmenTimeVisibility(KriegsrahmenZeit.Location location, boolean visibleEh) {
+
+        switch (location) {
+            case CETUS:
+                cetusTimeVisibleEh = visibleEh;
+                cetusMarkerGroup.setVisible(visibleEh);
+                cetusTimer.setVisible(visibleEh);
+                break;
+            case ORB_VALLIS:
+                orbVallisTimeVisibleEh = visibleEh;
+                orbVallisMarkerGroup.setVisible(visibleEh);
+                orbVallisTimer.setVisible(visibleEh);
+                break;
+            default: {}
+        }
     }
 
     public void setCetusTimeVisibility(boolean visibleEh) {
+        setKriegsrahmenTimeVisibility(KriegsrahmenZeit.Location.CETUS, visibleEh);
+    }
 
-        cetusTimeVisibleEh = visibleEh;
-
-        cetusMarkerGroup.setVisible(visibleEh);
-        cetusTimer.setVisible(visibleEh);
+    public void setOrbVallisTimeVisibility(boolean visibleEh) {
+        setKriegsrahmenTimeVisibility(KriegsrahmenZeit.Location.ORB_VALLIS, visibleEh);
     }
 
     public void setTimeDisplayOpacity(double opacity) {
@@ -1339,6 +1500,14 @@ public class Sundial {
                 timeline.setRate(Sunconfig.CETUS_MARKER_DURATION);
             }
         }
+
+        for (Timeline timeline : orbVallisMarkerHoverTransitionList) {
+            if (ledAnimationOnEh) {
+                timeline.setRate(1);
+            } else {
+                timeline.setRate(Sunconfig.ORBVALLIS_MARKER_DURATION);
+            }
+        }
     }
 
     public void toggleHelp() {
@@ -1408,6 +1577,10 @@ public class Sundial {
 
     public boolean getCetusTimeVisibleEh() {
         return cetusTimeVisibleEh;
+    }
+
+    public boolean getOrbVallisTimeVisibleEh() {
+        return orbVallisTimeVisibleEh;
     }
 
     public boolean getLedAnimationOnEh() {

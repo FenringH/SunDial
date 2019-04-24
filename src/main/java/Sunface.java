@@ -73,7 +73,8 @@ public class Sunface extends Application {
     private Suntime suntimeLocal;
     private Suntime suntimeGlobal;
 
-    private Cetustime cetustime;
+    private KriegsrahmenZeit cetusTime;
+    private KriegsrahmenZeit orbVallisTime;
 
     private Sunchart sunchart;
     private Sunyear sunyear;
@@ -86,7 +87,8 @@ public class Sunface extends Application {
 
     private Clipboard clipboard;
 
-    private ArrayList<ArrayList<GregorianCalendar>> cetusNightList;
+    private ArrayList<ArrayList<GregorianCalendar>> cetusCycleList;
+    private ArrayList<ArrayList<GregorianCalendar>> orbVallisCycleList;
 
     private ArrayList<MouseButton> mouseButtonList = new ArrayList<>();
 
@@ -128,7 +130,8 @@ public class Sunface extends Application {
         sundial.rotateGlobe(longitude, latitude);
         sundial.getControlThingyDst().toggleState();
 
-        cetustime = new Cetustime();
+        cetusTime = new KriegsrahmenZeit(KriegsrahmenZeit.Platform.PC, KriegsrahmenZeit.Location.CETUS);
+        orbVallisTime = new KriegsrahmenZeit(KriegsrahmenZeit.Platform.PC, KriegsrahmenZeit.Location.ORB_VALLIS);
 
         sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
         sunyear = new Sunyear(longitude, latitude, currentLocalTime, timeZoneOffset);
@@ -484,7 +487,8 @@ public class Sunface extends Application {
             suntimeLocal.setObserverPosition(longitude, latitude);
             suntimeGlobal.setObserverPosition(longitude, latitude);
 
-            cetusNightList = cetustime.getNightList(timeZonedCalendar);
+            cetusCycleList = cetusTime.getCycleList(timeZonedCalendar);
+            orbVallisCycleList = orbVallisTime.getCycleList(timeZonedCalendar);
 
             double highNoonJulianDate = suntimeLocal.getHighnoonJulianDate();
             double sunriseJulianDate = suntimeLocal.getSunriseJulianDate();
@@ -498,7 +502,8 @@ public class Sunface extends Application {
 
             sundial.setHorizon(sunriseDate, sunsetDate);
             sundial.setCoordinates(longitude, latitude);
-            sundial.setCetusTime(cetusNightList, timeZonedCalendar, timeZoneCorrection);
+            sundial.setCetusTime(cetusCycleList, timeZonedCalendar, timeZoneCorrection);
+            sundial.setOrbVallisTime(orbVallisCycleList, timeZonedCalendar, timeZoneCorrection);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
             sundial.setHighNoon(highNoonDate, noonAngle);
 
@@ -506,7 +511,8 @@ public class Sunface extends Application {
         }
 
         sundial.setLocalTime(offsetLocalTime);
-        sundial.updateCetusTimer(cetusNightList);
+        sundial.updateCetusTimer(cetusCycleList);
+        sundial.updateOrbVallisTimer(orbVallisCycleList);
         sundial.updateDialMarkers();
 
         double phase = (suntimeGlobal.getJulianDate() - suntimeGlobal.getJulianDayNumber()) * 360;
@@ -759,31 +765,39 @@ public class Sunface extends Application {
         }
     }
 
-    private void refreshCetusTime(MouseEvent mouseEvent) {
+    private void refreshKriegsrahmenTime(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
 
         sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
 
-        RefreshCetusDataTask refreshCetusDataTask = new RefreshCetusDataTask(cetustime);
+        KriegsrahmenZeit kriegsrahmenZeit;
 
-        refreshCetusDataTask.setOnScheduled(refreshEvent -> {
-            sundial.getInfoText().setText("Syncing with Cetus...");
+        switch (location) {
+            case CETUS: kriegsrahmenZeit = cetusTime; break;
+            case ORB_VALLIS: kriegsrahmenZeit = orbVallisTime; break;
+            default: return;
+        }
+
+        RefreshKriegsrahmenZeitDataTask refreshDataTask = new RefreshKriegsrahmenZeitDataTask(kriegsrahmenZeit);
+
+        refreshDataTask.setOnScheduled(refreshEvent -> {
+            sundial.getInfoText().setText("Syncing with " + location.getFullName() + "...");
             showInfoText();
         });
 
-        refreshCetusDataTask.setOnFailed(refreshEvent -> {
-            sundial.getInfoText().setText(cetustime.getShortResult());
+        refreshDataTask.setOnFailed(refreshEvent -> {
+            sundial.getInfoText().setText(kriegsrahmenZeit.getShortResult());
             showInfoText();
             hideInfoTextWithDelay();
         });
 
-        refreshCetusDataTask.setOnSucceeded(refreshEvent -> {
-            sundial.getInfoText().setText(cetustime.getShortResult());
-            showCetusTime(mouseEvent);
+        refreshDataTask.setOnSucceeded(refreshEvent -> {
+            sundial.getInfoText().setText(kriegsrahmenZeit.getShortResult());
+            showKriegsrahmenTime(location, mouseEvent);
             hideInfoTextWithDelay();
         });
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(refreshCetusDataTask);
+        executorService.execute(refreshDataTask);
         executorService.shutdown();
     }
 
@@ -809,18 +823,31 @@ public class Sunface extends Application {
         }
     }
 
-    private void showCetusTime(MouseEvent mouseEvent) {
+    private void showKriegsrahmenTime(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
 
-        if (cetustime.cetusTimeOkEh()) {
+        KriegsrahmenZeit kriegsrahmenZeit;
+        ArrayList<ArrayList<GregorianCalendar>> cycleList;
 
-            if (cetusNightList.isEmpty()) { cetusNightList = cetustime.getNightList(offsetLocalTime); }
+        switch (location) {
+            case CETUS:
+                kriegsrahmenZeit = cetusTime;
+                if (cetusCycleList.isEmpty()) { cetusCycleList = kriegsrahmenZeit.getCycleList(offsetLocalTime); }
+                cycleList = cetusCycleList;
+                break;
+            case ORB_VALLIS:
+                kriegsrahmenZeit = orbVallisTime;
+                if (orbVallisCycleList.isEmpty()) { orbVallisCycleList = kriegsrahmenZeit.getCycleList(offsetLocalTime); }
+                cycleList = orbVallisCycleList;
+                break;
+            default: return;
+        }
 
-            sundial.setCetusTime(cetusNightList, timeZonedCalendar, timeZoneCorrection);
-            sundial.updateCetusTimer(cetusNightList);
-            sundial.setCetusTimeVisibility(true);
-
+        if (kriegsrahmenZeit.getStatusOkEh()) {
+            sundial.setKriegsrahmenZeit(location, cycleList, timeZonedCalendar, timeZoneCorrection);
+            sundial.updateKriegsrahmenTimer(location, cycleList);
+            sundial.setKriegsrahmenTimeVisibility(location, true);
         } else {
-            sundial.getInfoText().setText("Cetus time unavailable: \n" + cetustime.getShortResult());
+            sundial.getInfoText().setText(location.getFullName() + " time unavailable: \n" + kriegsrahmenZeit.getShortResult());
             sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
             showInfoText();
         }
@@ -830,18 +857,18 @@ public class Sunface extends Application {
         updateDebugWindow(sundial);
     }
 
-    private class RefreshCetusDataTask extends Task<Boolean> {
+    private class RefreshKriegsrahmenZeitDataTask extends Task<Boolean> {
 
-        Cetustime cetustime;
+        KriegsrahmenZeit kriegsrahmenZeit;
 
-        public RefreshCetusDataTask(Cetustime cetustime) {
-            this.cetustime = cetustime;
+        public RefreshKriegsrahmenZeitDataTask(KriegsrahmenZeit kriegsrahmenZeit) {
+            this.kriegsrahmenZeit = kriegsrahmenZeit;
         }
 
         @Override
         protected Boolean call() {
-            this.cetustime.requestNewData();
-            return cetustime.cetusTimeOkEh();
+            this.kriegsrahmenZeit.requestNewData();
+            return kriegsrahmenZeit.getStatusOkEh();
         }
     }
 
@@ -886,22 +913,28 @@ public class Sunface extends Application {
 
         StringBuilder cetusDataString = new StringBuilder();
 
-        for (String key : cetustime.getDataMap().keySet()) {
-            cetusDataString.append(key).append(" = ").append(cetustime.getDataMap().get(key)).append("\n");
+        for (String key : cetusTime.getDataMap().keySet()) {
+            cetusDataString.append(key).append(" = ").append(cetusTime.getDataMap().get(key)).append("\n");
         }
 
-        String cetusExpiryDate = ""
-                + cetustime.getCetusExpiry().get(Calendar.HOUR_OF_DAY) + ":"
-                + cetustime.getCetusExpiry().get(Calendar.MINUTE) + ":"
-                + cetustime.getCetusExpiry().get(Calendar.SECOND)
-                + " " + cetustime.getCetusExpiry().getTimeZone().getDisplayName()
-                ;
-
         StringBuilder cetusNightListString = new StringBuilder();
-        for(int i = 0; i < cetusNightList.size(); i++) {
-            String nightStart = cetusNightList.get(i).get(0).getTime().toString();
-            String nightEnd = cetusNightList.get(i).get(1).getTime().toString();
+        for(int i = 0; i < cetusCycleList.size(); i++) {
+            String nightStart = cetusCycleList.get(i).get(0).getTime().toString();
+            String nightEnd = cetusCycleList.get(i).get(1).getTime().toString();
             cetusNightListString.append("\nnight ").append(i+1).append(": start = ").append(nightStart).append(", end = ").append(nightEnd);
+        }
+
+        StringBuilder orbVallisDataString = new StringBuilder();
+
+        for (String key : orbVallisTime.getDataMap().keySet()) {
+            orbVallisDataString.append(key).append(" = ").append(orbVallisTime.getDataMap().get(key)).append("\n");
+        }
+
+        StringBuilder orbVallisNightListString = new StringBuilder();
+        for(int i = 0; i < orbVallisCycleList.size(); i++) {
+            String nightStart = orbVallisCycleList.get(i).get(0).getTime().toString();
+            String nightEnd = orbVallisCycleList.get(i).get(1).getTime().toString();
+            orbVallisNightListString.append("\nwarm ").append(i+1).append(": start = ").append(nightStart).append(", end = ").append(nightEnd);
         }
 
         long timeZoneOffset = offsetLocalTime.getTimeZone().getOffset(offsetLocalTime.getTimeInMillis());
@@ -939,18 +972,24 @@ public class Sunface extends Application {
                 + "hourAngle                = " + suntimeLocal.getHourAngle() + "\n"
                 + "solarTransit             = " + suntimeLocal.getSolarTransit() + "\n"
                 + "localHourAngle           = " + suntimeLocal.getLocalHourAngle() + "\n"
-                + "localHourAngle dividend  = " + dividend + "\n"
-                + "localHourAngle divisor   = " + divisor + "\n"
+//                + "localHourAngle dividend  = " + dividend + "\n"
+//                + "localHourAngle divisor   = " + divisor + "\n"
                 + "\n"
-                + "Cetus okEh = " + cetustime.cetusTimeOkEh() + "\n"
-                + "Cetus result = " + cetustime.getResult() + "\n"
-                + "Cetus shortResult = " + cetustime.getShortResult() + "\n"
-                + "Cetus data expired = " + cetustime.cetusTimeExpiredEh() + "\n"
-//                + "Cetus isDay = " + cetustime.cetusDayEh() + "\n"
-                + "Cetus expiry calendar = " + cetustime.getCetusExpiry().getTime() + "\n"
-//                + "Cetus expiry string = " + cetusExpiryDate + "\n"
-                + "Cetus reloadCounter: " + cetustime.getReloadCounter() + "\n"
-                + "Cetus dataMap: \n" + cetusDataString + "\n"
+                + "Cetus okEh = " + cetusTime.getStatusOkEh() + "\n"
+//                + "Cetus result = " + cetusTime.getResult() + "\n"
+//                + "Cetus shortResult = " + cetusTime.getShortResult() + "\n"
+//                + "Cetus data expired = " + cetusTime.dataExpiredEh() + "\n"
+//                + "Cetus expiry calendar = " + cetusTime.getExpiry().getTime() + "\n"
+//                + "Cetus reloadCounter: " + cetusTime.getReloadCounter() + "\n"
+                + "Cetus dataMap: \n" + cetusDataString
+                + "\n"
+                + "Orb Vallis okEh = " + orbVallisTime.getStatusOkEh() + "\n"
+//                + "Orb Vallis result = " + orbVallisTime.getResult() + "\n"
+//                + "Orb Vallis shortResult = " + orbVallisTime.getShortResult() + "\n"
+//                + "Orb Vallis data expired = " + orbVallisTime.dataExpiredEh() + "\n"
+//                + "Orb Vallis expiry calendar = " + orbVallisTime.getExpiry().getTime() + "\n"
+//                + "Orb Vallis reloadCounter: " + orbVallisTime.getReloadCounter() + "\n"
+                + "Orb Vallis dataMap: \n" + orbVallisDataString
                 ;
 
         if (debugErrorMessage != null && !debugErrorMessage.isEmpty()) {
@@ -1186,17 +1225,31 @@ public class Sunface extends Application {
             return;
         }
 
-        // RMB action (toggle Cetus time)
+        // RMB action (toggle Kriegsrahmen time)
         if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
 
-            if (sundial.cetusTimeVisibleEh()) {
-                sundial.setCetusTimeVisibility(false);
-            } else {
-                if (cetustime.cetusTimeExpiredEh()) {
-                    refreshCetusTime(mouseEvent);
+            if (mouseEvent.isShiftDown()) {
+
+                if (sundial.getOrbVallisTimeVisibleEh()) {
+                    sundial.setOrbVallisTimeVisibility(false);
+                } else {
+                    if (orbVallisTime.dataExpiredEh()) {
+                        refreshKriegsrahmenTime(KriegsrahmenZeit.Location.ORB_VALLIS, mouseEvent);
+                    } else {
+                        showKriegsrahmenTime(KriegsrahmenZeit.Location.ORB_VALLIS, mouseEvent);
+                    }
                 }
-                else {
-                    showCetusTime(mouseEvent);
+
+            } else {
+
+                if (sundial.getCetusTimeVisibleEh()) {
+                    sundial.setCetusTimeVisibility(false);
+                } else {
+                    if (cetusTime.dataExpiredEh()) {
+                        refreshKriegsrahmenTime(KriegsrahmenZeit.Location.CETUS, mouseEvent);
+                    } else {
+                        showKriegsrahmenTime(KriegsrahmenZeit.Location.CETUS, mouseEvent);
+                    }
                 }
             }
 

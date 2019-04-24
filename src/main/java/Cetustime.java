@@ -31,6 +31,7 @@ public class Cetustime {
     public static final long NIGHT_LENGTH = 50 * 60 * 1000;             // in ms
     public static final long CYCLE_LENGTH = DAY_LENGTH + NIGHT_LENGTH;  // in ms
 
+    public static final long CYCLES_OFFSET = 12 * 60 * 60 * 1000; // 12 hour offset to accommodate negative timezones
     public static final long CYCLES_PER_DAY = (int) ceil(24d * 60 * 60 * 1000 / CYCLE_LENGTH);
     public static final long CYCLES_PER_48h = 2 * CYCLES_PER_DAY;
 
@@ -63,14 +64,6 @@ public class Cetustime {
         dayEh = false;
         expiry = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 
-    }
-
-    public boolean cetusDayEh() {
-        return dayEh;
-    }
-
-    public GregorianCalendar getCetusExpiry() {
-        return expiry;
     }
 
     public void requestNewData() {
@@ -129,7 +122,7 @@ public class Cetustime {
                 dateUtc.get(Calendar.DAY_OF_MONTH),
                 0, 0, 0
         );
-        dateMidnightUtc.setTimeInMillis(dateMidnightUtc.getTimeInMillis() - (12 * 60 * 60 * 1000));
+        dateMidnightUtc.setTimeInMillis(dateMidnightUtc.getTimeInMillis() - CYCLES_OFFSET);
 
         long offsetInMillis = expiry.getTimeInMillis() - dateMidnightUtc.getTimeInMillis();
         long cycleStart = dateMidnightUtc.getTimeInMillis() + (offsetInMillis % CYCLE_LENGTH);
@@ -256,4 +249,13 @@ public class Cetustime {
     public int getReloadCounter() {
         return reloadCounter;
     }
+
+    public boolean cetusDayEh() {
+        return dayEh;
+    }
+
+    public GregorianCalendar getCetusExpiry() {
+        return expiry;
+    }
+
 }

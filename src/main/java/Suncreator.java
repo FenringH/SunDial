@@ -55,7 +55,8 @@ public class Suncreator {
                         .colorStroke(Sunconfig.Color_Of_HelpStroke_Off, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_HELP_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
-                        .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+//                        .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .image(Sunconfig.LOGO_OSTRON, 1)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_HELP, helpText)
@@ -835,40 +836,85 @@ public class Suncreator {
         return dialCircleFrame;
     }
 
-    public static Group createCetusMarkerGroup(
+    public static Group createKriegsrahmenZeitMarkerGroup(
+            KriegsrahmenZeit.Location location,
             Rotate centerRotate,
-            ArrayList<Double> cetusMarkerAngleList,
-            ArrayList<Rotate> cetusMarkerRotateList,
-            ArrayList<Line> cetusMarkerLineList,
-            ArrayList<Arc> cetusMarkerArcList,
-            ArrayList<DotMatrix> cetusTimeMatrixList,
-            ArrayList<Timeline> cetusMarkerHoverTransitionList) {
+            ArrayList<Double> markerAngleList,
+            ArrayList<Rotate> markerRotateList,
+            ArrayList<Line> markerLineList,
+            ArrayList<Arc> markerArcList,
+            ArrayList<DotMatrix> matrixList,
+            ArrayList<Timeline> markerHoverTransitionList) {
 
         Group cetusMarkerGroup = new Group();
         Group cetusHorizonGroup = new Group();
         Group cetusArcGroup = new Group();
 
-        for (int i = 0; i <= Cetustime.CYCLES_PER_48h; i++) {
+        long mainPhaseLength = location.getMainPhaseLength();
+        long cycleLength = location.getCycleLength();
+        long cyclesPerTwoDays = (long) ceil(48d * 60 * 60 * 1000 / cycleLength);
 
-            double startAngle = (i * Cetustime.CYCLE_LENGTH * 360d) / (24d * 60 * 60 * 1000);
-            double endAngle = ((i * Cetustime.CYCLE_LENGTH + Cetustime.NIGHT_LENGTH) * 360d) / (24d * 60 * 60 * 1000);
+        double markerWidth, markerLength;
+        Color markerColor;
+        String markerShadow;
+        double matrixScaleX, matrixScaleY;
+        double horizonOffset;
+        Paint arcFill;
+        Color arcColor;
+        double arcOpacity;
+        double animationDuration;
 
-            Line markerLineStart = new Line(Sunconfig.CENTER_X, Sunconfig.CETUS_MARKER_LENGTH + Sunconfig.MARGIN_Y, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-            markerLineStart.setStroke(Sunconfig.Color_Of_CetusMarker);
-            markerLineStart.setStrokeWidth(Sunconfig.CETUS_MARKER_WIDTH);
-            markerLineStart.setStyle(Sunconfig.CETUS_MARKER_SHADOW);
+        switch (location) {
+            case CETUS:
+                markerWidth = Sunconfig.CETUS_MARKER_WIDTH;
+                markerLength = Sunconfig.CETUS_MARKER_LENGTH;
+                markerColor = Sunconfig.Color_Of_CetusMarker;
+                markerShadow = Sunconfig.CETUS_MARKER_SHADOW;
+                matrixScaleX = Sunconfig.CETUS_HORIZON_SCALE;
+                matrixScaleY = Sunconfig.CETUS_HORIZON_SCALE;
+                horizonOffset = Sunconfig.CETUS_HORIZON_OFFSET;
+                arcFill = Sunconfig.CETUS_ARC_GRADIENT;
+                arcColor = Sunconfig.Color_Of_CetusArc;
+                arcOpacity = Sunconfig.CETUS_ARC_OPACITY;
+                animationDuration = Sunconfig.CETUS_MARKER_DURATION;
+                break;
+            case ORB_VALLIS:
+                markerWidth = Sunconfig.ORBVALLIS_MARKER_WIDTH;
+                markerLength = Sunconfig.ORBVALLIS_MARKER_LENGTH;
+                markerColor = Sunconfig.Color_Of_OrbVallisMarker;
+                markerShadow = Sunconfig.ORBVALLIS_MARKER_SHADOW;
+                matrixScaleX = Sunconfig.ORBVALLIS_HORIZON_SCALE;
+                matrixScaleY = Sunconfig.ORBVALLIS_HORIZON_SCALE;
+                horizonOffset = Sunconfig.ORBVALLIS_HORIZON_OFFSET;
+                arcFill = Sunconfig.ORBVALLIS_ARC_GRADIENT;
+                arcColor = Sunconfig.Color_Of_OrbVallisArc;
+                arcOpacity = Sunconfig.ORBVALLIS_ARC_OPACITY;
+                animationDuration = Sunconfig.ORBVALLIS_MARKER_DURATION;
+                break;
+            default: return cetusMarkerGroup;
+        }
+
+        for (int i = 0; i <= cyclesPerTwoDays; i++) {
+
+            double startAngle = (i * cycleLength * 360d) / (24d * 60 * 60 * 1000);
+            double endAngle = ((i * cycleLength + mainPhaseLength) * 360d) / (24d * 60 * 60 * 1000);
+
+            Line markerLineStart = new Line(Sunconfig.CENTER_X, markerLength + Sunconfig.MARGIN_Y, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
+            markerLineStart.setStroke(markerColor);
+            markerLineStart.setStrokeWidth(markerWidth);
+            markerLineStart.setStyle(markerShadow);
             markerLineStart.setMouseTransparent(true);
 
             Rotate markerLineStartRotate = centerRotate.clone();
             markerLineStartRotate.setAngle(startAngle);
 
-            DotMatrix matrixStart = new DotMatrix("00:00", Sunconfig.Color_Of_CetusMarker);
-            matrixStart.setScaleX(Sunconfig.CETUS_HORIZON_SCALE);
-            matrixStart.setScaleY(Sunconfig.CETUS_HORIZON_SCALE);
+            DotMatrix matrixStart = new DotMatrix("00:00", markerColor);
+            matrixStart.setScaleX(matrixScaleX);
+            matrixStart.setScaleY(matrixScaleY);
             matrixStart.setLayoutX(Sunconfig.CENTER_X - matrixStart.getLayoutBounds().getWidth() / 2 - matrixStart.getLayoutBounds().getHeight() / 2);
-            matrixStart.setLayoutY(Sunconfig.CETUS_HORIZON_OFFSET);
+            matrixStart.setLayoutY(horizonOffset);
             matrixStart.setRotate(90d);
-            matrixStart.setStyle(Sunconfig.CETUS_MARKER_SHADOW);
+            matrixStart.setStyle(markerShadow);
             matrixStart.setMouseTransparent(true);
             matrixStart.setOpacity(0);
 
@@ -876,19 +922,19 @@ public class Suncreator {
             startHorizonGroup.getChildren().addAll(markerLineStart, matrixStart);
             startHorizonGroup.getTransforms().add(markerLineStartRotate);
 
-            Line markerLineEnd = new Line(Sunconfig.CENTER_X, Sunconfig.CETUS_MARKER_LENGTH + Sunconfig.MARGIN_Y, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-            markerLineEnd.setStroke(Sunconfig.Color_Of_CetusMarker);
-            markerLineEnd.setStrokeWidth(Sunconfig.CETUS_MARKER_WIDTH);
-            markerLineEnd.setStyle(Sunconfig.CETUS_MARKER_SHADOW);
+            Line markerLineEnd = new Line(Sunconfig.CENTER_X, markerLength + Sunconfig.MARGIN_Y, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
+            markerLineEnd.setStroke(markerColor);
+            markerLineEnd.setStrokeWidth(markerWidth);
+            markerLineEnd.setStyle(markerShadow);
             markerLineEnd.setMouseTransparent(true);
 
-            DotMatrix matrixEnd = new DotMatrix("00:00", Sunconfig.Color_Of_CetusMarker);
-            matrixEnd.setScaleX(Sunconfig.CETUS_HORIZON_SCALE);
-            matrixEnd.setScaleY(Sunconfig.CETUS_HORIZON_SCALE);
+            DotMatrix matrixEnd = new DotMatrix("00:00", markerColor);
+            matrixEnd.setScaleX(matrixScaleX);
+            matrixEnd.setScaleY(matrixScaleY);
             matrixEnd.setTranslateX(Sunconfig.CENTER_X - matrixEnd.getLayoutBounds().getWidth() / 2 + matrixEnd.getLayoutBounds().getHeight() / 2);
-            matrixEnd.setTranslateY(Sunconfig.CETUS_HORIZON_OFFSET);
+            matrixEnd.setTranslateY(horizonOffset);
             matrixEnd.setRotate(90d);
-            matrixEnd.setStyle(Sunconfig.CETUS_MARKER_SHADOW);
+            matrixEnd.setStyle(markerShadow);
             matrixEnd.setMouseTransparent(true);
             matrixEnd.setOpacity(0);
 
@@ -902,8 +948,8 @@ public class Suncreator {
             Arc nightArc = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y, 90 - startAngle, startAngle - endAngle);
             nightArc.setType(ArcType.ROUND);
             nightArc.setStroke(Sunconfig.Color_Of_Void);
-            nightArc.setFill(Sunconfig.CETUS_ARC_GRADIENT);
-            nightArc.setOpacity(Sunconfig.CETUS_ARC_OPACITY);
+            nightArc.setFill(arcFill);
+            nightArc.setOpacity(arcOpacity);
 //            nightArc.setBlendMode(BlendMode.MULTIPLY);
             nightArc.setMouseTransparent(false);
 
@@ -917,13 +963,13 @@ public class Suncreator {
             cetusMarkerTransitionOn.setAutoReverse(false);
 
             KeyValue keyValueStartOpacityOn = new KeyValue(matrixStart.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameStartOpacityOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueStartOpacityOn);
+            KeyFrame keyFrameStartOpacityOn = new KeyFrame(Duration.millis(animationDuration), keyValueStartOpacityOn);
             KeyValue keyValueEndOpacityOn = new KeyValue(matrixEnd.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameEndOpacityOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueEndOpacityOn);
-            KeyValue keyValueLineStartOn = new KeyValue(markerLineStart.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH * 4, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameLineStartOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueLineStartOn);
-            KeyValue keyValueLineEndOn = new KeyValue(markerLineEnd.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH * 4, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameLineEndOn = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueLineEndOn);
+            KeyFrame keyFrameEndOpacityOn = new KeyFrame(Duration.millis(animationDuration), keyValueEndOpacityOn);
+            KeyValue keyValueLineStartOn = new KeyValue(markerLineStart.startYProperty(), markerLength * 3, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineStartOn = new KeyFrame(Duration.millis(animationDuration), keyValueLineStartOn);
+            KeyValue keyValueLineEndOn = new KeyValue(markerLineEnd.startYProperty(), markerLength * 3, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineEndOn = new KeyFrame(Duration.millis(animationDuration), keyValueLineEndOn);
 
             cetusMarkerTransitionOn.getKeyFrames().addAll(keyFrameStartOpacityOn, keyFrameEndOpacityOn, keyFrameLineStartOn, keyFrameLineEndOn);
 
@@ -933,13 +979,13 @@ public class Suncreator {
             cetusMarkerTransitionOff.setAutoReverse(false);
 
             KeyValue keyValueStartOpacityOff = new KeyValue(matrixStart.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameStartOpacityOff = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueStartOpacityOff);
+            KeyFrame keyFrameStartOpacityOff = new KeyFrame(Duration.millis(animationDuration), keyValueStartOpacityOff);
             KeyValue keyValueEndOpacityOff = new KeyValue(matrixEnd.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameEndOpacityOff = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueEndOpacityOff);
-            KeyValue keyValueLineStartOff = new KeyValue(markerLineStart.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH + Sunconfig.MARGIN_Y, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameLineStartOff = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueLineStartOff);
-            KeyValue keyValueLineEndOff = new KeyValue(markerLineEnd.startYProperty(), Sunconfig.CETUS_MARKER_LENGTH + Sunconfig.MARGIN_Y, Interpolator.EASE_BOTH);
-            KeyFrame keyFrameLineEndOff = new KeyFrame(Duration.millis(Sunconfig.CETUS_MARKER_DURATION), keyValueLineEndOff);
+            KeyFrame keyFrameEndOpacityOff = new KeyFrame(Duration.millis(animationDuration), keyValueEndOpacityOff);
+            KeyValue keyValueLineStartOff = new KeyValue(markerLineStart.startYProperty(), markerLength + Sunconfig.MARGIN_Y, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineStartOff = new KeyFrame(Duration.millis(animationDuration), keyValueLineStartOff);
+            KeyValue keyValueLineEndOff = new KeyValue(markerLineEnd.startYProperty(), markerLength + Sunconfig.MARGIN_Y, Interpolator.EASE_BOTH);
+            KeyFrame keyFrameLineEndOff = new KeyFrame(Duration.millis(animationDuration), keyValueLineEndOff);
 
             cetusMarkerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
 
@@ -952,7 +998,7 @@ public class Suncreator {
                         false,
                         CycleMethod.NO_CYCLE,
                         new Stop(stop1, Sunconfig.Color_Of_Void),
-                        new Stop(stop2, Sunconfig.Color_Of_CetusArc)
+                        new Stop(stop2, arcColor)
                 );
             }, matrixStart.opacityProperty()));
 
@@ -967,22 +1013,22 @@ public class Suncreator {
             });
 
             // these are sent back
-            cetusMarkerAngleList.add(startAngle);
-            cetusMarkerAngleList.add(endAngle);
+            markerAngleList.add(startAngle);
+            markerAngleList.add(endAngle);
 
-            cetusMarkerRotateList.add(markerLineStartRotate);
-            cetusMarkerRotateList.add(markerLineEndRotate);
+            markerRotateList.add(markerLineStartRotate);
+            markerRotateList.add(markerLineEndRotate);
 
-            cetusMarkerLineList.add(markerLineStart);
-            cetusMarkerLineList.add(markerLineEnd);
+            markerLineList.add(markerLineStart);
+            markerLineList.add(markerLineEnd);
 
-            cetusMarkerArcList.add(nightArc);
+            markerArcList.add(nightArc);
 
-            cetusTimeMatrixList.add(matrixStart);
-            cetusTimeMatrixList.add(matrixEnd);
+            matrixList.add(matrixStart);
+            matrixList.add(matrixEnd);
 
-            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOn);
-            cetusMarkerHoverTransitionList.add(cetusMarkerTransitionOff);
+            markerHoverTransitionList.add(cetusMarkerTransitionOn);
+            markerHoverTransitionList.add(cetusMarkerTransitionOff);
 
         }
 
@@ -1000,6 +1046,17 @@ public class Suncreator {
         cetusTimer.setLayoutX(Sunconfig.CENTER_X - cetusTimer.getLayoutBounds().getWidth() / 2);
         cetusTimer.setLayoutY(Sunconfig.CETUS_TIMER_OFFSET);
         cetusTimer.setStyle(Sunconfig.CETUS_MATRIX_SHADOW_NIGHT);
+        cetusTimer.setVisible(false);
+        return cetusTimer;
+    }
+
+    public static DotMatrix createOrbVallisTimer() {
+        DotMatrix cetusTimer = new DotMatrix("0h00m00s", Sunconfig.Color_Of_OrbVallisWarm);
+        cetusTimer.setScaleX(Sunconfig.ORBVALLIS_TIMER_SCALE);
+        cetusTimer.setScaleY(Sunconfig.ORBVALLIS_TIMER_SCALE);
+        cetusTimer.setLayoutX(Sunconfig.CENTER_X - cetusTimer.getLayoutBounds().getWidth() / 2);
+        cetusTimer.setLayoutY(Sunconfig.ORBVALLIS_TIMER_OFFSET);
+        cetusTimer.setStyle(Sunconfig.ORBVALLIS_MATRIX_SHADOW_WARM);
         cetusTimer.setVisible(false);
         return cetusTimer;
     }

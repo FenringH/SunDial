@@ -1,11 +1,15 @@
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import static java.lang.Math.*;
@@ -39,6 +43,10 @@ public class ControlThingy extends Group {
     private Polygon triangle;
     private Polygon overlayTriangle;
     private DotMatrix dotMatrix;
+    private Image image;
+    private ImageView imageBox;
+    private double imageScale;
+
     private BooleanProperty stateProperty;
 
     public ControlThingy(PleaseBuildControlThingy builder) {
@@ -64,6 +72,8 @@ public class ControlThingy extends Group {
         this.helpTextObject = builder.helpTextObject;
         this.cursor = builder.cursor;
         this.cycles = builder.cycles;
+        this.image = builder.image;
+        this.imageScale = builder.imageScale;
 
         this.cycle = 0;
         this.onEh = false;
@@ -97,6 +107,11 @@ public class ControlThingy extends Group {
             super.getChildren().addAll(overlayTriangle);
         }
 
+        if (image != null) {
+            imageBox = createImageView();
+            super.getChildren().add(imageBox);
+        }
+
         super.setTranslateX(x);
         super.setTranslateY(y);
 
@@ -115,6 +130,13 @@ public class ControlThingy extends Group {
             super.setStyle(styleShadow);
         });
 
+    }
+
+    private ImageView createImageView() {
+        ImageView imageView = new ImageView(image);
+        imageView.setScaleX(((size * 2) / image.getWidth()) * imageScale);
+        imageView.setScaleY(((size * 2) / image.getHeight()) * imageScale);
+        return imageView;
     }
 
     private Circle createCircle() {
@@ -193,6 +215,8 @@ public class ControlThingy extends Group {
         private Cursor cursor;
         private String helpTextString;
         private Text helpTextObject;
+        private Image image;
+        private double imageScale;
         private int cycles;
 
         public PleaseBuildControlThingy() {
@@ -214,6 +238,8 @@ public class ControlThingy extends Group {
             this.cursor = Cursor.DEFAULT;
             this.helpTextString = "No function";
             this.cycles = 0;
+            this.image = null;
+            this.imageScale = 1.0d;
 
             this.colorFill = new Color(
                     this.strokeColorOff.getRed() * 0.5,
@@ -299,6 +325,12 @@ public class ControlThingy extends Group {
         public PleaseBuildControlThingy helpText(String helpTextString, Text helpTextObject) {
             this.helpTextString = helpTextString;
             this.helpTextObject = helpTextObject;
+            return this;
+        }
+
+        public PleaseBuildControlThingy image(Image image, double scale) {
+            this.image = image;
+            this.imageScale = scale;
             return this;
         }
 

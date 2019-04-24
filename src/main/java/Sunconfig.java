@@ -17,6 +17,17 @@ public class Sunconfig {
     public static final String DEFAULT_EDGE_MAP              = "maps/2k_earth_edge_map.jpg";
     public static final String DEFAULT_SPECULAR_MAP          = "maps/2k_earth_specular_map.jpg";
 
+    public static final Image GLOBE_DAY_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_DAY_MAP));
+    public static final Image GLOBE_NIGHT_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_NIGHT_MAP));;
+    public static final Image GLOBE_SPECULAR_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_SPECULAR_MAP));;
+    public static final Image GLOBE_EDGE_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_EDGE_MAP));;
+
+    public static final String DEFAULT_LOGO_OSTRON           = "icons/Ostron.png";
+    public static final String DEFAULT_LOGO_SOLARIS_UNITED   = "icons/SolarisUnited.png";
+
+    public static final Image LOGO_OSTRON = new Image(DEFAULT_LOGO_OSTRON);
+    public static final Image LOGO_SOLARIS_UNITED = new Image(DEFAULT_LOGO_SOLARIS_UNITED);
+
     public static final String DEFAULT_FONT_COURIER_PRIME_CODE          = "fonts/Courier Prime Code.ttf";
 
     public static final Font FONT_DEBUG = Font.loadFont(ClassLoader.getSystemResourceAsStream(DEFAULT_FONT_COURIER_PRIME_CODE), 14);
@@ -255,7 +266,8 @@ public class Sunconfig {
     public static final double CONTROL_CHART_RADIUS = 7.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CONTROL_DST_RADIUS = 10.0d;
-    public static final double CETUS_MARKER_LENGTH = 21.0d;
+    public static final double CETUS_MARKER_LENGTH = 30.0d;
+    public static final double ORBVALLIS_MARKER_LENGTH = 21.0d;
     public static final double HELP_OVERLAY_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double HELP_MARKER_ROUND = 10.0d;
     public static final double HELP_MARKER_RADIUS = 4.0d;
@@ -287,6 +299,7 @@ public class Sunconfig {
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_DST_STROKE_WIDTH = 3.0d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
+    public static final double ORBVALLIS_MARKER_WIDTH = 1.00d;
     public static final double DAY_TERMINATOR_WIDTH = 1.25d;
     public static final double DAY_TERMINATOR_GLOW_WIDTH = 12.00d;
     public static final double TINYGLOBE_TERMINATOR_WIDTH = 1.00d;
@@ -306,6 +319,7 @@ public class Sunconfig {
     public static final double CONTROL_NIGHTMODE_OPACITY = 1.00d;
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
     public static final double CETUS_ARC_OPACITY = 1.00d;
+    public static final double ORBVALLIS_ARC_OPACITY = 1.00d;
     public static final double DAY_TERMINATOR_GLOW_OPACITY = 0.35d;
     public static final double DAY_TERMINATOR_LINE_OPACITY = 0.90d;
     public static final double DAY_GRIDLINE_OPACITY = 0.25d;
@@ -354,8 +368,10 @@ public class Sunconfig {
     public static final double CONTROL_GLOBEGRID_OFFSET = 232.0d;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
     public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
+    public static final double ORBVALLIS_TIMER_OFFSET = CENTER_Y - 70.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     public static final double CETUS_HORIZON_OFFSET = 45.0d;
+    public static final double ORBVALLIS_HORIZON_OFFSET = 45.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 45.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
     public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 25;
@@ -375,8 +391,10 @@ public class Sunconfig {
     public static final double MATRIX_MINUTE_SCALE = 0.75d;
     public static final double TINYGLOBE_DOWNSCALE = 0.80d;
     public static final double CETUS_TIMER_SCALE = 1.00d;
+    public static final double ORBVALLIS_TIMER_SCALE = 1.00d;
     public static final double CETUS_TIMEREADER_SCALE = 0.75d;
     public static final double CETUS_HORIZON_SCALE = 0.75d;
+    public static final double ORBVALLIS_HORIZON_SCALE = 0.75d;
     public static final double MATRIX_TIMEZONE_SCALE = 1.10d;
     public static final double MATRIX_HIGHNOON_SCALE = 1.00d;
     public static final double MATRIX_CONTROLTHINGY_SCALE = 1.25d;
@@ -400,6 +418,7 @@ public class Sunconfig {
     public static final int TINY_GLOBE_DURATION = 350;
     public static final int TIMEANDDATE_DURATION = 350;
     public static final int CETUS_MARKER_DURATION = 150;
+    public static final int ORBVALLIS_MARKER_DURATION = 150;
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
     public static final Color Color_Of_Earth      = new Color(0.85, 0.85, 0.65, 1.00);
@@ -413,12 +432,13 @@ public class Sunconfig {
     public static final Color Color_Of_Nominalish = new Color(0.10, 0.40, 1.00, 0.50);
     public static final Color Color_Of_Warning    = new Color(1.00, 0.65, 0.00, 0.35);
 
-    public static final Color Color_Of_DaySky     = new Color(0.50, 0.75, 1.00, 1.00);
-    public static final Color Color_Of_Atmosphere = new Color(0.25, 0.50, 0.90, 0.85);
-    public static final Color Color_Of_Space      = new Color(0.25, 0.50, 0.90, 0.00);
-    public static final Color Color_Of_NightSky   = new Color(0.50, 0.35, 1.00, 1.00);
-    public static final Color Color_Of_Midnight   = new Color(0.00, 0.00, 0.00, 0.20);
-    public static final Color Color_Of_Margin     = new Color(0.10, 0.25, 0.60, 1.00);
+    public static final Color Color_Of_DaySky       = new Color(0.50, 0.75, 1.00, 1.00);
+    public static final Color Color_Of_Atmosphere   = new Color(0.25, 0.50, 0.90, 0.85);
+    public static final Color Color_Of_Space        = new Color(0.25, 0.50, 0.90, 0.00);
+    public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
+    public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.20);
+    public static final Color Color_Of_Margin       = new Color(0.10, 0.25, 0.60, 1.00);
+    public static final Color Color_Of_Margin_Hover = new Color(0.20, 0.40, 0.80, 1.00);
 
     public static final Color Color_Of_SunTime    = new Color(1.00, 0.50, 0.00, 1.00);
     public static final Color Color_Of_HighNoon   = new Color(1.00, 1.00, 0.00, 1.00);
@@ -462,10 +482,14 @@ public class Sunconfig {
     public static final Color Color_Of_AnimationOn = new Color(1.00, 0.65, 0.35, 1.00);
 
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
+    public static final Color Color_Of_OrbVallisMarker = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusFrame  = new Color(0.85, 0.60, 0.95, 1.00);
     public static final Color Color_Of_CetusArc    = new Color(0.90, 0.25, 1.00, 1.00);
+    public static final Color Color_Of_OrbVallisArc    = new Color(1.00, 0.75, 0.25, 1.00);
     public static final Color Color_Of_CetusDay    = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusNight  = new Color(0.90, 0.70, 1.00, 1.00);
+    public static final Color Color_Of_OrbVallisWarm  = new Color(1.00, 0.75, 0.50, 1.00);
+    public static final Color Color_Of_OrbVallisCold  = new Color(0.70, 0.85, 1.00, 1.00);
 
     public static final Color Color_Of_DayDay           = new Color(1.00, 1.00, 0.80, 1.00);
     public static final Color Color_Of_DayReverse       = new Color(1.00, 0.25, 0.00, 1.00);
@@ -526,18 +550,16 @@ public class Sunconfig {
     public static final String CONTROL_GLOBEGRID_GLOW       = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  4.0, 0.50, 0, 0);";
 
     public static final String CETUS_MARKER_SHADOW          = "-fx-effect: dropshadow(three-pass-box, rgba(192, 48,192, 1.0), 10.0, 0.75, 0, 0);";
+    public static final String ORBVALLIS_MARKER_SHADOW      = "-fx-effect: dropshadow(three-pass-box, rgba(192,192, 48, 1.0), 10.0, 0.75, 0, 0);";
     public static final String CETUS_MARKER_GLOW            = "-fx-effect: dropshadow(three-pass-box, rgba(255,196,255, 1.0), 10.0, 0.75, 0, 0);";
     public static final String CETUS_MATRIX_SHADOW_DAY      = "-fx-effect: dropshadow(three-pass-box, rgba(128, 64,  0, 1.0), 15.0, 0.75, 0, 0);";
     public static final String CETUS_MATRIX_SHADOW_NIGHT    = "-fx-effect: dropshadow(three-pass-box, rgba(128, 32,164, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String ORBVALLIS_MATRIX_SHADOW_WARM = "-fx-effect: dropshadow(three-pass-box, rgba(192, 96,  0, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String ORBVALLIS_MATRIX_SHADOW_COLD = "-fx-effect: dropshadow(three-pass-box, rgba(  0, 96,192, 1.0), 15.0, 0.75, 0, 0);";
 
     public static final String HELP_MARKER_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
 
     public static final String HOUR_MARKER_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 0.5),  4.0, 0.50, 0, 0);";
-
-    public static final Image GLOBE_DAY_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_DAY_MAP));
-    public static final Image GLOBE_NIGHT_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_NIGHT_MAP));;
-    public static final Image GLOBE_SPECULAR_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_SPECULAR_MAP));;
-    public static final Image GLOBE_EDGE_IMAGE = Sunutil.convertSphericalToCylindricalMapping(new Image(DEFAULT_EDGE_MAP));;
 
     public static final RadialGradient FRAME_DIAL_NOMINAL = new RadialGradient(
             0, 0,
@@ -628,6 +650,15 @@ public class Sunconfig {
             CycleMethod.NO_CYCLE,
             new Stop(0.87, Color_Of_Void),
             new Stop(0.95, Color_Of_CetusArc)
+    );
+
+    public static final RadialGradient ORBVALLIS_ARC_GRADIENT = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.87, Color_Of_Void),
+            new Stop(0.95, Color_Of_OrbVallisArc)
     );
 
     public static final RadialGradient CETUS_ARC_GRADIENT_HOVER = new RadialGradient(
