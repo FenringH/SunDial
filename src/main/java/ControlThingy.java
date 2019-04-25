@@ -86,16 +86,15 @@ public class ControlThingy extends Group {
         this.stateProperty = new SimpleBooleanProperty(this.onEh);
         this.stateProperty.addListener((observable, oldValue, newValue) -> changeState(this.stateProperty.get()));
 
+        // LAYERS
         switch (type) {
             case CIRCLE:
                 circle = createCircle();
-                overlayCircle = createOverlayCircle();
-                super.getChildren().addAll(circle, overlayCircle);
+                super.getChildren().addAll(circle);
                 break;
             case TRIANGLE:
                 triangle = createTriangle();
-                overlayTriangle = createOverlayTriangle();
-                super.getChildren().addAll(triangle, overlayTriangle);
+                super.getChildren().addAll(triangle);
                 break;
             default: {}
         }
@@ -110,6 +109,19 @@ public class ControlThingy extends Group {
             super.getChildren().add(imageBox);
         }
 
+        switch (type) {
+            case CIRCLE:
+                overlayCircle = createOverlayCircle();
+                super.getChildren().addAll(overlayCircle);
+                break;
+            case TRIANGLE:
+                overlayTriangle = createOverlayTriangle();
+                super.getChildren().addAll(overlayTriangle);
+                break;
+            default: {}
+        }
+
+        // Transforms
         super.setTranslateX(x);
         super.setTranslateY(y);
 
