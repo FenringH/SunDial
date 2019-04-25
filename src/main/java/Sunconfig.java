@@ -205,6 +205,12 @@ public class Sunconfig {
     public static final String HELPTEXT_HELP = "HALP !!!" +
             "\n LMB : toggle Help Overlay\u2122";
 
+    public static final String HELPTEXT_CETUS = "CETUS TIME" +
+            "\n LMB : toggle Cetus night/day timer";
+
+    public static final String HELPTEXT_ORBVALLIS = "ORB VALIS TIME" +
+            "\n LMB : toggle Orb Vallis warm/cold timer";
+
     public static final String HELPTEXT_DST = "DAYLIGHT SAVING TIME" +
             "\n LMB : toggle Daylight Saving Time" +
             "\n\n" + HELPTEXT_NIGHTCOMPRESSION;
@@ -260,10 +266,10 @@ public class Sunconfig {
     public static final double CONTROL_CLOSE_RADIUS = 10.0d;
     public static final double CONTROL_MAXIMIZE_RADIUS = 10.0d;
     public static final double CONTROL_MINIMIZE_RADIUS = 10.0d;
-    public static final double CONTROL_NIGHTMODE_RADIUS = 7.0d;
-    public static final double CONTROL_ALWAYSONTOP_RADIUS = 7.0d;
-    public static final double CONTROL_ANIMATION_RADIUS = 7.0d;
-    public static final double CONTROL_CHART_RADIUS = 7.0d;
+    public static final double CONTROL_NIGHTMODE_RADIUS = 8.0d;
+    public static final double CONTROL_ALWAYSONTOP_RADIUS = 8.0d;
+    public static final double CONTROL_ANIMATION_RADIUS = 8.0d;
+    public static final double CONTROL_CHART_RADIUS = 8.0d;
     public static final double CONTROL_GLOBEGRID_RADIUS = 8.0d;
     public static final double CONTROL_DST_RADIUS = 10.0d;
     public static final double CETUS_MARKER_LENGTH = 30.0d;
@@ -318,8 +324,8 @@ public class Sunconfig {
     public static final double CONTROL_MINIMIZE_OPACITY = 1.00d;
     public static final double CONTROL_NIGHTMODE_OPACITY = 1.00d;
     public static final double CONTROL_ALWAYSONTOP_OPACITY = 1.00d;
-    public static final double CETUS_ARC_OPACITY = 1.00d;
-    public static final double ORBVALLIS_ARC_OPACITY = 1.00d;
+    public static final double CETUS_ARC_OPACITY = 0.65d;
+    public static final double ORBVALLIS_ARC_OPACITY = 0.75d;
     public static final double DAY_TERMINATOR_GLOW_OPACITY = 0.35d;
     public static final double DAY_TERMINATOR_LINE_OPACITY = 0.90d;
     public static final double DAY_GRIDLINE_OPACITY = 0.25d;
@@ -402,16 +408,18 @@ public class Sunconfig {
     public static final double HIGHNOON_DOWN_SCALE = 0.825d;
     public static final double CONTROL_DST_MATRIX_SCALE = 0.85d * (CONTROL_DST_RADIUS / 10);
 
-    public static final double CONTROL_MINIMIZE_ANGLE = 45.0d;
+    public static final double CONTROL_MINIMIZE_ANGLE = 45;
     public static final double CONTROL_CLOSE_ANGLE = CONTROL_MINIMIZE_ANGLE - 8;
     public static final double CONTROL_MAXIMIZE_ANGLE = CONTROL_MINIMIZE_ANGLE + 8;
     public static final double CONTROL_HELP_ANGLE = 180 - CONTROL_MAXIMIZE_ANGLE;
-    public static final double CONTROL_ALWAYSONTOP_ANGLE = CONTROL_HELP_ANGLE + 7;
+    public static final double CONTROL_ALWAYSONTOP_ANGLE = CONTROL_HELP_ANGLE + 6;
     public static final double CONTROL_NIGHTMODE_ANGLE = CONTROL_ALWAYSONTOP_ANGLE + 6;
     public static final double CONTROL_ANIMATION_ANGLE = CONTROL_NIGHTMODE_ANGLE + 6;
-    public static final double CONTROL_CHART_ANGLE = CONTROL_ANIMATION_ANGLE + 6;
-    public static final double CONTROL_GLOBE_LINES_ANGLE = 56d + 180d;
+    public static final double CONTROL_CHART_ANGLE  = CONTROL_ANIMATION_ANGLE + 6;
+    public static final double CONTROL_GLOBE_LINES_ANGLE = 56 + 180;
     public static final double CONTROL_GLOBE_GRID_ANGLE = CONTROL_GLOBE_LINES_ANGLE + 6;
+    public static final double CONTROL_ORBVALLIS_ANGLE = 34 + 180;
+    public static final double CONTROL_CETUS_ANGLE = CONTROL_ORBVALLIS_ANGLE - 6;
 
     public static final int LED_OPACITY_DURATION = 350;
     public static final int GLOBE_ROTATE_DURATION = 750;
@@ -437,8 +445,8 @@ public class Sunconfig {
     public static final Color Color_Of_Space        = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
     public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.20);
-    public static final Color Color_Of_Margin       = new Color(0.10, 0.25, 0.60, 1.00);
-    public static final Color Color_Of_Margin_Hover = new Color(0.20, 0.40, 0.80, 1.00);
+    public static final Color Color_Of_Margin       = new Color(0.10, 0.25, 0.60, MARGIN_CIRCLE_OPACITY);
+    public static final Color Color_Of_Margin_Hover = new Color(0.10, 0.40, 0.60, 0.90);
 
     public static final Color Color_Of_SunTime    = new Color(1.00, 0.50, 0.00, 1.00);
     public static final Color Color_Of_HighNoon   = new Color(1.00, 1.00, 0.00, 1.00);
@@ -484,7 +492,7 @@ public class Sunconfig {
     public static final Color Color_Of_CetusMarker = new Color(0.90, 0.70, 1.00, 1.00);
     public static final Color Color_Of_OrbVallisMarker = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusFrame  = new Color(0.85, 0.60, 0.95, 1.00);
-    public static final Color Color_Of_CetusArc    = new Color(0.90, 0.25, 1.00, 1.00);
+    public static final Color Color_Of_CetusArc    = new Color(0.75, 0.15, 1.00, 1.00);
     public static final Color Color_Of_OrbVallisArc    = new Color(1.00, 0.75, 0.25, 1.00);
     public static final Color Color_Of_CetusDay    = new Color(1.00, 0.90, 0.70, 1.00);
     public static final Color Color_Of_CetusNight  = new Color(0.90, 0.70, 1.00, 1.00);
@@ -502,7 +510,7 @@ public class Sunconfig {
     public static final Color Color_Of_NightSpecular    = new Color(1.00, 1.00, 1.00, 1.00);
 
     public static final Color Color_Of_AtmosphereDay    = new Color(0.50, 0.85, 1.00, 1.00);
-    public static final Color Color_Of_AtmosphereNight  = new Color(1.00, 0.35, 0.10, 1.00);
+    public static final Color Color_Of_AtmosphereNight  = new Color(1.00, 0.38, 0.10, 1.00);
     public static final Color Color_Of_AtmosphereMid    = new Color(0.25, 0.50, 1.00, 1.00);
 
     public static final Color Color_Of_HourMarkerFull    = new Color(1.00, 0.30, 0.00, 1.00);
@@ -643,22 +651,28 @@ public class Sunconfig {
             new Stop(1.00, Color_Of_TinyFrame)
     );
 
+    public static final double CETUS_ARC_GRADIENT_STOP1 = 0.87;
+    public static final double CETUS_ARC_GRADIENT_STOP2 = 0.95;
+
     public static final RadialGradient CETUS_ARC_GRADIENT = new RadialGradient(
             0, 0,
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.87, Color_Of_Void),
-            new Stop(0.95, Color_Of_CetusArc)
+            new Stop(CETUS_ARC_GRADIENT_STOP1, Color_Of_Void),
+            new Stop(CETUS_ARC_GRADIENT_STOP2, Color_Of_CetusArc)
     );
+
+    public static final double ORBVALLIS_ARC_GRADIENT_STOP1 = 0.90;
+    public static final double ORBVALLIS_ARC_GRADIENT_STOP2 = 0.96;
 
     public static final RadialGradient ORBVALLIS_ARC_GRADIENT = new RadialGradient(
             0, 0,
             CENTER_X, CENTER_Y, CENTER_Y - MARGIN_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.87, Color_Of_Void),
-            new Stop(0.95, Color_Of_OrbVallisArc)
+            new Stop(ORBVALLIS_ARC_GRADIENT_STOP1, Color_Of_Void),
+            new Stop(ORBVALLIS_ARC_GRADIENT_STOP2, Color_Of_OrbVallisArc)
     );
 
     public static final RadialGradient CETUS_ARC_GRADIENT_HOVER = new RadialGradient(

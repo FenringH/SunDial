@@ -48,13 +48,14 @@ public class DotMatrix extends Group {
     final private static long MATRIX_Y =           0b00100_00100_00100_01010_10001_10001_10001L;
     final private static long MATRIX_A =           0b10001_10001_11111_10001_10001_01010_00100L;
     final private static long MATRIX_SPACE =       0b00000_00000_00000_00000_00000_00000_00000L;
-    final private static long MATRIX_DASH =        0b00000_00000_00000_11111_00000_00000_00000L;
+    final private static long MATRIX_MINUS =        0b00000_00000_00000_11111_00000_00000_00000L;
     final private static long MATRIX_PLUS =        0b00000_00100_00100_11111_00100_00100_00000L;
     final private static long MATRIX_COLON =       0b00000_00100_00000_00000_00100_00000_00000L;
     final private static long MATRIX_DOT =         0b00100_00000_00000_00000_00000_00000_00000L;
     final private static long MATRIX_QUESTION =    0b00100_00000_00100_00010_00001_10001_01110L;
     final private static long MATRIX_UNKNOWN =     0b00100_01010_10101_01010_10101_01010_00100L;
     final private static long MATRIX_DEGREE =      0b00000_00000_00000_01100_10010_10010_01100L;
+    final private static long MATRIX_HASH =        0b01010_01010_11111_01010_11111_01010_01010L;
 
     private Circle[][][] dots;
     private String string;
@@ -68,7 +69,7 @@ public class DotMatrix extends Group {
         stringGroup = new Group();
 
         if (string == null || string.isEmpty()) {
-            this.string = "##";
+            this.string = "``";
         } else {
             this.string = string;
         }
@@ -171,12 +172,13 @@ public class DotMatrix extends Group {
                 case 'Y': charCode = MATRIX_Y; break;
                 case 'A': charCode = MATRIX_A; break;
                 case ' ': charCode = MATRIX_SPACE; break;
-                case '-': charCode = MATRIX_DASH; break;
+                case '-': charCode = MATRIX_MINUS; break;
                 case '+': charCode = MATRIX_PLUS; break;
                 case ':': charCode = MATRIX_COLON; break;
                 case '.': charCode = MATRIX_DOT; break;
                 case '?': charCode = MATRIX_QUESTION; break;
                 case '^': charCode = MATRIX_DEGREE; break;
+                case '#': charCode = MATRIX_HASH; break;
                 default : charCode = MATRIX_UNKNOWN; break;
             }
 

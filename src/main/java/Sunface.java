@@ -282,9 +282,6 @@ public class Sunface extends Application {
 
         // SUNDIAL WINDOW
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
-
-        sundial.getControlThingyHelp().setOnMouseClicked(event -> sundial.toggleHelp());
-
         sundial.getControlThingyMaximize().setOnMouseClicked(event -> maximizeActions(primaryStage, WindowType.PRIMARY));
 
         sundial.getControlThingyMinimize().setOnMousePressed(event -> saveMouse(primaryStage, event));
@@ -294,17 +291,17 @@ public class Sunface extends Application {
         sundial.getControlThingyResize().setOnMouseReleased(event -> { resizeActions(primaryStage, WindowType.PRIMARY, event); killMouse(); });
         sundial.getControlThingyResize().setOnMouseDragged(event -> resizeWindow(primaryStage, WindowType.PRIMARY, event));
 
-        sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
-
+        sundial.getControlThingyHelp().setOnMouseClicked(event -> sundial.toggleHelp());
         sundial.getControlThingyAlwaysOnTop().setOnMouseClicked(event -> toggleAlwaysOnTop(primaryStage));
-
-        sundial.getControlThingyGlobeGrid().setOnMouseClicked(event -> sundial.toggleGlobeGrid());
-
-        sundial.getControlThingyGlobeLines().setOnMouseClicked(event -> sundial.toggleGlobeLines());
-
+        sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
         sundial.getControlThingyAnimation().setOnMouseClicked(event -> sundial.toggleAnimation());
 
         sundial.getControlThingyChart().setOnMouseClicked(event -> toggleSunchartWindow());
+        sundial.getControlThingyCetus().setOnMouseClicked(event -> toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.CETUS, event));
+        sundial.getControlThingyOrbVallis().setOnMouseClicked(event -> toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.ORB_VALLIS, event));
+
+        sundial.getControlThingyGlobeGrid().setOnMouseClicked(event -> sundial.toggleGlobeGrid());
+        sundial.getControlThingyGlobeLines().setOnMouseClicked(event -> sundial.toggleGlobeLines());
 
         sundial.getControlThingyDst().setOnMousePressed(event -> saveMouse(primaryStage, event));
         sundial.getControlThingyDst().setOnMouseReleased(event -> { nightCompressionActions(primaryStage, event); killMouse(); });
@@ -532,14 +529,14 @@ public class Sunface extends Application {
         updateDebugWindow(sundial);
     }
 
-    public void openBrowser(Event event, String uri) {
+    public void openBrowser(MouseEvent event, String uri) {
 
         try {
             HostServicesDelegate hostServices = HostServicesFactory.getInstance(this);
             hostServices.showDocument(uri);
         } catch (Exception e) {
             sundial.getInfoText().setText("Error opening web browser.");
-            showInfoText();
+            showInfoText(event);
             hideInfoTextWithDelay();
         }
     }
@@ -765,9 +762,9 @@ public class Sunface extends Application {
         }
     }
 
-    private void refreshKriegsrahmenTime(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
+    private void refreshKriegsrahmenZeit(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
 
-        sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
+        sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent, Sundial.MouseCatcher.SCENE);
 
         KriegsrahmenZeit kriegsrahmenZeit;
 
@@ -781,24 +778,34 @@ public class Sunface extends Application {
 
         refreshDataTask.setOnScheduled(refreshEvent -> {
             sundial.getInfoText().setText("Syncing with " + location.getFullName() + "...");
-            showInfoText();
+            showInfoText(mouseEvent);
         });
 
         refreshDataTask.setOnFailed(refreshEvent -> {
             sundial.getInfoText().setText(kriegsrahmenZeit.getShortResult());
-            showInfoText();
+            showInfoText(mouseEvent);
             hideInfoTextWithDelay();
         });
 
         refreshDataTask.setOnSucceeded(refreshEvent -> {
             sundial.getInfoText().setText(kriegsrahmenZeit.getShortResult());
-            showKriegsrahmenTime(location, mouseEvent);
+            showKriegsrahmenZeit(location, mouseEvent);
             hideInfoTextWithDelay();
         });
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(refreshDataTask);
         executorService.shutdown();
+    }
+
+    private void showInfoText(MouseEvent event) {
+        sundial.moveGroup(sundial.getInfoTextGroup(), event, Sundial.MouseCatcher.SCENE);
+        showInfoText();
+    }
+
+    private void showInfoText(DragEvent event) {
+        sundial.moveGroup(sundial.getInfoTextGroup(), event, Sundial.MouseCatcher.SCENE);
+        showInfoText();
     }
 
     private void showInfoText() {
@@ -823,7 +830,7 @@ public class Sunface extends Application {
         }
     }
 
-    private void showKriegsrahmenTime(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
+    private void showKriegsrahmenZeit(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
 
         KriegsrahmenZeit kriegsrahmenZeit;
         ArrayList<ArrayList<GregorianCalendar>> cycleList;
@@ -848,8 +855,8 @@ public class Sunface extends Application {
             sundial.setKriegsrahmenTimeVisibility(location, true);
         } else {
             sundial.getInfoText().setText(location.getFullName() + " time unavailable: \n" + kriegsrahmenZeit.getShortResult());
-            sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent);
-            showInfoText();
+            sundial.moveGroup(sundial.getInfoTextGroup(), mouseEvent, Sundial.MouseCatcher.LOCAL);
+            showInfoText(mouseEvent);
         }
 
         hideInfoTextWithDelay();
@@ -1217,6 +1224,28 @@ public class Sunface extends Application {
         stage.setAlwaysOnTop(sundial.getControlThingyAlwaysOnTop().getState());
     }
 
+    private boolean getKriegsrahmenZeitDataExpired(KriegsrahmenZeit.Location location) {
+        switch (location) {
+            case CETUS: return cetusTime.dataExpiredEh();
+            case ORB_VALLIS: return orbVallisTime.dataExpiredEh();
+            default: return false;
+        }
+    }
+
+    private void toggleKriegsrahmenZeit(KriegsrahmenZeit.Location location, MouseEvent mouseEvent) {
+
+        if (sundial.getKriegsrahmenZeitVisibleEh(location)) {
+            sundial.setKriegsrahmenTimeVisibility(location,false);
+        } else {
+
+            if (getKriegsrahmenZeitDataExpired(location)) {
+                refreshKriegsrahmenZeit(location, mouseEvent);
+            } else {
+                showKriegsrahmenZeit(location, mouseEvent);
+            }
+        }
+    }
+
     private void tinyGlobeActions(MouseEvent mouseEvent) {
 
         // LMB action (toggle Globe)
@@ -1225,36 +1254,19 @@ public class Sunface extends Application {
             return;
         }
 
+/*
         // RMB action (toggle Kriegsrahmen time)
         if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
 
             if (mouseEvent.isShiftDown()) {
-
-                if (sundial.getOrbVallisTimeVisibleEh()) {
-                    sundial.setOrbVallisTimeVisibility(false);
-                } else {
-                    if (orbVallisTime.dataExpiredEh()) {
-                        refreshKriegsrahmenTime(KriegsrahmenZeit.Location.ORB_VALLIS, mouseEvent);
-                    } else {
-                        showKriegsrahmenTime(KriegsrahmenZeit.Location.ORB_VALLIS, mouseEvent);
-                    }
-                }
-
+                toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.ORB_VALLIS, mouseEvent);
             } else {
-
-                if (sundial.getCetusTimeVisibleEh()) {
-                    sundial.setCetusTimeVisibility(false);
-                } else {
-                    if (cetusTime.dataExpiredEh()) {
-                        refreshKriegsrahmenTime(KriegsrahmenZeit.Location.CETUS, mouseEvent);
-                    } else {
-                        showKriegsrahmenTime(KriegsrahmenZeit.Location.CETUS, mouseEvent);
-                    }
-                }
+                toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.CETUS, mouseEvent);
             }
 
             return;
         }
+*/
 
         // MMB action (reset Coordinates)
         if (mouseEvent.getButton().equals(MouseButton.MIDDLE)) {
@@ -1590,14 +1602,14 @@ public class Sunface extends Application {
 
             } catch (NumberFormatException e) {
                 sundial.getInfoText().setText("Catasptrophic error while parsing coordinates!\nPlease don't try again.");
-                sundial.moveGroup(sundial.getInfoTextGroup(), dragEvent);
-                showInfoText();
+                sundial.moveGroup(sundial.getInfoTextGroup(), dragEvent, Sundial.MouseCatcher.LOCAL);
+                showInfoText(dragEvent);
                 debugErrorMessage = "NumberFormatException while parsing string: " + string + "\n" + e.getMessage();
             }
         } else {
             sundial.getInfoText().setText("Unable to match coordinates.\nPlease try again.");
-            sundial.moveGroup(sundial.getInfoTextGroup(), dragEvent);
-            showInfoText();
+            sundial.moveGroup(sundial.getInfoTextGroup(), dragEvent, Sundial.MouseCatcher.LOCAL);
+            showInfoText(dragEvent);
         }
 
         hideInfoTextWithDelay();

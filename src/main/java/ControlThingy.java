@@ -46,6 +46,8 @@ public class ControlThingy extends Group {
     private Image image;
     private SubScene imageBox;
     private double imageScale;
+    private double imageOffsetX, imageOffsetY;
+    private String imageStyle;
 
     private BooleanProperty stateProperty;
 
@@ -74,6 +76,9 @@ public class ControlThingy extends Group {
         this.cycles = builder.cycles;
         this.image = builder.image;
         this.imageScale = builder.imageScale;
+        this.imageOffsetX = builder.imageOffsetX;
+        this.imageOffsetY = builder.imageOffsetY;
+        this.imageStyle = builder.imageStyle;
 
         this.cycle = 0;
         this.onEh = false;
@@ -128,10 +133,11 @@ public class ControlThingy extends Group {
     private SubScene createImageBox() {
         ImageView imageView = new ImageView(image);
         SubScene imageScene = new SubScene(new Group(imageView), image.getWidth(), image.getHeight(), true, SceneAntialiasing.BALANCED);
-        imageScene.setTranslateX(-image.getWidth() / 2);
-        imageScene.setTranslateY(-image.getHeight() / 2);
+        imageScene.setTranslateX(-image.getWidth() / 2 + imageOffsetX);
+        imageScene.setTranslateY(-image.getHeight() / 2 + imageOffsetY);
         imageScene.setScaleX(((size * 2) / image.getWidth()) * imageScale);
         imageScene.setScaleY(((size * 2) / image.getHeight()) * imageScale);
+        imageScene.setStyle(imageStyle);
         return imageScene;
     }
 
@@ -213,6 +219,8 @@ public class ControlThingy extends Group {
         private Text helpTextObject;
         private Image image;
         private double imageScale;
+        private double imageOffsetX, imageOffsetY;
+        private String imageStyle;
         private int cycles;
 
         public PleaseBuildControlThingy() {
@@ -236,6 +244,9 @@ public class ControlThingy extends Group {
             this.cycles = 0;
             this.image = null;
             this.imageScale = 1.0d;
+            this.imageOffsetX = 0;
+            this.imageOffsetY = 0;
+            this.imageStyle = "";
 
             this.colorFill = new Color(
                     this.strokeColorOff.getRed() * 0.5,
@@ -324,9 +335,12 @@ public class ControlThingy extends Group {
             return this;
         }
 
-        public PleaseBuildControlThingy image(Image image, double scale) {
+        public PleaseBuildControlThingy image(Image image, double scale, double offsetX, double offsetY, String style) {
             this.image = image;
             this.imageScale = scale;
+            this.imageOffsetX = offsetX;
+            this.imageOffsetY = offsetY;
+            this.imageStyle = style;
             return this;
         }
 

@@ -15,6 +15,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ import java.util.TimeZone;
 import static java.lang.Math.*;
 
 public class Sundial {
+
+    public enum MouseCatcher { LOCAL, SCENE };
 
     public static final double DEFAULT_WIDTH = 440.0d;
     public static final double DEFAULT_HEIGHT = 440.0d;
@@ -75,6 +78,7 @@ public class Sundial {
     private Arc dialArcDayLength;
 
     private Circle dialMarginCircle;
+    private Circle dialMarginCircleRing;
     private Circle dialCircleBackground;
     private Circle dialCircleFrame;
     private Group controlNightCompression;
@@ -129,6 +133,8 @@ public class Sundial {
     private ControlThingy controlThingyAlwaysOnTop;
     private ControlThingy controlThingyAnimation;
     private ControlThingy controlThingyChart;
+    private ControlThingy controlThingyCetus;
+    private ControlThingy controlThingyOrbVallis;
     private ControlThingy controlThingyGlobeGrid;
     private ControlThingy controlThingyGlobeLines;
     private ControlThingy controlThingyDst;
@@ -468,6 +474,8 @@ public class Sundial {
         controlThingyAlwaysOnTop = Suncreator.createControlThingy(Suncreator.ControlThingyType.ALWAYSONTOP, helpText);
         controlThingyAnimation = Suncreator.createControlThingy(Suncreator.ControlThingyType.ANIMATION, helpText);
         controlThingyChart = Suncreator.createControlThingy(Suncreator.ControlThingyType.CHART, helpText);
+        controlThingyCetus = Suncreator.createControlThingy(Suncreator.ControlThingyType.CETUS, helpText);
+        controlThingyOrbVallis = Suncreator.createControlThingy(Suncreator.ControlThingyType.ORBVALLIS, helpText);
 
         outerControlsGroup = new Group(
                 controlThingyResize,
@@ -478,8 +486,13 @@ public class Sundial {
                 controlThingyAlwaysOnTop,
                 controlThingyAnimation,
                 controlThingyChart,
+                controlThingyCetus,
+                controlThingyOrbVallis,
                 controlThingyHelp
         );
+
+        controlThingyCetus.stateProperty().bind(cetusTimer.visibleProperty());
+        controlThingyOrbVallis.stateProperty().bind(orbVallisTimer.visibleProperty());
 
         controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
         controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
@@ -546,6 +559,7 @@ public class Sundial {
 
         // Other stuff
         dialMarginCircle = Suncreator.createDialMarginCircle();
+        dialMarginCircleRing = Suncreator.createDialMarginCircleRing();
         dialArcNight = Suncreator.createDialArcNight();
         dialArcMidnight = Suncreator.createDialArcMidnight();
         dialCircleBackground = Suncreator.createDialCircleBackground();
@@ -600,6 +614,8 @@ public class Sundial {
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyAlwaysOnTop, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyAnimation, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyChart, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyCetus, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlThingyOrbVallis, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyHelp, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null, null));
@@ -614,7 +630,8 @@ public class Sundial {
 
 
         // LAYERS
-        SubScene backgroundScene = Suncreator.createBackgroundSubScene(dialMarginCircle);
+        Group backgroundGroup = new Group(dialMarginCircle/*, dialMarginCircleRing*/);
+        SubScene backgroundScene = Suncreator.createBackgroundSubScene(backgroundGroup);
 
         Group foregroundGroup = new Group();
         foregroundGroup.getChildren().add(dialCircleBackground);
@@ -707,28 +724,58 @@ public class Sundial {
         miroTextGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); miroTextGroup.setCursor(Cursor.DEFAULT); miroText.setUnderline(false); });
 
         dialsGroup.setOnMouseMoved(event -> {
-            if (helpTextGroup.isVisible()) { moveGroup(helpTextGroup, event); }
-            if (infoTextGroup.isVisible()) { moveGroup(infoTextGroup, event); }
+            if (helpTextGroup.isVisible()) { moveGroup(helpTextGroup, event, MouseCatcher.LOCAL); }
+            if (infoTextGroup.isVisible()) { moveGroup(infoTextGroup, event, MouseCatcher.LOCAL); }
         });
 
     }
 
 
     // Methods
-    public void moveGroup(Node node, Event event) {
+    public void moveGroup(Node node, Event event, MouseCatcher mouseCatcher) {
 
+        double mouseLocalX, mouseLocalY;
+        double mouseSceneX, mouseSceneY;
         double mouseX, mouseY;
+
+        double scaleX = 1.0;
+        double scaleY = 1.0;
+
+        Transform transform = dialsGroup.getTransforms().get(0);
+        if (transform != null && transform instanceof Scale) {
+            scaleX = ((Scale) transform).getX();
+            scaleY = ((Scale) transform).getY();
+        }
 
         if (event != null) {
             if (event instanceof DragEvent) {
-                mouseX = ((DragEvent) event).getX();
-                mouseY = ((DragEvent) event).getY();
+                mouseLocalX = ((DragEvent) event).getX();
+                mouseLocalY = ((DragEvent) event).getY();
+                mouseSceneX = ((DragEvent) event).getSceneX() / scaleX;
+                mouseSceneY = ((DragEvent) event).getSceneY() / scaleY;
             } else if (event instanceof MouseEvent) {
-                mouseX = ((MouseEvent) event).getX();
-                mouseY = ((MouseEvent) event).getY();
+                mouseLocalX = ((MouseEvent) event).getX();
+                mouseLocalY = ((MouseEvent) event).getY();
+                mouseSceneX = ((MouseEvent) event).getSceneX() / scaleX;
+                mouseSceneY = ((MouseEvent) event).getSceneY() / scaleY;
             } else {
                 return;
             }
+
+            switch (mouseCatcher) {
+                case LOCAL:
+                    mouseX = mouseLocalX;
+                    mouseY = mouseLocalY;
+                    break;
+                case SCENE:
+                    mouseX = mouseSceneX;
+                    mouseY = mouseSceneY;
+                    break;
+                default:
+                    mouseX = 0;
+                    mouseY = 0;
+            }
+
         } else {
             mouseX = node.getLayoutBounds().getMaxX();
             mouseY = node.getLayoutBounds().getMaxY();
@@ -1572,8 +1619,12 @@ public class Sundial {
 
 
     // Getterers
-    public boolean getGlobeVisibleEh() {
-        return globeVisibleEh;
+    public boolean getKriegsrahmenZeitVisibleEh(KriegsrahmenZeit.Location location) {
+        switch (location) {
+            case CETUS: return getCetusTimeVisibleEh();
+            case ORB_VALLIS: return getOrbVallisTimeVisibleEh();
+            default: return false;
+        }
     }
 
     public boolean getCetusTimeVisibleEh() {
@@ -1582,6 +1633,10 @@ public class Sundial {
 
     public boolean getOrbVallisTimeVisibleEh() {
         return orbVallisTimeVisibleEh;
+    }
+
+    public boolean getGlobeVisibleEh() {
+        return globeVisibleEh;
     }
 
     public boolean getLedAnimationOnEh() {
@@ -1698,6 +1753,14 @@ public class Sundial {
 
     public ControlThingy getControlThingyChart() {
         return controlThingyChart;
+    }
+
+    public ControlThingy getControlThingyCetus() {
+        return controlThingyCetus;
+    }
+
+    public ControlThingy getControlThingyOrbVallis() {
+        return controlThingyOrbVallis;
     }
 
     public ControlThingy getControlThingyDst() {

@@ -18,6 +18,7 @@ import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.util.Duration;
 import org.w3c.dom.css.Rect;
+import sun.security.provider.Sun;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,9 @@ public class Suncreator {
         GLOBELINES,
         DST,
         ANIMATION,
-        CHART
+        CHART,
+        CETUS,
+        ORBVALLIS
     };
 
     public static ControlThingy createControlThingy(ControlThingyType type, Text helpText) {
@@ -55,11 +58,36 @@ public class Suncreator {
                         .colorStroke(Sunconfig.Color_Of_HelpStroke_Off, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_HELP_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
-//                        .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                        .image(Sunconfig.LOGO_OSTRON, 1)
+                        .marker("?", Color.WHITE, Sunconfig.MATRIX_SHADOW)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_HELP, helpText)
+                        .thankYou();
+                break;
+            case CETUS:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_CHART_OFFSET, Sunconfig.CONTROL_CETUS_ANGLE)
+                        .size(Sunconfig.CONTROL_CHART_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_CHART_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .image(Sunconfig.LOGO_OSTRON, 1.25, 0, -1, Sunconfig.CONTROL_RESIZE_SHADOW)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_CETUS, helpText)
+                        .thankYou();
+                break;
+            case ORBVALLIS:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_CHART_OFFSET, Sunconfig.CONTROL_ORBVALLIS_ANGLE)
+                        .size(Sunconfig.CONTROL_CHART_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_CHART_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .image(Sunconfig.LOGO_SOLARIS_UNITED, 1.0, 0, 0, Sunconfig.CONTROL_RESIZE_SHADOW)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_ORBVALLIS, helpText)
                         .thankYou();
                 break;
             case CHART:
@@ -69,8 +97,8 @@ public class Suncreator {
                         .colorStroke(Sunconfig.Color_Of_ChartStroke_Off, Color.WHITE)
                         .strokeWidth(Sunconfig.CONTROL_CHART_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
-                        .marker("Y", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                        .markerScale(0.50)
+                        .marker("#", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.75)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_CHART, helpText)
@@ -84,7 +112,7 @@ public class Suncreator {
                         .strokeWidth(Sunconfig.CONTROL_ANIMATION_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
                         .marker("A", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                        .markerScale(0.50)
+                        .markerScale(0.75)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_ANIMATION, helpText)
@@ -147,7 +175,7 @@ public class Suncreator {
                         .strokeWidth(Sunconfig.CONTROL_NIGHTMODE_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
                         .marker("N", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                        .markerScale(0.50)
+                        .markerScale(0.75)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_NIGHTMODE, helpText)
@@ -161,7 +189,7 @@ public class Suncreator {
                         .strokeWidth(Sunconfig.CONTROL_ALWAYSONTOP_STROKE_WIDTH)
                         .colorFill(Sunconfig.Color_Of_ResizeFill)
                         .marker("T", Color.WHITE, Sunconfig.MATRIX_SHADOW)
-                        .markerScale(0.50)
+                        .markerScale(0.75)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_ALWAYSONTOP, helpText)
@@ -385,7 +413,7 @@ public class Suncreator {
 //        globeAtmosphere.setBlendMode(BlendMode.SCREEN);
 
 
-        // Bindings for color changes of atmosphere nad terminator line while changing globe rotation
+        // Bindings for color changes of atmosphere and terminator line while changing globe rotation
         dayTerminatorLine.getRingMaterial().diffuseColorProperty().bind(Bindings.createObjectBinding(() -> {
 
             double dayLightSceneZ = dayGlobe.getDayLight().localToSceneTransformProperty().get().getTz()
@@ -448,26 +476,17 @@ public class Suncreator {
 
             double changeFactor = pow(ratio, 3);
 
-            ArrayList<Color> colorList = new ArrayList<>();
+            Color sideColor;
 
-            for (int i = 0; i < 3; i++) {
-
-                Color sideColor;
-
-                if (dayLightSceneZ > 0) {
-                    sideColor = Sunconfig.Color_Of_AtmosphereNight;
-                } else {
-                    sideColor = Sunconfig.Color_Of_AtmosphereDay;
-                }
-
-                double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
-                double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
-                double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
-                double a = (i % 2) * (0.75 * (1 - changeFactor) + 1 * changeFactor);
-
-                Color newColor = new Color(r, g, b, a);
-                colorList.add(newColor);
+            if (dayLightSceneZ > 0) {
+                sideColor = Sunconfig.Color_Of_AtmosphereNight;
+            } else {
+                sideColor = Sunconfig.Color_Of_AtmosphereDay;
             }
+
+            double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
 
             return new RadialGradient(
                     0, 0,
@@ -475,9 +494,24 @@ public class Suncreator {
                     atmosphereRadius,
                     false,
                     CycleMethod.NO_CYCLE,
-                    new Stop(0.960, colorList.get(0)),
-                    new Stop(0.975, colorList.get(1)),
-                    new Stop(1.000, colorList.get(2))
+                    new Stop(0.700, new Color(
+                            Sunconfig.Color_Of_AtmosphereDay.getRed(),
+                            Sunconfig.Color_Of_AtmosphereDay.getGreen(),
+                            Sunconfig.Color_Of_AtmosphereDay.getBlue(),
+                            0.00
+                    )),
+                    new Stop(0.850, new Color(
+                            Sunconfig.Color_Of_AtmosphereDay.getRed(),
+                            Sunconfig.Color_Of_AtmosphereDay.getGreen(),
+                            Sunconfig.Color_Of_AtmosphereDay.getBlue(),
+                            0.15
+                    )),
+                    new Stop(0.960, new Color(r, g, b, 0.35)),
+                    new Stop(0.971, new Color(r, g, b, 1.00)),
+                    new Stop(0.975, new Color(0.85, 0.77, 0.85, 1.00)),
+                    new Stop(0.979, new Color(r, g, b, 1.00)),
+                    new Stop(0.985, new Color(r, g, b, 0.65)),
+                    new Stop(1.000, new Color(r, g, b, 0.00))
             );
 
         }, dayGlobe.getDayLight().localToSceneTransformProperty()));
@@ -788,11 +822,21 @@ public class Suncreator {
         Circle dialMarginCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2);
         dialMarginCircle.setFill(Sunconfig.Color_Of_Margin);
         dialMarginCircle.setStroke(Sunconfig.Color_Of_Void);
-        dialMarginCircle.setOpacity(Sunconfig.MARGIN_CIRCLE_OPACITY);
         return dialMarginCircle;
     }
 
-    public static SubScene createBackgroundSubScene(Circle dialMarginCircle) {
+    public static Circle createDialMarginCircleRing() {
+        Circle dialMarginCircleRing = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2);
+        dialMarginCircleRing.setFill(Sunconfig.Color_Of_Void);
+        dialMarginCircleRing.setStroke(Sunconfig.Color_Of_ChartStroke_On);
+        dialMarginCircleRing.setStrokeWidth(1.50);
+        dialMarginCircleRing.setStyle(Sunconfig.HELP_MARKER_GLOW);
+        dialMarginCircleRing.setVisible(false);
+        dialMarginCircleRing.setMouseTransparent(true);
+        return dialMarginCircleRing;
+    }
+
+    public static SubScene createBackgroundSubScene(Group group) {
 
         Rectangle dialMarginFillBox = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
         dialMarginFillBox.setTranslateX(0);
@@ -801,7 +845,7 @@ public class Suncreator {
         dialMarginFillBox.setStroke(Sunconfig.Color_Of_Void);
         dialMarginFillBox.setOpacity(0);
 
-        return new SubScene(new Group(dialMarginFillBox, dialMarginCircle), Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.DISABLED);
+        return new SubScene(new Group(dialMarginFillBox, group), Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT, true, SceneAntialiasing.DISABLED);
     }
 
     public static Arc createDialArcNight() {
@@ -860,9 +904,11 @@ public class Suncreator {
         double matrixScaleX, matrixScaleY;
         double horizonOffset;
         Paint arcFill;
+        double arcFillStop1, arcFillStop2;
         Color arcColor;
         double arcOpacity;
         double animationDuration;
+        boolean arcMouseTransparentEh;
 
         switch (location) {
             case CETUS:
@@ -874,21 +920,27 @@ public class Suncreator {
                 matrixScaleY = Sunconfig.CETUS_HORIZON_SCALE;
                 horizonOffset = Sunconfig.CETUS_HORIZON_OFFSET;
                 arcFill = Sunconfig.CETUS_ARC_GRADIENT;
+                arcFillStop1 = Sunconfig.CETUS_ARC_GRADIENT_STOP1;
+                arcFillStop2 = Sunconfig.CETUS_ARC_GRADIENT_STOP2;
                 arcColor = Sunconfig.Color_Of_CetusArc;
                 arcOpacity = Sunconfig.CETUS_ARC_OPACITY;
+                arcMouseTransparentEh = false;
                 animationDuration = Sunconfig.CETUS_MARKER_DURATION;
                 break;
             case ORB_VALLIS:
                 markerWidth = Sunconfig.ORBVALLIS_MARKER_WIDTH;
                 markerLength = Sunconfig.ORBVALLIS_MARKER_LENGTH;
-                markerColor = Sunconfig.Color_Of_OrbVallisMarker;
-                markerShadow = Sunconfig.ORBVALLIS_MARKER_SHADOW;
+                markerColor = Color.TRANSPARENT/*Sunconfig.Color_Of_OrbVallisMarker*/;
+                markerShadow = ""/*Sunconfig.ORBVALLIS_MARKER_SHADOW*/;
                 matrixScaleX = Sunconfig.ORBVALLIS_HORIZON_SCALE;
                 matrixScaleY = Sunconfig.ORBVALLIS_HORIZON_SCALE;
                 horizonOffset = Sunconfig.ORBVALLIS_HORIZON_OFFSET;
                 arcFill = Sunconfig.ORBVALLIS_ARC_GRADIENT;
+                arcFillStop1 = Sunconfig.ORBVALLIS_ARC_GRADIENT_STOP1;
+                arcFillStop2 = Sunconfig.ORBVALLIS_ARC_GRADIENT_STOP2;
                 arcColor = Sunconfig.Color_Of_OrbVallisArc;
                 arcOpacity = Sunconfig.ORBVALLIS_ARC_OPACITY;
+                arcMouseTransparentEh = true;
                 animationDuration = Sunconfig.ORBVALLIS_MARKER_DURATION;
                 break;
             default: return cetusMarkerGroup;
@@ -950,8 +1002,7 @@ public class Suncreator {
             nightArc.setStroke(Sunconfig.Color_Of_Void);
             nightArc.setFill(arcFill);
             nightArc.setOpacity(arcOpacity);
-//            nightArc.setBlendMode(BlendMode.MULTIPLY);
-            nightArc.setMouseTransparent(false);
+            nightArc.setMouseTransparent(arcMouseTransparentEh);
 
             cetusArcGroup.getChildren().addAll(nightArc);
             cetusHorizonGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
@@ -990,8 +1041,8 @@ public class Suncreator {
             cetusMarkerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
 
             nightArc.fillProperty().bind(Bindings.createObjectBinding(() -> {
-                double stop1 = 0.87 - (3 * 0.13 * matrixStart.opacityProperty().get());
-                double stop2 = 0.95 - (3 * 0.05 * matrixStart.opacityProperty().get());
+                double stop1 = arcFillStop1 - (0.40 * matrixStart.opacityProperty().get());
+                double stop2 = arcFillStop2 - (0.15 * matrixStart.opacityProperty().get());
                 return new RadialGradient(
                         0, 0,
                         Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y,
@@ -1019,10 +1070,10 @@ public class Suncreator {
             markerRotateList.add(markerLineStartRotate);
             markerRotateList.add(markerLineEndRotate);
 
+            markerArcList.add(nightArc);
+
             markerLineList.add(markerLineStart);
             markerLineList.add(markerLineEnd);
-
-            markerArcList.add(nightArc);
 
             matrixList.add(matrixStart);
             matrixList.add(matrixEnd);
@@ -1032,7 +1083,7 @@ public class Suncreator {
 
         }
 
-        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
+//        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
 
         cetusMarkerGroup.getChildren().addAll(cetusArcGroup, cetusHorizonGroup);
 
