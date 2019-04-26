@@ -798,7 +798,7 @@ public class Suncreator {
 
         if (timelineDirection.equals(TimelineDirection.IN)) {
             scale = 1;
-            opacity = 1;
+            opacity = Sunconfig.HIGHNOON_NORMAL_OPACITY;
         } else {
             scale = Sunconfig.HIGHNOON_DOWN_SCALE;
             opacity = Sunconfig.HIGHNOON_DOWN_OPACITY;
@@ -1307,26 +1307,44 @@ public class Suncreator {
         Group dialHighNoonGroup = new Group();
 
         Polygon dialHighNoonPoly = new Polygon(
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH
+/*
+                - Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
+                - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
+                Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH
+*/
+                0, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                -Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                -Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y / 2,
+                0, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH / 2,
+                Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y / 2,
+                Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y
         );
-        dialHighNoonPoly.setFill(Sunconfig.Color_Of_HighNoon);
-        dialHighNoonPoly.setStroke(Sunconfig.Color_Of_Void);
+        dialHighNoonPoly.setTranslateX(Sunconfig.CENTER_X);
+        dialHighNoonPoly.setFill(Color.TRANSPARENT);
+        dialHighNoonPoly.setStroke(Sunconfig.Color_Of_HighNoon);
+        dialHighNoonPoly.setStrokeWidth(Sunconfig.HIGHNOON_STROKE_WIDTH);
 
         Polygon dialHighNoonPolyBackground = new Polygon(
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
-                Sunconfig.CENTER_X - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
-                Sunconfig.CENTER_X + Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH
+                0, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                -Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                -Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
+                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
+                Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y
+/*
+                - Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
+                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
+                Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH
+*/
         );
+        dialHighNoonPolyBackground.setTranslateX(Sunconfig.CENTER_X);
         dialHighNoonPolyBackground.setFill(Sunconfig.Color_Of_Void);
         dialHighNoonPolyBackground.setStroke(Sunconfig.Color_Of_Void);
 

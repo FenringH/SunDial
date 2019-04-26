@@ -453,6 +453,7 @@ public class Sundial {
         sunHighNoon.setMatrixTimeLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_GLOW);
         sunHighNoon.setMatrixAngleLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
         sunHighNoon.setMatrixDayLengthLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
+        sunHighNoon.setOpacity(Sunconfig.HIGHNOON_NORMAL_OPACITY);
         sunHighNoon.setVisible(sunHighNoonVisibleEh);
 
         sunHighNoonScale = new Scale();

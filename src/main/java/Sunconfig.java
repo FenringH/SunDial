@@ -342,6 +342,7 @@ public class Sunconfig {
     public static final double SECOND_LED_ON_OPACITY = 1.00d;
     public static final double MATRIX_TIMEZONE_DEFAULT_OPACITY = 0.65d;
     public static final double MATRIX_TIMEZONE_GLOBE_OPACITY = 1.00d;
+    public static final double HIGHNOON_NORMAL_OPACITY = 0.85d;
     public static final double HIGHNOON_DOWN_OPACITY = 0.75d;
 
     public static final double MATRIX_MARKER_OFFSET = 6.5d;
