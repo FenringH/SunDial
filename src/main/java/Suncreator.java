@@ -895,6 +895,7 @@ public class Suncreator {
         Group cetusArcGroup = new Group();
 
         long mainPhaseLength = location.getMainPhaseLength();
+        long lastPhaseLength = location.getLastPhaseLength();
         long cycleLength = location.getCycleLength();
         long cyclesPerTwoDays = (long) ceil(48d * 60 * 60 * 1000 / cycleLength);
 
@@ -948,7 +949,7 @@ public class Suncreator {
 
         for (int i = 0; i <= cyclesPerTwoDays; i++) {
 
-            double startAngle = (i * cycleLength * 360d) / (24d * 60 * 60 * 1000);
+            double startAngle = ((i * cycleLength) * 360d) / (24d * 60 * 60 * 1000);
             double endAngle = ((i * cycleLength + mainPhaseLength) * 360d) / (24d * 60 * 60 * 1000);
 
             Line markerLineStart = new Line(Sunconfig.CENTER_X, markerLength + Sunconfig.MARGIN_Y, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);

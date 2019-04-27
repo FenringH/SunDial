@@ -38,10 +38,11 @@ public class KriegsrahmenZeit {
         CETUS (
                 "Cetus",
                 "cetusCycle",
-                50 * 60 * 1000,       // 100 minutes (DAY)
-                100 * 60 * 1000,        // 50 minutes (NIGHT)
+                50 * 60 * 1000,        // 50 minutes (NIGHT)
+                100 * 60 * 1000,       // 100 minutes (DAY)
                 "isDay",
-                "expiry"
+                "expiry",
+                true
         ),
 
         ORB_VALLIS (
@@ -50,7 +51,8 @@ public class KriegsrahmenZeit {
                 (6 * 60 + 40) * 1000,    // 6 minutes and 40 seconds (WARM)
                 20 * 60 * 1000,        // 20 minutes (COLD)
                 "isWarm",
-                "expiry"
+                "expiry",
+                false
         );
 
         private String fullName;
@@ -59,6 +61,7 @@ public class KriegsrahmenZeit {
         private int lastPhaseLength;
         private String mainPhaseKeyword;
         private String expiryKeyword;
+        private boolean flipMainPhase;
 
         private Location(
                 String fullName,
@@ -66,14 +69,16 @@ public class KriegsrahmenZeit {
                 int mainPhaseLength,
                 int lastPhaseLength,
                 String mainPhaseKeyword,
-                String expiryKeyword)
-        {
+                String expiryKeyword,
+                boolean flipMainPhase
+        ) {
             this.fullName = fullName;
             this.code = code;
             this.mainPhaseLength = mainPhaseLength;
             this.lastPhaseLength = lastPhaseLength;
             this.mainPhaseKeyword = mainPhaseKeyword;
             this.expiryKeyword = expiryKeyword;
+            this.flipMainPhase = flipMainPhase;
         }
 
         public String getFullName() {
@@ -102,6 +107,10 @@ public class KriegsrahmenZeit {
 
         public int getCycleLength() {
             return  this.mainPhaseLength + this.lastPhaseLength;
+        }
+
+        public boolean getFlipMainPhase() {
+            return this.flipMainPhase;
         }
     }
 
@@ -139,6 +148,7 @@ public class KriegsrahmenZeit {
     private long cyclesPerTwoDays;
     private String mainPhaseKeyword;
     private String expiryKeyword;
+    private boolean flipMainPhase;
 
     public KriegsrahmenZeit(Platform platform, Location location) {
 
@@ -150,6 +160,7 @@ public class KriegsrahmenZeit {
         cyclesPerTwoDays = (long) ceil(48d * 60 * 60 * 1000 / cycleLength);
         mainPhaseKeyword = location.getMainPhaseKeyword();
         expiryKeyword = location.getExpiryKeyword();
+        flipMainPhase = location.getFlipMainPhase();
 
         statusOkEh = false;
         expiredEh = true;
@@ -228,7 +239,15 @@ public class KriegsrahmenZeit {
 
         if (offsetInMillis > 0) { cycleStart -= cycleLength; }
 
-        if (!mainPhaseEh) { cycleStart -= mainPhaseLength; }
+        if (flipMainPhase) {
+            if (!mainPhaseEh) {
+                cycleStart -= mainPhaseLength;
+            }
+        } else {
+            if (mainPhaseEh) {
+                cycleStart -= mainPhaseLength;
+            }
+        }
 
         for (int i = 0; i <= cyclesPerTwoDays; i++) {
 
