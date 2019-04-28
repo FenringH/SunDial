@@ -72,8 +72,19 @@ public class Sunutil {
     public static String getShorterTimeString(GregorianCalendar calendar) {
 
         int minutes = calendar.get(Calendar.MINUTE) + round(calendar.get(Calendar.SECOND) / 60f);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
 
-        String hourString = ("00" + calendar.get(Calendar.HOUR_OF_DAY));
+        if (minutes >= 60) {
+
+            hours++;
+            minutes = 0;
+
+            if (hours >= 24) {
+                hours = 0;
+            }
+        }
+
+        String hourString = ("00" + hours);
         hourString = hourString.substring(hourString.length() - 2);
 
         String minuteString = ("00" + minutes);
