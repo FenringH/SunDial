@@ -1,4 +1,4 @@
-# SunDial (Sunface)
+# Sunface
 Desktop application that displays current time and calculates sunrise and sunset times.
 
 ## Requirements
