@@ -33,5 +33,5 @@
 
 + add display about sun elevation at noon
 
-? add Copy button to debug window
++ add Copy button to debug window
 
