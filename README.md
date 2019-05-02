@@ -32,6 +32,8 @@ Desktop application that displays current time and calculates sunrise and sunset
 * It started as a project to learn more about JavaFX features.
 
 ## Resources
-* Font: "Courier Prime Code.ttf" obtained under OFL license (http://scripts.sil.org/OFL)
+* Astronomy: based on [Astronomy Answers
+Position of the Sun](https://www.aa.quae.nl/en/reken/zonpositie.html) published by Dr. Louis Strous
 * Maps: downloaded from https://www.solarsystemscope.com/textures/
+* Font: "Courier Prime Code.ttf" obtained under OFL license (http://scripts.sil.org/OFL)
 * Icon: Designed by [Freepik](https://www.freepik.com/) from www.flaticon.com
