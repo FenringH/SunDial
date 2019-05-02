@@ -6,7 +6,9 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75ea860b-e028-4683-8af2-7dabfcf56d2a" name="Default Changelist" comment="" />
+    <list default="true" id="75ea860b-e028-4683-8af2-7dabfcf56d2a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,7 +22,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/Sunface.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="480">
@@ -28,6 +30,15 @@
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" selection-start-line="5" selection-end-line="5" />
             </state>
           </provider>
         </entry>
@@ -183,6 +194,7 @@
         <option value="$PROJECT_DIR$/src/main/java/Sundial.java" />
         <option value="$PROJECT_DIR$/src/main/java/Suncreator.java" />
         <option value="$PROJECT_DIR$/src/main/java/Sunface.java" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -211,7 +223,7 @@
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="Scope" currentSubView="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope" proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
@@ -263,6 +275,20 @@
           </expand>
           <select />
         </subPane>
+        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
+          <expand>
+            <path>
+              <item name="sundial" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="SunDial" type="2674bda8:ScopeViewTreeModel$GroupNode" />
+            </path>
+            <path>
+              <item name="sundial" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="SunDial" type="2674bda8:ScopeViewTreeModel$GroupNode" />
+              <item name="target" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
       </pane>
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
@@ -271,51 +297,6 @@
             <path>
               <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
               <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-              <item name="fonts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-              <item name="icons" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="Stuff" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sundial" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SunDial" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -375,13 +356,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1534417735116</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Added day length, longitude and latitude display. Night-time arcs need to be fixed for extreme values.">
-      <created>1549987821212</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1549987821212</updated>
     </task>
     <task id="LOCAL-00018" summary="Added globe. Just barely. Needs more tweaking.">
       <created>1550074255833</created>
@@ -719,7 +693,14 @@
       <option name="project" value="LOCAL" />
       <updated>1556287315690</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Redesign of High-noon dial.">
+      <created>1556784889360</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1556784889361</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="TodoView">
@@ -733,9 +714,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49840257" visible="true" weight="0.23027718" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49840257" visible="true" weight="0.23027718" />
       <window_info id="Structure" order="1" sideWeight="0.50159746" side_tool="true" weight="0.23400854" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -744,7 +724,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3290461" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946696" visible="true" weight="0.30010718" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49946696" weight="0.30010718" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39978564" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -833,17 +813,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="Redesign of High-noon dial." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/javafx-src.zip!/javafx/beans/property/SimpleDoubleProperty.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="72" column="11" selection-start-line="72" selection-start-column="11" selection-end-line="72" selection-end-column="11" />
-          <folding>
-            <element signature="e#1223#1224#0" expanded="true" />
-            <element signature="e#1285#1286#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/javafx-src.zip!/javafx/scene/transform/Transform.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="294">
@@ -1336,6 +1305,13 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
         </state>
       </provider>
     </entry>
