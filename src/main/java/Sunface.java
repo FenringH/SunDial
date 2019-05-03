@@ -1,10 +1,7 @@
-import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
-import com.sun.javafx.application.HostServicesDelegate;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
-import javafx.event.Event;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.Cursor;
@@ -19,6 +16,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -531,6 +532,18 @@ public class Sunface extends Application {
 
     public void openBrowser(MouseEvent event, String uri) {
 
+        if(Desktop.isDesktopSupported())
+        {
+            try {
+                Desktop.getDesktop().browse(new URI(uri));
+            } catch (IOException|URISyntaxException e) {
+                sundial.getInfoText().setText("Unable to open web browser.");
+                showInfoText(event);
+                hideInfoTextWithDelay();
+            }
+        }
+
+/*
         try {
             HostServicesDelegate hostServices = HostServicesFactory.getInstance(this);
             hostServices.showDocument(uri);
@@ -539,6 +552,7 @@ public class Sunface extends Application {
             showInfoText(event);
             hideInfoTextWithDelay();
         }
+*/
     }
 
     private void sendTextToClipboard(String string) {

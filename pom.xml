@@ -6,9 +6,16 @@
 
     <groupId>com.choam.fenring.suntools</groupId>
     <artifactId>sunface</artifactId>
-    <version>0.901</version>
+    <version>1.0</version>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
+
         <plugins>
 
             <plugin>
