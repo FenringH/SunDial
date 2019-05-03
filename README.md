@@ -2,10 +2,11 @@
 Desktop application that displays current time and calculates sunrise and sunset times.
 
 ## Requirements
-* Java version 8.60 or higher with bundled JavaFX 8
-* GPU
-* 3-button mouse with scroll
-* Internet connection for additional features
+* Java 8.60+ with [JavaFX](https://openjfx.io/)
+  * If your JRE does not bundle JavaFX, it needs to be installed separately.
+* GPU.
+* 3-button mouse with scroll.
+* Internet connection for additional features.
 
 ## Help!
 * For help press the round red button with question mark in the top left corner.
@@ -32,8 +33,7 @@ Desktop application that displays current time and calculates sunrise and sunset
 * It started as a project to learn more about JavaFX features.
 
 ## Resources
-* Astronomy: based on [Astronomy Answers
-Position of the Sun](https://www.aa.quae.nl/en/reken/zonpositie.html) published by Dr. Louis Strous
+* Astronomy: based on [Astronomy Answers Position of the Sun](https://www.aa.quae.nl/en/reken/zonpositie.html) published by Dr. Louis Strous
 * Maps: downloaded from https://www.solarsystemscope.com/textures/
 * Font: "Courier Prime Code.ttf" obtained under OFL license (http://scripts.sil.org/OFL)
 * Icon: Designed by [Freepik](https://www.freepik.com/) from www.flaticon.com
