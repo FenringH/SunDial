@@ -1194,23 +1194,25 @@ public class Suncreator {
 
         for(int i = 0; i < Sunconfig.MAX_MARKER; i++) {
 
-            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.70;
+            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
             double lineOpacity = 0.50d;
             Color lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
+            String style = "";
 
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
                 lineOpacity = 0.65d;
                 lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
-                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 0.80;
+                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             }
 
             if (i % 4 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH;
                 lineOpacity = 0.85d;
-                lineColor = Sunconfig.Color_Of_HourMarkerFull;
+                lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerFull*/;
                 strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+//                style = Sunconfig.HOUR_MARKER_SHADOW;
             }
 
             Rotate markerRotate = centerRotate.clone();
@@ -1236,6 +1238,7 @@ public class Suncreator {
             markerLine.setStroke(lineColor);
             markerLine.setStrokeWidth(strokeWidth);
             markerLine.setOpacity(lineOpacity);
+            markerLine.setStyle(style);
             markerLine.setMouseTransparent(true);
 
             Group markerGroup = new Group(/*markerPoly, */markerLine);
@@ -1355,6 +1358,19 @@ public class Suncreator {
         dialHighNoonGroup.setBlendMode(BlendMode.SCREEN);
 
         return dialHighNoonGroup;
+    }
+
+    public static Arc createDialLocalHourArc() {
+        Arc arc = new Arc(0, 0,
+                Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y,
+                0, 15);
+        arc.setType(ArcType.ROUND);
+        arc.setTranslateX(Sunconfig.CENTER_X);
+        arc.setTranslateY(Sunconfig.CENTER_Y);
+        arc.setFill(Sunconfig.LOCAL_HOUR_ARC_FILL);
+        arc.setStroke(Color.TRANSPARENT);
+//        arc.setBlendMode(BlendMode.OVERLAY);
+        return arc;
     }
 
     public static Group createDialLocalHourGroup(Rotate dialRotateLocalHour) {

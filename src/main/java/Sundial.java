@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -76,6 +75,7 @@ public class Sundial {
     private Arc dialArcNight;
     private Arc dialArcMidnight;
     private Arc dialArcDayLength;
+    private Arc dialLocalHourArc;
 
     private Circle dialMarginCircle;
     private Circle dialMarginCircleRing;
@@ -421,9 +421,10 @@ public class Sundial {
 
         // Dials
         dialHighNoonGroup = Suncreator.createDialHighNoonGroup(highNoonDialRotate);
-        dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialRotateLocalHour);
         dialLocalMinuteGroup = Suncreator.createDialLocalMinuteGroup(dialRotateLocalMinute);
         dialLocalSecondGroup = Suncreator.createDialLocalSecondGroup(dialRotateLocalSecond);
+        dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialRotateLocalHour);
+        dialLocalHourArc = Suncreator.createDialLocalHourArc();
 
         matrixSunrise = Suncreator.createMatrixSunrise();
         matrixSunset = Suncreator.createMatrixSunset();
@@ -643,6 +644,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().add(cetusMarkerGroup);
         foregroundGroup.getChildren().add(orbVallisMarkerGroup);
+        foregroundGroup.getChildren().add(dialLocalHourArc);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
         foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().add(sunHighNoon);
@@ -951,6 +953,14 @@ public class Sundial {
         this.localTime = localTime;
 
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
+
+        double hourAngle = 270 - localTime.get(Calendar.HOUR_OF_DAY) * 360 / 24d;
+        double startHourArcAngle = Sunutil.getNightCompressionAngle(hourAngle, nightCompression);
+        double endHourArcAngle = Sunutil.getNightCompressionAngle(hourAngle - 15, nightCompression);
+        double lengthHourArcAngle = endHourArcAngle - startHourArcAngle;
+
+        dialLocalHourArc.setStartAngle(startHourArcAngle);
+        dialLocalHourArc.setLength(lengthHourArcAngle);
 
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
         dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);

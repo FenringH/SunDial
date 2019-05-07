@@ -289,7 +289,7 @@ public class Sunconfig {
     public static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
     public static final double SUNRISE_STROKE_WIDTH = 1.00d;
     public static final double SUNSET_STROKE_WIDTH = 1.00d;
-    public static final double MARKER_HOUR_STROKE_WIDTH = 1.25d;
+    public static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
     public static final double MARKER_FRAME_STROKE_WIDTH = 2.00d;
     public static final double TINYGLOBE_FRAME_STROKE_WIDTH = 2.00d;
     public static final double CONTROL_THINGY_STROKE_WIDTH = 3.00d;
@@ -455,6 +455,7 @@ public class Sunconfig {
     public static final Color Color_Of_SunRise    = new Color(1.00, 0.00, 0.00, 1.00);
     public static final Color Color_Of_SunSet     = new Color(0.65, 0.00, 0.65, 1.00);
     public static final Color Color_Of_LocalTime  = new Color(1.00, 1.00, 1.00, 1.00);
+    public static final Color Color_Of_LocalArc   = new Color(1.00, 0.65, 0.25, 0.90);
     public static final Color Color_Of_TinyFrame  = new Color(1.00, 1.00, 1.00, 1.00);
 
     public static final Color Color_Of_TinyDay      = new Color(0.65, 0.65,0.65, 1.00);
@@ -514,7 +515,7 @@ public class Sunconfig {
     public static final Color Color_Of_AtmosphereNight  = new Color(1.00, 0.38, 0.10, 1.00);
     public static final Color Color_Of_AtmosphereMid    = new Color(0.25, 0.50, 1.00, 1.00);
 
-    public static final Color Color_Of_HourMarkerFull    = new Color(1.00, 0.30, 0.00, 1.00);
+    public static final Color Color_Of_HourMarkerFull    = new Color(1.00, 0.70, 0.70, 1.00);
     public static final Color Color_Of_HourMarkerHalf    = new Color(0.20, 1.00, 0.20, 1.00);
     public static final Color Color_Of_HourMarkerQwrt    = new Color(0.15, 0.90, 0.15, 1.00);
     public static final Color Color_Of_HourMarkerStroke  = new Color(0.15, 0.30, 0.60, 0.50);
@@ -568,7 +569,7 @@ public class Sunconfig {
 
     public static final String HELP_MARKER_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(  0,255,  0, 1.0), 10.0, 0.60, 0, 0);";
 
-    public static final String HOUR_MARKER_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 0.5),  4.0, 0.50, 0, 0);";
+    public static final String HOUR_MARKER_SHADOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0),  4.0, 0.50, 0, 0);";
 
     public static final RadialGradient FRAME_DIAL_NOMINAL = new RadialGradient(
             0, 0,
@@ -693,6 +694,15 @@ public class Sunconfig {
             new Stop(0.960, new Color(1, 1, 1, 0)),
             new Stop(0.975, new Color(1, 1, 1, 1)),
             new Stop(1.000, new Color(1, 1, 1, 0))
+    );
+
+    public static final RadialGradient LOCAL_HOUR_ARC_FILL = new RadialGradient(
+            0, 0,
+            0, 0, CENTER_Y - MARGIN_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.1, Color.TRANSPARENT),
+            new Stop(0.75, Color_Of_LocalArc)
     );
 
 }
