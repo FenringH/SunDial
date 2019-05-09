@@ -447,7 +447,7 @@ public class Sunconfig {
     public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
     public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.20);
     public static final Color Color_Of_Margin       = new Color(0.10, 0.25, 0.60, MARGIN_CIRCLE_OPACITY);
-    public static final Color Color_Of_Margin_Hover = new Color(0.10, 0.40, 0.60, 0.90);
+    public static final Color Color_Of_Margin_Hover = new Color(0.10, 0.35, 0.50, MARGIN_CIRCLE_OPACITY);
 
     public static final Color Color_Of_SunTime    = new Color(1.00, 0.50, 0.00, 1.00);
     public static final Color Color_Of_HighNoon   = new Color(1.00, 1.00, 0.00, 1.00);

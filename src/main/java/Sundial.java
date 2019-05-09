@@ -644,7 +644,7 @@ public class Sundial {
         foregroundGroup.getChildren().add(dialCircleFrame);
         foregroundGroup.getChildren().add(cetusMarkerGroup);
         foregroundGroup.getChildren().add(orbVallisMarkerGroup);
-        foregroundGroup.getChildren().add(dialLocalHourArc);
+//        foregroundGroup.getChildren().add(dialLocalHourArc);
         foregroundGroup.getChildren().addAll(dialLocalMinuteLedList);
         foregroundGroup.getChildren().addAll(dialLocalSecondLedList);
         foregroundGroup.getChildren().add(sunHighNoon);
