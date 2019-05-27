@@ -259,6 +259,25 @@ public class Suncreator {
         return controlThingy;
     }
 
+    public static Timeline createOuterControlsGroupTimeline(Group group) {
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        KeyValue keyValueStartOpacitySleep = new KeyValue(group.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameStartOpacitySleep = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_HIDE_DURATION / 2), keyValueStartOpacitySleep);
+        KeyValue keyValueStartOpacityZero = new KeyValue(group.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
+        KeyFrame keyFrameStartOpacityZero = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_HIDE_DURATION), keyValueStartOpacityZero);
+
+        timeline.getKeyFrames().addAll(keyFrameStartOpacitySleep, keyFrameStartOpacityZero);
+
+        timeline.setOnFinished(event -> group.setVisible(false));
+
+        return timeline;
+    }
+
     public static Group createMasterGlobe(
             DoubleProperty longitude,
             DoubleProperty latitude,
@@ -820,7 +839,7 @@ public class Suncreator {
 
     public static Circle createDialMarginCircle() {
         Circle dialMarginCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2);
-        dialMarginCircle.setFill(Sunconfig.Color_Of_Margin);
+        dialMarginCircle.setFill(Sunconfig.MARGIN_CIRCLE_FILL);
         dialMarginCircle.setStroke(Sunconfig.Color_Of_Void);
         return dialMarginCircle;
     }
@@ -890,9 +909,9 @@ public class Suncreator {
             ArrayList<DotMatrix> matrixList,
             ArrayList<Timeline> markerHoverTransitionList) {
 
-        Group cetusMarkerGroup = new Group();
-        Group cetusHorizonGroup = new Group();
-        Group cetusArcGroup = new Group();
+        Group markerGroup = new Group();
+        Group horizonGroup = new Group();
+        Group arcGroup = new Group();
 
         long mainPhaseLength = location.getMainPhaseLength();
         long lastPhaseLength = location.getLastPhaseLength();
@@ -910,6 +929,7 @@ public class Suncreator {
         double arcOpacity;
         double animationDuration;
         boolean arcMouseTransparentEh;
+        BlendMode blendMode;
 
         switch (location) {
             case CETUS:
@@ -927,6 +947,7 @@ public class Suncreator {
                 arcOpacity = Sunconfig.CETUS_ARC_OPACITY;
                 arcMouseTransparentEh = false;
                 animationDuration = Sunconfig.CETUS_MARKER_DURATION;
+                blendMode = BlendMode.MULTIPLY;
                 break;
             case ORB_VALLIS:
                 markerWidth = Sunconfig.ORBVALLIS_MARKER_WIDTH;
@@ -943,8 +964,9 @@ public class Suncreator {
                 arcOpacity = Sunconfig.ORBVALLIS_ARC_OPACITY;
                 arcMouseTransparentEh = true;
                 animationDuration = Sunconfig.ORBVALLIS_MARKER_DURATION;
+                blendMode = BlendMode.SRC_OVER;
                 break;
-            default: return cetusMarkerGroup;
+            default: return markerGroup;
         }
 
         for (int i = 0; i <= cyclesPerTwoDays; i++) {
@@ -1005,14 +1027,14 @@ public class Suncreator {
             nightArc.setOpacity(arcOpacity);
             nightArc.setMouseTransparent(arcMouseTransparentEh);
 
-            cetusArcGroup.getChildren().addAll(nightArc);
-            cetusHorizonGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
+            arcGroup.getChildren().addAll(nightArc);
+            horizonGroup.getChildren().addAll(startHorizonGroup, endHorizonGroup);
 
             // Animations
-            Timeline cetusMarkerTransitionOn = new Timeline();
-            cetusMarkerTransitionOn.setCycleCount(1);
-            cetusMarkerTransitionOn.setRate(1);
-            cetusMarkerTransitionOn.setAutoReverse(false);
+            Timeline markerTransitionOn = new Timeline();
+            markerTransitionOn.setCycleCount(1);
+            markerTransitionOn.setRate(1);
+            markerTransitionOn.setAutoReverse(false);
 
             KeyValue keyValueStartOpacityOn = new KeyValue(matrixStart.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
             KeyFrame keyFrameStartOpacityOn = new KeyFrame(Duration.millis(animationDuration), keyValueStartOpacityOn);
@@ -1023,12 +1045,12 @@ public class Suncreator {
             KeyValue keyValueLineEndOn = new KeyValue(markerLineEnd.startYProperty(), markerLength * 3, Interpolator.EASE_BOTH);
             KeyFrame keyFrameLineEndOn = new KeyFrame(Duration.millis(animationDuration), keyValueLineEndOn);
 
-            cetusMarkerTransitionOn.getKeyFrames().addAll(keyFrameStartOpacityOn, keyFrameEndOpacityOn, keyFrameLineStartOn, keyFrameLineEndOn);
+            markerTransitionOn.getKeyFrames().addAll(keyFrameStartOpacityOn, keyFrameEndOpacityOn, keyFrameLineStartOn, keyFrameLineEndOn);
 
-            Timeline cetusMarkerTransitionOff = new Timeline();
-            cetusMarkerTransitionOff.setCycleCount(1);
-            cetusMarkerTransitionOff.setRate(1);
-            cetusMarkerTransitionOff.setAutoReverse(false);
+            Timeline markerTransitionOff = new Timeline();
+            markerTransitionOff.setCycleCount(1);
+            markerTransitionOff.setRate(1);
+            markerTransitionOff.setAutoReverse(false);
 
             KeyValue keyValueStartOpacityOff = new KeyValue(matrixStart.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
             KeyFrame keyFrameStartOpacityOff = new KeyFrame(Duration.millis(animationDuration), keyValueStartOpacityOff);
@@ -1039,7 +1061,7 @@ public class Suncreator {
             KeyValue keyValueLineEndOff = new KeyValue(markerLineEnd.startYProperty(), markerLength + Sunconfig.MARGIN_Y, Interpolator.EASE_BOTH);
             KeyFrame keyFrameLineEndOff = new KeyFrame(Duration.millis(animationDuration), keyValueLineEndOff);
 
-            cetusMarkerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
+            markerTransitionOff.getKeyFrames().addAll(keyFrameStartOpacityOff, keyFrameEndOpacityOff, keyFrameLineStartOff, keyFrameLineEndOff);
 
             nightArc.fillProperty().bind(Bindings.createObjectBinding(() -> {
                 double stop1 = arcFillStop1 - (0.40 * matrixStart.opacityProperty().get());
@@ -1056,12 +1078,12 @@ public class Suncreator {
 
             // Events
             nightArc.setOnMouseEntered(event -> {
-                cetusMarkerTransitionOff.stop();
-                cetusMarkerTransitionOn.play();
+                markerTransitionOff.stop();
+                markerTransitionOn.play();
             });
             nightArc.setOnMouseExited(event -> {
-                cetusMarkerTransitionOn.stop();
-                cetusMarkerTransitionOff.play();
+                markerTransitionOn.stop();
+                markerTransitionOff.play();
             });
 
             // these are sent back
@@ -1079,16 +1101,16 @@ public class Suncreator {
             matrixList.add(matrixStart);
             matrixList.add(matrixEnd);
 
-            markerHoverTransitionList.add(cetusMarkerTransitionOn);
-            markerHoverTransitionList.add(cetusMarkerTransitionOff);
+            markerHoverTransitionList.add(markerTransitionOn);
+            markerHoverTransitionList.add(markerTransitionOff);
 
         }
 
-//        cetusArcGroup.setBlendMode(BlendMode.MULTIPLY);
+        arcGroup.setBlendMode(blendMode);
 
-        cetusMarkerGroup.getChildren().addAll(cetusArcGroup, cetusHorizonGroup);
+        markerGroup.getChildren().addAll(arcGroup, horizonGroup);
 
-        return cetusMarkerGroup;
+        return markerGroup;
     }
 
     public static DotMatrix createCetusTimer() {
@@ -1148,7 +1170,7 @@ public class Suncreator {
             markerMinuteCircle.setTranslateX(Sunconfig.CENTER_X);
             markerMinuteCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
             markerMinuteCircle.setFill(Sunconfig.MINUTE_CIRCLE_GRADIENT);
-            markerMinuteCircle.setOpacity(((i % 5) == 0) ? opacity * 2 : opacity);
+            markerMinuteCircle.setOpacity(((i % 5) == 0) ? opacity * 1.5 : opacity);
 
             markerGroup.getChildren().add(markerMinuteCircle);
 
@@ -1188,7 +1210,8 @@ public class Suncreator {
             Rotate centerRotate,
             Group dialHourMatrixMarkerGroup,
             ArrayList<DotMatrix> hourMarkerMatrixList,
-            Group dialHourLineMarkerGroup,
+            Group dialHourLineMarkerGroupA,
+            Group dialHourLineMarkerGroupB,
             ArrayList<Rotate> dialMarkerRotateList
             ) {
 
@@ -1196,21 +1219,23 @@ public class Suncreator {
 
             double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
-            double lineOpacity = 0.50d;
-            Color lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
+            double lineOpacityA = 0.50d;
+            double lineOpacityB = 1.00d;
+            Color lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
+            Color lineColorB = Color.WHITE/*Sunconfig.Color_Of_HourMarkerQwrt*/;
             String style = "";
 
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
-                lineOpacity = 0.65d;
-                lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
+                lineOpacityA = 0.65d;
+                lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
                 strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             }
 
             if (i % 4 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH;
-                lineOpacity = 0.85d;
-                lineColor = Color.BLACK/*Sunconfig.Color_Of_HourMarkerFull*/;
+                lineOpacityA = 0.85d;
+                lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerFull*/;
                 strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
 //                style = Sunconfig.HOUR_MARKER_SHADOW;
             }
@@ -1228,22 +1253,33 @@ public class Suncreator {
             markerPoly.setTranslateY(Sunconfig.MARGIN_Y);
             markerPoly.setStroke(Sunconfig.Color_Of_HourMarkerStroke);
             markerPoly.setStrokeWidth(strokeWidth);
-            markerPoly.setFill(lineColor);
-            markerPoly.setOpacity(lineOpacity / 2);
+            markerPoly.setFill(lineColorA);
+            markerPoly.setOpacity(lineOpacityA / 2);
             markerPoly.setMouseTransparent(true);
 
-            Line markerLine = new Line(0, lineLength, 0, 1);
-            markerLine.setTranslateX(Sunconfig.CENTER_X);
-            markerLine.setTranslateY(Sunconfig.MARGIN_Y);
-            markerLine.setStroke(lineColor);
-            markerLine.setStrokeWidth(strokeWidth);
-            markerLine.setOpacity(lineOpacity);
-            markerLine.setStyle(style);
-            markerLine.setMouseTransparent(true);
+            Line markerLineA = new Line(0, lineLength, 0, 1);
+            markerLineA.setTranslateX(Sunconfig.CENTER_X);
+            markerLineA.setTranslateY(Sunconfig.MARGIN_Y);
+            markerLineA.setStroke(lineColorA);
+            markerLineA.setStrokeWidth(strokeWidth);
+            markerLineA.setOpacity(lineOpacityA);
+            markerLineA.setStyle(style);
+            markerLineA.setMouseTransparent(true);
 
-            Group markerGroup = new Group(/*markerPoly, */markerLine);
-            markerGroup.getTransforms().add(markerRotate);
-//            markerGroup.setStyle(Sunconfig.HOUR_MARKER_SHADOW);
+            Line markerLineB = new Line(0, 0, 0, -lineLength);
+            markerLineB.setTranslateX(Sunconfig.CENTER_X);
+            markerLineB.setTranslateY(Sunconfig.MARGIN_Y);
+            markerLineB.setStroke(lineColorB);
+            markerLineB.setStrokeWidth(strokeWidth);
+            markerLineB.setOpacity(lineOpacityB);
+            markerLineB.setStyle(style);
+            markerLineB.setMouseTransparent(true);
+
+            Group markerGroupA = new Group(markerLineA);
+            markerGroupA.getTransforms().add(markerRotate);
+
+            Group markerGroupB = new Group(markerLineB);
+            markerGroupB.getTransforms().add(markerRotate);
 
             if (i % 4 == 0) {
 
@@ -1263,6 +1299,14 @@ public class Suncreator {
                 markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_SCALE);
                 markerMatrix.setScaleY(Sunconfig.MATRIX_HOUR_SCALE);
 
+                if (i % 24 != 0) {
+                    markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_OFF_SCALE);
+                    markerMatrix.setScaleY(Sunconfig.MATRIX_HOUR_OFF_SCALE);
+                    markerMatrix.setFill(Color.BLACK);
+                    markerMatrix.setOpacity(Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY);
+                    markerMatrix.setBlendMode(BlendMode.MULTIPLY);
+                }
+
                 matrixMarkerGroup.getChildren().addAll(matrixMarkerLine, markerMatrix);
                 matrixMarkerGroup.getTransforms().add(markerRotate);
 
@@ -1270,7 +1314,9 @@ public class Suncreator {
                 hourMarkerMatrixList.add(markerMatrix);
             }
 
-            dialHourLineMarkerGroup.getChildren().addAll(markerGroup);
+            dialHourLineMarkerGroupA.getChildren().addAll(markerGroupA);
+            dialHourLineMarkerGroupB.getChildren().addAll(markerGroupB);
+
             dialMarkerRotateList.add(markerRotate);
         }
 
@@ -1312,21 +1358,22 @@ public class Suncreator {
 
         Polygon dialHighNoonPoly = new Polygon(
 /*
-                - Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                - Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
-                - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
-                - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
-                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y / 2,
-                Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
-                Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH
-*/
                 0, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
                 -Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
                 -Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y / 2,
                 0, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH / 2,
                 Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y / 2,
                 Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y
+*/
+
+                0, Sunconfig.CENTER_Y - Sunconfig.DOT_RADIUS_SMOL,
+                - Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                - Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y * 0.35,
+                0, Sunconfig.MARGIN_Y,
+                Sunconfig.HIGHNOON_STROKE_WIDTH, Sunconfig.MARGIN_Y * 0.35,
+                Sunconfig.HIGHNOON_DIAL_WIDTH / 2, Sunconfig.MARGIN_Y,
+                Sunconfig.HIGHNOON_STROKE_WIDTH / 2, Sunconfig.MARGIN_Y + Sunconfig.MARKER_HOUR_LENGTH
         );
         dialHighNoonPoly.setTranslateX(Sunconfig.CENTER_X);
         dialHighNoonPoly.setFill(Color.TRANSPARENT);
@@ -1354,15 +1401,17 @@ public class Suncreator {
 
         dialHighNoonGroup.getChildren().addAll(dialHighNoonPolyBackground, dialHighNoonPoly);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
-        dialHighNoonGroup.setStyle(Sunconfig.MATRIX_GLOW);
-        dialHighNoonGroup.setBlendMode(BlendMode.SCREEN);
+        dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_SHADOW);
+//        dialHighNoonGroup.setBlendMode(BlendMode.SCREEN);
+
+        dialHighNoonGroup.setOpacity(Sunconfig.DIAL_HIGH_NOON_OPACITY);
 
         return dialHighNoonGroup;
     }
 
     public static Arc createDialLocalHourArc() {
         Arc arc = new Arc(0, 0,
-                Sunconfig.CENTER_X - Sunconfig.MARGIN_X, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y,
+                Sunconfig.CENTER_X, Sunconfig.CENTER_Y,
                 0, 15);
         arc.setType(ArcType.ROUND);
         arc.setTranslateX(Sunconfig.CENTER_X);
@@ -1480,9 +1529,9 @@ public class Suncreator {
     }
 
     public static void createLEDs(
-            ArrayList<Node> dialLocalSecondLedList,
+            Group dialLocalSecondLedList,
             ArrayList<Boolean> dialLocalSecondOn,
-            ArrayList<Node> dialLocalMinuteLedList,
+            Group dialLocalMinuteLedList,
             ArrayList<Boolean> dialLocalMinuteOn,
             ArrayList<Timeline> dialLocalSecondLedOffList,
             ArrayList<Timeline> dialLocalMinuteLedOffList,
@@ -1583,8 +1632,8 @@ public class Suncreator {
             minuteLedGroup.getTransforms().add(localMinuteRotate);
 //            minuteLedGroup.setBlendMode(BlendMode.SCREEN);
 
-            dialLocalSecondLedList.add(secondGroup);
-            dialLocalMinuteLedList.add(minuteLedGroup);
+            dialLocalSecondLedList.getChildren().add(secondGroup);
+            dialLocalMinuteLedList.getChildren().add(minuteLedGroup);
 
             dialLocalSecondOn.add(false);
             dialLocalMinuteOn.add(false);

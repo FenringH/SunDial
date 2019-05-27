@@ -66,6 +66,7 @@ public class Sunface extends Application {
     private HashMap <WindowType, Boolean> maximizedEh;
     private boolean snapToCenterEh = true;
     private boolean inCenterEh = false;
+    private boolean firstShowPrimary = true;
 
     private TextArea debugTextArea;
     private String debugErrorMessage;
@@ -265,7 +266,6 @@ public class Sunface extends Application {
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.getIcons().add(appIconSun);
 
-
         // Playtime
         KeyFrame keyframeClockTick = new KeyFrame(
                 Duration.millis(fpsSetting),
@@ -280,6 +280,9 @@ public class Sunface extends Application {
         // PRIMARY STAGE
         primaryStage.setOnHidden(event -> timeline.pause());
         primaryStage.setOnShown(event -> timeline.play());
+
+        mainScene.setOnMouseEntered(event -> sundial.showOuterControlsGroup());
+        mainScene.setOnMouseExited(event -> sundial.hideOuterControlsGroup());
 
         // SUNDIAL WINDOW
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
@@ -393,10 +396,9 @@ public class Sunface extends Application {
         // *** SHOWTIME ***
 
         initCurrentTime();
-
-        primaryStage.show();
-
         timeline.play();
+        sundial.hideOuterControlsGroup();
+        primaryStage.show();
 
         saveMouse(primaryStage, null);
 
@@ -908,7 +910,6 @@ public class Sunface extends Application {
             sunyear.setSpaceTime(longitude, latitude, offsetLocalTime, timeZoneOffset);
         }
     }
-
 
     // ***************************************************************
     // *** DEBUG window contents ***
