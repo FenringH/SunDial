@@ -639,15 +639,11 @@ public class Sundial {
 
 
         // LAYERS
-        Group backgroundGroup = new Group(
+        Group foregroundGroup = new Group(
                 dialMarginCircle
                 ,dialLocalHourArc
-//                ,dialMarginCircleRing
-        );
-        SubScene backgroundScene = Suncreator.createBackgroundSubScene(backgroundGroup);
-
-        Group foregroundGroup = new Group(
-                dialCircleBackground
+                ,dialCircleBackground
+                ,dialHourLineMarkerGroupA
                 ,dialArcNight
                 ,dialArcMidnight
                 ,globeMasterGroup
@@ -657,14 +653,13 @@ public class Sundial {
                 ,orbVallisMarkerGroup
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
-                ,dialHighNoonGroup
-                ,sunHighNoon
                 ,dialHourLineMarkerGroupB
                 ,dialHourMatrixMarkerGroup
                 ,dialLocalHourGroup
+                ,dialHighNoonGroup
+                ,sunHighNoon
                 ,horizonGroup
                 ,dialArcDayLength
-//                ,dialHourLineMarkerGroupA
                 ,dialCircleCenterPoint
                 ,cetusTimer
                 ,orbVallisTimer
@@ -684,7 +679,7 @@ public class Sundial {
 
         SubScene foregroundScene = new SubScene(foregroundGroup, DEFAULT_WIDTH, DEFAULT_HEIGHT, true, SceneAntialiasing.DISABLED);
 
-        dialsGroup.getChildren().addAll(backgroundScene, foregroundScene);
+        dialsGroup.getChildren().addAll(foregroundScene);
         dialsGroup.setScaleX(Sunconfig.SCALE_X);
         dialsGroup.setScaleY(Sunconfig.SCALE_Y);
 
@@ -905,6 +900,10 @@ public class Sundial {
             }
 
             i++;
+        }
+
+        if (gregorianCalendar.get(Calendar.HOUR_OF_DAY) == 11) {
+            dialHourLineMarkerGroupB.getChildren().get(0).setVisible(true);
         }
     }
 
@@ -1406,6 +1405,7 @@ public class Sundial {
         int animationRate = globeAnimationEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
 
         MorphingPolygon dialLocalHourMorphingPolygon = (MorphingPolygon) dialLocalHourGroup.getChildren().get(0);
+        MorphingPolygon dialHighNoonMorphingPolygon = (MorphingPolygon) dialHighNoonGroup.getChildren().get(0);
 
         tinyGlobeMoveOutTimeline.setRate(animationRate);
         tinyGlobeMoveInTimeline.setRate(animationRate);
@@ -1418,6 +1418,7 @@ public class Sundial {
         horizonMoveOutTimeline.setRate(animationRate);
         horizonMoveInTimeline.setRate(animationRate);
         dialLocalHourMorphingPolygon.setRate(animationRate);
+        dialHighNoonMorphingPolygon.setRate(animationRate);
         highNoonMoveOutTimeline.setRate(animationRate);
         highNoonMoveInTimeline.setRate(animationRate);
 
@@ -1433,6 +1434,8 @@ public class Sundial {
         horizonMoveInTimeline.stop();
         dialLocalHourMorphingPolygon.stopOut();
         dialLocalHourMorphingPolygon.stopIn();
+        dialHighNoonMorphingPolygon.stopOut();
+        dialHighNoonMorphingPolygon.stopIn();
         highNoonMoveOutTimeline.stop();
         highNoonMoveInTimeline.stop();
 
@@ -1443,6 +1446,7 @@ public class Sundial {
             globeMoveOutTimeline.play();
             horizonMoveOutTimeline.play();
             dialLocalHourMorphingPolygon.playOut();
+            dialHighNoonMorphingPolygon.playOut();
             highNoonMoveOutTimeline.play();
         }
         else {
@@ -1452,6 +1456,7 @@ public class Sundial {
             globeMoveInTimeline.play();
             horizonMoveInTimeline.play();
             dialLocalHourMorphingPolygon.playIn();
+            dialHighNoonMorphingPolygon.playIn();
             highNoonMoveInTimeline.play();
         }
 

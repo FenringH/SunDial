@@ -227,7 +227,6 @@ public class Sunconfig {
     public static final double DOT_RADIUS_SMOL = 10.0d;
     public static final double DOT_RADIUS_BIGH = 100.0d;
     public static final double SUNTIME_DIAL_LENGTH = 50.0d;
-    public static final double HIGHNOON_DIAL_LENGTH = 50.0d;
     public static final double SUNRISE_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNSET_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNRISE_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
@@ -238,11 +237,13 @@ public class Sunconfig {
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double LOCALTIME_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double LOCALTIME_DIAL_MID_LENGTH = Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS;
-    public static final double LOCALTIME_HOUR_WIDTH = 18.0d;
+    public static final double LOCALTIME_HOUR_WIDTH = 12.0d;
     public static final double LOCALTIME_HOUR_SHORT_WIDTH = 8.0d;
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
-    public static final double HIGHNOON_DIAL_WIDTH = 14.0d;
+    public static final double HIGHNOON_DIAL_WIDTH = 6.0d;
+    public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
+    public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
     public static final double DAY_ARC_MARGIN = 12.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
@@ -285,7 +286,7 @@ public class Sunconfig {
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
     public static final double HIGHNOON_STROKE_WIDTH = 1.00d;
-    public static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.25d;
+    public static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.00d;
     public static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
     public static final double SUNRISE_STROKE_WIDTH = 1.00d;
     public static final double SUNSET_STROKE_WIDTH = 1.00d;
@@ -312,7 +313,7 @@ public class Sunconfig {
     public static final double GLOBEGRID_LINE_WIDTH = 0.50d;
 
     public static final double DAYLENGTH_ARC_OPACITY = 0.65d;
-    public static final double MARGIN_CIRCLE_OPACITY = 1.00d;
+    public static final double MARGIN_CIRCLE_OPACITY = 0.90d;
     public static final double TINYGLOBE_DEFAULT_OPACITY = 0.65d;
     public static final double TINYGLOBE_OFFSET_OPACITY = 0.90d;
     public static final double MARKER_MINUTE_OPACITY = 0.15d;
@@ -450,7 +451,7 @@ public class Sunconfig {
     public static final Color Color_Of_Space        = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
     public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.20);
-    public static final Color Color_Of_Margin       = new Color(0.10, 0.25, 0.60, MARGIN_CIRCLE_OPACITY);
+    public static final Color Color_Of_Margin       = new Color(0.25, 0.35, 0.65, MARGIN_CIRCLE_OPACITY);
     public static final Color Color_Of_Margin_Hover = new Color(0.10, 0.35, 0.50, MARGIN_CIRCLE_OPACITY);
 
     public static final Color Color_Of_SunTime    = new Color(1.00, 0.50, 0.00, 1.00);
