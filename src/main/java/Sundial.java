@@ -584,6 +584,7 @@ public class Sundial {
                 , globeMasterGroup.opacityProperty()
         ));
 
+/*
         dialArcDayLength.opacityProperty().bind(Bindings.createDoubleBinding(() ->
                         Sunconfig.DAYLENGTH_ARC_OPACITY * (0.5 + 0.5 * (1 - globeMasterGroup.opacityProperty().get()))
                 , globeMasterGroup.opacityProperty()
@@ -598,6 +599,7 @@ public class Sundial {
                         0.65 + 0.35 * (1 - globeMasterGroup.opacityProperty().get())
                 , globeMasterGroup.opacityProperty()
         ));
+*/
 
         // Info overlay
         infoText = new Text();
@@ -647,16 +649,16 @@ public class Sundial {
                 ,dialArcNight
                 ,dialArcMidnight
                 ,globeMasterGroup
-                ,dialMinuteMarkers
                 ,dialCircleFrame
                 ,cetusMarkerGroup
                 ,orbVallisMarkerGroup
+                ,dialHourLineMarkerGroupB
+//                ,dialHourMatrixMarkerGroup
+                ,dialMinuteMarkers
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
-                ,dialHourLineMarkerGroupB
-                ,dialHourMatrixMarkerGroup
-                ,dialLocalHourGroup
                 ,dialHighNoonGroup
+                ,dialLocalHourGroup
                 ,sunHighNoon
                 ,horizonGroup
                 ,dialArcDayLength
@@ -1405,7 +1407,7 @@ public class Sundial {
         int animationRate = globeAnimationEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
 
         MorphingPolygon dialLocalHourMorphingPolygon = (MorphingPolygon) dialLocalHourGroup.getChildren().get(0);
-        MorphingPolygon dialHighNoonMorphingPolygon = (MorphingPolygon) dialHighNoonGroup.getChildren().get(0);
+        MorphingPolygon dialHighNoonMorphingPolygon = (MorphingPolygon) dialHighNoonGroup.getChildren().get(1);
 
         tinyGlobeMoveOutTimeline.setRate(animationRate);
         tinyGlobeMoveInTimeline.setRate(animationRate);
@@ -1664,9 +1666,9 @@ public class Sundial {
 
         sunHighNoonVisibleEh = !sunHighNoonVisibleEh;
 
-        matrixDayLength.setVisible(!sunHighNoonVisibleEh);
+//        matrixDayLength.setVisible(!sunHighNoonVisibleEh);
+//        dialArcDayLength.setVisible(!sunHighNoonVisibleEh);
 
-        dialArcDayLength.setVisible(!sunHighNoonVisibleEh);
         sunHighNoon.setVisible(sunHighNoonVisibleEh);
     }
 

@@ -103,7 +103,7 @@ public class SunHighNoon extends Group {
             markerGroup.getChildren().add(line);
         }
 
-        super.getChildren().addAll(/*sunLine, */markerGroup, /*horizonLine, */arc, sunDot, matrixTime, matrixAngle, matrixDayLength);
+        super.getChildren().addAll(/*sunLine, */markerGroup, /*horizonLine, arc,*/ sunDot, matrixTime, matrixAngle/*, matrixDayLength*/);
         super.getTransforms().add(rotate);
         super.setMouseTransparent(true);
     }

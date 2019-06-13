@@ -217,8 +217,8 @@ public class Sunconfig {
 
     public static final String HELPTEXT_MIRO = "Open web page in browser...";
 
-    public static final double MARGIN_X = 30.0d;
-    public static final double MARGIN_Y = 30.0d;
+    public static final double MARGIN_X = 40.0d;
+    public static final double MARGIN_Y = 40.0d;
     public static final double SCALE_X = 1.0d;
     public static final double SCALE_Y = 1.0d;
     public static final double CENTER_X = Sundial.DEFAULT_WIDTH / 2;
@@ -231,7 +231,9 @@ public class Sunconfig {
     public static final double SUNSET_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNRISE_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double SUNSET_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
-    public static final double MARKER_HOUR_LENGTH = MARGIN_Y - 3.0d;
+    public static final double LOCALSECOND_RADIUS_BIG = 5;
+    public static final double LOCALSECOND_RADIUS_SMOL = 4;
+    public static final double MARKER_HOUR_LENGTH = MARGIN_Y - LOCALSECOND_RADIUS_BIG * 4;
     public static final double MARKER_MINUTE_LENGTH = 8.0d;
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
@@ -241,7 +243,7 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_SHORT_WIDTH = 8.0d;
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
-    public static final double HIGHNOON_DIAL_WIDTH = 6.0d;
+    public static final double HIGHNOON_DIAL_WIDTH = 2.0d;
     public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double DAYLENGTH_ARC_RADIUS = 110.0d;
@@ -252,8 +254,6 @@ public class Sunconfig {
     public static final double LOCALMINUTE_HEIGHT = 16;
     public static final double LOCALMINUTE_ROUND = 6;
     public static final double LOCALSECOND_WIDTH = 8;
-    public static final double LOCALSECOND_RADIUS_BIG = 5;
-    public static final double LOCALSECOND_RADIUS_SMOL = 4;
     public static final double LOCALSECOND_HEIGHT = 16;
     public static final double LOCALSECOND_POLY_WIDTH = 6;
     public static final double LOCALSECOND_POLY_HEIGHT = 20;
@@ -283,7 +283,7 @@ public class Sunconfig {
     public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNHIGHNOON_RADIUS = 130;
 
-    public static final double DAYLENGTH_STROKE_WIDTH = 2.00d;
+    public static final double DAYLENGTH_STROKE_WIDTH = 2.00d * 0.75;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
     public static final double HIGHNOON_STROKE_WIDTH = 1.00d;
     public static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.00d;
@@ -313,7 +313,7 @@ public class Sunconfig {
     public static final double GLOBEGRID_LINE_WIDTH = 0.50d;
 
     public static final double DAYLENGTH_ARC_OPACITY = 0.65d;
-    public static final double MARGIN_CIRCLE_OPACITY = 0.90d;
+    public static final double MARGIN_CIRCLE_OPACITY = 0.93d;
     public static final double TINYGLOBE_DEFAULT_OPACITY = 0.65d;
     public static final double TINYGLOBE_OFFSET_OPACITY = 0.90d;
     public static final double MARKER_MINUTE_OPACITY = 0.15d;
@@ -348,7 +348,7 @@ public class Sunconfig {
     public static final double LOCAL_HOUR_MARKER_OFF_OPACITY = 0.50d;
     public static final double DIAL_HIGH_NOON_OPACITY = 0.75d;
 
-    public static final double MATRIX_MARKER_OFFSET = 9.0d;
+    public static final double MATRIX_MARKER_OFFSET = 10.0 + LOCALSECOND_RADIUS_BIG * 2;
     public static final double MATRIX_HORIZON_OFFSET = 83.0d;
     public static final double MATRIX_TIME_OFFSET = 0.0d;
     public static final double MATRIX_DATE_OFFSET = 45.0d;
@@ -362,7 +362,7 @@ public class Sunconfig {
     public static final double TINYGLOBE_SLIDE = 5.0d;
     public static final double LOCALMINUTE_OFFSET = 50.0d;
     public static final double LOCALSECOND_OFFSET = 50.0d;
-    public static final double LOCALMINUTE_CIRCLE_OFFSET = MARGIN_Y + 10.0d;
+    public static final double LOCALMINUTE_CIRCLE_OFFSET = LOCALSECOND_RADIUS_BIG * 2;
     public static final double LOCALMINUTE_DIAL_OFFSET = LOCALMINUTE_CIRCLE_OFFSET + 10.0d;
     public static final double MATRIX_MINUTE_OFFSET = 70.0d;
     public static final double CONTROL_HELP_OFFSET = 236.0d;
@@ -380,8 +380,8 @@ public class Sunconfig {
     public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
     public static final double ORBVALLIS_TIMER_OFFSET = CENTER_Y - 70.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
-    public static final double CETUS_HORIZON_OFFSET = 45.0d;
-    public static final double ORBVALLIS_HORIZON_OFFSET = 45.0d;
+    public static final double CETUS_HORIZON_OFFSET = 55.0d;
+    public static final double ORBVALLIS_HORIZON_OFFSET = 55.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 45.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
     public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 25;
@@ -397,7 +397,7 @@ public class Sunconfig {
     public static final double MATRIX_DAYLENGTH_SCALE = 1.00d;
     public static final double MATRIX_LONGITUDE_SCALE = 1.10d;
     public static final double MATRIX_LATITUDE_SCALE = 1.10d;
-    public static final double MATRIX_HOUR_SCALE = 1.15d;
+    public static final double MATRIX_HOUR_SCALE = 1.00d;
     public static final double MATRIX_HOUR_OFF_SCALE = 0.85d;
     public static final double MATRIX_MINUTE_SCALE = 0.75d;
     public static final double TINYGLOBE_DOWNSCALE = 0.80d;
@@ -450,7 +450,7 @@ public class Sunconfig {
     public static final Color Color_Of_Atmosphere   = new Color(0.25, 0.50, 0.90, 0.85);
     public static final Color Color_Of_Space        = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
-    public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.20);
+    public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.07);
     public static final Color Color_Of_Margin       = new Color(0.25, 0.35, 0.65, MARGIN_CIRCLE_OPACITY);
     public static final Color Color_Of_Margin_Hover = new Color(0.10, 0.35, 0.50, MARGIN_CIRCLE_OPACITY);
 
@@ -460,7 +460,7 @@ public class Sunconfig {
     public static final Color Color_Of_SunRise    = new Color(1.00, 0.00, 0.00, 1.00);
     public static final Color Color_Of_SunSet     = new Color(0.65, 0.00, 0.65, 1.00);
     public static final Color Color_Of_LocalTime  = new Color(1.00, 1.00, 1.00, 1.00);
-    public static final Color Color_Of_LocalArc   = new Color(0.25, 0.65, 1.00, 1.00);
+    public static final Color Color_Of_LocalArc   = new Color(0.50, 0.75, 1.00, 1.00);
     public static final Color Color_Of_TinyFrame  = new Color(1.00, 1.00, 1.00, 1.00);
 
     public static final Color Color_Of_TinyDay      = new Color(0.65, 0.65,0.65, 1.00);
@@ -707,7 +707,7 @@ public class Sunconfig {
             0, 0, CENTER_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.90, Color_Of_LocalArc),
+            new Stop(0.83, Color_Of_LocalArc),
             new Stop(1.00, Color.TRANSPARENT)
     );
 
