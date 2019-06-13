@@ -644,6 +644,7 @@ public class Sundial {
         Group foregroundGroup = new Group(
                 dialMarginCircle
                 ,dialLocalHourArc
+                ,dialHourLineMarkerGroupB
                 ,dialCircleBackground
                 ,dialHourLineMarkerGroupA
                 ,dialArcNight
@@ -652,8 +653,7 @@ public class Sundial {
                 ,dialCircleFrame
                 ,cetusMarkerGroup
                 ,orbVallisMarkerGroup
-                ,dialHourLineMarkerGroupB
-//                ,dialHourMatrixMarkerGroup
+                ,dialHourMatrixMarkerGroup
                 ,dialMinuteMarkers
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
