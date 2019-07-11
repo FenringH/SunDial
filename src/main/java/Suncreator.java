@@ -1429,6 +1429,21 @@ public class Suncreator {
         return arc;
     }
 
+    public static SuperNiceArc createDialLocalHourSuperNiceArc() {
+
+        SuperNiceArc superNiceArc = new SuperNiceArc.PleaseBuild()
+                .center(Sunconfig.CENTER_X, Sunconfig.CENTER_Y)
+                .size(165, Sunconfig.CENTER_Y)
+                .thankYou();
+
+        superNiceArc.setStrokeColor(Color.WHITE);
+        superNiceArc.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
+        superNiceArc.setBlendMode(BlendMode.SCREEN);
+        superNiceArc.setMouseTransparent(true);
+
+        return superNiceArc;
+    }
+
     public static Group createDialLocalHourGroup(Rotate dialRotateLocalHour) {
 
         Polygon dialLocalHourPolyLongSimple = new Polygon(

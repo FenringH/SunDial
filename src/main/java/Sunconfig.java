@@ -452,7 +452,8 @@ public class Sunconfig {
     public static final Color Color_Of_Space        = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
     public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.07);
-    public static final Color Color_Of_Margin       = new Color(0.25, 0.35, 0.65, MARGIN_CIRCLE_OPACITY);
+    public static final Color Color_Of_MarginEnd    = new Color(0.25, 0.35, 0.65, 0.20);
+    public static final Color Color_Of_MarginStart  = new Color(0.25, 0.35, 0.65, 0.50);
     public static final Color Color_Of_Margin_Hover = new Color(0.10, 0.35, 0.50, MARGIN_CIRCLE_OPACITY);
 
     public static final Color Color_Of_SunTime    = new Color(1.00, 0.50, 0.00, 1.00);
@@ -717,8 +718,9 @@ public class Sunconfig {
             CENTER_X, CENTER_Y, CENTER_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.93, Color_Of_Margin),
-            new Stop(1.00, Color.TRANSPARENT)
+            new Stop(0.930, Color_Of_MarginStart),
+            new Stop(0.955, Color_Of_MarginEnd),
+            new Stop(1.000, Color.TRANSPARENT)
     );
 
 }

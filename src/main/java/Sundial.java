@@ -86,6 +86,7 @@ public class Sundial {
     private Group dialLocalSecondGroup;
     private Group dialLocalMinuteGroup;
     private Group dialLocalHourGroup;
+    private SuperNiceArc dialLocalHourSuperNiceArc;
     private Group dialHighNoonGroup;
     private ArrayList<Arc> cetusMarkerArcList;
     private ArrayList<Line> cetusMarkerLineList;
@@ -411,7 +412,9 @@ public class Sundial {
         hourMarkerMatrixList = new ArrayList<>();
 
         dialHourLineMarkerGroupA = new Group();
+
         dialHourLineMarkerGroupB = new Group();
+        dialHourLineMarkerGroupB.setOpacity(0.50);
 
         Suncreator.createDialHourMarkers(
                 nightCompression,
@@ -428,7 +431,10 @@ public class Sundial {
         dialLocalMinuteGroup = Suncreator.createDialLocalMinuteGroup(dialRotateLocalMinute);
         dialLocalSecondGroup = Suncreator.createDialLocalSecondGroup(dialRotateLocalSecond);
         dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialRotateLocalHour);
+        dialLocalHourSuperNiceArc = Suncreator.createDialLocalHourSuperNiceArc();
+
         dialLocalHourArc = Suncreator.createDialLocalHourArc();
+        dialLocalHourArc.setOpacity(0.50);
 
         matrixSunrise = Suncreator.createMatrixSunrise();
         matrixSunset = Suncreator.createMatrixSunset();
@@ -654,11 +660,12 @@ public class Sundial {
                 ,cetusMarkerGroup
                 ,orbVallisMarkerGroup
                 ,dialHourMatrixMarkerGroup
-                ,dialMinuteMarkers
+//                ,dialMinuteMarkers
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
                 ,dialHighNoonGroup
-                ,dialLocalHourGroup
+//                ,dialLocalHourGroup
+                ,dialLocalHourSuperNiceArc
                 ,sunHighNoon
                 ,horizonGroup
                 ,dialArcDayLength
@@ -718,7 +725,7 @@ public class Sundial {
         tinyGlobeFrame.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); tinyGlobeFrame.setCursor(Cursor.DEFAULT); tinyGlobeFrame.setStyle(Sunconfig.MATRIX_SHADOW); });
 
         dialMarginCircle.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_WINDOW); dialMarginCircle.setCursor(Cursor.MOVE);/* dialMarginCircle.setFill(Sunconfig.Color_Of_Margin_Hover); */});
-        dialMarginCircle.setOnMouseExited(event -> {  helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialMarginCircle.setCursor(Cursor.DEFAULT);/* dialMarginCircle.setFill(Sunconfig.Color_Of_Margin); */});
+        dialMarginCircle.setOnMouseExited(event -> {  helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialMarginCircle.setCursor(Cursor.DEFAULT);/* dialMarginCircle.setFill(Sunconfig.Color_Of_MarginEnd); */});
 
         dialCircleFrame.setOnMouseEntered(event -> { helpText.setText(globeVisibleEh ? Sunconfig.HELPTEXT_GLOBE : Sunconfig.HELPTEXT_WINDOW); dialCircleFrame.setCursor(globeVisibleEh ? Cursor.OPEN_HAND : Cursor.MOVE); });
         dialCircleFrame.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialCircleFrame.setCursor(Cursor.DEFAULT); });
@@ -1254,6 +1261,7 @@ public class Sundial {
     public void setDialAngleLocalHour(double dialAngleLocalHour) {
         this.dialAngleLocalHour = Sunutil.getNightCompressionAngle(dialAngleLocalHour, nightCompression);
         dialRotateLocalHour.setAngle(this.dialAngleLocalHour);
+        dialLocalHourSuperNiceArc.setEndAngle(this.dialAngleLocalHour);
     }
 
     public void updateDialMarkers() {
