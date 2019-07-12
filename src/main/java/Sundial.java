@@ -177,6 +177,8 @@ public class Sundial {
     private Timeline highNoonMoveOutTimeline;
     private Timeline highNoonMoveInTimeline;
     private Timeline outerControlsGroupTimeline;
+    private Timeline dialLocalHourSuperNiceArcOutTimeline;
+    private Timeline dialLocalHourSuperNiceArcInTimeline;
 
     private Text helpText;
     private Group helpTextGroup;
@@ -414,7 +416,7 @@ public class Sundial {
         dialHourLineMarkerGroupA = new Group();
 
         dialHourLineMarkerGroupB = new Group();
-        dialHourLineMarkerGroupB.setOpacity(0.50);
+//        dialHourLineMarkerGroupB.setOpacity(0.50);
 
         Suncreator.createDialHourMarkers(
                 nightCompression,
@@ -434,7 +436,7 @@ public class Sundial {
         dialLocalHourSuperNiceArc = Suncreator.createDialLocalHourSuperNiceArc();
 
         dialLocalHourArc = Suncreator.createDialLocalHourArc();
-        dialLocalHourArc.setOpacity(0.50);
+//        dialLocalHourArc.setOpacity(0.50);
 
         matrixSunrise = Suncreator.createMatrixSunrise();
         matrixSunset = Suncreator.createMatrixSunset();
@@ -447,6 +449,9 @@ public class Sundial {
 
         horizonMoveOutTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.OUT, horizonGroup);
         horizonMoveInTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.IN, horizonGroup);
+
+        dialLocalHourSuperNiceArcOutTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.OUT, dialLocalHourSuperNiceArc);
+        dialLocalHourSuperNiceArcInTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.IN, dialLocalHourSuperNiceArc);
 
         // Sun High Noon extra information
         sunHighNoon = new SunHighNoon(
@@ -664,7 +669,7 @@ public class Sundial {
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
                 ,dialHighNoonGroup
-//                ,dialLocalHourGroup
+                ,dialLocalHourGroup
                 ,dialLocalHourSuperNiceArc
                 ,sunHighNoon
                 ,horizonGroup
@@ -1431,6 +1436,8 @@ public class Sundial {
         dialHighNoonMorphingPolygon.setRate(animationRate);
         highNoonMoveOutTimeline.setRate(animationRate);
         highNoonMoveInTimeline.setRate(animationRate);
+        dialLocalHourSuperNiceArcOutTimeline.setRate(animationRate);
+        dialLocalHourSuperNiceArcInTimeline.setRate(animationRate);
 
         tinyGlobeMoveOutTimeline.stop();
         tinyGlobeMoveInTimeline.stop();
@@ -1448,6 +1455,8 @@ public class Sundial {
         dialHighNoonMorphingPolygon.stopIn();
         highNoonMoveOutTimeline.stop();
         highNoonMoveInTimeline.stop();
+        dialLocalHourSuperNiceArcOutTimeline.stop();
+        dialLocalHourSuperNiceArcInTimeline.stop();
 
         if (visibleEh) {
             tinyGlobeMoveOutTimeline.play();
@@ -1458,6 +1467,7 @@ public class Sundial {
             dialLocalHourMorphingPolygon.playOut();
             dialHighNoonMorphingPolygon.playOut();
             highNoonMoveOutTimeline.play();
+            dialLocalHourSuperNiceArcOutTimeline.play();
         }
         else {
             tinyGlobeMoveInTimeline.play();
@@ -1468,6 +1478,7 @@ public class Sundial {
             dialLocalHourMorphingPolygon.playIn();
             dialHighNoonMorphingPolygon.playIn();
             highNoonMoveInTimeline.play();
+            dialLocalHourSuperNiceArcInTimeline.play();
         }
 
         int i = 0;
