@@ -657,7 +657,7 @@ public class Sundial {
                 ,dialLocalHourArc
                 ,dialHourLineMarkerGroupB
                 ,dialCircleBackground
-                ,dialHourLineMarkerGroupA
+//                ,dialHourLineMarkerGroupA
                 ,dialArcNight
                 ,dialArcMidnight
                 ,globeMasterGroup
@@ -669,7 +669,7 @@ public class Sundial {
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
                 ,dialHighNoonGroup
-                ,dialLocalHourGroup
+//                ,dialLocalHourGroup
                 ,dialLocalHourSuperNiceArc
                 ,sunHighNoon
                 ,horizonGroup
