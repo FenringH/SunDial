@@ -1470,17 +1470,27 @@ public class Suncreator {
 
     public static Group createDialLocalHourGroup(Rotate dialRotateLocalHour) {
 
+        double C = Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL * 1.1;
+        double D = C * 0.75;
+
+        Polygon dialLocalHourPolyShortestSimple = new Polygon(
+                0, C, // 1
+                - Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D, // 2
+                0, 3, // 3
+                + Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D // 4
+        );
+
         Polygon dialLocalHourPolyShorterSimple = new Polygon(
                 0, (Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL) * 1.33, // 1
                 - Sunconfig.LOCALTIME_HOUR_SHORTER_WIDTH / 2, (Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL), // 2
-                0, 5, // 3
+                0, 3, // 3
                 + Sunconfig.LOCALTIME_HOUR_SHORTER_WIDTH / 2, (Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL) // 4
         );
 
         Polygon dialLocalHourPolyShortSimple = new Polygon(
                 0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
                 - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 2
-                0, 5, // 3
+                0, 3, // 3
                 + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75 // 4
         );
 
@@ -1511,7 +1521,7 @@ public class Suncreator {
         );
 
         MorphingPolygon morphingPolygon = new MorphingPolygon(
-                dialLocalHourPolyShorterSimple.getPoints(),
+                dialLocalHourPolyShortestSimple.getPoints(),
                 dialLocalHourPolyShortSimple.getPoints(),
                 Sunconfig.TIMEANDDATE_DURATION,
                 Interpolator.EASE_BOTH
@@ -1520,7 +1530,6 @@ public class Suncreator {
         morphingPolygon.setFill(new Color(1, 1, 1, 0.1));
         morphingPolygon.setStroke(Color.WHITE);
         morphingPolygon.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-        morphingPolygon.setStrokeLineCap(StrokeLineCap.ROUND);
         morphingPolygon.setOpacity(1);
 
         Group dialLocalHourGroup = new Group(morphingPolygon);

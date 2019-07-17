@@ -243,6 +243,7 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_WIDTH = 12.0d;
     public static final double LOCALTIME_HOUR_SHORT_WIDTH = 8.0d;
     public static final double LOCALTIME_HOUR_SHORTER_WIDTH = 5.0d;
+    public static final double LOCALTIME_HOUR_SHORTEST_WIDTH = 1.0d;
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 2.0d;

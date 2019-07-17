@@ -8,8 +8,8 @@ import javafx.scene.transform.Rotate;
 
 public class SuperNiceArc extends Group {
 
-    private final static double START_REDUCTION_ANGLE = 20;
-    private final static double END_REDUCTION_ANGLE = 10;
+    private final static double START_REDUCTION_ANGLE = 15;
+    private final static double END_REDUCTION_ANGLE = 5;
 
     private final static double START_CURVE_HEIGHT = 0.2;
     private final static double END_CURVE_HEIGHT = 0.1;
@@ -21,6 +21,10 @@ public class SuperNiceArc extends Group {
     private double radiusBig;
     private double radiusSmol;
 
+    private double totalReductionAngle;
+    private double startCurveRatio;
+    private double endCurveRatio;
+
     private DoubleProperty startAngle;
     private DoubleProperty endAngle;
 
@@ -29,6 +33,7 @@ public class SuperNiceArc extends Group {
     private Arc mainArc;
     private Polygon startPoly;
     private CubicCurve startCurve;
+    private CubicCurve endCurve;
 
     private Rotate startLineRotate;
     private Rotate endLineRotate;
@@ -45,6 +50,10 @@ public class SuperNiceArc extends Group {
         double startPolyHeight = radiusSmol * (1 - START_CURVE_HEIGHT);
         double endPolyHeight = radiusSmol * (1 + END_CURVE_HEIGHT);
 
+        totalReductionAngle = START_REDUCTION_ANGLE + END_REDUCTION_ANGLE;
+        startCurveRatio = START_REDUCTION_ANGLE / totalReductionAngle;
+        endCurveRatio = END_REDUCTION_ANGLE / totalReductionAngle;
+
         startAngle = new SimpleDoubleProperty(180);
         endAngle = new SimpleDoubleProperty(0);
 
@@ -54,23 +63,75 @@ public class SuperNiceArc extends Group {
         endLineRotate = new Rotate();
         endLineRotate.angleProperty().bind(endAngle);
 
-        DoubleProperty arcStartX = new SimpleDoubleProperty();
-        DoubleProperty arcStartY = new SimpleDoubleProperty();
-        DoubleProperty arcTangentY = new SimpleDoubleProperty();
+        // helper bindings
+        DoubleProperty arcStartPointX = new SimpleDoubleProperty();
+        DoubleProperty arcStartPointY = new SimpleDoubleProperty();
+        DoubleProperty arcStartTangentY = new SimpleDoubleProperty();
 
-        arcStartX.bind(Bindings.createDoubleBinding(() ->
+        arcStartPointX.bind(Bindings.createDoubleBinding(() ->
                     -radiusSmol * Math.sin(Math.toRadians(getStartReductionAngle())),
                 startAngle, endAngle
         ));
 
-        arcStartY.bind(Bindings.createDoubleBinding(() ->
-                    radiusSmol - radiusSmol * (1 - Math.cos(Math.toRadians(getStartReductionAngle()))),
+        arcStartPointY.bind(Bindings.createDoubleBinding(() ->
+                    radiusSmol * Math.cos(Math.toRadians(getStartReductionAngle())),
                 startAngle, endAngle
         ));
 
-        arcTangentY.bind(Bindings.createDoubleBinding(() ->
+        arcStartTangentY.bind(Bindings.createDoubleBinding(() ->
                     radiusSmol / Math.cos(Math.toRadians(getStartReductionAngle())),
                 startAngle, endAngle
+        ));
+
+        DoubleProperty arcEndPoint1X = new SimpleDoubleProperty();
+        DoubleProperty arcEndPoint1Y = new SimpleDoubleProperty();
+        DoubleProperty arcEndPoint2X = new SimpleDoubleProperty();
+        DoubleProperty arcEndPoint2Y = new SimpleDoubleProperty();
+        DoubleProperty arcEndTangentQ = new SimpleDoubleProperty();
+        DoubleProperty arcEndTangentL = new SimpleDoubleProperty();
+        DoubleProperty arcEndTangentX = new SimpleDoubleProperty();
+        DoubleProperty arcEndTangentY = new SimpleDoubleProperty();
+
+        arcEndPoint1X.bind(Bindings.createDoubleBinding(() ->
+                        radiusSmol * Math.sin(Math.toRadians(getLength() + getEndReductionAngle())),
+                startAngle, endAngle
+        ));
+
+        arcEndPoint1Y.bind(Bindings.createDoubleBinding(() ->
+                        radiusSmol * Math.cos(Math.toRadians(getLength() + getEndReductionAngle())),
+                startAngle, endAngle
+        ));
+
+        arcEndPoint2X.bind(Bindings.createDoubleBinding(() ->
+                        endPolyHeight  * Math.sin(Math.toRadians(getLength())),
+                startAngle, endAngle
+        ));
+
+        arcEndPoint2Y.bind(Bindings.createDoubleBinding(() ->
+                        endPolyHeight * Math.cos(Math.toRadians(getLength())),
+                startAngle, endAngle
+        ));
+
+        arcEndTangentQ.bind(Bindings.createDoubleBinding(() ->
+                        radiusSmol * Math.tan(Math.toRadians(getEndReductionAngle())),
+                startAngle, endAngle
+        ));
+
+        arcEndTangentL.bind(Bindings.createDoubleBinding(() ->
+                        radiusSmol / Math.cos(Math.toRadians(getEndReductionAngle())),
+                startAngle, endAngle
+        ));
+
+        arcEndTangentX.bind(Bindings.createDoubleBinding(() ->
+                        arcEndTangentL.get() * Math.cos(Math.toRadians(90 - getLength())),
+//                        arcEndPoint1X.get() + arcEndTangentQ.get() * Math.cos(Math.toRadians(getLength() + 180)),
+                startAngle, endAngle, arcEndTangentL
+        ));
+
+        arcEndTangentY.bind(Bindings.createDoubleBinding(() ->
+                        arcEndTangentL.get() * Math.sin(Math.toRadians(90 - getLength())),
+//                        arcEndPoint1Y.get() + arcEndTangentQ.get() * Math.sin(Math.toRadians(getLength() + 180)),
+                startAngle, endAngle, arcEndTangentL
         ));
 
         // 1) start line
@@ -93,22 +154,22 @@ public class SuperNiceArc extends Group {
         startCurve.setStrokeLineCap(StrokeLineCap.ROUND);
 
         startCurve.controlY1Property().bind(Bindings.createDoubleBinding(() ->
-                    startPolyHeight + (arcTangentY.get() - startPolyHeight) * CURVE_SHARPNESS,
-                arcTangentY
+                    startPolyHeight + (arcStartTangentY.get() - startPolyHeight) * CURVE_SHARPNESS,
+                arcStartTangentY
         ));
 
         startCurve.controlX2Property().bind(Bindings.createDoubleBinding(() ->
-                    arcStartX.get() * (1 - CURVE_SHARPNESS),
-                arcStartX
+                    arcStartPointX.get() * (1 - CURVE_SHARPNESS),
+                arcStartPointX
         ));
 
         startCurve.controlY2Property().bind(Bindings.createDoubleBinding(() ->
-                    arcStartY.get() + (arcTangentY.get() - arcStartY.get()) * CURVE_SHARPNESS,
-                arcStartY, arcTangentY
+                    arcStartPointY.get() + (arcStartTangentY.get() - arcStartPointY.get()) * CURVE_SHARPNESS,
+                arcStartPointY, arcStartTangentY
         ));
 
-        startCurve.endXProperty().bind(arcStartX);
-        startCurve.endYProperty().bind(arcStartY);
+        startCurve.endXProperty().bind(arcStartPointX);
+        startCurve.endYProperty().bind(arcStartPointY);
 
         // 3) main arc
         mainArc = new Arc(0, 0, radiusSmol, radiusSmol, -90, -180);
@@ -117,37 +178,76 @@ public class SuperNiceArc extends Group {
         mainArc.setStrokeLineCap(StrokeLineCap.ROUND);
 
         mainArc.startAngleProperty().bind(Bindings.createDoubleBinding(() ->
-                        90 - (startAngle.get() + getStartReductionAngle() + END_REDUCTION_ANGLE),
+                        90 - (startAngle.get() + getStartReductionAngle()),
                 startAngle, endAngle
         ));
 
         mainArc.lengthProperty().bind(Bindings.createDoubleBinding(() -> {
-                    double length = Math.abs(getLength(startAngle.get(), endAngle.get())) - END_REDUCTION_ANGLE;
-                    return -(length - getStartReductionAngle());
+                    double length = Math.abs(getLength());
+                    return -(length - getStartReductionAngle() - getEndReductionAngle());
                 },
                 startAngle, endAngle
         ));
 
         // 4) end bezier curve
+        endCurve = new CubicCurve(-10, -radiusSmol, 0, radiusSmol, 0, radiusSmol, 0, endPolyHeight);
+        endCurve.setFill(Color.TRANSPARENT);
+        endCurve.setStrokeLineCap(StrokeLineCap.ROUND);
+
+        endCurve.startXProperty().bind(arcEndPoint1X);
+        endCurve.startYProperty().bind(arcEndPoint1Y);
+
+        endCurve.controlX1Property().bind(Bindings.createDoubleBinding(() ->
+                        arcEndPoint1X.get() + (arcEndTangentX.get() - arcEndPoint1X.get()) * CURVE_SHARPNESS,
+                arcEndPoint1X, arcEndTangentX
+        ));
+
+        endCurve.controlY1Property().bind(Bindings.createDoubleBinding(() ->
+                        arcEndPoint1Y.get() + (arcEndTangentY.get() - arcEndPoint1Y.get()) * CURVE_SHARPNESS,
+                arcEndPoint1Y, arcEndTangentY
+        ));
+
+        endCurve.controlX2Property().bind(Bindings.createDoubleBinding(() ->
+                        arcEndTangentX.get() + (arcEndPoint2X.get() - arcEndTangentX.get()) * (1 - CURVE_SHARPNESS),
+                arcEndTangentX, arcEndPoint2X
+        ));
+
+        endCurve.controlY2Property().bind(Bindings.createDoubleBinding(() ->
+                        arcEndTangentY.get() + (arcEndPoint2Y.get() - arcEndTangentY.get()) * (1 - CURVE_SHARPNESS),
+                arcEndTangentY, arcEndPoint2Y
+        ));
+
+        endCurve.endXProperty().bind(arcEndPoint2X);
+        endCurve.endYProperty().bind(arcEndPoint2Y);
 
         // 5) end line
         endLine = new Line(0, -endPolyHeight, 0, -radiusBig);
         endLine.getTransforms().add(endLineRotate);
         endLine.setStrokeLineCap(StrokeLineCap.ROUND);
 
-        super.getChildren().addAll(startPoly, startCurve, endLine, mainArc);
+        super.getChildren().addAll(startPoly, startCurve, mainArc, endCurve, endLine);
         super.setTranslateX(centerX);
         super.setTranslateY(centerY);
     }
 
-    private double getLength(double start, double end) {
+    private double getLength() {
+        double start = startAngle.get();
+        double end = endAngle.get();
         return (start < end) ? -(end - start) : -(end + start);
     }
 
     private double getStartReductionAngle() {
-        double length = Math.abs(getLength(startAngle.get(), endAngle.get()));
-        return (length < START_REDUCTION_ANGLE + END_REDUCTION_ANGLE) ? length : START_REDUCTION_ANGLE + END_REDUCTION_ANGLE;
+        double length = Math.abs(getLength());
+        return (length < totalReductionAngle) ? length * startCurveRatio : START_REDUCTION_ANGLE;
     }
+
+    private double getEndReductionAngle() {
+        double length = Math.abs(getLength());
+        return (length < totalReductionAngle) ? length * endCurveRatio : END_REDUCTION_ANGLE;
+    }
+
+
+    // public
 
     public void setStartAngle(double startAngle) {
         this.startAngle.set(startAngle);
@@ -163,6 +263,7 @@ public class SuperNiceArc extends Group {
         mainArc.setStroke(color);
         startPoly.setFill(color);
         startCurve.setStroke(color);
+        endCurve.setStroke(color);
     }
 
     // Builder

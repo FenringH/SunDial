@@ -669,7 +669,7 @@ public class Sundial {
                 ,dialLocalMinuteLedList
                 ,dialLocalSecondLedList
                 ,dialHighNoonGroup
-//                ,dialLocalHourGroup
+                ,dialLocalHourGroup
                 ,dialLocalHourSuperNiceArc
                 ,sunHighNoon
                 ,horizonGroup
