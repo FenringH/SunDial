@@ -315,6 +315,7 @@ public class Sunconfig {
     public static final double DAY_TERMINATOR_GLOW_WIDTH = 12.00d;
     public static final double TINYGLOBE_TERMINATOR_WIDTH = 1.00d;
     public static final double GLOBEGRID_LINE_WIDTH = 0.50d;
+    public static final double SUPER_NICE_ARC_STROKE_WIDTH = 1.50d;
 
     public static final double DAYLENGTH_ARC_OPACITY = 0.65d;
     public static final double MARGIN_CIRCLE_OPACITY = 0.50d;
@@ -345,7 +346,7 @@ public class Sunconfig {
     public static final double SECOND_LED_OFF_OPACITY = 0.00d;
     public static final double SECOND_LED_DIM_OPACITY = 0.50d;
     public static final double SECOND_LED_ON_OPACITY = 1.00d;
-    public static final double MATRIX_TIMEZONE_DEFAULT_OPACITY = 0.65d;
+    public static final double MATRIX_TIMEZONE_DEFAULT_OPACITY = 0.55d;
     public static final double MATRIX_TIMEZONE_GLOBE_OPACITY = 1.00d;
     public static final double HIGHNOON_NORMAL_OPACITY = 0.85d;
     public static final double HIGHNOON_DOWN_OPACITY = 0.75d;
@@ -413,7 +414,7 @@ public class Sunconfig {
     public static final double CETUS_TIMEREADER_SCALE = 0.75d;
     public static final double CETUS_HORIZON_SCALE = 0.75d;
     public static final double ORBVALLIS_HORIZON_SCALE = 0.75d;
-    public static final double MATRIX_TIMEZONE_SCALE = 1.10d;
+    public static final double MATRIX_TIMEZONE_SCALE = 1.00d;
     public static final double MATRIX_HIGHNOON_SCALE = 1.00d;
     public static final double MATRIX_CONTROLTHINGY_SCALE = 1.25d;
     public static final double MATRIX_SUNHIGHNOON_SCALE = 1.00d;
@@ -457,7 +458,7 @@ public class Sunconfig {
     public static final Color Color_Of_Atmosphere   = new Color(0.25, 0.50, 0.90, 0.85);
     public static final Color Color_Of_Space        = new Color(0.25, 0.50, 0.90, 0.00);
     public static final Color Color_Of_NightSky     = new Color(0.50, 0.35, 1.00, 1.00);
-    public static final Color Color_Of_Midnight     = new Color(0.00, 0.00, 0.00, 0.07);
+    public static final Color Color_Of_HalfNight = new Color(0.00, 0.00, 0.00, 0.10);
     public static final Color Color_Of_MarginEnd    = new Color(0.25, 0.35, 0.65, 0.00);
     public static final Color Color_Of_MarginMiddle = new Color(0.25, 0.35, 0.65, 0.20);
     public static final Color Color_Of_MarginStart  = new Color(0.25, 0.35, 0.65, 0.50);
@@ -549,6 +550,7 @@ public class Sunconfig {
     public static final String LOCALMINUTE_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
     public static final String LOCALNOON_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,255, 64, 1.0), 12.0, 0.65, 0, 0);";
+    public static final String LOCALNOON_DIAL_HOT           = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 15.0, 0.75, 0, 0);";
     public static final String LOCALNOON_DIAL_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 12.0, 0.60, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";

@@ -14,14 +14,25 @@ public class MorphingPolygon extends Polygon {
 
     private DoubleProperty morphPosition;
 
-    private ArrayList<Double> startPointList, endPointList;
+    private ArrayList<Double> startPointList;
+    private ArrayList<Double> endPointList;
+    private double startOpacity;
+    private double endOpacity;
 
     private Timeline timelineOut;
     private Timeline timelineIn;
 
-    public MorphingPolygon(Collection<Double> startPoints, Collection<Double> endPoints, long duration, Interpolator interpolator) {
+    public MorphingPolygon(
+            Collection<Double> startPoints
+            , Collection<Double> endPoints
+            , long duration
+            , Interpolator interpolator)
+    {
 
         super();
+
+        this.startOpacity = 1.0;
+        this.endOpacity = 1.0;
 
         this.startPointList = new ArrayList<>(startPoints);
         this.endPointList = new ArrayList<>(endPoints);
@@ -55,16 +66,36 @@ public class MorphingPolygon extends Polygon {
         super.getPoints().addAll(this.startPointList);
     }
 
+    public MorphingPolygon(
+            Collection<Double> startPoints
+            , Collection<Double> endPoints
+            , double startOpacity
+            , double endOpacity
+            , long duration
+            , Interpolator interpolator)
+    {
+        this(startPoints, endPoints, duration, interpolator);
+
+        this.startOpacity = startOpacity;
+        this.endOpacity = endOpacity;
+
+        this.setOpacity(startOpacity);
+    }
+
     private void updatePoints() {
 
         int size = startPointList.size() <= endPointList.size() ? startPointList.size() : endPointList.size();
 
+        double change = morphPosition.get();
+
         for (int i = 0; i < size; i++) {
-
-            double change = morphPosition.get();
             double interimPoint = startPointList.get(i) * (1 - change) + endPointList.get(i) * change;
-
             super.getPoints().set(i, interimPoint);
+        }
+
+        if (startOpacity != endOpacity) {
+            double interimOpacity = startOpacity * (1 - change) + endOpacity * change;
+            super.setOpacity(interimOpacity);
         }
     }
 

@@ -17,8 +17,6 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.util.Duration;
-import org.w3c.dom.css.Rect;
-import sun.security.provider.Sun;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -899,11 +897,11 @@ public class Suncreator {
         return dialArcNight;
     }
 
-    public static Arc createDialArcMidnight() {
+    public static Arc createDialArcHalfNight() {
         Arc dialArcMidnight = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sundial.DEFAULT_WIDTH / 2 - Sunconfig.MARGIN_X, Sundial.DEFAULT_HEIGHT / 2 - Sunconfig.MARGIN_Y, 0, -180);
         dialArcMidnight.setType(ArcType.ROUND);
         dialArcMidnight.setStroke(Sunconfig.Color_Of_Void);
-        dialArcMidnight.setFill(Sunconfig.Color_Of_Midnight);
+        dialArcMidnight.setFill(Sunconfig.Color_Of_HalfNight);
         return dialArcMidnight;
     }
 
@@ -1433,7 +1431,7 @@ public class Suncreator {
 
         dialHighNoonGroup.getChildren().addAll(dialHighNoonPolyBack, morphingPolygon);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
-        dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_SHADOW);
+        dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
         dialHighNoonGroup.setOpacity(Sunconfig.DIAL_HIGH_NOON_OPACITY);
 
         return dialHighNoonGroup;
@@ -1457,7 +1455,8 @@ public class Suncreator {
 
         SuperNiceArc superNiceArc = new SuperNiceArc.PleaseBuild()
                 .center(Sunconfig.CENTER_X, Sunconfig.CENTER_Y)
-                .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y - 5)
+                .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y - 1)
+                .strokeWidth(Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH)
                 .thankYou();
 
         superNiceArc.setStrokeColor(Color.WHITE);
@@ -1523,6 +1522,7 @@ public class Suncreator {
         MorphingPolygon morphingPolygon = new MorphingPolygon(
                 dialLocalHourPolyShortestSimple.getPoints(),
                 dialLocalHourPolyShortSimple.getPoints(),
+                0.0, 1.0,
                 Sunconfig.TIMEANDDATE_DURATION,
                 Interpolator.EASE_BOTH
         );
@@ -1530,7 +1530,7 @@ public class Suncreator {
         morphingPolygon.setFill(new Color(1, 1, 1, 0.1));
         morphingPolygon.setStroke(Color.WHITE);
         morphingPolygon.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-        morphingPolygon.setOpacity(1);
+//        morphingPolygon.setOpacity(1);
 
         Group dialLocalHourGroup = new Group(morphingPolygon);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);

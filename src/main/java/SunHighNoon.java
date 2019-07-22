@@ -103,7 +103,7 @@ public class SunHighNoon extends Group {
             markerGroup.getChildren().add(line);
         }
 
-        super.getChildren().addAll(/*sunLine, */markerGroup, /*horizonLine, arc,*/ sunDot, matrixTime, matrixAngle/*, matrixDayLength*/);
+        super.getChildren().addAll(/*sunLine, */markerGroup, /*horizonLine, arc, */sunDot, matrixTime, matrixAngle, matrixDayLength);
         super.getTransforms().add(rotate);
         super.setMouseTransparent(true);
     }
@@ -121,7 +121,7 @@ public class SunHighNoon extends Group {
         double dY = ((90 - this.angle) / 90d) * radius;
 
         sunDot.setCenterY(centerY - dY);
-        matrixAngle.setTranslateY(centerY - dY / 2 - radius / 2 - matrixAngle.getLayoutBounds().getHeight() / 2);
+        matrixAngle.setTranslateY(centerY - dY * 0.75 - radius * 0.25 - matrixAngle.getLayoutBounds().getHeight() / 2);
 
         Rotate rotate = (Rotate) super.getTransforms().get(0);
         if (rotate.getAngle() > 90 && rotate.getAngle() < 270) {
@@ -147,14 +147,12 @@ public class SunHighNoon extends Group {
         arc.setLength(arcLength);
         arc.setRadiusY(dY);
 
-/*
         double hY = (dY * -cos(toRadians(arcLength / 2)));
 
         arc.setCenterY(Sunconfig.CENTER_Y - hY);
         arc.setRadiusY(dY - hY);
 
         horizonLine.setTranslateY(dY * (-cos(toRadians(arcLength / 2))));
-*/
 
     }
 

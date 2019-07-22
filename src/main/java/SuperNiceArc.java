@@ -20,6 +20,7 @@ public class SuperNiceArc extends Group {
     private double centerY;
     private double radiusBig;
     private double radiusSmol;
+    private double strokeWidth;
 
     private double totalReductionAngle;
     private double startCurveRatio;
@@ -32,6 +33,7 @@ public class SuperNiceArc extends Group {
     private Line endLine;
     private Arc mainArc;
     private Polygon startPoly;
+    private Polygon endPoly;
     private CubicCurve startCurve;
     private CubicCurve endCurve;
 
@@ -46,6 +48,7 @@ public class SuperNiceArc extends Group {
         this.centerY = builder.centerY;
         this.radiusBig = builder.radiusBig;
         this.radiusSmol = builder.radiusSmol;
+        this.strokeWidth = builder.strokeWidth;
 
         double startPolyHeight = radiusSmol * (1 - START_CURVE_HEIGHT);
         double endPolyHeight = radiusSmol * (1 + END_CURVE_HEIGHT);
@@ -138,12 +141,14 @@ public class SuperNiceArc extends Group {
         startLine = new Line(0, 0, 0, -radiusSmol);
         startLine.getTransforms().add(startLineRotate);
         startLine.setStrokeLineCap(StrokeLineCap.ROUND);
+        startLine.setStrokeWidth(strokeWidth);
 
         // 1b) start poly
         startPoly = new Polygon(
-                0, 0,
-                -0.5, -startPolyHeight,
-                0.5, -startPolyHeight
+                -0.5 * strokeWidth, -startPolyHeight,
+                -0.25, 0,
+                0.25, 0,
+                0.5 * strokeWidth, -startPolyHeight
         );
         startPoly.setStroke(Color.TRANSPARENT);
         startPoly.getTransforms().add(startLineRotate);
@@ -170,12 +175,14 @@ public class SuperNiceArc extends Group {
 
         startCurve.endXProperty().bind(arcStartPointX);
         startCurve.endYProperty().bind(arcStartPointY);
+        startCurve.setStrokeWidth(strokeWidth);
 
         // 3) main arc
         mainArc = new Arc(0, 0, radiusSmol, radiusSmol, -90, -180);
         mainArc.setType(ArcType.OPEN);
         mainArc.setFill(Color.TRANSPARENT);
         mainArc.setStrokeLineCap(StrokeLineCap.ROUND);
+        mainArc.setStrokeWidth(strokeWidth);
 
         mainArc.startAngleProperty().bind(Bindings.createDoubleBinding(() ->
                         90 - (startAngle.get() + getStartReductionAngle()),
@@ -193,6 +200,7 @@ public class SuperNiceArc extends Group {
         endCurve = new CubicCurve(-10, -radiusSmol, 0, radiusSmol, 0, radiusSmol, 0, endPolyHeight);
         endCurve.setFill(Color.TRANSPARENT);
         endCurve.setStrokeLineCap(StrokeLineCap.ROUND);
+        endCurve.setStrokeWidth(strokeWidth);
 
         endCurve.startXProperty().bind(arcEndPoint1X);
         endCurve.startYProperty().bind(arcEndPoint1Y);
@@ -224,8 +232,19 @@ public class SuperNiceArc extends Group {
         endLine = new Line(0, -endPolyHeight, 0, -radiusBig);
         endLine.getTransforms().add(endLineRotate);
         endLine.setStrokeLineCap(StrokeLineCap.ROUND);
+        endLine.setStrokeWidth(strokeWidth);
 
-        super.getChildren().addAll(startPoly, startCurve, mainArc, endCurve, endLine);
+        // 5b) end poly
+        endPoly = new Polygon(
+                -0.5 * strokeWidth, -endPolyHeight,
+                -0.25, -radiusBig,
+                0.25, -radiusBig,
+                0.5 * strokeWidth, -endPolyHeight
+        );
+        endPoly.setStroke(Color.TRANSPARENT);
+        endPoly.getTransforms().add(endLineRotate);
+
+        super.getChildren().addAll(startPoly, startCurve, mainArc, endCurve, endPoly);
         super.setTranslateX(centerX);
         super.setTranslateY(centerY);
     }
@@ -262,6 +281,7 @@ public class SuperNiceArc extends Group {
         endLine.setStroke(color);
         mainArc.setStroke(color);
         startPoly.setFill(color);
+        endPoly.setFill(color);
         startCurve.setStroke(color);
         endCurve.setStroke(color);
     }
@@ -273,12 +293,15 @@ public class SuperNiceArc extends Group {
         private double centerY;
         private double radiusBig;
         private double radiusSmol;
+        private double strokeWidth;
 
         public PleaseBuild() {
             centerX = 0;
             centerY = 0;
             radiusBig = 10;
             radiusSmol = radiusBig / 2;
+            strokeWidth = 1.0;
+
         }
 
         public PleaseBuild center(double centerX, double centerY) {
@@ -290,6 +313,11 @@ public class SuperNiceArc extends Group {
         public PleaseBuild size(double radiusSmol, double radiusBig) {
             this.radiusSmol = radiusSmol;
             this.radiusBig = radiusBig;
+            return this;
+        }
+
+        public PleaseBuild strokeWidth(double strokeWidth) {
+            this.strokeWidth = strokeWidth;
             return this;
         }
 
