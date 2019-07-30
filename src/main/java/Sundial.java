@@ -330,7 +330,9 @@ public class Sundial {
 
         // Tiny globe
         tinyGlobeGroup = Suncreator.createTinyGlobe(longitude, latitude, phase, tilt);
+
         tinyGlobeFrame = Suncreator.createTinyGlobeFrame();
+        tinyGlobeFrame.setOpacity(0.75);
 
         tinyGlobeGroup.getChildren().add(tinyGlobeFrame);
         tinyGlobeGroup.setOpacity(Sunconfig.TINYGLOBE_DEFAULT_OPACITY);
@@ -494,6 +496,9 @@ public class Sundial {
         controlThingyCetus = Suncreator.createControlThingy(Suncreator.ControlThingyType.CETUS, helpText);
         controlThingyOrbVallis = Suncreator.createControlThingy(Suncreator.ControlThingyType.ORBVALLIS, helpText);
 
+        controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
+        controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
+
         outerControlsGroup = new Group(
                 controlThingyResize,
                 controlThingyClose,
@@ -505,7 +510,9 @@ public class Sundial {
                 controlThingyChart,
                 controlThingyCetus,
                 controlThingyOrbVallis,
-                controlThingyHelp
+                controlThingyHelp,
+                controlThingyGlobeGrid,
+                controlThingyGlobeLines
         );
 
         outerControlsGroupTimeline = Suncreator.createOuterControlsGroupTimeline(outerControlsGroup);
@@ -514,8 +521,6 @@ public class Sundial {
         controlThingyCetus.stateProperty().bind(cetusTimer.visibleProperty());
         controlThingyOrbVallis.stateProperty().bind(orbVallisTimer.visibleProperty());
 
-        controlThingyGlobeGrid = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBEGRID, helpText);
-        controlThingyGlobeLines = Suncreator.createControlThingy(Suncreator.ControlThingyType.GLOBELINES, helpText);
         controlThingyDst = Suncreator.createControlThingy(Suncreator.ControlThingyType.DST, helpText);
 
         controlThingyAnimation.stateProperty().bind(animationProperty);
@@ -533,15 +538,20 @@ public class Sundial {
         matrixWeek = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixDate = Suncreator.createMatrixDate(matrixDay, matrixMonth, matrixYear, matrixWeek);
 
+        matrixDate.opacityProperty().bind(outerControlsGroup.opacityProperty());
+
         matrixHour = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixMinute = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixSecond = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixTime = Suncreator.createMatrixTime(matrixHour, matrixMinute, matrixSecond);
 
         matrixTimeZone = Suncreator.createMatrixTimeZone();
-        matrixTimeZone.setTranslateX(-50);
+        matrixTimeZone.opacityProperty().bind(outerControlsGroup.opacityProperty());
 
-        masterTimeGroup = new Group(controlNightCompression, matrixTimeZone, matrixDate, matrixTime, controlThingyDst);
+        controlThingyDst.setTranslateY(matrixTimeZone.getLayoutY() - controlThingyDst.getLayoutBounds().getHeight() / 2 - 5);
+        controlThingyDst.opacityProperty().bind(matrixTimeZone.opacityProperty());
+
+        masterTimeGroup = new Group(matrixTimeZone, matrixDate, matrixTime, controlNightCompression, controlThingyDst);
 
         timeAndDateMoveOutTimeline = Suncreator.createTimeAndDateTimeline(Suncreator.TimelineDirection.OUT, masterTimeGroup);
         timeAndDateMoveInTimeline = Suncreator.createTimeAndDateTimeline(Suncreator.TimelineDirection.IN, masterTimeGroup);
@@ -597,22 +607,8 @@ public class Sundial {
                 , globeMasterGroup.opacityProperty()
         ));
 
-/*
-        dialArcDayLength.opacityProperty().bind(Bindings.createDoubleBinding(() ->
-                        Sunconfig.DAYLENGTH_ARC_OPACITY * (0.5 + 0.5 * (1 - globeMasterGroup.opacityProperty().get()))
-                , globeMasterGroup.opacityProperty()
-        ));
-
-        dialArcDayLength.strokeWidthProperty().bind(Bindings.createDoubleBinding(() ->
-                        Sunconfig.DAYLENGTH_STROKE_WIDTH * (0.5 + 0.5 * (1 - globeMasterGroup.opacityProperty().get()))
-                , globeMasterGroup.opacityProperty()
-        ));
-
-        matrixDayLength.opacityProperty().bind(Bindings.createDoubleBinding(() ->
-                        0.65 + 0.35 * (1 - globeMasterGroup.opacityProperty().get())
-                , globeMasterGroup.opacityProperty()
-        ));
-*/
+//        dialArcDayLength.opacityProperty().bind(outerControlsGroup.opacityProperty());
+        matrixDayLength.opacityProperty().bind(outerControlsGroup.opacityProperty());
 
         // Info overlay
         infoText = new Text();
@@ -644,6 +640,7 @@ public class Sundial {
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeGrid, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyGlobeLines, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(controlThingyDst, null, null));
+        helpMarkers.add(Suncreator.createHelpMarker(controlNightCompression, null, null));
 
         helpOverlay = Suncreator.createHelpOverlay(helpMarkers);
         helpTextGroup = Suncreator.createHelpTextGroup(helpText);
@@ -667,8 +664,8 @@ public class Sundial {
                 ,cetusMarkerGroup
                 ,orbVallisMarkerGroup
 //                ,dialMinuteMarkers
-                ,dialLocalMinuteLedList
-                ,dialLocalSecondLedList
+//                ,dialLocalMinuteLedList
+//                ,dialLocalSecondLedList
                 ,dialArcDayLength
                 ,dialHighNoonGroup
                 ,dialLocalHourGroup
@@ -683,8 +680,8 @@ public class Sundial {
                 ,masterTimeGroup
                 ,masterCoordinatesGroup
                 ,outerControlsGroup
-                ,controlThingyGlobeGrid
-                ,controlThingyGlobeLines
+//                ,controlThingyGlobeGrid
+//                ,controlThingyGlobeLines
                 ,tinyGlobeGroup
                 ,helpOverlay
                 ,miroTextGroup
@@ -701,8 +698,8 @@ public class Sundial {
 
 
         // EVENTS
-//        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW2); });
-//        controlNightCompression.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2); });
+        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW2); });
+        controlNightCompression.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2); });
 
         matrixYear.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_YEAR); matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, Sunconfig.MATRIX_GLOW); });
         matrixYear.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixYear.setCursor(Cursor.DEFAULT); setGroupGlow(matrixYear, Sunconfig.MATRIX_SHADOW); });
@@ -1016,9 +1013,9 @@ public class Sundial {
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
         dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
 
-        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
+//        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
 //        updateRowLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, dialLocalMinuteLedDimList, localTime.get(Calendar.MINUTE));
-        updateSingleLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, localTime.get(Calendar.MINUTE));
+//        updateSingleLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, localTime.get(Calendar.MINUTE));
     }
 
     private void updateSingleLEDs(Group ledList, ArrayList<Boolean> ledOn, ArrayList<Timeline> timelineList, int indexOn) {
@@ -1573,36 +1570,12 @@ public class Sundial {
 
     public void setTimeDisplayOpacity(double opacity) {
 
-        matrixTime.setOpacity(opacity);
-        matrixDate.setOpacity(opacity);
-        matrixTimeZone.setOpacity((opacity < 0.5) ? opacity : Sunconfig.MATRIX_TIMEZONE_DEFAULT_OPACITY);
-
-        dialLocalHourGroup.setOpacity((opacity < 0.5) ? 0.7 : opacity);
-        dialLocalMinuteGroup.setOpacity(opacity);
-        dialLocalSecondGroup.setOpacity(opacity);
-
-        controlThingyDst.setOpacity(opacity);
-        controlNightCompression.setOpacity(opacity);
-
-        dialMinuteMarkers.setVisible(opacity > 0.5);
+        masterTimeGroup.setOpacity(opacity);
 
         if (opacity < 0.5) {
-
-            matrixTime.setMouseTransparent(true);
-            matrixDate.setMouseTransparent(true);
-            matrixTimeZone.setMouseTransparent(true);
-
-            for (Node dialSecond : dialLocalSecondLedList.getChildren()) { dialSecond.setVisible(false); }
-            for (Node dialMinute : dialLocalMinuteLedList.getChildren()) { dialMinute.setVisible(false); }
-
+            masterTimeGroup.setMouseTransparent(true);
         } else {
-
-            matrixTime.setMouseTransparent(false);
-            matrixDate.setMouseTransparent(false);
-            matrixTimeZone.setMouseTransparent(false);
-
-            for (Node dialSecond : dialLocalSecondLedList.getChildren()) { dialSecond.setVisible(true); }
-            for (Node dialMinute : dialLocalMinuteLedList.getChildren()) { dialMinute.setVisible(true); }
+            masterTimeGroup.setMouseTransparent(false);
         }
     }
 

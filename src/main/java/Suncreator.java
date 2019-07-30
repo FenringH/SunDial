@@ -229,10 +229,10 @@ public class Suncreator {
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionCartesian(Sunconfig.CONTROL_DST_OFFSET_X, Sunconfig.CONTROL_DST_OFFSET_Y)
                         .size(Sunconfig.CONTROL_DST_RADIUS)
-                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .colorStroke(Color.TRANSPARENT, Color.TRANSPARENT)
                         .strokeWidth(Sunconfig.CONTROL_DST_STROKE_WIDTH)
-                        .colorFill(Sunconfig.Color_Of_ResizeFill)
-//                        .marker("DST", Sunconfig.Color_Of_ResizeStroke, Sunconfig.MATRIX_SHADOW)
+                        .colorFill(Color.TRANSPARENT)
+                        .marker("DST", Sunconfig.Color_Of_ResizeStroke, Sunconfig.MATRIX_SHADOW3)
                         .markerColorOn(Color.WHITE)
                         .markerScale(Sunconfig.CONTROL_DST_MATRIX_SCALE)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
@@ -446,12 +446,12 @@ public class Suncreator {
             if (dayLightSceneZ > 0) {
                 sideColor = Sunconfig.Color_Of_AtmosphereNight;
             } else {
-                sideColor = Sunconfig.Color_Of_AtmosphereDay;
+                sideColor = Sunconfig.Color_Of_TerminatorLine;
             }
 
-            double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
-            double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
-            double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+            double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
 
             return new Color(r, g, b, 1);
 
@@ -472,12 +472,12 @@ public class Suncreator {
             if (dayLightSceneZ > 0) {
                 sideColor = Sunconfig.Color_Of_AtmosphereNight;
             } else {
-                sideColor = Sunconfig.Color_Of_AtmosphereDay;
+                sideColor = Sunconfig.Color_Of_TerminatorLine;
             }
 
-            double r = Sunconfig.Color_Of_AtmosphereMid.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
-            double g = Sunconfig.Color_Of_AtmosphereMid.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
-            double b = Sunconfig.Color_Of_AtmosphereMid.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
+            double r = Sunconfig.Color_Of_TerminatorLine.getRed() * (1 - changeFactor) + sideColor.getRed() * changeFactor;
+            double g = Sunconfig.Color_Of_TerminatorLine.getGreen() * (1 - changeFactor) + sideColor.getGreen() * changeFactor;
+            double b = Sunconfig.Color_Of_TerminatorLine.getBlue() * (1 - changeFactor) + sideColor.getBlue() * changeFactor;
 
             return new Color(r, g, b, 1);
 
@@ -554,10 +554,10 @@ public class Suncreator {
         tinyGlobe.setDayReverseLightColor(Sunconfig.Color_Of_DayReverse);
         tinyGlobe.setNightLightColor(Color.BLACK);
         tinyGlobe.setAmbientLightColor(Sunconfig.Color_Of_DayAmbient);
-//        tinyGlobe.setSpecularColor(Sunconfig.Color_Of_DaySpecular);
-//        tinyGlobe.setSpecularPower(6);
-//        tinyGlobe.setReverseSpecularPower(12);
-//        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
+        tinyGlobe.setSpecularColor(Sunconfig.Color_Of_TinySpecular);
+        tinyGlobe.setSpecularPower(6);
+        tinyGlobe.setReverseSpecularPower(12);
+        tinyGlobe.setSpecularMap(Sunconfig.GLOBE_SPECULAR_IMAGE);
         tinyGlobe.setLayoutX(Sunconfig.CENTER_X);
         tinyGlobe.setLayoutY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
         tinyGlobe.longitudeProperty().bind(longitude);
@@ -740,8 +740,8 @@ public class Suncreator {
             scale = 1;
         } else {
             slideX = 0;
-            slideY = 115;
-            scale = 0.65;
+            slideY = Sunconfig.MATRIX_TIMEDATE_OFFSET;
+            scale = Sunconfig.MATRIX_TIMEDATE_DOWNSCALE;
         }
 
         Timeline timeline = new Timeline();
