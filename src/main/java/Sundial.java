@@ -459,7 +459,7 @@ public class Sundial {
         sunHighNoon = new SunHighNoon(
                 Sunconfig.CENTER_X
                 , Sunconfig.CENTER_Y
-                , Sunconfig.SUNHIGHNOON_RADIUS
+                , Sunconfig.DAYLENGTH_ARC_RADIUS
                 , Sunconfig.MATRIX_SUNHIGHNOON_SCALE
                 , highNoonDialRotate
         );
@@ -548,7 +548,8 @@ public class Sundial {
         matrixTimeZone = Suncreator.createMatrixTimeZone();
         matrixTimeZone.opacityProperty().bind(outerControlsGroup.opacityProperty());
 
-        controlThingyDst.setTranslateY(matrixTimeZone.getLayoutY() - controlThingyDst.getLayoutBounds().getHeight() / 2 - 5);
+        controlThingyDst.setTranslateX(Sunconfig.CENTER_Y + matrixTimeZone.getLayoutBounds().getWidth() / 2 + controlThingyDst.getLayoutBounds().getWidth() + 3);
+        controlThingyDst.setTranslateY(matrixTimeZone.getLayoutY() + controlThingyDst.getLayoutBounds().getHeight() / 2);
         controlThingyDst.opacityProperty().bind(matrixTimeZone.opacityProperty());
 
         masterTimeGroup = new Group(matrixTimeZone, matrixDate, matrixTime, controlNightCompression, controlThingyDst);
@@ -667,10 +668,10 @@ public class Sundial {
 //                ,dialLocalMinuteLedList
 //                ,dialLocalSecondLedList
                 ,dialArcDayLength
+                ,sunHighNoon
                 ,dialHighNoonGroup
                 ,dialLocalHourGroup
                 ,dialLocalHourSuperNiceArc
-                ,sunHighNoon
                 ,horizonGroup
                 ,dialHourMatrixMarkerGroup
                 ,dialCircleCenterPoint
@@ -1281,8 +1282,10 @@ public class Sundial {
             if (i % 4 == 0) {
                 int hourIndex = i / 4;
                 double angle = dialMarkerRotateList.get(i).getAngle();
+                double opacity = (hourIndex % 6 == 0) ? Sunconfig.LOCAL_HOUR_MARKER_OPACITY : Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY;
                 hourMarkerMatrixList.get(hourIndex).setRotate(-1 * angle);
                 hourMarkerMatrixList.get(hourIndex).setStyle(Sunconfig.MATRIX_SHADOW);
+                hourMarkerMatrixList.get(hourIndex).setOpacity(opacity);
             }
         }
 
@@ -1300,11 +1303,19 @@ public class Sundial {
         int componentG = 128;
         int componentB = (int) floor(partialEnd * (255 - 32) + 32);     // 32 -> 255
 
-        float glowRadiusStart = partialStart * 2.50f + 5.00f;           // 7.50 -> 5.00
-        float glowStrengthStart = partialStart * 0.25f + 0.60f;           // 0.85 -> 0.60
+        float glowRadiusStart = partialStart * 5.00f + 5.00f;           // 10.00 -> 5.00
+        float glowStrengthStart = partialStart * 0.15f + 0.60f;         // 0.75 -> 0.60
 
-        float glowRadiusEnd = partialEnd * 2.50f + 5.00f;             // 5.00 -> 7.50
-        float glowStrengthEnd = partialEnd * 0.25f + 0.60f;             // 0.60 -> 0.85
+        float glowRadiusEnd = partialEnd * 5.00f + 5.00f;               // 5.00 -> 10.00
+        float glowStrengthEnd = partialEnd * 0.15f + 0.60f;             // 0.60 -> 0.75
+
+        double opacityStart = (hourIndexStart % 6 == 0) ?
+                (partialStart * (1 - Sunconfig.LOCAL_HOUR_MARKER_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_ON_OPACITY :
+                (partialStart * (1 - Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_OFF_ON_OPACITY;
+
+        double opacityEnd = (hourIndexEnd % 6 == 0) ?
+                (partialEnd * (1 - Sunconfig.LOCAL_HOUR_MARKER_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_ON_OPACITY :
+                (partialEnd * (1 - Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_OFF_ON_OPACITY;
 
         StringBuilder hourStyleStart = new StringBuilder()
                 .append("-fx-effect: dropshadow(three-pass-box, rgba(")
@@ -1329,6 +1340,8 @@ public class Sundial {
         hourMarkerMatrixList.get(hourIndexStart).setStyle(hourStyleStart.toString());
         hourMarkerMatrixList.get(hourIndexEnd).setStyle(hourStyleEnd.toString());
 
+        hourMarkerMatrixList.get(hourIndexStart).setOpacity(opacityStart);
+        hourMarkerMatrixList.get(hourIndexEnd).setOpacity(opacityEnd);
 
         int cetusMarkerRotateListSize = cetusMarkerRotateList.size();
         for (int i = 0; i < cetusMarkerRotateListSize; i++) {

@@ -245,11 +245,11 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_SHORTEST_WIDTH = 1.0d;
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
-    public static final double HIGHNOON_DIAL_WIDTH = 2.0d;
+    public static final double HIGHNOON_DIAL_WIDTH = 1.5d;
     public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double DAYLENGTH_ARC_RADIUS = 120.0d;
-    public static final double DAY_ARC_MARGIN = 12.0d;
+    public static final double DAY_ARC_MARGIN = 10.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
     public static final double LOCALMINUTE_POLY_HEIGHT = 20;
     public static final double LOCALMINUTE_WIDTH = 8;
@@ -284,6 +284,7 @@ public class Sunconfig {
     public static final double NIGHTMODE_RECTANGLE_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNHIGHNOON_RADIUS = 130;
+    public static final double SUNDOT_RADIUS = 4.0;
     public static final double SUPER_NICE_ARC_RADIUS_SMOL = 170;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d * 0.75;
@@ -307,7 +308,7 @@ public class Sunconfig {
     public static final double CONTROL_ANIMATION_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_CHART_STROKE_WIDTH = 2.0d;
     public static final double CONTROL_GLOBEGRID_STROKE_WIDTH = 2.0d;
-    public static final double CONTROL_DST_STROKE_WIDTH = 1.50d;
+    public static final double CONTROL_DST_STROKE_WIDTH = 2.00d;
     public static final double CETUS_MARKER_WIDTH = 1.00d;
     public static final double ORBVALLIS_MARKER_WIDTH = 1.00d;
     public static final double DAY_TERMINATOR_WIDTH = 1.25d;
@@ -317,6 +318,7 @@ public class Sunconfig {
     public static final double SUPER_NICE_ARC_STROKE_WIDTH = 1.50d;
 
     public static final double DAYLENGTH_ARC_OPACITY = 0.65d;
+    public static final double DAYLENGTH_MATRIX_OPACITY = 0.80d;
     public static final double MARGIN_CIRCLE_OPACITY = 0.50d;
     public static final double TINYGLOBE_DEFAULT_OPACITY = 0.93d;
     public static final double TINYGLOBE_OFFSET_OPACITY = 0.90d;
@@ -350,7 +352,9 @@ public class Sunconfig {
     public static final double HIGHNOON_NORMAL_OPACITY = 0.85d;
     public static final double HIGHNOON_DOWN_OPACITY = 0.75d;
     public static final double LOCAL_HOUR_MARKER_OPACITY = 0.65d;
-    public static final double LOCAL_HOUR_MARKER_OFF_OPACITY = 0.20d;
+    public static final double LOCAL_HOUR_MARKER_ON_OPACITY = 0.85d;
+    public static final double LOCAL_HOUR_MARKER_OFF_OPACITY = 0.15d;
+    public static final double LOCAL_HOUR_MARKER_OFF_ON_OPACITY = 0.65d;
     public static final double DIAL_HIGH_NOON_OPACITY = 0.75d;
     public static final double DIAL_LOCAL_ARC_NORMAL_OPACITY = 1.00;
     public static final double DIAL_LOCAL_ARC_DOWN_OPACITY = 0.00;
@@ -542,7 +546,7 @@ public class Sunconfig {
     public static final String MATRIX_GLOW2                 = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
     public static final String MATRIX_SHADOW                = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_SHADOW2               = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
-    public static final String MATRIX_SHADOW3               = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 0.6), 10.0, 0.50, 0, 0);";
+    public static final String MATRIX_SHADOW3               = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 0.3), 15.0, 0.50, 0, 0);";
     public static final String MATRIX_BLOCK                 = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
     public static final String HORIZON_GLOW                 = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
     public static final String LOCALTIME_SHADOW             = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";

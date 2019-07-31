@@ -402,6 +402,9 @@ public class Sunface extends Application {
         sundial.hideOuterControlsGroup();
         primaryStage.show();
 
+        primaryStage.setAlwaysOnTop(true);
+        primaryStage.setAlwaysOnTop(false);
+
         saveMouse(primaryStage, null);
 
         unmaximizedWindowPositionX.put(WindowType.PRIMARY, savedWindowPositionX);

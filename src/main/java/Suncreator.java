@@ -229,11 +229,11 @@ public class Suncreator {
                 controlThingy = new ControlThingy.PleaseBuildControlThingy()
                         .positionCartesian(Sunconfig.CONTROL_DST_OFFSET_X, Sunconfig.CONTROL_DST_OFFSET_Y)
                         .size(Sunconfig.CONTROL_DST_RADIUS)
-                        .colorStroke(Color.TRANSPARENT, Color.TRANSPARENT)
+                        .colorStroke(Color.TRANSPARENT, Sunconfig.Color_Of_ResizeFill)
                         .strokeWidth(Sunconfig.CONTROL_DST_STROKE_WIDTH)
                         .colorFill(Color.TRANSPARENT)
                         .marker("DST", Sunconfig.Color_Of_ResizeStroke, Sunconfig.MATRIX_SHADOW3)
-                        .markerColorOn(Color.WHITE)
+                        .markerColorOn(Sunconfig.Color_Of_Horizon)
                         .markerScale(Sunconfig.CONTROL_DST_MATRIX_SCALE)
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
@@ -1393,6 +1393,7 @@ public class Suncreator {
 
         Group dialHighNoonGroup = new Group();
 
+/*
         Polygon dialHighNoonPolyLong = new Polygon(
                 0, Sunconfig.HIGHNOON_DIAL_LENGTH,
                 - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.HIGHNOON_DIAL_LENGTH * 0.25,
@@ -1406,10 +1407,25 @@ public class Suncreator {
                 0, Sunconfig.MARGIN_Y,
                 Sunconfig.HIGHNOON_DIAL_WIDTH * 0.85, Sunconfig.HIGHNOON_DIAL_SHORT_LENGTH * 0.4
         );
+*/
+
+        Polygon dialHighNoonPolySunLong = new Polygon(
+                0, Sunconfig.HIGHNOON_DIAL_LENGTH,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
+                0, Sunconfig.MARGIN_Y + 25,
+                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
+        );
+
+        Polygon dialHighNoonPolySunShort = new Polygon(
+                0, Sunconfig.DAYLENGTH_ARC_RADIUS * 1.35,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
+                0, Sunconfig.MARGIN_Y,
+                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
+        );
 
         MorphingPolygon morphingPolygon = new MorphingPolygon(
-                dialHighNoonPolyLong.getPoints(),
-                dialHighNoonPolyShort.getPoints(),
+                dialHighNoonPolySunLong.getPoints(),
+                dialHighNoonPolySunShort.getPoints(),
                 Sunconfig.TIMEANDDATE_DURATION,
                 Interpolator.EASE_BOTH
         );
@@ -1418,7 +1434,13 @@ public class Suncreator {
         morphingPolygon.setStroke(Color.TRANSPARENT);
         morphingPolygon.setStrokeWidth(Sunconfig.HIGHNOON_STROKE_WIDTH);
         morphingPolygon.setStrokeLineCap(StrokeLineCap.ROUND);
+        morphingPolygon.setOpacity(Sunconfig.DIAL_HIGH_NOON_OPACITY);
 
+        Circle sunDot = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS, Sunconfig.SUNDOT_RADIUS);
+        sunDot.setFill(Sunconfig.Color_Of_HighNoon);
+        sunDot.setStroke(Color.TRANSPARENT);
+
+/*
         Polygon dialHighNoonPolyBack = new Polygon(
                 0, Sunconfig.HIGHNOON_DIAL_LENGTH,
                 - Sunconfig.HIGHNOON_DIAL_WIDTH * 4, Sunconfig.HIGHNOON_DIAL_LENGTH * 0.25,
@@ -1428,11 +1450,11 @@ public class Suncreator {
         dialHighNoonPolyBack.setTranslateX(Sunconfig.CENTER_X);
         dialHighNoonPolyBack.setFill(Color.TRANSPARENT);
         dialHighNoonPolyBack.setStroke(Color.TRANSPARENT);
+*/
 
-        dialHighNoonGroup.getChildren().addAll(dialHighNoonPolyBack, morphingPolygon);
+        dialHighNoonGroup.getChildren().addAll(/*dialHighNoonPolyBack, */sunDot, morphingPolygon);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
         dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
-        dialHighNoonGroup.setOpacity(Sunconfig.DIAL_HIGH_NOON_OPACITY);
 
         return dialHighNoonGroup;
     }
@@ -1829,7 +1851,7 @@ public class Suncreator {
     public static Arc createDialArcDayLength() {
         Arc dialArcDayLength = new Arc(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.DAYLENGTH_ARC_RADIUS, Sunconfig.DAYLENGTH_ARC_RADIUS, 90, 360);
         dialArcDayLength.setType(ArcType.OPEN);
-        dialArcDayLength.setStroke(Sunconfig.Color_Of_LocalTime);
+        dialArcDayLength.setStroke(Sunconfig.Color_Of_Horizon);
         dialArcDayLength.setStrokeWidth(Sunconfig.DAYLENGTH_STROKE_WIDTH);
         dialArcDayLength.setFill(Sunconfig.Color_Of_Void);
         dialArcDayLength.setOpacity(Sunconfig.DAYLENGTH_ARC_OPACITY);
@@ -1843,9 +1865,9 @@ public class Suncreator {
         matrixDayLength.setScaleX(Sunconfig.MATRIX_DAYLENGTH_SCALE);
         matrixDayLength.setScaleY(Sunconfig.MATRIX_DAYLENGTH_SCALE);
         matrixDayLength.setLayoutX(Sunconfig.CENTER_X - matrixDayLength.getLayoutBounds().getWidth() / 2);
-        matrixDayLength.setLayoutY(Sunconfig.CENTER_Y + matrixDayLength.getLayoutBounds().getHeight() - Sunconfig.DAYLENGTH_ARC_RADIUS * 0.95);
+        matrixDayLength.setLayoutY(Sunconfig.CENTER_Y + matrixDayLength.getLayoutBounds().getHeight() - Sunconfig.DAYLENGTH_ARC_RADIUS * 0.97);
         matrixDayLength.setStyle(Sunconfig.LOCALTIME_SHADOW);
-        matrixDayLength.setOpacity(0.85);
+        matrixDayLength.setOpacity(Sunconfig.DAYLENGTH_MATRIX_OPACITY);
         matrixDayLength.setMouseTransparent(true);
         return matrixDayLength;
     }

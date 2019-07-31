@@ -55,7 +55,7 @@ public class SunHighNoon extends Group {
         this.centerY = centerY;
         this.radius = radius;
 
-        arc = new Arc(centerX, centerY, radius, radius * (45 / 90d), 0, 180);
+        arc = new Arc(centerX, centerY, radius, radius, 0, 180);
         arc.setType(ArcType.OPEN);
         arc.setFill(Color.TRANSPARENT);
         arc.setStroke(ARC_COLOR);
@@ -74,7 +74,7 @@ public class SunHighNoon extends Group {
         matrixTime.setScaleX(matrixScale);
         matrixTime.setScaleY(matrixScale);
         matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() / 2);
-        matrixTime.setTranslateY(centerY - radius - matrixTime.getLayoutBounds().getHeight() * 1.75);
+        matrixTime.setTranslateY(centerY - radius - matrixTime.getLayoutBounds().getHeight() * 1.35);
 
         matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
         matrixAngle.setScaleX(matrixScale);
@@ -103,7 +103,7 @@ public class SunHighNoon extends Group {
             markerGroup.getChildren().add(line);
         }
 
-        super.getChildren().addAll(/*sunLine, */markerGroup, /*horizonLine, arc, */sunDot, matrixTime, matrixAngle, matrixDayLength);
+        super.getChildren().addAll(/*sunLine, markerGroup, horizonLine, sunDot, */arc, matrixDayLength, matrixTime, matrixAngle);
         super.getTransforms().add(rotate);
         super.setMouseTransparent(true);
     }
@@ -121,7 +121,7 @@ public class SunHighNoon extends Group {
         double dY = ((90 - this.angle) / 90d) * radius;
 
         sunDot.setCenterY(centerY - dY);
-        matrixAngle.setTranslateY(centerY - dY * 0.75 - radius * 0.25 - matrixAngle.getLayoutBounds().getHeight() / 2);
+//        matrixAngle.setTranslateY(centerY - dY * 0.75 - radius * 0.25 - matrixAngle.getLayoutBounds().getHeight() / 2);
 
         Rotate rotate = (Rotate) super.getTransforms().get(0);
         if (rotate.getAngle() > 90 && rotate.getAngle() < 270) {
@@ -145,6 +145,8 @@ public class SunHighNoon extends Group {
 
         arc.setStartAngle(arcStart);
         arc.setLength(arcLength);
+
+/*
         arc.setRadiusY(dY);
 
         double hY = (dY * -cos(toRadians(arcLength / 2)));
@@ -153,6 +155,7 @@ public class SunHighNoon extends Group {
         arc.setRadiusY(dY - hY);
 
         horizonLine.setTranslateY(dY * (-cos(toRadians(arcLength / 2))));
+*/
 
     }
 
