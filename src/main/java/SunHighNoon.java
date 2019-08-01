@@ -48,8 +48,8 @@ public class SunHighNoon extends Group {
 
         super();
 
-        marginX = radius * 0.06;
-        marginY = radius * 0.02;
+        marginX = radius * 0.40;
+        marginY = radius * 0.05;
 
         this.centerX = centerX;
         this.centerY = centerY;
@@ -71,22 +71,22 @@ public class SunHighNoon extends Group {
         sunDot.setStroke(Color.TRANSPARENT);
 
         matrixTime = new DotMatrix("12:00:00", TIME_COLOR);
-        matrixTime.setScaleX(matrixScale);
-        matrixTime.setScaleY(matrixScale);
+        matrixTime.setScaleX(matrixScale * 0.85);
+        matrixTime.setScaleY(matrixScale * 0.85);
         matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() / 2);
-        matrixTime.setTranslateY(centerY - radius - matrixTime.getLayoutBounds().getHeight() * 1.35);
+        matrixTime.setTranslateY(centerY - radius * 1.02 + matrixTime.getLayoutBounds().getHeight());
 
         matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
-        matrixAngle.setScaleX(matrixScale);
-        matrixAngle.setScaleY(matrixScale);
-        matrixAngle.setTranslateX(centerX + marginX * 1.5);
-        matrixAngle.setTranslateY(centerY - radius + matrixAngle.getLayoutBounds().getHeight() / 2);
+        matrixAngle.setScaleX(matrixScale * 0.80);
+        matrixAngle.setScaleY(matrixScale * 0.80);
+        matrixAngle.setTranslateX(centerX + marginX);
+        matrixAngle.setTranslateY(matrixTime.getTranslateY() - matrixAngle.getLayoutBounds().getHeight());
 
         matrixDayLength = new DotMatrix("00h00m00s", DAYLENGTH_COLOR);
-        matrixDayLength.setScaleX(matrixScale * 0.85);
-        matrixDayLength.setScaleY(matrixScale * 0.85);
-        matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() - marginX * 1.5);
-        matrixDayLength.setTranslateY(centerY - radius + matrixDayLength.getLayoutBounds().getHeight() / 2);
+        matrixDayLength.setScaleX(matrixScale);
+        matrixDayLength.setScaleY(matrixScale);
+        matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() / 2);
+        matrixDayLength.setTranslateY(matrixTime.getTranslateY() + matrixDayLength.getLayoutBounds().getHeight() + marginY);
 
         markerGroup = new Group();
 
@@ -103,8 +103,8 @@ public class SunHighNoon extends Group {
             markerGroup.getChildren().add(line);
         }
 
-        super.getChildren().addAll(/*sunLine, markerGroup, horizonLine, sunDot, */arc, matrixDayLength, matrixTime, matrixAngle);
-        super.getTransforms().add(rotate);
+        super.getChildren().addAll(/*sunLine, markerGroup, horizonLine, sunDot, arc,*/ matrixDayLength, matrixTime, matrixAngle);
+//        super.getTransforms().add(rotate);
         super.setMouseTransparent(true);
     }
 
@@ -118,10 +118,17 @@ public class SunHighNoon extends Group {
         angleString = "00" + angleString + "^" + poleSuffix;
         angleString = angleString.substring(angleString.length() - 6);
 
+        long clampedDayLength = (dayLength >= DAY_SECONDS) ? DAY_SECONDS : dayLength;
+
+        matrixAngle.setString(angleString);
+        matrixTime.setString(Sunutil.getShortTimeString(noonTime));
+        matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
+
+/*
         double dY = ((90 - this.angle) / 90d) * radius;
 
         sunDot.setCenterY(centerY - dY);
-//        matrixAngle.setTranslateY(centerY - dY * 0.75 - radius * 0.25 - matrixAngle.getLayoutBounds().getHeight() / 2);
+        matrixAngle.setTranslateY(centerY - dY * 0.75 - radius * 0.25 - matrixAngle.getLayoutBounds().getHeight() / 2);
 
         Rotate rotate = (Rotate) super.getTransforms().get(0);
         if (rotate.getAngle() > 90 && rotate.getAngle() < 270) {
@@ -134,11 +141,6 @@ public class SunHighNoon extends Group {
             matrixDayLength.setRotate(0);
         }
 
-        long clampedDayLength = (dayLength >= DAY_SECONDS) ? DAY_SECONDS : dayLength;
-
-        matrixAngle.setString(angleString);
-        matrixTime.setString(Sunutil.getShortTimeString(noonTime));
-        matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
 
         double arcLength = (clampedDayLength / (double) DAY_SECONDS) * 360;
         double arcStart = 90 - arcLength / 2;
@@ -146,7 +148,6 @@ public class SunHighNoon extends Group {
         arc.setStartAngle(arcStart);
         arc.setLength(arcLength);
 
-/*
         arc.setRadiusY(dY);
 
         double hY = (dY * -cos(toRadians(arcLength / 2)));

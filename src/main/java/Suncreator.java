@@ -264,10 +264,31 @@ public class Suncreator {
         timeline.setRate(1);
         timeline.setAutoReverse(false);
 
-        KeyValue keyValueStartOpacitySleep = new KeyValue(group.opacityProperty(), 1.0, Interpolator.EASE_BOTH);
-        KeyFrame keyFrameStartOpacitySleep = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_HIDE_DURATION / 2), keyValueStartOpacitySleep);
-        KeyValue keyValueStartOpacityZero = new KeyValue(group.opacityProperty(), 0.0, Interpolator.EASE_BOTH);
+        KeyValue keyValueStartOpacitySleep = new KeyValue(group.opacityProperty(), 1.0, Interpolator.LINEAR);
+        KeyFrame keyFrameStartOpacitySleep = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_HIDE_DURATION * 0.2), keyValueStartOpacitySleep);
+
+        KeyValue keyValueStartOpacityZero = new KeyValue(group.opacityProperty(), 0.0, Interpolator.EASE_OUT);
         KeyFrame keyFrameStartOpacityZero = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_HIDE_DURATION), keyValueStartOpacityZero);
+
+        timeline.getKeyFrames().addAll(keyFrameStartOpacitySleep, keyFrameStartOpacityZero);
+
+        timeline.setOnFinished(event -> group.setVisible(false));
+
+        return timeline;
+    }
+
+    public static Timeline createOuterControlsGroupQuickTimeline(Group group) {
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setRate(1);
+        timeline.setAutoReverse(false);
+
+        KeyValue keyValueStartOpacitySleep = new KeyValue(group.opacityProperty(), 1.0, Interpolator.LINEAR);
+        KeyFrame keyFrameStartOpacitySleep = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_QUICK_HIDE_DURATION), keyValueStartOpacitySleep);
+
+        KeyValue keyValueStartOpacityZero = new KeyValue(group.opacityProperty(), 0.0, Interpolator.EASE_OUT);
+        KeyFrame keyFrameStartOpacityZero = new KeyFrame(Duration.millis(Sunconfig.OUTER_CONTROLS_QUICK_HIDE_DURATION + 1), keyValueStartOpacityZero);
 
         timeline.getKeyFrames().addAll(keyFrameStartOpacitySleep, keyFrameStartOpacityZero);
 
@@ -1455,6 +1476,7 @@ public class Suncreator {
         dialHighNoonGroup.getChildren().addAll(/*dialHighNoonPolyBack, */sunDot, morphingPolygon);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
         dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
+        dialHighNoonGroup.setMouseTransparent(true);
 
         return dialHighNoonGroup;
     }
@@ -1477,7 +1499,7 @@ public class Suncreator {
 
         SuperNiceArc superNiceArc = new SuperNiceArc.PleaseBuild()
                 .center(Sunconfig.CENTER_X, Sunconfig.CENTER_Y)
-                .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y - 1)
+                .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y)
                 .strokeWidth(Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH)
                 .thankYou();
 
@@ -1952,7 +1974,7 @@ public class Suncreator {
         nightModeRectangle.setMouseTransparent(true);
 
         Circle nightModeCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X);
-        nightModeCircle.setFill(Color.BLACK);
+        nightModeCircle.setFill(Sunconfig.NIGHTMODE_CIRCLE_FILL);
         nightModeCircle.setStroke(Sunconfig.Color_Of_Void);
         nightModeCircle.setBlendMode(BlendMode.BLUE);
         nightModeCircle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);

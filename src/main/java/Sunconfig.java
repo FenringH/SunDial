@@ -394,7 +394,7 @@ public class Sunconfig {
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     public static final double CETUS_HORIZON_OFFSET = 40.0d;
     public static final double ORBVALLIS_HORIZON_OFFSET = 40.0d;
-    public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 50.0d;
+    public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 48.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
     public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 30;
     public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 28;
@@ -439,13 +439,14 @@ public class Sunconfig {
     public static final double CONTROL_ORBVALLIS_ANGLE = 37 + 180;
     public static final double CONTROL_CETUS_ANGLE = CONTROL_ORBVALLIS_ANGLE - 6;
 
-    public static final int LED_OPACITY_DURATION = 350;
-    public static final int GLOBE_ROTATE_DURATION = 750;
-    public static final int TINY_GLOBE_DURATION = 350;
-    public static final int TIMEANDDATE_DURATION = 350;
-    public static final int CETUS_MARKER_DURATION = 150;
-    public static final int ORBVALLIS_MARKER_DURATION = 150;
-    public static final int OUTER_CONTROLS_HIDE_DURATION = 10000;
+    public static final int LED_OPACITY_DURATION = 350;             // ms
+    public static final int GLOBE_ROTATE_DURATION = 750;            // ms
+    public static final int TINY_GLOBE_DURATION = 350;              // ms
+    public static final int TIMEANDDATE_DURATION = 350;             // ms
+    public static final int CETUS_MARKER_DURATION = 150;            // ms
+    public static final int ORBVALLIS_MARKER_DURATION = 150;        // ms
+    public static final int OUTER_CONTROLS_HIDE_DURATION = 6000;    // ms
+    public static final double OUTER_CONTROLS_QUICK_HIDE_DURATION = 1000;    // ms
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
     public static final Color Color_Of_Earth      = new Color(0.85, 0.85, 0.65, 1.00);
@@ -737,6 +738,15 @@ public class Sunconfig {
             new Stop(0.940, Color_Of_MarginStart),
             new Stop(0.965, Color_Of_MarginMiddle),
             new Stop(1.000, Color_Of_MarginEnd)
+    );
+
+    public static final RadialGradient NIGHTMODE_CIRCLE_FILL = new RadialGradient(
+            0, 0,
+            CENTER_X, CENTER_Y, CENTER_Y,
+            false,
+            CycleMethod.NO_CYCLE,
+            new Stop(0.940, Color.BLACK),
+            new Stop(1.000, Color.TRANSPARENT)
     );
 
 }
