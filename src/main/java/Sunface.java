@@ -61,6 +61,7 @@ public class Sunface extends Application {
     private Node savedNode;
 
     private int timeZoneOffset;
+    private int localTimeZoneOffset;
     private long timeZoneCorrection;
 
     private HashMap <WindowType, Boolean> maximizedEh;
@@ -111,6 +112,7 @@ public class Sunface extends Application {
         timeZonedCalendar = new GregorianCalendar();
 
         timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
+        localTimeZoneOffset = timeZoneOffset;
 
         // Create 'sun' objects
         suntimeLocal = new Suntime.PleaseBuildSuntime()
@@ -439,6 +441,7 @@ public class Sunface extends Application {
 
     private void initCurrentTime() {
         updateCurrentTime(true);
+        setWarnings();
     }
 
     private void updateCurrentTime() {
@@ -574,7 +577,7 @@ public class Sunface extends Application {
 
     private void resetTime() {
         offsetLocalTime.setTimeInMillis(currentLocalTime.getTimeInMillis());
-        sundial.setDialFrameWarning(false);
+        sundial.setCustomTimeWarning(false);
         initCurrentTime();
     }
 
@@ -659,12 +662,6 @@ public class Sunface extends Application {
                 + offsetMinute * (60 * 1000)
                 + offsetSecond * 1000
         );
-
-        if (offsetLocalTime.getTimeInMillis() == currentLocalTime.getTimeInMillis()) {
-            sundial.setDialFrameWarning(false);
-        } else {
-            sundial.setDialFrameWarning(true);
-        }
 
         initCurrentTime();
     }
@@ -918,6 +915,13 @@ public class Sunface extends Application {
             sunyear.setTimeZone(offsetLocalTime.getTimeZone());
             sunyear.setSpaceTime(longitude, latitude, offsetLocalTime, timeZoneOffset);
         }
+    }
+
+    private void setWarnings() {
+        sundial.setCustomTimeWarning(offsetLocalTime.getTimeInMillis() != currentLocalTime.getTimeInMillis());
+        sundial.setCustomTimezoneWarning(timeZoneOffset != localTimeZoneOffset);
+        sundial.setCustomLongitudeWarning(longitude != customLongitude);
+        sundial.setCustomLatitudeWarning(latitude != customLatitude);
     }
 
     // ***************************************************************

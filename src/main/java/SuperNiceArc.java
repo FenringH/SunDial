@@ -21,6 +21,7 @@ public class SuperNiceArc extends Group {
     private double radiusBig;
     private double radiusSmol;
     private double strokeWidth;
+    private double endLineExtension;
 
     private double totalReductionAngle;
     private double startCurveRatio;
@@ -49,6 +50,7 @@ public class SuperNiceArc extends Group {
         this.radiusBig = builder.radiusBig;
         this.radiusSmol = builder.radiusSmol;
         this.strokeWidth = builder.strokeWidth;
+        this.endLineExtension = builder.endLineExtension;
 
         double startPolyHeight = radiusSmol * (1 - START_CURVE_HEIGHT);
         double endPolyHeight = radiusSmol * (1 + END_CURVE_HEIGHT);
@@ -239,7 +241,8 @@ public class SuperNiceArc extends Group {
                 -0.5 * strokeWidth, -endPolyHeight,
                 -0.25, -radiusBig,
                 0.25, -radiusBig,
-                0.5 * strokeWidth, -endPolyHeight
+                0.5 * strokeWidth, -endPolyHeight,
+                0, -(endPolyHeight - endLineExtension)
         );
         endPoly.setStroke(Color.TRANSPARENT);
         endPoly.getTransforms().add(endLineRotate);
@@ -294,6 +297,7 @@ public class SuperNiceArc extends Group {
         private double radiusBig;
         private double radiusSmol;
         private double strokeWidth;
+        private double endLineExtension;
 
         public PleaseBuild() {
             centerX = 0;
@@ -301,7 +305,7 @@ public class SuperNiceArc extends Group {
             radiusBig = 10;
             radiusSmol = radiusBig / 2;
             strokeWidth = 1.0;
-
+            endLineExtension = 0.0;
         }
 
         public PleaseBuild center(double centerX, double centerY) {
@@ -318,6 +322,11 @@ public class SuperNiceArc extends Group {
 
         public PleaseBuild strokeWidth(double strokeWidth) {
             this.strokeWidth = strokeWidth;
+            return this;
+        }
+
+        public PleaseBuild endLineExtension(double endLineExtension) {
+            this.endLineExtension = endLineExtension;
             return this;
         }
 

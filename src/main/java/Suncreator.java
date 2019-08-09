@@ -1433,7 +1433,7 @@ public class Suncreator {
         Polygon dialHighNoonPolySunLong = new Polygon(
                 0, Sunconfig.HIGHNOON_DIAL_LENGTH,
                 - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
-                0, Sunconfig.MARGIN_Y + 25,
+                0, Sunconfig.MARGIN_Y,
                 Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
         );
 
@@ -1500,6 +1500,7 @@ public class Suncreator {
         SuperNiceArc superNiceArc = new SuperNiceArc.PleaseBuild()
                 .center(Sunconfig.CENTER_X, Sunconfig.CENTER_Y)
                 .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y)
+                .endLineExtension(Sunconfig.SUPER_NICE_ARC_END_EXTENSION)
                 .strokeWidth(Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH)
                 .thankYou();
 

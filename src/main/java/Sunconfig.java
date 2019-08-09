@@ -245,10 +245,10 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_SHORTEST_WIDTH = 1.0d;
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
-    public static final double HIGHNOON_DIAL_WIDTH = 1.5d;
-    public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double DAYLENGTH_ARC_RADIUS = 120.0d;
+    public static final double HIGHNOON_DIAL_WIDTH = 1.5d;
+    public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DAYLENGTH_ARC_RADIUS * 0.35;
     public static final double DAY_ARC_MARGIN = 10.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
     public static final double LOCALMINUTE_POLY_HEIGHT = 20;
@@ -286,6 +286,7 @@ public class Sunconfig {
     public static final double SUNHIGHNOON_RADIUS = 130;
     public static final double SUNDOT_RADIUS = 4.0;
     public static final double SUPER_NICE_ARC_RADIUS_SMOL = 170;
+    public static final double SUPER_NICE_ARC_END_EXTENSION = 100;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d * 0.75;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
@@ -341,6 +342,7 @@ public class Sunconfig {
     public static final double CONTROL_THINGY_FILL_OPACITY = 0.20d;
     public static final double TIMEDATE_DEFAULT_OPACITY = 1.00d;
     public static final double TIMEDATE_TRANSPARENT_OPACITY = 0.10d;
+    public static final double DATE_OFF_OPACITY = 0.35d;
     public static final double MINUTE_LED_OFF_OPACITY = 0.00d;
     public static final double MINUTE_LED_DIM_OPACITY = 0.35d;
     public static final double MINUTE_LED_ON_OPACITY = 1.00d;

@@ -38,7 +38,10 @@ public class Sundial {
     private double sunsetDialAngle;
     private double dialAngleLocalHour;
     private double nightCompression;
-    private boolean warning;
+    private boolean timeWarning;
+    private boolean timezoneWarning;
+    private boolean longitudeWarning;
+    private boolean latitudeWarning;
 
     private GregorianCalendar sunTime;
     private GregorianCalendar highNoon;
@@ -541,7 +544,10 @@ public class Sundial {
         matrixWeek = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixDate = Suncreator.createMatrixDate(matrixDay, matrixMonth, matrixYear, matrixWeek);
 
-        matrixDate.opacityProperty().bind(outerControlsGroup.opacityProperty());
+        matrixDate.opacityProperty().bind(Bindings.createDoubleBinding(() ->
+                        outerControlsGroup.opacityProperty().get() * (1 - Sunconfig.DATE_OFF_OPACITY) + Sunconfig.DATE_OFF_OPACITY,
+                outerControlsGroup.opacityProperty()
+        ));
 
         matrixHour = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
         matrixMinute = new DotMatrix("00", Sunconfig.Color_Of_LocalTime);
@@ -1417,15 +1423,36 @@ public class Sundial {
         dialLocalHourArc.setLength(length);
     }
 
-    public void setDialFrameWarning(boolean warning) {
+    public void setCustomTimeWarning(boolean warning) {
 
-        this.warning = warning;
+        this.timeWarning = warning;
 
-        matrixHour.setFill(this.warning ? Color.YELLOW : Color.WHITE);
-        matrixMinute.setFill(this.warning ? Color.YELLOW : Color.WHITE);
-        matrixDay.setFill(this.warning ? Color.YELLOW : Color.WHITE);
-        matrixMonth.setFill(this.warning ? Color.YELLOW : Color.WHITE);
-        matrixYear.setFill(this.warning ? Color.YELLOW : Color.WHITE);
+        matrixHour.setFill(this.timeWarning ? Color.YELLOW : Color.WHITE);
+        matrixMinute.setFill(this.timeWarning ? Color.YELLOW : Color.WHITE);
+        matrixDay.setFill(this.timeWarning ? Color.YELLOW : Color.WHITE);
+        matrixMonth.setFill(this.timeWarning ? Color.YELLOW : Color.WHITE);
+        matrixYear.setFill(this.timeWarning ? Color.YELLOW : Color.WHITE);
+    }
+
+    public void setCustomTimezoneWarning(boolean warning) {
+
+        this.timezoneWarning = warning;
+
+        matrixTimeZone.setFill(this.timezoneWarning ? Color.YELLOW : Color.WHITE);
+    }
+
+    public void setCustomLongitudeWarning(boolean warning) {
+
+        this.longitudeWarning = warning;
+
+        matrixLongitude.setFill(this.longitudeWarning ? Color.YELLOW : Color.WHITE);
+    }
+
+    public void setCustomLatitudeWarning(boolean warning) {
+
+        this.latitudeWarning = warning;
+
+        matrixLatitude.setFill(this.latitudeWarning ? Color.YELLOW : Color.WHITE);
     }
 
     public void setGroupGlow(Group group, String style) {
