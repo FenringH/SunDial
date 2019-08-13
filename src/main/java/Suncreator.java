@@ -1340,7 +1340,7 @@ public class Suncreator {
 
             Line markerLineB = new Line(
                     0, Sunconfig.MARKER_LINE_B_START,
-                    0,Sunconfig.MARKER_LINE_B_END
+                    0, Sunconfig.MARKER_LINE_B_START - Sunconfig.MARKER_HOUR_LENGTH - (lineLength * 0.5)
             );
             markerLineB.setTranslateX(Sunconfig.CENTER_X);
             markerLineB.setTranslateY(0);
@@ -1502,7 +1502,7 @@ public class Suncreator {
 
     public static Arc createDialLocalHourArc() {
 
-        double radius = Sunconfig.CENTER_Y - Sunconfig.MARKER_LINE_B_START - Sunconfig.LOCAL_HOUR_ARC_STROKE_WIDTH / 2;
+        double radius = Sunconfig.CENTER_Y - Sunconfig.MARKER_LINE_B_START + Sunconfig.MARKER_HOUR_LENGTH / 2;
 
         Arc arc = new Arc(0, 0,
                 radius, radius,
@@ -1513,7 +1513,7 @@ public class Suncreator {
         arc.setFill(Color.TRANSPARENT);
         arc.setStroke(Color.WHITE);
         arc.setStrokeLineCap(StrokeLineCap.BUTT);
-        arc.setStrokeWidth(Sunconfig.LOCAL_HOUR_ARC_STROKE_WIDTH);
+        arc.setStrokeWidth(Sunconfig.MARKER_HOUR_LENGTH);
 //        arc.setBlendMode(BlendMode.OVERLAY);
         return arc;
     }

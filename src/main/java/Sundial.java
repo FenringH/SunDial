@@ -697,13 +697,13 @@ public class Sundial {
                 ,globeMasterGroup
                 ,dialLocalHourArcFuture
                 ,dialHourLineMarkerGroupB
-                ,dialLocalHourArcPast
+//                ,dialLocalHourArcPast
                 ,dialCircleFrame
                 ,cetusMarkerGroup
                 ,orbVallisMarkerGroup
 //                ,dialMinuteMarkers
 //                ,dialLocalMinuteLedList
-                ,dialLocalSecondLedList
+//                ,dialLocalSecondLedList
                 ,dialArcDayLength
                 ,dialHighNoonGroup
                 ,dialLocalHourGroup
@@ -1068,7 +1068,7 @@ public class Sundial {
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
         dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
 
-        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
+//        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
 //        updateRowLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, dialLocalMinuteLedDimList, localTime.get(Calendar.MINUTE));
 //        updateSingleLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, localTime.get(Calendar.MINUTE));
     }

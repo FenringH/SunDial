@@ -252,7 +252,7 @@ public class Sunconfig {
     public static final double DAYLENGTH_ARC_RADIUS = 120.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 1.5d;
     public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DAYLENGTH_ARC_RADIUS * 0.35;
-    public static final double DAY_ARC_MARGIN = 10.0d;
+    public static final double DAY_ARC_MARGIN = 11.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
     public static final double LOCALMINUTE_POLY_HEIGHT = 20;
     public static final double LOCALMINUTE_WIDTH = 8;
@@ -291,8 +291,8 @@ public class Sunconfig {
     public static final double SUPER_NICE_ARC_RADIUS_SMOL = 175;
     public static final double SUPER_NICE_ARC_END_EXTENSION = 100;
     public static final double SUPER_NICE_ARC_START_EXTENSION = 120;
-    public static final double MARKER_LINE_B_START = CENTER_Y - SUPER_NICE_ARC_RADIUS_SMOL + 10;
-    public static final double MARKER_LINE_B_END = CENTER_Y - DAYLENGTH_ARC_RADIUS - LOCALSECOND_RADIUS_BIG * 3 - 10;
+    public static final double MARKER_LINE_B_START = CENTER_Y - SUPER_NICE_ARC_RADIUS_SMOL + 1;
+    public static final double MARKER_LINE_B_END = MARKER_LINE_B_START + 20;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d * 0.75;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
@@ -371,14 +371,14 @@ public class Sunconfig {
     public static final double DIAL_LOCAL_ARC_PAST_OPACITY = 0.75;
 
     public static final double MATRIX_MARKER_OFFSET = MARGIN_Y + 7;
-    public static final double MATRIX_HORIZON_OFFSET = 75.0d;
+    public static final double MATRIX_HORIZON_OFFSET = 76.0d;
     public static final double MATRIX_TIME_OFFSET = 0.0d;
     public static final double MATRIX_DATE_OFFSET = 45.0d;
     public static final double MATRIX_TIMEDATE_OFFSET = 135.0d;
     public static final double MATRIX_WEEK_OFFSET = 70.0d;
     public static final double MATRIX_LONGITUDE_SLIDE = 0.0d;
     public static final double MATRIX_LATITUDE_SLIDE = 0.0d;
-    public static final double MATRIX_HORIZON_SLIDE = 2.0d;
+    public static final double MATRIX_HORIZON_SLIDE = 4.0d;
     public static final double COORDINATES_OFFSET = 70.0d;
     public static final double LOCALHOUR_OFFSET = 105.0d;
     public static final double TINYGLOBE_OFFSET = 93.0d;
