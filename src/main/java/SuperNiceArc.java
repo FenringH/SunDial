@@ -8,13 +8,13 @@ import javafx.scene.transform.Rotate;
 
 public class SuperNiceArc extends Group {
 
-    private final static double START_REDUCTION_ANGLE = 15;
-    private final static double END_REDUCTION_ANGLE = 5;
+    public final static double START_REDUCTION_ANGLE = 15;
+    public final static double END_REDUCTION_ANGLE = 5;
 
-    private final static double START_CURVE_HEIGHT = 0.2;
-    private final static double END_CURVE_HEIGHT = 0.1;
+    public final static double START_CURVE_HEIGHT = 0.2;
+    public final static double END_CURVE_HEIGHT = 0.1;
 
-    private final static double CURVE_SHARPNESS = 0.5;
+    public final static double CURVE_SHARPNESS = 0.5;
 
     private double centerX;
     private double centerY;
@@ -247,7 +247,7 @@ public class SuperNiceArc extends Group {
         endPoly.setStroke(Color.TRANSPARENT);
         endPoly.getTransforms().add(endLineRotate);
 
-        super.getChildren().addAll(startPoly, startCurve, mainArc, endCurve, endPoly);
+        super.getChildren().addAll(startCurve, mainArc, endCurve, endPoly);
         super.setTranslateX(centerX);
         super.setTranslateY(centerY);
     }

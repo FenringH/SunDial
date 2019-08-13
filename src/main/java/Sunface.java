@@ -302,6 +302,7 @@ public class Sunface extends Application {
         sundial.getControlThingyAlwaysOnTop().setOnMouseClicked(event -> toggleAlwaysOnTop(primaryStage));
         sundial.getControlThingyNightmode().setOnMouseClicked(event -> sundial.toggleNightmode());
         sundial.getControlThingyAnimation().setOnMouseClicked(event -> sundial.toggleAnimation());
+        sundial.getControlThingyPinInfo().setOnMouseClicked(event -> sundial.togglePinInfo());
 
         sundial.getControlThingyChart().setOnMouseClicked(event -> toggleSunchartWindow());
         sundial.getControlThingyCetus().setOnMouseClicked(event -> toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.CETUS, event));
@@ -326,6 +327,10 @@ public class Sunface extends Application {
         sundial.getDialCircleFrame().setOnMouseDragged(event -> frameDrag(primaryStage, event) );
         sundial.getDialCircleFrame().setOnDragOver(event -> checkDragAndDropString(event));
         sundial.getDialCircleFrame().setOnDragDropped(event -> rotateGlobe(PositionType.GOOGLE_MAPS, event));
+
+        sundial.getCetusMarkerGroup().setOnMousePressed(event -> { saveMouse(primaryStage, event); globeCheck(); });
+        sundial.getCetusMarkerGroup().setOnMouseReleased(event -> { frameActions(primaryStage, event); killMouse(); globeCheck(); });
+        sundial.getCetusMarkerGroup().setOnMouseDragged(event -> frameDrag(primaryStage, event) );
 
         sundial.getTinyGlobeGroup().setOnMouseClicked(event -> tinyGlobeActions(event));
         sundial.getTinyGlobeGroup().setOnDragOver(event -> checkDragAndDropString(event));

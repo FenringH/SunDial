@@ -41,7 +41,8 @@ public class Suncreator {
         ANIMATION,
         CHART,
         CETUS,
-        ORBVALLIS
+        ORBVALLIS,
+        PIN_INFO
     };
 
     public static ControlThingy createControlThingy(ControlThingyType type, Text helpText) {
@@ -114,6 +115,20 @@ public class Suncreator {
                         .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
                         .cursor(Cursor.HAND)
                         .helpText(Sunconfig.HELPTEXT_ANIMATION, helpText)
+                        .thankYou();
+                break;
+            case PIN_INFO:
+                controlThingy = new ControlThingy.PleaseBuildControlThingy()
+                        .positionPolar(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CONTROL_ANIMATION_OFFSET, Sunconfig.CONTROL_PIN_INFO_ANGLE)
+                        .size(Sunconfig.CONTROL_ANIMATION_RADIUS)
+                        .colorStroke(Sunconfig.Color_Of_ResizeStroke, Color.WHITE)
+                        .strokeWidth(Sunconfig.CONTROL_ANIMATION_STROKE_WIDTH)
+                        .colorFill(Sunconfig.Color_Of_ResizeFill)
+                        .marker("I", Color.WHITE, Sunconfig.MATRIX_SHADOW)
+                        .markerScale(0.75)
+                        .style(Sunconfig.CONTROL_RESIZE_SHADOW, Sunconfig.CONTROL_RESIZE_GLOW)
+                        .cursor(Cursor.HAND)
+                        .helpText(Sunconfig.HELPTEXT_PIN_INFO, helpText)
                         .thankYou();
                 break;
             case RESIZE:
@@ -716,7 +731,7 @@ public class Suncreator {
         KeyValue keyValueOpacity = new KeyValue(tinyGlobe.opacityProperty(), opacity, Interpolator.EASE_OUT);
         KeyFrame keyFrameOpacity = new KeyFrame(Duration.millis(Sunconfig.TINY_GLOBE_DURATION), keyValueOpacity);
 
-        timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY, keyFrameOpacity);
+        timeline.getKeyFrames().addAll(keyFrameScaleX, keyFrameScaleY, keyFrameSlideX, keyFrameSlideY/*, keyFrameOpacity*/);
 
         return timeline;
     }
@@ -1265,10 +1280,10 @@ public class Suncreator {
             double dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
             boolean dotVisibleA = false;
             double lineOpacityA = 0.50d;
-            double lineOpacityB = 0.50d;
-            Color lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
-            Color lineColorB = Color.BLACK/*Sunconfig.Color_Of_HourMarkerQwrt*/;
-            String style = "";
+            double lineOpacityB = 0.65d;
+            Color lineColorA = Color.BLACK;
+            Color lineColorB = Sunconfig.Color_Of_Horizon;
+            String style = Sunconfig.MATRIX_GLOW;
 
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
@@ -1323,11 +1338,15 @@ public class Suncreator {
             markerDotA.setVisible(dotVisibleA);
             markerDotA.setMouseTransparent(true);
 
-            Line markerLineB = new Line(0, 0, 0, -lineLength);
+            Line markerLineB = new Line(
+                    0, Sunconfig.MARKER_LINE_B_START,
+                    0,Sunconfig.MARKER_LINE_B_END
+            );
             markerLineB.setTranslateX(Sunconfig.CENTER_X);
-            markerLineB.setTranslateY(Sunconfig.MARGIN_Y);
+            markerLineB.setTranslateY(0);
             markerLineB.setStroke(lineColorB);
             markerLineB.setStrokeWidth(strokeWidth);
+            markerLineB.setStrokeLineCap(StrokeLineCap.BUTT);
             markerLineB.setOpacity(lineOpacityB);
             markerLineB.setStyle(style);
             markerLineB.setMouseTransparent(true);
@@ -1360,7 +1379,7 @@ public class Suncreator {
                 if (i % 24 != 0) {
                     markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_OFF_SCALE);
                     markerMatrix.setScaleY(Sunconfig.MATRIX_HOUR_OFF_SCALE);
-                    markerMatrix.setFill(Color.BLACK);
+//                    markerMatrix.setFill(Color.BLACK);
                     markerMatrix.setOpacity(Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY);
 //                    markerMatrix.setBlendMode(BlendMode.MULTIPLY);
                 }
@@ -1482,24 +1501,50 @@ public class Suncreator {
     }
 
     public static Arc createDialLocalHourArc() {
+
+        double radius = Sunconfig.CENTER_Y - Sunconfig.MARKER_LINE_B_START - Sunconfig.LOCAL_HOUR_ARC_STROKE_WIDTH / 2;
+
         Arc arc = new Arc(0, 0,
-                Sunconfig.CENTER_X,
-                Sunconfig.CENTER_Y,
+                radius, radius,
                 0, 15);
-        arc.setType(ArcType.ROUND);
+        arc.setType(ArcType.OPEN);
         arc.setTranslateX(Sunconfig.CENTER_X);
         arc.setTranslateY(Sunconfig.CENTER_Y);
-        arc.setFill(Sunconfig.LOCAL_HOUR_ARC_FILL);
-        arc.setStroke(Color.TRANSPARENT);
+        arc.setFill(Color.TRANSPARENT);
+        arc.setStroke(Color.WHITE);
+        arc.setStrokeLineCap(StrokeLineCap.BUTT);
+        arc.setStrokeWidth(Sunconfig.LOCAL_HOUR_ARC_STROKE_WIDTH);
 //        arc.setBlendMode(BlendMode.OVERLAY);
         return arc;
+    }
+
+    public static Group createDialMidnightGroup() {
+
+        double polyMid = Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL * (1 - SuperNiceArc.START_CURVE_HEIGHT);
+        double polyStart = Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL * (1 + SuperNiceArc.END_CURVE_HEIGHT) - Sunconfig.SUPER_NICE_ARC_START_EXTENSION;
+
+        Polygon polygon = new Polygon(
+                0, Sunconfig.CENTER_Y + polyStart,
+                -0.5 * Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH, Sunconfig.CENTER_Y + polyMid,
+                0, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y * 2,
+                0.5 * Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH, Sunconfig.CENTER_Y + polyMid
+        );
+        polygon.setTranslateX(Sunconfig.CENTER_X);
+        polygon.setStroke(Color.TRANSPARENT);
+        polygon.setFill(Color.WHITE);
+        polygon.setStyle(Sunconfig.LOCALMIDNIGHT_DIAL_GLOW);
+
+        Group group = new Group(polygon);
+        group.setMouseTransparent(true);
+
+        return group;
     }
 
     public static SuperNiceArc createDialLocalHourSuperNiceArc() {
 
         SuperNiceArc superNiceArc = new SuperNiceArc.PleaseBuild()
                 .center(Sunconfig.CENTER_X, Sunconfig.CENTER_Y)
-                .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y)
+                .size(Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL, Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y)
                 .endLineExtension(Sunconfig.SUPER_NICE_ARC_END_EXTENSION)
                 .strokeWidth(Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH)
                 .thankYou();
@@ -1519,49 +1564,20 @@ public class Suncreator {
 
         Polygon dialLocalHourPolyShortestSimple = new Polygon(
                 0, C, // 1
-                - Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D, // 2
-                0, 3, // 3
-                + Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D // 4
-        );
-
-        Polygon dialLocalHourPolyShorterSimple = new Polygon(
-                0, (Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL) * 1.33, // 1
-                - Sunconfig.LOCALTIME_HOUR_SHORTER_WIDTH / 2, (Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL), // 2
-                0, 3, // 3
-                + Sunconfig.LOCALTIME_HOUR_SHORTER_WIDTH / 2, (Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL) // 4
+                0, C, // 2
+                0, C, // 3
+                -Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D, // 4
+                0, Sunconfig.MARGIN_Y, // 5
+                Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D // 6
         );
 
         Polygon dialLocalHourPolyShortSimple = new Polygon(
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
-                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 2
-                0, 3, // 3
-                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75 // 4
-        );
-
-        Polygon dialLocalHourPolyLongComplex = new Polygon(
-                0, Sunconfig.LOCALTIME_DIAL_LENGTH, // 1
-                - Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH * 0.75, // 2
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 3
-                0, Sunconfig.MARGIN_Y, // 4
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 5
-                + Sunconfig.LOCALTIME_HOUR_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_LENGTH  * 0.75, // 6
-                0, Sunconfig.LOCALTIME_DIAL_LENGTH, // 7
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH  * 0.75, // 8
-                0, Sunconfig.LOCALTIME_DIAL_LENGTH  * 0.50, // 9
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.LOCALTIME_DIAL_LENGTH  * 0.75 // 10
-        );
-
-        Polygon dialLocalHourPolyShortComplex = new Polygon(
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
-                - Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 2
-                - Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 3
-                0, Sunconfig.MARGIN_Y, // 4
-                + Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH, Sunconfig.MARGIN_Y * 1.5, // 5
-                + Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 6
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 7
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 8
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 9
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH // 10
+                0.25, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
+                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.40, // 2
+                -0.25, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 3
+                -Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 4
+                0, Sunconfig.MARGIN_Y, // 5
+                Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75 // 6
         );
 
         MorphingPolygon morphingPolygon = new MorphingPolygon(
@@ -1575,7 +1591,6 @@ public class Suncreator {
         morphingPolygon.setFill(new Color(1, 1, 1, 0.1));
         morphingPolygon.setStroke(Color.WHITE);
         morphingPolygon.setStrokeWidth(Sunconfig.LOCALTIME_HOUR_STROKE_WIDTH);
-//        morphingPolygon.setOpacity(1);
 
         Group dialLocalHourGroup = new Group(morphingPolygon);
         dialLocalHourGroup.getTransforms().add(dialRotateLocalHour);
@@ -1683,7 +1698,7 @@ public class Suncreator {
             Circle localSecondCircle = new Circle();
             localSecondCircle.setRadius(((i % 5) == 0) ? Sunconfig.LOCALSECOND_RADIUS_BIG : Sunconfig.LOCALSECOND_RADIUS_SMOL);
             localSecondCircle.setTranslateX(Sunconfig.CENTER_X);
-            localSecondCircle.setTranslateY(Sunconfig.LOCALMINUTE_CIRCLE_OFFSET);
+            localSecondCircle.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.DAYLENGTH_ARC_RADIUS + Sunconfig.LOCALSECOND_RADIUS_BIG * 1.5);
             localSecondCircle.setFill(Sunconfig.Color_Of_Seconds);
             localSecondCircle.setStroke(Sunconfig.Color_Of_Void);
             localSecondCircle.setStyle(Sunconfig.LOCALSECOND_GLOW);
