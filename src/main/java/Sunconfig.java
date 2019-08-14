@@ -231,8 +231,8 @@ public class Sunconfig {
     public static final double SUNTIME_DIAL_LENGTH = 50.0d;
     public static final double SUNRISE_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNSET_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
-    public static final double SUNRISE_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
-    public static final double SUNSET_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
+    public static final double SUNRISE_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH + 20;
+    public static final double SUNSET_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH + 20;
     public static final double LOCALSECOND_RADIUS_BIG = 5;
     public static final double LOCALSECOND_RADIUS_SMOL = 4;
     public static final double MARKER_HOUR_LENGTH = 10;
@@ -241,7 +241,6 @@ public class Sunconfig {
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double LOCALTIME_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double LOCALTIME_DIAL_SHORTER_LENGTH = CENTER_Y - DOT_RADIUS_BIGH - 20;
-    public static final double LOCALTIME_DIAL_MID_LENGTH = Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS;
     public static final double LOCALTIME_HOUR_WIDTH = 12.0d;
     public static final double LOCALTIME_HOUR_SHORT_WIDTH = 8.0d;
     public static final double LOCALTIME_HOUR_SHORTER_WIDTH = 5.0d;
@@ -249,7 +248,7 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
-    public static final double DAYLENGTH_ARC_RADIUS = 120.0d;
+    public static final double DAYLENGTH_ARC_RADIUS = 125.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 1.5d;
     public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DAYLENGTH_ARC_RADIUS * 0.35;
     public static final double DAY_ARC_MARGIN = 11.0d;
@@ -293,13 +292,14 @@ public class Sunconfig {
     public static final double SUPER_NICE_ARC_START_EXTENSION = 120;
     public static final double MARKER_LINE_B_START = CENTER_Y - SUPER_NICE_ARC_RADIUS_SMOL + 1;
     public static final double MARKER_LINE_B_END = MARKER_LINE_B_START + 20;
+    public static final double MINUTE_ARC_RADIUS = SUPER_NICE_ARC_RADIUS_SMOL + 10;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d * 0.75;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
     public static final double HIGHNOON_STROKE_WIDTH = 1.00d;
     public static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.00d;
     public static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
-    public static final double SUNRISE_STROKE_WIDTH = 1.00d;
+    public static final double SUNRISE_STROKE_WIDTH = 1.25d;
     public static final double SUNSET_STROKE_WIDTH = 1.00d;
     public static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
     public static final double MARKER_FRAME_STROKE_WIDTH = 2.00d;
@@ -323,6 +323,7 @@ public class Sunconfig {
     public static final double TINYGLOBE_TERMINATOR_WIDTH = 1.00d;
     public static final double GLOBEGRID_LINE_WIDTH = 0.50d;
     public static final double SUPER_NICE_ARC_STROKE_WIDTH = 1.50d;
+    public static final double ARCHOUR_STROKE_WIDTH = 1.50d;
     public static final double LOCAL_HOUR_ARC_STROKE_WIDTH = MARKER_LINE_B_END - MARKER_LINE_B_START;
 
     public static final double DAYLENGTH_ARC_OPACITY = 0.65d;
@@ -369,12 +370,14 @@ public class Sunconfig {
     public static final double DIAL_LOCAL_ARC_DOWN_OPACITY = 0.00;
     public static final double DIAL_LOCAL_ARC_FUTURE_OPACITY = 0.50;
     public static final double DIAL_LOCAL_ARC_PAST_OPACITY = 0.75;
+    public static final double ARCHOUR_PROGRESS_OPACITY = 1.00;
+    public static final double ARCHOUR_SHADOW_OPACITY = 0.50;
 
     public static final double MATRIX_MARKER_OFFSET = MARGIN_Y + 7;
     public static final double MATRIX_HORIZON_OFFSET = 76.0d;
     public static final double MATRIX_TIME_OFFSET = 0.0d;
     public static final double MATRIX_DATE_OFFSET = 45.0d;
-    public static final double MATRIX_TIMEDATE_OFFSET = 135.0d;
+    public static final double MATRIX_TIMEDATE_OFFSET = 125.0d;
     public static final double MATRIX_WEEK_OFFSET = 70.0d;
     public static final double MATRIX_LONGITUDE_SLIDE = 0.0d;
     public static final double MATRIX_LATITUDE_SLIDE = 0.0d;
@@ -499,7 +502,7 @@ public class Sunconfig {
     public static final Color Color_Of_TerminatorGlow = new Color(0.90, 0.10, 0.00, 1.00);
 
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
-    public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 1.00);
+    public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 0.85);
 
     public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
     public static final Color Color_Of_HelpStroke_Off = new Color(1.00, 0.35, 0.10, 1.00);
@@ -758,7 +761,7 @@ public class Sunconfig {
             CENTER_X, CENTER_Y, CENTER_Y,
             false,
             CycleMethod.NO_CYCLE,
-            new Stop(0.940, Color.BLACK),
+            new Stop(0.960, Color.BLACK),
             new Stop(1.000, Color.TRANSPARENT)
     );
 

@@ -68,6 +68,8 @@ public class Sundial {
     private Rotate dialRotateLocalHour;
     private Rotate dialRotateLocalMinute;
     private Rotate dialRotateLocalSecond;
+    private Rotate arcHourRotate;
+
     private ArrayList<Rotate> dialMarkerRotateList;
     private ArrayList<Rotate> cetusMarkerRotateList;
     private ArrayList<Double> cetusMarkerAngleList;
@@ -97,6 +99,8 @@ public class Sundial {
     private ArrayList<Line> cetusMarkerLineList;
     private ArrayList<Arc> orbVallisMarkerArcList;
     private ArrayList<Line> orbVallisMarkerLineList;
+    private ArcHour arcHour;
+    private Group arcHourGroup;
 
     private Group dialLocalSecondLedList;
     private ArrayList<Boolean> dialLocalSecondOn;
@@ -149,6 +153,7 @@ public class Sundial {
 
     private Group tinyGlobeFrame;
     private Group tinyGlobeGroup;
+    private Group tinyGlobeNightModeOverlay;
     private Group globeMasterGroup;
     private Scale tinyGlobeScale;
     private Group horizonGroup;
@@ -330,6 +335,7 @@ public class Sundial {
         dialRotateLocalHour = centerRotate.clone();
         dialRotateLocalMinute = centerRotate.clone();
         dialRotateLocalSecond = centerRotate.clone();
+        arcHourRotate = centerRotate.clone();
 
         // Master globe
         globeMasterGroup = Suncreator.createMasterGlobe(longitude, latitude, phase, tilt, globeLightScaler, globeGridVisibleEh, globeLinesVisibleEh);
@@ -345,7 +351,10 @@ public class Sundial {
         tinyGlobeFrame = Suncreator.createTinyGlobeFrame();
         tinyGlobeFrame.setOpacity(0.75);
 
-        tinyGlobeGroup.getChildren().add(tinyGlobeFrame);
+        tinyGlobeNightModeOverlay = Suncreator.createTinyGlobeNightModeOverlay();
+        tinyGlobeNightModeOverlay.setVisible(false);
+
+        tinyGlobeGroup.getChildren().addAll(tinyGlobeFrame, tinyGlobeNightModeOverlay);
         tinyGlobeGroup.setOpacity(Sunconfig.TINYGLOBE_DEFAULT_OPACITY);
 
         tinyGlobeScale = new Scale();
@@ -451,6 +460,22 @@ public class Sundial {
         dialLocalHourSuperNiceArc = Suncreator.createDialLocalHourSuperNiceArc();
         dialMidnightGroup = Suncreator.createDialMidnightGroup();
 
+        arcHour = new ArcHour(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.MINUTE_ARC_RADIUS);
+        arcHour.setWidth(Sunconfig.ARCHOUR_STROKE_WIDTH);
+        arcHour.setMinuteStroke(Sunconfig.Color_Of_Minutes);
+        arcHour.setMinuteStyle(Sunconfig.LOCALMINUTE_GLOW);
+        arcHour.setSecondStroke(Sunconfig.Color_Of_Seconds);
+        arcHour.setSecondStyle(Sunconfig.LOCALSECOND_GLOW);
+        arcHour.setSecondWidth(Sunconfig.ARCHOUR_STROKE_WIDTH * 2);
+        arcHour.setLineStartStroke(Sunconfig.Color_Of_Minutes);
+        arcHour.setLineStartStyle(Sunconfig.LOCALMINUTE_GLOW);
+        arcHour.setProgressOpacity(Sunconfig.ARCHOUR_PROGRESS_OPACITY);
+        arcHour.setShadowOpacity(Sunconfig.ARCHOUR_SHADOW_OPACITY);
+        arcHour.setMouseTransparent(true);
+
+        arcHourGroup = new Group(arcHour);
+        arcHourGroup.getTransforms().addAll(arcHourRotate);
+
         dialLocalHourArcPast = Suncreator.createDialLocalHourArc();
         dialLocalHourArcPast.setStroke(Color.WHITE);
         dialLocalHourArcPast.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
@@ -466,13 +491,13 @@ public class Sundial {
         matrixSunset = Suncreator.createMatrixSunset();
 
         horizonGroup = new Group(
-                Suncreator.createSunriseGroup(sunriseDialRotate, matrixSunrise),
-                Suncreator.createSunsetGroup(sunsetDialRotate, matrixSunset)
+                Suncreator.createHorizonGroup(sunriseDialRotate, matrixSunrise),
+                Suncreator.createHorizonGroup(sunsetDialRotate, matrixSunset)
         );
         horizonGroup.setMouseTransparent(true);
 
-        horizonMoveOutTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.OUT, horizonGroup);
-        horizonMoveInTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.IN, horizonGroup);
+//        horizonMoveOutTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.OUT, horizonGroup);
+//        horizonMoveInTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.IN, horizonGroup);
 
         dialLocalHourSuperNiceArcOutTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.OUT, dialLocalHourSuperNiceArc);
         dialLocalHourSuperNiceArcInTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.IN, dialLocalHourSuperNiceArc);
@@ -636,6 +661,7 @@ public class Sundial {
         dialArcDayLength = Suncreator.createDialArcDayLength();
         matrixDayLength = Suncreator.createMatrixDayLength();
         matrixHighNoon = Suncreator.createMatrixHighNoon();
+
         nightModeOverlay = Suncreator.createNightModeOverlay();
 
         dialCircleFrame.opacityProperty().bind(Bindings.createDoubleBinding(() ->
@@ -695,7 +721,7 @@ public class Sundial {
                 ,dialArcNight
                 ,dialArcHalfNight
                 ,globeMasterGroup
-                ,dialLocalHourArcFuture
+//                ,dialLocalHourArcFuture
                 ,dialHourLineMarkerGroupB
 //                ,dialLocalHourArcPast
                 ,dialCircleFrame
@@ -705,6 +731,7 @@ public class Sundial {
 //                ,dialLocalMinuteLedList
 //                ,dialLocalSecondLedList
                 ,dialArcDayLength
+                ,arcHourGroup
                 ,dialHighNoonGroup
                 ,dialLocalHourGroup
                 ,sunHighNoon
@@ -1062,11 +1089,18 @@ public class Sundial {
 
         this.localTime = localTime;
 
+        int second = this.localTime.get(Calendar.SECOND);
+        int minute = this.localTime.get(Calendar.MINUTE);
+        int hour = this.localTime.get(Calendar.HOUR_OF_DAY);
+
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
         updateHourArc(this.localTime);
 
-        dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
-        dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
+        dialRotateLocalMinute.setAngle(minute * 6);
+        dialRotateLocalSecond.setAngle(second * 6);
+
+        arcHour.setTime(minute, second);
+        arcHourRotate.setAngle(((hour + 1) % 24) * (360d / 24d) - 90);
 
 //        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
 //        updateRowLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, dialLocalMinuteLedDimList, localTime.get(Calendar.MINUTE));
@@ -1517,6 +1551,9 @@ public class Sundial {
         MorphingPolygon dialLocalHourMorphingPolygon = (MorphingPolygon) dialLocalHourGroup.getChildren().get(0);
         MorphingPolygon dialHighNoonMorphingPolygon = (MorphingPolygon) dialHighNoonGroup.getChildren().get(1);
 
+        MorphingPolygon dialSunriseMorphingPolygon = (MorphingPolygon) ((Group) horizonGroup.getChildren().get(0)).getChildren().get(0);
+        MorphingPolygon dialSunsetMorphingPolygon = (MorphingPolygon) ((Group) horizonGroup.getChildren().get(1)).getChildren().get(0);
+
 //        tinyGlobeMoveOutTimeline.setRate(animationRate);
 //        tinyGlobeMoveInTimeline.setRate(animationRate);
         timeAndDateMoveOutTimeline.setRate(animationRate);
@@ -1525,8 +1562,10 @@ public class Sundial {
         coordinatesMoveInTimeline.setRate(animationRate);
         globeMoveOutTimeline.setRate(animationRate);
         globeMoveInTimeline.setRate(animationRate);
-        horizonMoveOutTimeline.setRate(animationRate);
-        horizonMoveInTimeline.setRate(animationRate);
+//        horizonMoveOutTimeline.setRate(animationRate);
+//        horizonMoveInTimeline.setRate(animationRate);
+        dialSunriseMorphingPolygon.setRate(animationRate);
+        dialSunsetMorphingPolygon.setRate(animationRate);
         dialLocalHourMorphingPolygon.setRate(animationRate);
         dialHighNoonMorphingPolygon.setRate(animationRate);
 //        highNoonMoveOutTimeline.setRate(animationRate);
@@ -1542,8 +1581,10 @@ public class Sundial {
         coordinatesMoveInTimeline.stop();
         globeMoveOutTimeline.stop();
         globeMoveInTimeline.stop();
-        horizonMoveOutTimeline.stop();
-        horizonMoveInTimeline.stop();
+//        horizonMoveOutTimeline.stop();
+//        horizonMoveInTimeline.stop();
+        dialSunriseMorphingPolygon.stop();
+        dialSunsetMorphingPolygon.stop();
         dialLocalHourMorphingPolygon.stopOut();
         dialLocalHourMorphingPolygon.stopIn();
         dialHighNoonMorphingPolygon.stopOut();
@@ -1558,7 +1599,9 @@ public class Sundial {
             timeAndDateMoveOutTimeline.play();
             coordinatesMoveOutTimeline.play();
             globeMoveOutTimeline.play();
-            horizonMoveOutTimeline.play();
+//            horizonMoveOutTimeline.play();
+            dialSunriseMorphingPolygon.playOut();
+            dialSunsetMorphingPolygon.playOut();
             dialLocalHourMorphingPolygon.playOut();
             dialHighNoonMorphingPolygon.playOut();
 //            highNoonMoveOutTimeline.play();
@@ -1569,7 +1612,9 @@ public class Sundial {
             timeAndDateMoveInTimeline.play();
             coordinatesMoveInTimeline.play();
             globeMoveInTimeline.play();
-            horizonMoveInTimeline.play();
+//            horizonMoveInTimeline.play();
+            dialSunriseMorphingPolygon.playIn();
+            dialSunsetMorphingPolygon.playIn();
             dialLocalHourMorphingPolygon.playIn();
             dialHighNoonMorphingPolygon.playIn();
 //            highNoonMoveInTimeline.play();
@@ -1737,7 +1782,9 @@ public class Sundial {
     public void toggleNightmode() {
 
         nightmodeEh = !nightmodeEh;
+
         nightModeOverlay.setVisible(nightmodeEh);
+        tinyGlobeNightModeOverlay.setVisible(nightmodeEh);
 
         for (Node node : outerControlsGroup.getChildren()) {
             ((ControlThingy) node).toggleNightMode();

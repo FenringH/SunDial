@@ -121,5 +121,10 @@ public class MorphingPolygon extends Polygon {
         timelineIn.stop();
     }
 
+    public void stop() {
+        timelineIn.stop();
+        timelineOut.stop();
+    }
+
 
 }

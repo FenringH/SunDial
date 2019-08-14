@@ -672,6 +672,22 @@ public class Suncreator {
         return group;
     }
 
+    public static Group createTinyGlobeNightModeOverlay() {
+
+        Circle circle = new Circle(Sunconfig.TINYGLOBE_RADIUS + Sunconfig.TINYGLOBE_FRAME_STROKE_WIDTH / 2);
+        circle.setFill(Color.BLACK);
+        circle.setStroke(Sunconfig.Color_Of_Void);
+        circle.setBlendMode(BlendMode.BLUE);
+        circle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);
+        circle.setMouseTransparent(true);
+
+        Group group = new Group(circle);
+        group.setTranslateX(Sunconfig.CENTER_X);
+        group.setTranslateY(Sunconfig.CENTER_Y + Sunconfig.TINYGLOBE_OFFSET);
+
+        return group;
+    }
+
     public static Timeline createGlobeTimeline(TimelineDirection timelineDirection, Group group) {
 
         Timeline timeline = new Timeline();
@@ -1340,7 +1356,7 @@ public class Suncreator {
 
             Line markerLineB = new Line(
                     0, Sunconfig.MARKER_LINE_B_START,
-                    0, Sunconfig.MARKER_LINE_B_START - Sunconfig.MARKER_HOUR_LENGTH - (lineLength * 0.5)
+                    0, Sunconfig.MARKER_LINE_B_START + Sunconfig.MARKER_HOUR_LENGTH + (lineLength * 0.5)
             );
             markerLineB.setTranslateX(Sunconfig.CENTER_X);
             markerLineB.setTranslateY(0);
@@ -1433,33 +1449,17 @@ public class Suncreator {
 
         Group dialHighNoonGroup = new Group();
 
-/*
-        Polygon dialHighNoonPolyLong = new Polygon(
-                0, Sunconfig.HIGHNOON_DIAL_LENGTH,
-                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.HIGHNOON_DIAL_LENGTH * 0.25,
-                0, Sunconfig.MARGIN_Y,
-                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.HIGHNOON_DIAL_LENGTH * 0.25
-        );
-
-        Polygon dialHighNoonPolyShort = new Polygon(
-                0, Sunconfig.HIGHNOON_DIAL_SHORT_LENGTH,
-                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.85, Sunconfig.HIGHNOON_DIAL_SHORT_LENGTH * 0.4,
-                0, Sunconfig.MARGIN_Y,
-                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.85, Sunconfig.HIGHNOON_DIAL_SHORT_LENGTH * 0.4
-        );
-*/
-
         Polygon dialHighNoonPolySunLong = new Polygon(
                 0, Sunconfig.HIGHNOON_DIAL_LENGTH,
                 - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
-                0, Sunconfig.MARGIN_Y,
+                0, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL,
                 Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
         );
 
         Polygon dialHighNoonPolySunShort = new Polygon(
                 0, Sunconfig.DAYLENGTH_ARC_RADIUS * 1.35,
                 - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
-                0, Sunconfig.MARGIN_Y,
+                0, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL,
                 Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
         );
 
@@ -1480,19 +1480,7 @@ public class Suncreator {
         sunDot.setFill(Sunconfig.Color_Of_HighNoon);
         sunDot.setStroke(Color.TRANSPARENT);
 
-/*
-        Polygon dialHighNoonPolyBack = new Polygon(
-                0, Sunconfig.HIGHNOON_DIAL_LENGTH,
-                - Sunconfig.HIGHNOON_DIAL_WIDTH * 4, Sunconfig.HIGHNOON_DIAL_LENGTH * 0.25,
-                0, Sunconfig.MARGIN_Y,
-                Sunconfig.HIGHNOON_DIAL_WIDTH * 4, Sunconfig.HIGHNOON_DIAL_LENGTH * 0.25
-        );
-        dialHighNoonPolyBack.setTranslateX(Sunconfig.CENTER_X);
-        dialHighNoonPolyBack.setFill(Color.TRANSPARENT);
-        dialHighNoonPolyBack.setStroke(Color.TRANSPARENT);
-*/
-
-        dialHighNoonGroup.getChildren().addAll(/*dialHighNoonPolyBack, */sunDot, morphingPolygon);
+        dialHighNoonGroup.getChildren().addAll(sunDot, morphingPolygon);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
         dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
         dialHighNoonGroup.setMouseTransparent(true);
@@ -1502,7 +1490,7 @@ public class Suncreator {
 
     public static Arc createDialLocalHourArc() {
 
-        double radius = Sunconfig.CENTER_Y - Sunconfig.MARKER_LINE_B_START + Sunconfig.MARKER_HOUR_LENGTH / 2;
+        double radius = Sunconfig.CENTER_Y - Sunconfig.MARKER_LINE_B_START - Sunconfig.MARKER_HOUR_LENGTH / 2;
 
         Arc arc = new Arc(0, 0,
                 radius, radius,
@@ -1564,19 +1552,19 @@ public class Suncreator {
 
         Polygon dialLocalHourPolyShortestSimple = new Polygon(
                 0, C, // 1
-                0, C, // 2
-                0, C, // 3
-                -Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D, // 4
+                -Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D, // 2
+                0, Sunconfig.MARGIN_Y, // 3
+                0, Sunconfig.MARGIN_Y, // 4
                 0, Sunconfig.MARGIN_Y, // 5
                 Sunconfig.LOCALTIME_HOUR_SHORTEST_WIDTH / 2, D // 6
         );
 
         Polygon dialLocalHourPolyShortSimple = new Polygon(
-                0.25, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
-                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.40, // 2
-                -0.25, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 3
-                -Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 4
-                0, Sunconfig.MARGIN_Y, // 5
+                0, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH, // 1
+                -Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75, // 2
+                -0.25, Sunconfig.MARGIN_Y, // 3
+                0, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL + 10, //4
+                0.25, Sunconfig.MARGIN_Y, // 5
                 Sunconfig.LOCALTIME_HOUR_SHORT_WIDTH / 2, Sunconfig.LOCALTIME_DIAL_SHORT_LENGTH * 0.75 // 6
         );
 
@@ -1794,34 +1782,47 @@ public class Suncreator {
         return matrixSunset;
     }
 
-    public static Group createSunriseGroup(Rotate sunriseDialRotate, DotMatrix matrixSunrise) {
+    public static Group createHorizonGroup(Rotate rotate, DotMatrix dotMatrix) {
 
-        Group sunriseGroup = new Group();
+        Group group = new Group();
 
-        Line sunriseLine = new Line(Sunconfig.CENTER_X, Sunconfig.SUNRISE_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-        sunriseLine.setStroke(Sunconfig.Color_Of_Horizon);
-        sunriseLine.setStrokeWidth(Sunconfig.SUNRISE_STROKE_WIDTH);
-        sunriseLine.setStyle(Sunconfig.HORIZON_GLOW);
+        Line line = new Line(Sunconfig.CENTER_X, Sunconfig.SUNRISE_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
+        line.setStroke(Sunconfig.Color_Of_Horizon);
+        line.setStrokeWidth(Sunconfig.SUNRISE_STROKE_WIDTH);
+        line.setStyle(Sunconfig.HORIZON_GLOW);
+        line.setVisible(false);
 
-        sunriseGroup.getChildren().addAll(sunriseLine, matrixSunrise);
-        sunriseGroup.getTransforms().add(sunriseDialRotate);
+        Polygon polygonStart = new Polygon(
+                0, Sunconfig.SUNRISE_DIAL_LENGTH,
+                -Sunconfig.SUNRISE_STROKE_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL,
+                -0.25, Sunconfig.MARGIN_Y,
+                0.25, Sunconfig.MARGIN_Y,
+                Sunconfig.SUNRISE_STROKE_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL
+        );
 
-        return sunriseGroup;
-    }
+        Polygon polygonEnd = new Polygon(
+                0, Sunconfig.SUNRISE_DIAL_SHORT_LENGTH,
+                -Sunconfig.SUNRISE_STROKE_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL,
+                -0.25, Sunconfig.MARGIN_Y,
+                0.25, Sunconfig.MARGIN_Y,
+                Sunconfig.SUNRISE_STROKE_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL
+        );
 
-    public static Group createSunsetGroup(Rotate sunsetDialRotate, DotMatrix matrixSunset) {
+        MorphingPolygon morphingPolygon = new MorphingPolygon(
+                polygonStart.getPoints(),
+                polygonEnd.getPoints(),
+                Sunconfig.TIMEANDDATE_DURATION,
+                Interpolator.EASE_BOTH
+        );
+        morphingPolygon.setTranslateX(Sunconfig.CENTER_X);
+        morphingPolygon.setFill(Sunconfig.Color_Of_Horizon);
+        morphingPolygon.setStroke(Color.TRANSPARENT);
+        morphingPolygon.setStyle(Sunconfig.HORIZON_GLOW);
 
-        Group sunsetGroup = new Group();
+        group.getChildren().addAll(morphingPolygon, dotMatrix);
+        group.getTransforms().add(rotate);
 
-        Line sunsetLine = new Line(Sunconfig.CENTER_X, Sunconfig.SUNRISE_DIAL_LENGTH, Sunconfig.CENTER_X, Sunconfig.MARGIN_Y);
-        sunsetLine.setStroke(Sunconfig.Color_Of_Horizon);
-        sunsetLine.setStrokeWidth(Sunconfig.SUNSET_STROKE_WIDTH);
-        sunsetLine.setStyle(Sunconfig.HORIZON_GLOW);
-
-        sunsetGroup.getChildren().addAll(sunsetLine, matrixSunset);
-        sunsetGroup.getTransforms().add(sunsetDialRotate);
-
-        return sunsetGroup;
+        return group;
     }
 
     public static Group createMatrixDate(DotMatrix matrixDay, DotMatrix matrixMonth, DotMatrix matrixYear, DotMatrix matrixWeek) {
@@ -1980,23 +1981,14 @@ public class Suncreator {
 
         Group nightModeOverlay = new Group();
 
-        Rectangle nightModeRectangle = new Rectangle(Sundial.DEFAULT_WIDTH, Sundial.DEFAULT_HEIGHT);
-        nightModeRectangle.setArcWidth(Sunconfig.NIGHTMODE_RECTANGLE_ROUND);
-        nightModeRectangle.setArcHeight(Sunconfig.NIGHTMODE_RECTANGLE_ROUND);
-        nightModeRectangle.setFill(Color.BLACK);
-        nightModeRectangle.setStroke(Sunconfig.Color_Of_Void);
-        nightModeRectangle.setBlendMode(BlendMode.BLUE);
-        nightModeRectangle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);
-        nightModeRectangle.setMouseTransparent(true);
+        Circle bigCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X);
+        bigCircle.setFill(Sunconfig.NIGHTMODE_CIRCLE_FILL);
+        bigCircle.setStroke(Sunconfig.Color_Of_Void);
+        bigCircle.setBlendMode(BlendMode.BLUE);
+        bigCircle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);
+        bigCircle.setMouseTransparent(true);
 
-        Circle nightModeCircle = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.CENTER_X);
-        nightModeCircle.setFill(Sunconfig.NIGHTMODE_CIRCLE_FILL);
-        nightModeCircle.setStroke(Sunconfig.Color_Of_Void);
-        nightModeCircle.setBlendMode(BlendMode.BLUE);
-        nightModeCircle.setOpacity(Sunconfig.NIGHTMODE_RECTANGLE_OPACITY);
-        nightModeCircle.setMouseTransparent(true);
-
-        nightModeOverlay.getChildren().addAll(nightModeCircle);
+        nightModeOverlay.getChildren().addAll(bigCircle);
         nightModeOverlay.setVisible(false);
 
         return nightModeOverlay;
