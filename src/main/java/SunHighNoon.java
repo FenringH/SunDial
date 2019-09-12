@@ -76,17 +76,17 @@ public class SunHighNoon extends Group {
         matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() / 2);
         matrixTime.setTranslateY(centerY - radius * 1.02 + matrixTime.getLayoutBounds().getHeight());
 
-        matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
-        matrixAngle.setScaleX(matrixScale * 0.80);
-        matrixAngle.setScaleY(matrixScale * 0.80);
-        matrixAngle.setTranslateX(centerX + marginX);
-        matrixAngle.setTranslateY(matrixTime.getTranslateY() - matrixAngle.getLayoutBounds().getHeight());
-
         matrixDayLength = new DotMatrix("00h00m00s", DAYLENGTH_COLOR);
         matrixDayLength.setScaleX(matrixScale);
         matrixDayLength.setScaleY(matrixScale);
         matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() / 2);
         matrixDayLength.setTranslateY(matrixTime.getTranslateY() + matrixDayLength.getLayoutBounds().getHeight() + marginY);
+
+        matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
+        matrixAngle.setScaleX(matrixScale * 0.85);
+        matrixAngle.setScaleY(matrixScale * 0.85);
+        matrixAngle.setTranslateX(centerX - matrixAngle.getLayoutBounds().getWidth() / 2);
+        matrixAngle.setTranslateY(matrixDayLength.getTranslateY() + matrixAngle.getLayoutBounds().getHeight() + marginY);
 
         markerGroup = new Group();
 

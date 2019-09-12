@@ -148,8 +148,8 @@ public class SuperNiceArc extends Group {
         // 1b) start poly
         startPoly = new Polygon(
                 -0.5 * strokeWidth, -startPolyHeight,
-                -0.25, 0,
-                0.25, 0,
+                -0.25, -Sunconfig.DOT_RADIUS_SMOL,
+                0.25, -Sunconfig.DOT_RADIUS_SMOL,
                 0.5 * strokeWidth, -startPolyHeight
         );
         startPoly.setStroke(Color.TRANSPARENT);
@@ -247,7 +247,7 @@ public class SuperNiceArc extends Group {
         endPoly.setStroke(Color.TRANSPARENT);
         endPoly.getTransforms().add(endLineRotate);
 
-        super.getChildren().addAll(startCurve, mainArc, endCurve, endPoly);
+        super.getChildren().addAll(startPoly, startCurve, mainArc, endCurve, endPoly);
         super.setTranslateX(centerX);
         super.setTranslateY(centerY);
     }

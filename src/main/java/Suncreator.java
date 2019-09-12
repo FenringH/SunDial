@@ -1291,12 +1291,13 @@ public class Suncreator {
 
         for(int i = 0; i < Sunconfig.MAX_MARKER; i++) {
 
-            double strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+            double strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+            double strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
             double dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
             boolean dotVisibleA = false;
             double lineOpacityA = 0.50d;
-            double lineOpacityB = 0.65d;
+            double lineOpacityB = 0.75d;
             Color lineColorA = Color.BLACK;
             Color lineColorB = Sunconfig.Color_Of_Horizon;
             String style = Sunconfig.MATRIX_GLOW;
@@ -1305,8 +1306,10 @@ public class Suncreator {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
                 dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.50;
                 lineOpacityA = 0.65d;
+                lineOpacityB = 0.90d;
                 lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
-                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+                strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+                strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
             }
 
             if (i % 4 == 0) {
@@ -1314,8 +1317,10 @@ public class Suncreator {
                 dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 2.00;
                 dotVisibleA = true;
                 lineOpacityA = 0.85d;
+                lineOpacityB = 1.00d;
                 lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerFull*/;
-                strokeWidth = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+                strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+                strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.50;
 //                style = Sunconfig.HOUR_MARKER_SHADOW;
             }
 
@@ -1331,7 +1336,7 @@ public class Suncreator {
             markerPoly.setTranslateX(Sunconfig.CENTER_X);
             markerPoly.setTranslateY(Sunconfig.MARGIN_Y);
             markerPoly.setStroke(Sunconfig.Color_Of_HourMarkerStroke);
-            markerPoly.setStrokeWidth(strokeWidth);
+            markerPoly.setStrokeWidth(strokeWidthA);
             markerPoly.setFill(lineColorA);
             markerPoly.setOpacity(lineOpacityA / 2);
             markerPoly.setMouseTransparent(true);
@@ -1340,7 +1345,7 @@ public class Suncreator {
             markerLineA.setTranslateX(Sunconfig.CENTER_X);
             markerLineA.setTranslateY(Sunconfig.MARGIN_Y);
             markerLineA.setStroke(Sunconfig.Color_Of_DaySky);
-            markerLineA.setStrokeWidth(strokeWidth);
+            markerLineA.setStrokeWidth(strokeWidthA);
             markerLineA.setOpacity(lineOpacityA * 0.35);
             markerLineA.setVisible(dotVisibleA);
             markerLineA.setMouseTransparent(true);
@@ -1356,12 +1361,12 @@ public class Suncreator {
 
             Line markerLineB = new Line(
                     0, Sunconfig.MARKER_LINE_B_START,
-                    0, Sunconfig.MARKER_LINE_B_START + Sunconfig.MARKER_HOUR_LENGTH + (lineLength * 0.5)
+                    0, Sunconfig.MARKER_LINE_B_END + (lineLength * 0.5)
             );
             markerLineB.setTranslateX(Sunconfig.CENTER_X);
             markerLineB.setTranslateY(0);
             markerLineB.setStroke(lineColorB);
-            markerLineB.setStrokeWidth(strokeWidth);
+            markerLineB.setStrokeWidth(strokeWidthB);
             markerLineB.setStrokeLineCap(StrokeLineCap.BUTT);
             markerLineB.setOpacity(lineOpacityB);
             markerLineB.setStyle(style);
@@ -1388,9 +1393,12 @@ public class Suncreator {
 
                 double rotationAdjust = i * -3.75d;
                 markerMatrix.setRotate(rotationAdjust);
-                markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_SCALE);
-                markerMatrix.setScaleY(Sunconfig.MATRIX_HOUR_SCALE);
-                markerMatrix.setOpacity(Sunconfig.LOCAL_HOUR_MARKER_OPACITY);
+//                markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_SCALE);
+//                markerMatrix.setScaleY(Sunconfig.MATRIX_HOUR_SCALE);
+//                markerMatrix.setOpacity(Sunconfig.LOCAL_HOUR_MARKER_OPACITY);
+                markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_OFF_SCALE);
+                markerMatrix.setScaleY(Sunconfig.MATRIX_HOUR_OFF_SCALE);
+                markerMatrix.setOpacity(Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY);
 
                 if (i % 24 != 0) {
                     markerMatrix.setScaleX(Sunconfig.MATRIX_HOUR_OFF_SCALE);
@@ -1451,16 +1459,16 @@ public class Suncreator {
 
         Polygon dialHighNoonPolySunLong = new Polygon(
                 0, Sunconfig.HIGHNOON_DIAL_LENGTH,
-                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS,
                 0, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL,
-                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
+                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS
         );
 
         Polygon dialHighNoonPolySunShort = new Polygon(
-                0, Sunconfig.DAYLENGTH_ARC_RADIUS * 1.35,
-                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS,
+                0, Sunconfig.HIGHNOON_DIAL_LENGTH,
+                - Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS,
                 0, Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL,
-                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.DAYLENGTH_ARC_RADIUS
+                Sunconfig.HIGHNOON_DIAL_WIDTH * 0.5, Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS
         );
 
         MorphingPolygon morphingPolygon = new MorphingPolygon(
@@ -1506,24 +1514,34 @@ public class Suncreator {
         return arc;
     }
 
-    public static Group createDialMidnightGroup() {
+    public static Group createDialMidnightGroup(Paint paint, String style, double angle) {
 
         double polyMid = Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL * (1 - SuperNiceArc.START_CURVE_HEIGHT);
         double polyStart = Sunconfig.SUPER_NICE_ARC_RADIUS_SMOL * (1 + SuperNiceArc.END_CURVE_HEIGHT) - Sunconfig.SUPER_NICE_ARC_START_EXTENSION;
 
         Polygon polygon = new Polygon(
-                0, Sunconfig.CENTER_Y + polyStart,
+                0.25, Sunconfig.CENTER_Y + polyStart,
+                -0.25, Sunconfig.CENTER_Y + polyStart,
                 -0.5 * Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH, Sunconfig.CENTER_Y + polyMid,
-                0, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y * 2,
+                -0.25, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y,
+                0.25, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y,
                 0.5 * Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH, Sunconfig.CENTER_Y + polyMid
         );
         polygon.setTranslateX(Sunconfig.CENTER_X);
         polygon.setStroke(Color.TRANSPARENT);
-        polygon.setFill(Color.WHITE);
-        polygon.setStyle(Sunconfig.LOCALMIDNIGHT_DIAL_GLOW);
+        polygon.setFill(paint);
+        polygon.setStyle(style);
 
         Group group = new Group(polygon);
         group.setMouseTransparent(true);
+
+        Rotate rotate = new Rotate();
+        rotate.setPivotX(Sunconfig.CENTER_X);
+        rotate.setPivotY(Sunconfig.CENTER_Y);
+
+        group.getTransforms().add(rotate);
+
+        rotate.setAngle(angle);
 
         return group;
     }
@@ -1894,7 +1912,7 @@ public class Suncreator {
         dialArcDayLength.setStrokeWidth(Sunconfig.DAYLENGTH_STROKE_WIDTH);
         dialArcDayLength.setFill(Sunconfig.Color_Of_Void);
         dialArcDayLength.setOpacity(Sunconfig.DAYLENGTH_ARC_OPACITY);
-        dialArcDayLength.setStyle(Sunconfig.MATRIX_SHADOW);
+        dialArcDayLength.setStyle(Sunconfig.MATRIX_GLOW);
         dialArcDayLength.setMouseTransparent(true);
         return dialArcDayLength;
     }

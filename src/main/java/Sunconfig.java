@@ -235,7 +235,7 @@ public class Sunconfig {
     public static final double SUNSET_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH + 20;
     public static final double LOCALSECOND_RADIUS_BIG = 5;
     public static final double LOCALSECOND_RADIUS_SMOL = 4;
-    public static final double MARKER_HOUR_LENGTH = 10;
+    public static final double MARKER_HOUR_LENGTH = 8;
     public static final double MARKER_MINUTE_LENGTH = 8.0d;
     public static final double MARKER_MINUTE_WIDTH = 8.0d;
     public static final double LOCALTIME_DIAL_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
@@ -249,8 +249,8 @@ public class Sunconfig {
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
     public static final double DAYLENGTH_ARC_RADIUS = 125.0d;
-    public static final double HIGHNOON_DIAL_WIDTH = 1.5d;
-    public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DAYLENGTH_ARC_RADIUS * 0.35;
+    public static final double HIGHNOON_DIAL_WIDTH = 1.75d;
+    public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DAYLENGTH_ARC_RADIUS * 0.15;
     public static final double DAY_ARC_MARGIN = 11.0d;
     public static final double LOCALMINUTE_POLY_WIDTH = 6;
     public static final double LOCALMINUTE_POLY_HEIGHT = 20;
@@ -286,13 +286,13 @@ public class Sunconfig {
     public static final double NIGHTMODE_RECTANGLE_ROUND = Sundial.DEFAULT_WIDTH / 2 + 20.0d;
     public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNHIGHNOON_RADIUS = 130;
-    public static final double SUNDOT_RADIUS = 4.0;
-    public static final double SUPER_NICE_ARC_RADIUS_SMOL = 175;
+    public static final double SUNDOT_RADIUS = 4.5;
+    public static final double SUPER_NICE_ARC_RADIUS_SMOL = 185;
     public static final double SUPER_NICE_ARC_END_EXTENSION = 100;
-    public static final double SUPER_NICE_ARC_START_EXTENSION = 120;
+    public static final double SUPER_NICE_ARC_START_EXTENSION = 140;
+    public static final double MINUTE_ARC_RADIUS = (SUPER_NICE_ARC_RADIUS_SMOL + (CENTER_Y - MARGIN_Y)) * 0.5;
     public static final double MARKER_LINE_B_START = CENTER_Y - SUPER_NICE_ARC_RADIUS_SMOL + 1;
-    public static final double MARKER_LINE_B_END = MARKER_LINE_B_START + 20;
-    public static final double MINUTE_ARC_RADIUS = SUPER_NICE_ARC_RADIUS_SMOL + 10;
+    public static final double MARKER_LINE_B_END = MARKER_LINE_B_START + 10;
 
     public static final double DAYLENGTH_STROKE_WIDTH = 2.00d * 0.75;
     public static final double SUNTIME_STROKE_WIDTH = 2.00d;
@@ -373,7 +373,7 @@ public class Sunconfig {
     public static final double ARCHOUR_PROGRESS_OPACITY = 1.00;
     public static final double ARCHOUR_SHADOW_OPACITY = 0.50;
 
-    public static final double MATRIX_MARKER_OFFSET = MARGIN_Y + 7;
+    public static final double MATRIX_MARKER_OFFSET = MARKER_LINE_B_END + 15;
     public static final double MATRIX_HORIZON_OFFSET = 76.0d;
     public static final double MATRIX_TIME_OFFSET = 0.0d;
     public static final double MATRIX_DATE_OFFSET = 45.0d;
@@ -410,8 +410,8 @@ public class Sunconfig {
     public static final double ORBVALLIS_HORIZON_OFFSET = 40.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 48.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
-    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 30;
-    public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 28;
+    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 40;
+    public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 25;
     public static final double CONTROL_DST_OFFSET_X = CENTER_X;
     public static final double CONTROL_DST_OFFSET_Y = CENTER_Y;
     public static final double MATRIX_DAYLENGTH_OFFSET = CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS * 0.95;
@@ -422,10 +422,10 @@ public class Sunconfig {
     public static final double MATRIX_WEEK_SCALE = 1.00d;
     public static final double MATRIX_HORIZON_SCALE = 1.15d;
     public static final double MATRIX_DAYLENGTH_SCALE = 1.00d;
-    public static final double MATRIX_LONGITUDE_SCALE = 1.50d;
-    public static final double MATRIX_LATITUDE_SCALE = 1.50d;
+    public static final double MATRIX_LONGITUDE_SCALE = 1.25d;
+    public static final double MATRIX_LATITUDE_SCALE = 1.25d;
     public static final double MATRIX_HOUR_SCALE = 1.25d;
-    public static final double MATRIX_HOUR_OFF_SCALE = 1.00d;
+    public static final double MATRIX_HOUR_OFF_SCALE = 1.25d;
     public static final double MATRIX_MINUTE_SCALE = 0.75d;
     public static final double TINYGLOBE_DOWNSCALE = 0.80d;
     public static final double CETUS_TIMER_SCALE = 1.00d;
@@ -503,6 +503,7 @@ public class Sunconfig {
 
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 0.85);
+    public static final Color Color_Of_MinutesArc = new Color(0.59, 1.00, 0.50, 1.00);
 
     public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
     public static final Color Color_Of_HelpStroke_Off = new Color(1.00, 0.35, 0.10, 1.00);
@@ -559,10 +560,11 @@ public class Sunconfig {
 
 
     public static final String MATRIX_GLOW                  = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0),  5.0, 0.60, 0, 0);";
-    public static final String MATRIX_GLOW2                 = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 10.0, 0.50, 0, 0);";
+    public static final String MATRIX_GLOW2                 = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 12.0, 0.75, 0, 0);";
     public static final String MATRIX_SHADOW                = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_SHADOW2               = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 10.0, 0.50, 0, 0);";
     public static final String MATRIX_SHADOW3               = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 0.3), 15.0, 0.50, 0, 0);";
+    public static final String MATRIX_SHADOW4               = "-fx-effect: dropshadow(three-pass-box, rgba( 16,192, 64, 1.0),  5.0, 0.60, 0, 0);";
     public static final String MATRIX_BLOCK                 = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
     public static final String HORIZON_GLOW                 = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
     public static final String LOCALTIME_SHADOW             = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
@@ -572,7 +574,9 @@ public class Sunconfig {
     public static final String LOCALSECOND_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
+    public static final String LOCALHOUR_PAST_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255,164, 0.5), 12.0, 0.68, 0, 0);";
     public static final String LOCALMIDNIGHT_DIAL_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128,255, 1.0), 12.0, 0.68, 0, 0);";
+    public static final String LOCALMIDDAY_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(224,224, 96, 1.0), 12.0, 0.68, 0, 0);";
     public static final String LOCALNOON_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,255, 64, 1.0), 12.0, 0.65, 0, 0);";
     public static final String LOCALNOON_DIAL_HOT           = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 15.0, 0.75, 0, 0);";
     public static final String LOCALNOON_DIAL_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 12.0, 0.60, 0, 0);";

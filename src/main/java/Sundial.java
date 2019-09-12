@@ -94,6 +94,7 @@ public class Sundial {
     private Group dialLocalHourGroup;
     private SuperNiceArc dialLocalHourSuperNiceArc;
     private Group dialMidnightGroup;
+    private Group dialMiddayGroup;
     private Group dialHighNoonGroup;
     private ArrayList<Arc> cetusMarkerArcList;
     private ArrayList<Line> cetusMarkerLineList;
@@ -457,8 +458,14 @@ public class Sundial {
         dialLocalMinuteGroup = Suncreator.createDialLocalMinuteGroup(dialRotateLocalMinute);
         dialLocalSecondGroup = Suncreator.createDialLocalSecondGroup(dialRotateLocalSecond);
         dialLocalHourGroup = Suncreator.createDialLocalHourGroup(dialRotateLocalHour);
+
         dialLocalHourSuperNiceArc = Suncreator.createDialLocalHourSuperNiceArc();
-        dialMidnightGroup = Suncreator.createDialMidnightGroup();
+
+        dialMidnightGroup = Suncreator.createDialMidnightGroup(Color.WHITE, Sunconfig.LOCALMIDNIGHT_DIAL_GLOW, 0);
+
+        dialMiddayGroup = Suncreator.createDialMidnightGroup(Color.BLACK, Sunconfig.MATRIX_SHADOW, 180);
+        dialMiddayGroup.setBlendMode(BlendMode.OVERLAY);
+        dialMiddayGroup.setOpacity(0.75);
 
         arcHour = new ArcHour(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.MINUTE_ARC_RADIUS);
         arcHour.setWidth(Sunconfig.ARCHOUR_STROKE_WIDTH);
@@ -477,8 +484,8 @@ public class Sundial {
         arcHourGroup.getTransforms().addAll(arcHourRotate);
 
         dialLocalHourArcPast = Suncreator.createDialLocalHourArc();
-        dialLocalHourArcPast.setStroke(Color.WHITE);
-        dialLocalHourArcPast.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
+        dialLocalHourArcPast.setStroke(Sunconfig.Color_Of_MinutesArc);
+        dialLocalHourArcPast.setStyle(Sunconfig.LOCALHOUR_PAST_GLOW);
         dialLocalHourArcPast.setBlendMode(BlendMode.LIGHTEN);
         dialLocalHourArcPast.setOpacity(Sunconfig.DIAL_LOCAL_ARC_PAST_OPACITY);
 
@@ -516,7 +523,7 @@ public class Sundial {
         sunHighNoon.setMarkerLook(Color.WHITE, 1, Sunconfig.MATRIX_SHADOW);
         sunHighNoon.setSunDotLook(Color.LIGHTYELLOW, Sunconfig.LOCALNOON_DIAL_GLOW, BlendMode.SRC_OVER);
         sunHighNoon.setMatrixTimeLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_GLOW);
-        sunHighNoon.setMatrixAngleLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_SHADOW);
+        sunHighNoon.setMatrixAngleLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_SHADOW4);
         sunHighNoon.setMatrixDayLengthLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
         sunHighNoon.setOpacity(Sunconfig.HIGHNOON_NORMAL_OPACITY);
         sunHighNoon.setVisible(sunHighNoonVisibleEh);
@@ -671,6 +678,8 @@ public class Sundial {
 
 //        dialArcDayLength.opacityProperty().bind(outerControlsGroup.opacityProperty());
         matrixDayLength.opacityProperty().bind(outerControlsGroup.opacityProperty());
+        dialHourMatrixMarkerGroup.opacityProperty().bind(outerControlsGroup.opacityProperty());
+        dialHourLineMarkerGroupB.opacityProperty().bind(outerControlsGroup.opacityProperty());
 
         // Info overlay
         infoText = new Text();
@@ -721,24 +730,25 @@ public class Sundial {
                 ,dialArcNight
                 ,dialArcHalfNight
                 ,globeMasterGroup
-//                ,dialLocalHourArcFuture
-                ,dialHourLineMarkerGroupB
-//                ,dialLocalHourArcPast
                 ,dialCircleFrame
+//                ,dialMidnightGroup
+                ,dialMiddayGroup
                 ,cetusMarkerGroup
                 ,orbVallisMarkerGroup
 //                ,dialMinuteMarkers
 //                ,dialLocalMinuteLedList
 //                ,dialLocalSecondLedList
                 ,dialArcDayLength
-                ,arcHourGroup
                 ,dialHighNoonGroup
                 ,dialLocalHourGroup
-                ,sunHighNoon
-                ,dialLocalHourSuperNiceArc
-                ,dialMidnightGroup
-                ,horizonGroup
                 ,dialHourMatrixMarkerGroup
+                ,sunHighNoon
+                ,horizonGroup
+                ,dialLocalHourArcFuture
+                ,dialLocalHourArcPast
+                ,dialHourLineMarkerGroupB
+                ,arcHourGroup
+                ,dialLocalHourSuperNiceArc
                 ,dialCircleCenterPoint
                 ,cetusTimer
                 ,orbVallisTimer
@@ -765,7 +775,7 @@ public class Sundial {
         cetusMarkerGroup.setOnMouseEntered(event -> { cetusMarkerGroup.setCursor(globeVisibleEh ? Cursor.OPEN_HAND : Cursor.MOVE); });
         cetusMarkerGroup.setOnMouseExited(event -> { cetusMarkerGroup.setCursor(Cursor.DEFAULT); });
 
-        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW2); });
+        controlNightCompression.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_NIGHTCOMPRESSION); controlNightCompression.setCursor(Cursor.V_RESIZE); controlNightCompression.setStyle(Sunconfig.MATRIX_GLOW); });
         controlNightCompression.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); controlNightCompression.setCursor(Cursor.DEFAULT); controlNightCompression.setStyle(Sunconfig.MATRIX_SHADOW2); });
 
         matrixYear.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_YEAR); matrixYear.setCursor(Cursor.V_RESIZE); setGroupGlow(matrixYear, Sunconfig.MATRIX_GLOW); });
@@ -974,6 +984,7 @@ public class Sundial {
         setHorizonDialAngle(getAbsoluteAngle(this.sunrise), getAbsoluteAngle(this.sunset));
         setDialAngleLocalHour(getAbsoluteAngle(this.localTime));
         setHourMarkerLocalHour(this.localTime);
+        setArcHourRotate(this.localTime);
 
         dialRotateLocalMinute.setAngle(this.localTime.get(Calendar.MINUTE) * 6);
         dialRotateLocalSecond.setAngle(this.localTime.get(Calendar.SECOND) * 6);
@@ -1085,6 +1096,18 @@ public class Sundial {
         matrixDayLength.setString(Sunutil.getShortTimeLengthString(clampedDayLength));
     }
 
+    public void setArcHourRotate(GregorianCalendar localTime) {
+
+        GregorianCalendar fullHourTime = new GregorianCalendar();
+        fullHourTime.setTime(localTime.getTime());
+        fullHourTime.set(GregorianCalendar.HOUR_OF_DAY, localTime.get(GregorianCalendar.HOUR_OF_DAY) + 1);
+        fullHourTime.set(GregorianCalendar.MINUTE, 0);
+        fullHourTime.set(GregorianCalendar.SECOND, 0);
+
+        double angle = getAbsoluteAngle(fullHourTime);
+        arcHourRotate.setAngle(Sunutil.getNightCompressionAngle(angle, nightCompression) + 90);
+    }
+
     public void setLocalTime(GregorianCalendar localTime) {
 
         this.localTime = localTime;
@@ -1100,7 +1123,7 @@ public class Sundial {
         dialRotateLocalSecond.setAngle(second * 6);
 
         arcHour.setTime(minute, second);
-        arcHourRotate.setAngle(((hour + 1) % 24) * (360d / 24d) - 90);
+        setArcHourRotate(this.localTime);
 
 //        updateSingleLEDs(dialLocalSecondLedList, dialLocalSecondOn, dialLocalSecondLedOffList, localTime.get(Calendar.SECOND));
 //        updateRowLEDs(dialLocalMinuteLedList, dialLocalMinuteOn, dialLocalMinuteLedOffList, dialLocalMinuteLedDimList, localTime.get(Calendar.MINUTE));
@@ -1310,10 +1333,12 @@ public class Sundial {
         if (this.daylength > 24 * 60 * 60) {
             horizonGroup.setVisible(false);
             dialArcNight.setVisible(false);
+            dialArcNight.setLength(0);
             dialArcDayLength.setLength(360);
         } else if (this.daylength <= 0) {
             horizonGroup.setVisible(false);
             dialArcNight.setVisible(true);
+            dialArcNight.setLength(360);
             dialArcDayLength.setLength(0);
         } else {
             horizonGroup.setVisible(true);
@@ -1367,10 +1392,21 @@ public class Sundial {
 
             dialMarkerRotateList.get(i).setAngle(Sunutil.getNightCompressionAngle(i * 360d / 96d, nightCompression));
 
+/*
             if (i % 4 == 0) {
                 int hourIndex = i / 4;
                 double angle = dialMarkerRotateList.get(i).getAngle();
                 double opacity = (hourIndex % 6 == 0) ? Sunconfig.LOCAL_HOUR_MARKER_OPACITY : Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY;
+                hourMarkerMatrixList.get(hourIndex).setRotate(-1 * angle);
+                hourMarkerMatrixList.get(hourIndex).setStyle(Sunconfig.MATRIX_SHADOW);
+                hourMarkerMatrixList.get(hourIndex).setOpacity(opacity);
+            }
+*/
+
+            if (i % 4 == 0) {
+                int hourIndex = i / 4;
+                double angle = dialMarkerRotateList.get(i).getAngle();
+                double opacity = Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY;
                 hourMarkerMatrixList.get(hourIndex).setRotate(-1 * angle);
                 hourMarkerMatrixList.get(hourIndex).setStyle(Sunconfig.MATRIX_SHADOW);
                 hourMarkerMatrixList.get(hourIndex).setOpacity(opacity);
@@ -1397,6 +1433,7 @@ public class Sundial {
         float glowRadiusEnd = partialEnd * 5.00f + 5.00f;               // 5.00 -> 10.00
         float glowStrengthEnd = partialEnd * 0.15f + 0.60f;             // 0.60 -> 0.75
 
+/*
         double opacityStart = (hourIndexStart % 6 == 0) ?
                 (partialStart * (1 - Sunconfig.LOCAL_HOUR_MARKER_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_ON_OPACITY :
                 (partialStart * (1 - Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_OFF_ON_OPACITY;
@@ -1404,6 +1441,10 @@ public class Sundial {
         double opacityEnd = (hourIndexEnd % 6 == 0) ?
                 (partialEnd * (1 - Sunconfig.LOCAL_HOUR_MARKER_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_ON_OPACITY :
                 (partialEnd * (1 - Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_OFF_ON_OPACITY;
+*/
+
+        double opacityStart = (partialStart * (1 - Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_OFF_ON_OPACITY;
+        double opacityEnd = (partialEnd * (1 - Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) + Sunconfig.LOCAL_HOUR_MARKER_OFF_OPACITY) * Sunconfig.LOCAL_HOUR_MARKER_OFF_ON_OPACITY;
 
         StringBuilder hourStyleStart = new StringBuilder()
                 .append("-fx-effect: dropshadow(three-pass-box, rgba(")
@@ -1602,10 +1643,10 @@ public class Sundial {
 //            horizonMoveOutTimeline.play();
             dialSunriseMorphingPolygon.playOut();
             dialSunsetMorphingPolygon.playOut();
-            dialLocalHourMorphingPolygon.playOut();
+//            dialLocalHourMorphingPolygon.playOut();
             dialHighNoonMorphingPolygon.playOut();
 //            highNoonMoveOutTimeline.play();
-            dialLocalHourSuperNiceArcOutTimeline.play();
+//            dialLocalHourSuperNiceArcOutTimeline.play();
         }
         else {
 //            tinyGlobeMoveInTimeline.play();
@@ -1615,10 +1656,10 @@ public class Sundial {
 //            horizonMoveInTimeline.play();
             dialSunriseMorphingPolygon.playIn();
             dialSunsetMorphingPolygon.playIn();
-            dialLocalHourMorphingPolygon.playIn();
+//            dialLocalHourMorphingPolygon.playIn();
             dialHighNoonMorphingPolygon.playIn();
 //            highNoonMoveInTimeline.play();
-            dialLocalHourSuperNiceArcInTimeline.play();
+//            dialLocalHourSuperNiceArcInTimeline.play();
         }
 
         int i = 0;

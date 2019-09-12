@@ -523,6 +523,7 @@ public class Sunface extends Application {
             sundial.setOrbVallisTime(orbVallisCycleList, timeZonedCalendar, timeZoneCorrection);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
             sundial.setHighNoon(highNoonDate, noonAngle);
+            sundial.setArcHourRotate(offsetLocalTime);
 
             sunyear.setLocalDate(offsetLocalTime);
         }
