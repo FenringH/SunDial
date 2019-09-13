@@ -587,7 +587,6 @@ public class Sundial {
         controlThingyGlobeLines.visibleProperty().bind(globeMasterGroup.visibleProperty());
         controlThingyGlobeLines.opacityProperty().bind(globeMasterGroup.opacityProperty());
 
-        sunHighNoon.opacityProperty().bind(outerControlsGroup.opacityProperty());
         tinyGlobeGroup.opacityProperty().bind(outerControlsGroup.opacityProperty());
 
         // Time and Date
@@ -620,6 +619,15 @@ public class Sundial {
 
         timeAndDateMoveOutTimeline = Suncreator.createTimeAndDateTimeline(Suncreator.TimelineDirection.OUT, masterTimeGroup);
         timeAndDateMoveInTimeline = Suncreator.createTimeAndDateTimeline(Suncreator.TimelineDirection.IN, masterTimeGroup);
+
+        sunHighNoon.opacityProperty().bind(Bindings.createDoubleBinding(() -> {
+                    double outerControlsGroupOpacity = outerControlsGroup.opacityProperty().get();
+                    double masterTimeGroupOpacity = masterTimeGroup.opacityProperty().get();
+                    return (masterTimeGroupOpacity < outerControlsGroupOpacity && outerControlsGroupOpacity > 0.5) ?
+                            0.5 : outerControlsGroupOpacity;
+                },
+                outerControlsGroup.opacityProperty(), masterTimeGroup.opacityProperty()
+        ));
 
         // LEDs with minutes and seconds markers
         dialLocalSecondLedList = new Group();
