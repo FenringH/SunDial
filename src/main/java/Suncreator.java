@@ -699,10 +699,10 @@ public class Suncreator {
 
         if (timelineDirection.equals(TimelineDirection.IN)) {
             opacity = 0;
-            timeline.setOnFinished(event -> group.setVisible(false));
+//            timeline.setOnFinished(event -> group.setVisible(false));
         } else {
             opacity = 1;
-            timeline.setOnFinished(event -> group.setVisible(true));
+//            timeline.setOnFinished(event -> group.setVisible(true));
         }
 
         KeyValue keyValueOpacity = new KeyValue(group.opacityProperty(), opacity, Interpolator.EASE_OUT);
@@ -833,13 +833,13 @@ public class Suncreator {
             slideY = 150;
             opacity = 0;
             interpolator = Interpolator.EASE_OUT;
-            timeline.setOnFinished(event -> group.setVisible(false));
+//            timeline.setOnFinished(event -> group.setVisible(false));
         } else {
             slideX = 0;
             slideY = 0;
             opacity = 1;
             interpolator = Interpolator.EASE_IN;
-            timeline.setOnFinished(event -> group.setVisible(true));
+//            timeline.setOnFinished(event -> group.setVisible(true));
         }
 
         KeyValue keyValueSlideX = new KeyValue(group.translateXProperty(), slideX, interpolator);
@@ -1309,7 +1309,7 @@ public class Suncreator {
                 lineOpacityB = 0.90d;
                 lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
                 strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
-                strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
+                strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
             }
 
             if (i % 4 == 0) {
@@ -1320,7 +1320,7 @@ public class Suncreator {
                 lineOpacityB = 1.00d;
                 lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerFull*/;
                 strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
-                strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.50;
+                strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
 //                style = Sunconfig.HOUR_MARKER_SHADOW;
             }
 
@@ -1483,14 +1483,16 @@ public class Suncreator {
         morphingPolygon.setStrokeWidth(Sunconfig.HIGHNOON_STROKE_WIDTH);
         morphingPolygon.setStrokeLineCap(StrokeLineCap.ROUND);
         morphingPolygon.setOpacity(Sunconfig.DIAL_HIGH_NOON_OPACITY);
+        morphingPolygon.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
 
         Circle sunDot = new Circle(Sunconfig.CENTER_X, Sunconfig.CENTER_Y - Sunconfig.DAYLENGTH_ARC_RADIUS, Sunconfig.SUNDOT_RADIUS);
         sunDot.setFill(Sunconfig.Color_Of_HighNoon);
         sunDot.setStroke(Color.TRANSPARENT);
+        sunDot.setStyle(Sunconfig.SUNDOT_GLOW);
 
         dialHighNoonGroup.getChildren().addAll(sunDot, morphingPolygon);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
-        dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
+//        dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
         dialHighNoonGroup.setMouseTransparent(true);
 
         return dialHighNoonGroup;
@@ -1498,7 +1500,7 @@ public class Suncreator {
 
     public static Arc createDialLocalHourArc() {
 
-        double radius = Sunconfig.CENTER_Y - Sunconfig.MARKER_LINE_B_START - Sunconfig.MARKER_HOUR_LENGTH / 2;
+        double radius = Sunconfig.CENTER_Y - Sunconfig.MARGIN_Y - Sunconfig.MARKER_HOUR_LENGTH / 2;
 
         Arc arc = new Arc(0, 0,
                 radius, radius,

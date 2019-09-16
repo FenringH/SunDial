@@ -146,10 +146,12 @@ public class SuperNiceArc extends Group {
         startLine.setStrokeWidth(strokeWidth);
 
         // 1b) start poly
+        double polyTip = Sunconfig.CENTER_Y - Sunconfig.SUPER_NICE_ARC_START_EXTENSION;
+
         startPoly = new Polygon(
                 -0.5 * strokeWidth, -startPolyHeight,
-                -0.25, -Sunconfig.DOT_RADIUS_SMOL,
-                0.25, -Sunconfig.DOT_RADIUS_SMOL,
+                -0.25, -polyTip,
+                0.25, -polyTip,
                 0.5 * strokeWidth, -startPolyHeight
         );
         startPoly.setStroke(Color.TRANSPARENT);

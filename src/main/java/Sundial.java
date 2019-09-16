@@ -340,7 +340,7 @@ public class Sundial {
 
         // Master globe
         globeMasterGroup = Suncreator.createMasterGlobe(longitude, latitude, phase, tilt, globeLightScaler, globeGridVisibleEh, globeLinesVisibleEh);
-        globeMasterGroup.setVisible(false);
+//        globeMasterGroup.setVisible(false);
         globeMasterGroup.setOpacity(0);
 
         globeMoveOutTimeline = Suncreator.createGlobeTimeline(Suncreator.TimelineDirection.OUT, globeMasterGroup);
@@ -461,6 +461,11 @@ public class Sundial {
 
         dialLocalHourSuperNiceArc = Suncreator.createDialLocalHourSuperNiceArc();
 
+        dialLocalHourSuperNiceArc.opacityProperty().bind(Bindings.createDoubleBinding(() ->
+                        1 - globeMasterGroup.opacityProperty().get() * 0.5,
+                globeMasterGroup.opacityProperty()
+        ));
+
         dialMidnightGroup = Suncreator.createDialMidnightGroup(Color.WHITE, Sunconfig.LOCALMIDNIGHT_DIAL_GLOW, 0);
 
         dialMiddayGroup = Suncreator.createDialMidnightGroup(Color.BLACK, Sunconfig.MATRIX_SHADOW, 180);
@@ -482,6 +487,11 @@ public class Sundial {
 
         arcHourGroup = new Group(arcHour);
         arcHourGroup.getTransforms().addAll(arcHourRotate);
+
+        arcHourGroup.opacityProperty().bind(Bindings.createDoubleBinding(() ->
+                        1 - globeMasterGroup.opacityProperty().get() * 0.5,
+                globeMasterGroup.opacityProperty()
+        ));
 
         dialLocalHourArcPast = Suncreator.createDialLocalHourArc();
         dialLocalHourArcPast.setStroke(Sunconfig.Color_Of_MinutesArc);
@@ -506,8 +516,8 @@ public class Sundial {
 //        horizonMoveOutTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.OUT, horizonGroup);
 //        horizonMoveInTimeline = Suncreator.createHorizonTimeline(Suncreator.TimelineDirection.IN, horizonGroup);
 
-        dialLocalHourSuperNiceArcOutTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.OUT, dialLocalHourSuperNiceArc);
-        dialLocalHourSuperNiceArcInTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.IN, dialLocalHourSuperNiceArc);
+//        dialLocalHourSuperNiceArcOutTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.OUT, dialLocalHourSuperNiceArc);
+//        dialLocalHourSuperNiceArcInTimeline = Suncreator.createDialLocalHourSuperNiceArcTimeline(Suncreator.TimelineDirection.IN, dialLocalHourSuperNiceArc);
 
         // Sun High Noon extra information
         sunHighNoon = new SunHighNoon(
@@ -521,7 +531,7 @@ public class Sundial {
         sunHighNoon.setHorizonLook(Sunconfig.Color_Of_Horizon, Sunconfig.SUNRISE_STROKE_WIDTH, Sunconfig.HORIZON_GLOW);
         sunHighNoon.setSunLineLook(Sunconfig.Color_Of_Horizon, Sunconfig.SUNRISE_STROKE_WIDTH, Sunconfig.MATRIX_GLOW, BlendMode.SRC_OVER);
         sunHighNoon.setMarkerLook(Color.WHITE, 1, Sunconfig.MATRIX_SHADOW);
-        sunHighNoon.setSunDotLook(Color.LIGHTYELLOW, Sunconfig.LOCALNOON_DIAL_GLOW, BlendMode.SRC_OVER);
+        sunHighNoon.setSunDotLook(Color.LIGHTYELLOW, Sunconfig.SUNDOT_GLOW, BlendMode.SRC_OVER);
         sunHighNoon.setMatrixTimeLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_GLOW);
         sunHighNoon.setMatrixAngleLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_SHADOW4);
         sunHighNoon.setMatrixDayLengthLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
@@ -659,7 +669,7 @@ public class Sundial {
 
         masterCoordinatesGroup = new Group(matrixLongitude, matrixLatitude);
         masterCoordinatesGroup.setOpacity(0);
-        masterCoordinatesGroup.setVisible(false);
+//        masterCoordinatesGroup.setVisible(false);
         masterCoordinatesGroup.setTranslateY(150);
 
         coordinatesMoveOutTimeline = Suncreator.createCoordinatesTimeline(Suncreator.TimelineDirection.OUT, masterCoordinatesGroup);
@@ -746,10 +756,10 @@ public class Sundial {
 //                ,dialMinuteMarkers
 //                ,dialLocalMinuteLedList
 //                ,dialLocalSecondLedList
+                ,dialHourMatrixMarkerGroup
                 ,dialArcDayLength
                 ,dialHighNoonGroup
                 ,dialLocalHourGroup
-                ,dialHourMatrixMarkerGroup
                 ,sunHighNoon
                 ,horizonGroup
                 ,dialLocalHourArcFuture
@@ -1591,8 +1601,8 @@ public class Sundial {
     public void setGlobeVisibility(boolean visibleEh) {
 
         if (visibleEh) {
-            masterCoordinatesGroup.setVisible(true);
-            globeMasterGroup.setVisible(true);
+//            masterCoordinatesGroup.setVisible(true);
+//            globeMasterGroup.setVisible(true);
         }
 
         int animationRate = globeAnimationEh ? 1 : Sunconfig.TINY_GLOBE_DURATION;
@@ -1619,8 +1629,8 @@ public class Sundial {
         dialHighNoonMorphingPolygon.setRate(animationRate);
 //        highNoonMoveOutTimeline.setRate(animationRate);
 //        highNoonMoveInTimeline.setRate(animationRate);
-        dialLocalHourSuperNiceArcOutTimeline.setRate(animationRate);
-        dialLocalHourSuperNiceArcInTimeline.setRate(animationRate);
+//        dialLocalHourSuperNiceArcOutTimeline.setRate(animationRate);
+//        dialLocalHourSuperNiceArcInTimeline.setRate(animationRate);
 
 //        tinyGlobeMoveOutTimeline.stop();
 //        tinyGlobeMoveInTimeline.stop();
@@ -1640,8 +1650,8 @@ public class Sundial {
         dialHighNoonMorphingPolygon.stopIn();
 //        highNoonMoveOutTimeline.stop();
 //        highNoonMoveInTimeline.stop();
-        dialLocalHourSuperNiceArcOutTimeline.stop();
-        dialLocalHourSuperNiceArcInTimeline.stop();
+//        dialLocalHourSuperNiceArcOutTimeline.stop();
+//        dialLocalHourSuperNiceArcInTimeline.stop();
 
         if (visibleEh) {
 //            tinyGlobeMoveOutTimeline.play();
