@@ -41,19 +41,19 @@ public class ArcHour extends Group {
         double secondsOffsetAngle = 90d / 60d;
 
         double segmentLength = (radius * Math.PI) / 60;
-        double dashLengthFull = segmentLength * (1d/5d);
+        double dashLengthFull = segmentLength * (1d/20d);
         double dashLengthEmpty = segmentLength - dashLengthFull;
 
         arcMinuteProgress = new Arc(0, 0, radius, radius, 0, -90);
         arcMinuteProgress.setType(ArcType.OPEN);
-        arcMinuteProgress.setStrokeLineCap(StrokeLineCap.BUTT);
+        arcMinuteProgress.setStrokeLineCap(StrokeLineCap.ROUND);
         arcMinuteProgress.setStrokeWidth(DEFAULT_WIDTH);
         arcMinuteProgress.setStroke(Color.WHITE);
         arcMinuteProgress.setFill(Color.TRANSPARENT);
 
         arcMinuteShadow = new Arc(0, 0, radius, radius, 0, -180);
         arcMinuteShadow.setType(ArcType.OPEN);
-        arcMinuteShadow.setStrokeLineCap(StrokeLineCap.BUTT);
+        arcMinuteShadow.setStrokeLineCap(StrokeLineCap.ROUND);
         arcMinuteShadow.setStrokeWidth(DEFAULT_WIDTH);
         arcMinuteShadow.setStroke(Color.BLACK);
         arcMinuteShadow.setFill(Color.TRANSPARENT);
@@ -62,7 +62,7 @@ public class ArcHour extends Group {
 
         arcSecondProgress = new Arc(0, 0, radius, radius, 180 - secondsOffsetAngle, -90);
         arcSecondProgress.setType(ArcType.OPEN);
-        arcSecondProgress.setStrokeLineCap(StrokeLineCap.BUTT);
+        arcSecondProgress.setStrokeLineCap(StrokeLineCap.ROUND);
         arcSecondProgress.setStrokeWidth(DEFAULT_WIDTH);
         arcSecondProgress.getStrokeDashArray().addAll(dashLengthFull, dashLengthEmpty);
         arcSecondProgress.setStrokeDashOffset(-dashLengthEmpty * 0.5);
@@ -71,7 +71,7 @@ public class ArcHour extends Group {
 
         arcSecondShadow = new Arc(0, 0, radius, radius, 180 - secondsOffsetAngle, -180 + secondsOffsetAngle * 2);
         arcSecondShadow.setType(ArcType.OPEN);
-        arcSecondShadow.setStrokeLineCap(StrokeLineCap.BUTT);
+        arcSecondShadow.setStrokeLineCap(StrokeLineCap.ROUND);
         arcSecondShadow.setStrokeWidth(DEFAULT_WIDTH);
         arcSecondShadow.getStrokeDashArray().addAll(dashLengthFull, dashLengthEmpty);
         arcSecondShadow.setStrokeDashOffset(-dashLengthEmpty * 0.5);
@@ -83,12 +83,14 @@ public class ArcHour extends Group {
         lineStart = new Line(radius, 0, radius + DEFAULT_LINE_LENGTH, 0);
         lineStart.setStrokeWidth(DEFAULT_WIDTH);
         lineStart.setStroke(Color.WHITE);
+        lineStart.setStrokeLineCap(StrokeLineCap.ROUND);
 //        lineStart.setBlendMode(BlendMode.OVERLAY);
 //        lineStart.setOpacity(DEFAULT_SHADOW_OPACITY);
 
         lineEnd = new Line(-radius, 0, -radius + DEFAULT_LINE_LENGTH, 0);
         lineEnd.setStrokeWidth(DEFAULT_WIDTH);
         lineEnd.setStroke(Color.BLACK);
+        lineEnd.setStrokeLineCap(StrokeLineCap.ROUND);
         lineEnd.setBlendMode(BlendMode.OVERLAY);
         lineEnd.setOpacity(DEFAULT_SHADOW_OPACITY);
 

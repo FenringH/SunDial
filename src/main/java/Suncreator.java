@@ -1296,7 +1296,7 @@ public class Suncreator {
             double lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.50d;
             double dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
             boolean dotVisibleA = false;
-            double lineOpacityA = 0.50d;
+            double lineOpacityA = 0;
             double lineOpacityB = 0.75d;
             Color lineColorA = Color.BLACK;
             Color lineColorB = Sunconfig.Color_Of_Horizon;
@@ -1305,7 +1305,7 @@ public class Suncreator {
             if (i % 2 == 0) {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH * 0.75d;
                 dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.50;
-                lineOpacityA = 0.65d;
+                lineOpacityA = 0;
                 lineOpacityB = 0.90d;
                 lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerHalf*/;
                 strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
@@ -1316,10 +1316,10 @@ public class Suncreator {
                 lineLength = Sunconfig.MARKER_HOUR_LENGTH;
                 dotRadiusA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 2.00;
                 dotVisibleA = true;
-                lineOpacityA = 0.85d;
+                lineOpacityA = 0.60d;
                 lineOpacityB = 1.00d;
                 lineColorA = Color.BLACK/*Sunconfig.Color_Of_HourMarkerFull*/;
-                strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.00;
+                strokeWidthA = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 2.00;
                 strokeWidthB = Sunconfig.MARKER_HOUR_STROKE_WIDTH * 1.25;
 //                style = Sunconfig.HOUR_MARKER_SHADOW;
             }
@@ -1341,13 +1341,15 @@ public class Suncreator {
             markerPoly.setOpacity(lineOpacityA / 2);
             markerPoly.setMouseTransparent(true);
 
-            Line markerLineA = new Line(0, 0, 0, -lineLength);
+            Line markerLineA = new Line(0, 0, 0, lineLength);
             markerLineA.setTranslateX(Sunconfig.CENTER_X);
             markerLineA.setTranslateY(Sunconfig.MARGIN_Y);
-            markerLineA.setStroke(Sunconfig.Color_Of_DaySky);
+            markerLineA.setStroke(Color.BLACK);
             markerLineA.setStrokeWidth(strokeWidthA);
-            markerLineA.setOpacity(lineOpacityA * 0.35);
+            markerLineA.setStrokeLineCap(StrokeLineCap.ROUND);
+            markerLineA.setOpacity(1);
             markerLineA.setVisible(dotVisibleA);
+//            markerLineA.setBlendMode(BlendMode.OVERLAY);
             markerLineA.setMouseTransparent(true);
 
             Circle markerDotA = new Circle();
@@ -1372,7 +1374,7 @@ public class Suncreator {
             markerLineB.setStyle(style);
             markerLineB.setMouseTransparent(true);
 
-            Group markerGroupA = new Group(markerDotA);
+            Group markerGroupA = new Group(markerLineA);
             markerGroupA.getTransforms().add(markerRotate);
 
             Group markerGroupB = new Group(markerLineB);
@@ -1493,7 +1495,7 @@ public class Suncreator {
         dialHighNoonGroup.getChildren().addAll(sunDot, morphingPolygon);
         dialHighNoonGroup.getTransforms().add(highNoonDialRotate);
 //        dialHighNoonGroup.setStyle(Sunconfig.LOCALNOON_DIAL_GLOW);
-        dialHighNoonGroup.setMouseTransparent(true);
+//        dialHighNoonGroup.setMouseTransparent(true);
 
         return dialHighNoonGroup;
     }
@@ -1557,9 +1559,14 @@ public class Suncreator {
                 .strokeWidth(Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH)
                 .thankYou();
 
-        superNiceArc.setStrokeColor(Color.WHITE);
-        superNiceArc.setStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
-        superNiceArc.setBlendMode(BlendMode.SCREEN);
+        superNiceArc.setNiceArcColor(Color.WHITE);
+        superNiceArc.setNiceArcStyle(Sunconfig.LOCALHOUR_DIAL_GLOW);
+        superNiceArc.setNiceArcBlendMode(BlendMode.SCREEN);
+
+        superNiceArc.setDialColor(Color.WHITE);
+        superNiceArc.setDialStyle(Sunconfig.LOCALSECOND_DIAL_GLOW);
+        superNiceArc.setDialBlendMode(BlendMode.SRC_OVER);
+
         superNiceArc.setMouseTransparent(true);
 
         return superNiceArc;
@@ -2125,6 +2132,7 @@ public class Suncreator {
             }
 
             backdropCutout.visibleProperty().bind((markerRectangle.visibleProperty()));
+            backdropCutout.opacityProperty().bind((markerRectangle.opacityProperty()));
 
             backdropGroup.getChildren().add(backdropCutout);
         }

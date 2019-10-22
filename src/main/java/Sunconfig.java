@@ -173,7 +173,7 @@ public class Sunconfig {
             "\n LMB : toggle Always-On-Top";
 
     public static final String HELPTEXT_HIGHNOON = "HIGH NOON" +
-            "\n HOVER : toggle High Noon time";
+            "\n LMB : toggle High Noon details";
 
     public static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
             "\n LMB : toggle Globe-mode\u2122" +
@@ -288,7 +288,7 @@ public class Sunconfig {
     public static final double SUNHIGHNOON_RADIUS = 130;
     public static final double SUNDOT_RADIUS = 4.5;
     public static final double SUPER_NICE_ARC_RADIUS_SMOL = 180;
-    public static final double SUPER_NICE_ARC_END_EXTENSION = 100;
+    public static final double SUPER_NICE_ARC_END_EXTENSION = SUPER_NICE_ARC_RADIUS_SMOL - DOT_RADIUS_SMOL;
     public static final double SUPER_NICE_ARC_START_EXTENSION = 140;
     public static final double MINUTE_ARC_RADIUS = (SUPER_NICE_ARC_RADIUS_SMOL + (CENTER_Y - MARGIN_Y)) * 0.5;
     public static final double MARKER_LINE_B_START = MARGIN_Y;
@@ -299,8 +299,8 @@ public class Sunconfig {
     public static final double HIGHNOON_STROKE_WIDTH = 1.00d;
     public static final double LOCALTIME_HOUR_STROKE_WIDTH = 1.00d;
     public static final double LOCALTIME_MINUTE_STROKE_WIDTH = 1.25d;
-    public static final double SUNRISE_STROKE_WIDTH = 1.25d;
-    public static final double SUNSET_STROKE_WIDTH = 1.00d;
+    public static final double SUNRISE_STROKE_WIDTH = 1.50d;
+    public static final double SUNSET_STROKE_WIDTH = 1.50d;
     public static final double MARKER_HOUR_STROKE_WIDTH = 1.00d;
     public static final double MARKER_FRAME_STROKE_WIDTH = 2.00d;
     public static final double TINYGLOBE_FRAME_STROKE_WIDTH = 3.00d;
@@ -364,11 +364,11 @@ public class Sunconfig {
     public static final double LOCAL_HOUR_MARKER_OPACITY = 0.65d;
     public static final double LOCAL_HOUR_MARKER_ON_OPACITY = 0.85d;
     public static final double LOCAL_HOUR_MARKER_OFF_OPACITY = 0.00d;
-    public static final double LOCAL_HOUR_MARKER_OFF_ON_OPACITY = 0.85d;
+    public static final double LOCAL_HOUR_MARKER_OFF_ON_OPACITY = 0.90d;
     public static final double DIAL_HIGH_NOON_OPACITY = 0.75d;
     public static final double DIAL_LOCAL_ARC_NORMAL_OPACITY = 1.00;
     public static final double DIAL_LOCAL_ARC_DOWN_OPACITY = 0.00;
-    public static final double DIAL_LOCAL_ARC_FUTURE_OPACITY = 0.50;
+    public static final double DIAL_LOCAL_ARC_FUTURE_OPACITY = 0.60;
     public static final double DIAL_LOCAL_ARC_PAST_OPACITY = 0.75;
     public static final double ARCHOUR_PROGRESS_OPACITY = 1.00;
     public static final double ARCHOUR_SHADOW_OPACITY = 0.50;
@@ -403,14 +403,14 @@ public class Sunconfig {
     public static final double CONTROL_CHART_OFFSET = 232.0d;
     public static final double CONTROL_GLOBEGRID_OFFSET = 232.0d;
     public static final double MARKER_MINUTE_OFFSET = 65.0d;
-    public static final double CETUS_TIMER_OFFSET = CENTER_Y - 70.0d;
-    public static final double ORBVALLIS_TIMER_OFFSET = CENTER_Y - 70.0d;
+    public static final double CETUS_TIMER_OFFSET = CENTER_Y + 65.0d;
+    public static final double ORBVALLIS_TIMER_OFFSET = CENTER_Y + 65.0d;
     public static final double CETUS_TIMEREADER_OFFSET = 170.0d;
     public static final double CETUS_HORIZON_OFFSET = 40.0d;
     public static final double ORBVALLIS_HORIZON_OFFSET = 40.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 48.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
-    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 45;
+    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 42;
     public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 25;
     public static final double CONTROL_DST_OFFSET_X = CENTER_X;
     public static final double CONTROL_DST_OFFSET_Y = CENTER_Y;
@@ -503,7 +503,7 @@ public class Sunconfig {
 
     public static final Color Color_Of_Seconds    = new Color(1.00, 1.00, 1.00, 1.00);
     public static final Color Color_Of_Minutes    = new Color(1.00, 1.00, 1.00, 0.85);
-    public static final Color Color_Of_MinutesArc = new Color(0.59, 1.00, 0.50, 1.00);
+    public static final Color Color_Of_MinutesArc = new Color(0.50, 1.00, 0.50, 1.00);
 
     public static final Color Color_Of_HelpFill   = new Color(0.10, 0.20, 0.50, 0.20);
     public static final Color Color_Of_HelpStroke_Off = new Color(1.00, 0.35, 0.10, 1.00);
@@ -568,18 +568,18 @@ public class Sunconfig {
     public static final String MATRIX_BLOCK                 = "-fx-effect: dropshadow(three-pass-box, rgba(  0,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
     public static final String HORIZON_GLOW                 = "-fx-effect: dropshadow(three-pass-box, rgba(255, 96, 32, 1.0), 15.0, 0.87, 0, 0);";
     public static final String LOCALTIME_SHADOW             = "-fx-effect: dropshadow(three-pass-box, rgba( 32,128,255, 1.0), 15.0, 0.50, 0, 0);";
-    public static final String LOCALSECOND_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255, 64, 64, 1.0), 10.0, 0.60, 0, 0);";
+    public static final String LOCALSECOND_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba(255,  0,  0, 1.0), 10.0, 0.50, 0, 0);";
     public static final String LOCALMINUTE_GLOW             = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOWIER       = "-fx-effect: dropshadow(three-pass-box, rgba( 64,192,255, 1.0), 12.0, 0.75, 0, 0);";
     public static final String LOCALSECOND_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255, 32, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMINUTE_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(  0,192,  0, 1.0), 12.0, 0.67, 0, 0);";
     public static final String LOCALHOUR_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,164,255, 1.0), 12.0, 0.68, 0, 0);";
-    public static final String LOCALHOUR_PAST_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255,164, 0.5), 12.0, 0.68, 0, 0);";
+    public static final String LOCALHOUR_PAST_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba( 32,255, 32, 1.0), 10.0, 0.60, 0, 0);";
     public static final String LOCALMIDNIGHT_DIAL_GLOW      = "-fx-effect: dropshadow(three-pass-box, rgba(255,128,255, 1.0), 12.0, 0.68, 0, 0);";
     public static final String LOCALMIDDAY_DIAL_GLOW        = "-fx-effect: dropshadow(three-pass-box, rgba(224,224, 96, 1.0), 12.0, 0.68, 0, 0);";
     public static final String LOCALNOON_DIAL_GLOW          = "-fx-effect: dropshadow(three-pass-box, rgba(255,255, 64, 1.0), 12.0, 0.65, 0, 0);";
     public static final String SUNDOT_GLOW                  = "-fx-effect: dropshadow(three-pass-box, rgba(255,255, 64, 1.0), 15.0, 0.60, 0, 0);";
-    public static final String LOCALNOON_DIAL_HOT           = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 1.0), 15.0, 0.75, 0, 0);";
+    public static final String LOCALNOON_DIAL_HOT           = "-fx-effect: dropshadow(three-pass-box, rgba(255,255,255, 0.7), 10.0, 0.50, 0, 0);";
     public static final String LOCALNOON_DIAL_SHADOW        = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 1.0), 12.0, 0.60, 0, 0);";
 
     public static final String HORIZON_HOVER_GLOW           = "-fx-effect: dropshadow(three-pass-box, rgba(255,128, 32, 0.5), 5.0, 0.50, 0, 0);";

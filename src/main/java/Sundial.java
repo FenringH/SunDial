@@ -440,6 +440,7 @@ public class Sundial {
         hourMarkerMatrixList = new ArrayList<>();
 
         dialHourLineMarkerGroupA = new Group();
+        dialHourLineMarkerGroupA.setBlendMode(BlendMode.OVERLAY);
 
         dialHourLineMarkerGroupB = new Group();
 
@@ -478,7 +479,7 @@ public class Sundial {
         arcHour.setMinuteStyle(Sunconfig.LOCALMINUTE_GLOW);
         arcHour.setSecondStroke(Sunconfig.Color_Of_Seconds);
         arcHour.setSecondStyle(Sunconfig.LOCALSECOND_GLOW);
-        arcHour.setSecondWidth(Sunconfig.ARCHOUR_STROKE_WIDTH * 2);
+        arcHour.setSecondWidth(Sunconfig.ARCHOUR_STROKE_WIDTH * 1.50);
         arcHour.setLineStartStroke(Sunconfig.Color_Of_Minutes);
         arcHour.setLineStartStyle(Sunconfig.LOCALMINUTE_GLOW);
         arcHour.setProgressOpacity(Sunconfig.ARCHOUR_PROGRESS_OPACITY);
@@ -494,7 +495,7 @@ public class Sundial {
         ));
 
         dialLocalHourArcPast = Suncreator.createDialLocalHourArc();
-        dialLocalHourArcPast.setStroke(Sunconfig.Color_Of_MinutesArc);
+        dialLocalHourArcPast.setStroke(Color.WHITE);
         dialLocalHourArcPast.setStyle(Sunconfig.LOCALHOUR_PAST_GLOW);
         dialLocalHourArcPast.setBlendMode(BlendMode.LIGHTEN);
         dialLocalHourArcPast.setOpacity(Sunconfig.DIAL_LOCAL_ARC_PAST_OPACITY);
@@ -536,7 +537,7 @@ public class Sundial {
         sunHighNoon.setMatrixAngleLook(Sunconfig.Color_Of_HighNoon, Sunconfig.MATRIX_SHADOW4);
         sunHighNoon.setMatrixDayLengthLook(Color.WHITE, Sunconfig.MATRIX_SHADOW);
         sunHighNoon.setOpacity(Sunconfig.HIGHNOON_NORMAL_OPACITY);
-        sunHighNoon.setVisible(sunHighNoonVisibleEh);
+//        sunHighNoon.setVisible(sunHighNoonVisibleEh);
 
         sunHighNoonScale = new Scale();
         sunHighNoonScale.setPivotX(Sunconfig.CENTER_X);
@@ -634,7 +635,7 @@ public class Sundial {
                     double outerControlsGroupOpacity = outerControlsGroup.opacityProperty().get();
                     double masterTimeGroupOpacity = masterTimeGroup.opacityProperty().get();
                     return (masterTimeGroupOpacity < outerControlsGroupOpacity && outerControlsGroupOpacity > 0.5) ?
-                            0.5 : outerControlsGroupOpacity;
+                            0.5 : Sunconfig.DATE_OFF_OPACITY + outerControlsGroupOpacity * (1 - Sunconfig.DATE_OFF_OPACITY);
                 },
                 outerControlsGroup.opacityProperty(), masterTimeGroup.opacityProperty()
         ));
@@ -698,6 +699,10 @@ public class Sundial {
         matrixDayLength.opacityProperty().bind(outerControlsGroup.opacityProperty());
         dialHourMatrixMarkerGroup.opacityProperty().bind(outerControlsGroup.opacityProperty());
         dialHourLineMarkerGroupB.opacityProperty().bind(outerControlsGroup.opacityProperty());
+        dialHourLineMarkerGroupA.opacityProperty().bind(Bindings.createDoubleBinding(() ->
+                        0.25 + outerControlsGroup.opacityProperty().get() * 0.50,
+                outerControlsGroup.opacityProperty()
+        ));
 
         // Info overlay
         infoText = new Text();
@@ -705,7 +710,7 @@ public class Sundial {
 
         // Help overlay
         helpMarkers = new ArrayList<>();
-//        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup, null,  null));
+        helpMarkers.add(Suncreator.createHelpMarker(dialHighNoonGroup, null,  null));
         helpMarkers.add(Suncreator.createHelpMarker(matrixHour, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(matrixMinute, null, null));
         helpMarkers.add(Suncreator.createHelpMarker(matrixDay, null, null));
@@ -742,12 +747,12 @@ public class Sundial {
 
         // LAYERS
         Group foregroundGroup = new Group(
-                dialMarginCircle
+                 dialMarginCircle
                 ,dialCircleBackground
-//                ,dialHourLineMarkerGroupA
                 ,dialArcNight
                 ,dialArcHalfNight
                 ,globeMasterGroup
+                ,dialHourLineMarkerGroupA
                 ,dialCircleFrame
 //                ,dialMidnightGroup
                 ,dialMiddayGroup
@@ -763,14 +768,14 @@ public class Sundial {
                 ,sunHighNoon
                 ,horizonGroup
                 ,dialLocalHourArcFuture
-                ,dialLocalHourArcPast
+//                ,dialLocalHourArcPast
                 ,dialHourLineMarkerGroupB
                 ,arcHourGroup
                 ,dialLocalHourSuperNiceArc
                 ,dialCircleCenterPoint
                 ,cetusTimer
                 ,orbVallisTimer
-                ,matrixDayLength
+//                ,matrixDayLength
                 ,masterTimeGroup
                 ,masterCoordinatesGroup
                 ,outerControlsGroup
@@ -832,8 +837,8 @@ public class Sundial {
 //        matrixDayLength.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HORIZON); matrixDayLength.setCursor(Cursor.HAND); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_GLOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_GLOW); });
 //        matrixDayLength.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixDayLength.setCursor(Cursor.DEFAULT); setGroupGlow(matrixDayLength, Sunconfig.MATRIX_SHADOW); dialArcDayLength.setStyle(Sunconfig.MATRIX_SHADOW); });
 
-//        dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); setGroupGlow(dialHighNoonGroup, Sunconfig.LOCALNOON_DIAL_HOT); });
-//        dialHighNoonGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialHighNoonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(dialHighNoonGroup, Sunconfig.LOCALNOON_DIAL_GLOW); });
+        dialHighNoonGroup.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_HIGHNOON); dialHighNoonGroup.setCursor(Cursor.HAND); setGroupGlow(dialHighNoonGroup, Sunconfig.LOCALNOON_DIAL_HOT); });
+        dialHighNoonGroup.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); dialHighNoonGroup.setCursor(Cursor.DEFAULT); setGroupGlow(dialHighNoonGroup, ""); });
 
         matrixTimeZone.setOnMouseEntered(event -> { helpText.setText(Sunconfig.HELPTEXT_TIMEZONE); matrixTimeZone.setCursor(Cursor.V_RESIZE); matrixTimeZone.setStyle(Sunconfig.MATRIX_GLOW); });
         matrixTimeZone.setOnMouseExited(event -> { helpText.setText(Sunconfig.HELPTEXT_DEFAULT); matrixTimeZone.setCursor(Cursor.DEFAULT); matrixTimeZone.setStyle(Sunconfig.MATRIX_SHADOW); });
@@ -1484,11 +1489,11 @@ public class Sundial {
                 .append(glowStrengthEnd).append(",")
                 .append("0, 0);");
 
-        hourMarkerMatrixList.get(hourIndexStart).setStyle(hourStyleStart.toString());
-        hourMarkerMatrixList.get(hourIndexEnd).setStyle(hourStyleEnd.toString());
-
         hourMarkerMatrixList.get(hourIndexStart).setOpacity(opacityStart);
         hourMarkerMatrixList.get(hourIndexEnd).setOpacity(opacityEnd);
+
+        hourMarkerMatrixList.get(hourIndexStart).setStyle(hourStyleStart.toString());
+        hourMarkerMatrixList.get(hourIndexEnd).setStyle(hourStyleEnd.toString());
 
         int cetusMarkerRotateListSize = cetusMarkerRotateList.size();
         for (int i = 0; i < cetusMarkerRotateListSize; i++) {
@@ -1536,7 +1541,9 @@ public class Sundial {
     private void updateHourArc(GregorianCalendar gregorianCalendar) {
 
         double startAngle = ((gregorianCalendar.get(Calendar.HOUR_OF_DAY) + 12) % 24) * 15;
-        double midAngle = startAngle + (gregorianCalendar.get(Calendar.MINUTE) / 60d) * 15;
+        double midAngle = startAngle
+                + (gregorianCalendar.get(Calendar.MINUTE) / 60d) * 15
+                + (gregorianCalendar.get(Calendar.SECOND) / 3600d) * 15;
         double endAngle = startAngle + 15;
 
         double adjustedStartAngle = Sunutil.getNightCompressionAngle(startAngle, nightCompression);
@@ -1863,13 +1870,7 @@ public class Sundial {
     }
 
     public void toggleSunHighNoon() {
-
-        sunHighNoonVisibleEh = !sunHighNoonVisibleEh;
-
-        matrixDayLength.setVisible(!sunHighNoonVisibleEh);
-//        dialArcDayLength.setVisible(!sunHighNoonVisibleEh);
-
-        sunHighNoon.setVisible(sunHighNoonVisibleEh);
+        sunHighNoon.toggleDetails();
     }
 
     public void fadeOutInfoText(long millis) {

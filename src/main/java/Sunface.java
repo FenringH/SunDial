@@ -380,7 +380,7 @@ public class Sunface extends Application {
         sundial.getMatrixWeek().setOnMouseDragged(event -> offsetTimeByEvent(OffsetType.WEEK, event));
         sundial.getMatrixWeek().setOnScroll(event -> offsetTimeByEvent(OffsetType.WEEK, event));
 
-//        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleSunHighNoon());
+        sundial.getDialHighNoonGroup().setOnMouseClicked(event -> sundial.toggleSunHighNoon());
 
         sundial.getMiroTextGroup().setOnMouseClicked(event -> openBrowser(event, Sunconfig.MIRO_URL));
 
@@ -409,7 +409,7 @@ public class Sunface extends Application {
         timeline.play();
 
         sundial.hideOuterControlsGroup();
-        sundial.toggleSunHighNoon();
+//        sundial.toggleSunHighNoon();
 
         primaryStage.show();
 

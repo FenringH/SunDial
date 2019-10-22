@@ -1,3 +1,5 @@
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
@@ -40,6 +42,8 @@ public class SunHighNoon extends Group {
 
     private double centerX, centerY, radius, angle, marginX, marginY;
 
+    private boolean detailsVisible;
+
     public SunHighNoon(double radius, Rotate rotate) {
         this(0, 0, radius, 1, rotate);
     }
@@ -47,6 +51,8 @@ public class SunHighNoon extends Group {
     public SunHighNoon(double centerX, double centerY, double radius, double matrixScale, Rotate rotate) {
 
         super();
+
+        detailsVisible = false;
 
         marginX = radius * 0.40;
         marginY = radius * 0.05;
@@ -102,6 +108,9 @@ public class SunHighNoon extends Group {
 
             markerGroup.getChildren().add(line);
         }
+
+        matrixTime.setVisible(detailsVisible);
+        matrixAngle.setVisible(detailsVisible);
 
         super.getChildren().addAll(/*sunLine, markerGroup, horizonLine, sunDot, arc,*/ matrixDayLength, matrixTime, matrixAngle);
 //        super.getTransforms().add(rotate);
@@ -213,5 +222,10 @@ public class SunHighNoon extends Group {
         matrixDayLength.setStyle(style);
     }
 
+    public void toggleDetails() {
+        detailsVisible = !detailsVisible;
+        matrixTime.setVisible(detailsVisible);
+        matrixAngle.setVisible(detailsVisible);
+    }
 
 }

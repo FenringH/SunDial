@@ -2,6 +2,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
@@ -35,11 +36,14 @@ public class SuperNiceArc extends Group {
     private Arc mainArc;
     private Polygon startPoly;
     private Polygon endPoly;
+    private Polygon dial;
     private CubicCurve startCurve;
     private CubicCurve endCurve;
 
     private Rotate startLineRotate;
     private Rotate endLineRotate;
+
+    private Group niceArc;
 
     public SuperNiceArc(PleaseBuild builder) {
 
@@ -243,13 +247,24 @@ public class SuperNiceArc extends Group {
                 -0.5 * strokeWidth, -endPolyHeight,
                 -0.25, -radiusBig,
                 0.25, -radiusBig,
-                0.5 * strokeWidth, -endPolyHeight,
-                0, -(endPolyHeight - endLineExtension)
+                0.5 * strokeWidth, -endPolyHeight
         );
         endPoly.setStroke(Color.TRANSPARENT);
         endPoly.getTransforms().add(endLineRotate);
 
-        super.getChildren().addAll(startPoly, startCurve, mainArc, endCurve, endPoly);
+        // 6) dial
+        dial = new Polygon(
+                -0.5 * strokeWidth, -radiusSmol,
+                0, -radiusBig,
+                0.5 * strokeWidth, -radiusSmol,
+                0, -(endPolyHeight - endLineExtension)
+        );
+        dial.setStroke(Color.TRANSPARENT);
+        dial.getTransforms().add(endLineRotate);
+
+        niceArc = new Group(startPoly, startCurve, mainArc, endCurve, endPoly);
+
+        super.getChildren().addAll(dial, niceArc);
         super.setTranslateX(centerX);
         super.setTranslateY(centerY);
     }
@@ -257,7 +272,7 @@ public class SuperNiceArc extends Group {
     private double getLength() {
         double start = startAngle.get();
         double end = endAngle.get();
-        return (start < end) ? -(end - start) : -(end + start);
+        return (start <= end) ? -(end - start) : -(end + start);
     }
 
     private double getStartReductionAngle() {
@@ -281,7 +296,7 @@ public class SuperNiceArc extends Group {
         this.endAngle.set(endAngle);
     }
 
-    public void setStrokeColor(Color color) {
+    public void setNiceArcColor(Color color) {
         startLine.setStroke(color);
         endLine.setStroke(color);
         mainArc.setStroke(color);
@@ -289,6 +304,26 @@ public class SuperNiceArc extends Group {
         endPoly.setFill(color);
         startCurve.setStroke(color);
         endCurve.setStroke(color);
+    }
+
+    public void setDialColor(Color color) {
+        dial.setFill(color);
+    }
+
+    public void setNiceArcStyle(String style) {
+        niceArc.setStyle(style);
+    }
+
+    public void setNiceArcBlendMode(BlendMode blendMode) {
+        niceArc.setBlendMode(blendMode);
+    }
+
+    public void setDialStyle(String style) {
+        dial.setStyle(style);
+    }
+
+    public void setDialBlendMode(BlendMode blendMode) {
+        dial.setBlendMode(blendMode);
     }
 
     // Builder
