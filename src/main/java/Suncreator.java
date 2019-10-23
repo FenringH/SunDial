@@ -1527,8 +1527,8 @@ public class Suncreator {
                 0.25, Sunconfig.CENTER_Y + polyStart,
                 -0.25, Sunconfig.CENTER_Y + polyStart,
                 -0.5 * Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH, Sunconfig.CENTER_Y + polyMid,
-                -0.25, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y,
-                0.25, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y,
+                -0.25, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y - Sunconfig.MARKER_MINUTE_LENGTH * 2,
+                0.25, Sunconfig.CENTER_Y * 2 - Sunconfig.MARGIN_Y - Sunconfig.MARKER_MINUTE_LENGTH * 2,
                 0.5 * Sunconfig.SUPER_NICE_ARC_STROKE_WIDTH, Sunconfig.CENTER_Y + polyMid
         );
         polygon.setTranslateX(Sunconfig.CENTER_X);

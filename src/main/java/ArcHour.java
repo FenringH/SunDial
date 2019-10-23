@@ -1,3 +1,5 @@
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
@@ -6,52 +8,74 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.transform.Rotate;
 
 public class ArcHour extends Group {
 
     private double DEFAULT_WIDTH = 5.0d;
     private double DEFAULT_SHADOW_OPACITY = 0.5d;
     private double DEFAULT_LINE_LENGTH = 10.0d;
+    private double DEFAULT_MATRIX_SCALE = 0.5;
+    private double DEFAULT_MATRIX_OPACITY = 0.75;
 
     private double centerX;
     private double centerY;
     private double radius;
+
+    private Rotate rotate;
 
     private Arc arcMinuteProgress;
     private Arc arcMinuteShadow;
     private Arc arcSecondProgress;
     private Arc arcSecondShadow;
 
+    private Group minutesMarkerMatrixGroup;
+    private Group secondsMarkerMatrixGroup;
+
     private Line lineStart;
     private Line lineEnd;
 
-    public ArcHour(double centerX, double centerY, double radius) {
+    public ArcHour(double centerX, double centerY, double radius, Rotate rotate) {
 
         super();
 
         this.centerX = centerX;
         this.centerY = centerY;
         this.radius = radius;
+        this.rotate = rotate;
 
         createArcHour();
+
+        Group subGroup = new Group(
+                minutesMarkerMatrixGroup, secondsMarkerMatrixGroup,
+                lineStart, lineEnd, arcMinuteShadow, arcSecondShadow, arcMinuteProgress, arcSecondProgress
+        );
+        subGroup.setTranslateX(centerX);
+        subGroup.setTranslateY(centerY);
+
+        super.getChildren().add(subGroup);
+        super.getTransforms().add(this.rotate);
     }
 
     private void createArcHour() {
 
-        double secondsOffsetAngle = 90d / 60d;
+        double secondsOffsetAngle = 90d / 75d;
 
-        double segmentLength = (radius * Math.PI) / 60;
+        double segmentLength = (radius * Math.PI) / 59d;
         double dashLengthFull = segmentLength * (1d/20d);
         double dashLengthEmpty = segmentLength - dashLengthFull;
 
-        arcMinuteProgress = new Arc(0, 0, radius, radius, 0, -90);
+        double arcMinuteRadius = radius;
+        double arcSecondRadius = radius + DEFAULT_WIDTH * 0.5;
+
+        arcMinuteProgress = new Arc(0, 0, arcMinuteRadius, arcMinuteRadius, 0, -90);
         arcMinuteProgress.setType(ArcType.OPEN);
         arcMinuteProgress.setStrokeLineCap(StrokeLineCap.ROUND);
         arcMinuteProgress.setStrokeWidth(DEFAULT_WIDTH);
         arcMinuteProgress.setStroke(Color.WHITE);
         arcMinuteProgress.setFill(Color.TRANSPARENT);
 
-        arcMinuteShadow = new Arc(0, 0, radius, radius, 0, -180);
+        arcMinuteShadow = new Arc(0, 0, arcMinuteRadius, arcMinuteRadius, 0, -180);
         arcMinuteShadow.setType(ArcType.OPEN);
         arcMinuteShadow.setStrokeLineCap(StrokeLineCap.ROUND);
         arcMinuteShadow.setStrokeWidth(DEFAULT_WIDTH);
@@ -60,7 +84,7 @@ public class ArcHour extends Group {
         arcMinuteShadow.setBlendMode(BlendMode.OVERLAY);
         arcMinuteShadow.setOpacity(DEFAULT_SHADOW_OPACITY);
 
-        arcSecondProgress = new Arc(0, 0, radius, radius, 180 - secondsOffsetAngle, -90);
+        arcSecondProgress = new Arc(0, 0, arcSecondRadius, arcSecondRadius, 180 - secondsOffsetAngle, -90);
         arcSecondProgress.setType(ArcType.OPEN);
         arcSecondProgress.setStrokeLineCap(StrokeLineCap.ROUND);
         arcSecondProgress.setStrokeWidth(DEFAULT_WIDTH);
@@ -69,7 +93,7 @@ public class ArcHour extends Group {
         arcSecondProgress.setStroke(Color.WHITE);
         arcSecondProgress.setFill(Color.TRANSPARENT);
 
-        arcSecondShadow = new Arc(0, 0, radius, radius, 180 - secondsOffsetAngle, -180 + secondsOffsetAngle * 2);
+        arcSecondShadow = new Arc(0, 0, arcSecondRadius, arcSecondRadius, 180 - secondsOffsetAngle, -180 + secondsOffsetAngle * 2);
         arcSecondShadow.setType(ArcType.OPEN);
         arcSecondShadow.setStrokeLineCap(StrokeLineCap.ROUND);
         arcSecondShadow.setStrokeWidth(DEFAULT_WIDTH);
@@ -94,9 +118,50 @@ public class ArcHour extends Group {
         lineEnd.setBlendMode(BlendMode.OVERLAY);
         lineEnd.setOpacity(DEFAULT_SHADOW_OPACITY);
 
-        super.getChildren().addAll(lineStart, lineEnd, arcMinuteShadow, arcSecondShadow, arcMinuteProgress, arcSecondProgress);
-        super.setTranslateX(centerX);
-        super.setTranslateY(centerY);
+        minutesMarkerMatrixGroup = new Group();
+        secondsMarkerMatrixGroup = new Group();
+
+        double matrixRadius = radius - 8;
+
+        for (int i = 1; i < 60; i++) {
+
+            if (i % 10 == 0) {
+
+                double x = matrixRadius * Math.cos(Math.toRadians(i * 3));
+                double y = matrixRadius * Math.sin(Math.toRadians(i * 3));
+
+                DotMatrix dotMatrix = new DotMatrix(i + "", Color.WHITE);
+                dotMatrix.setStyle(Sunconfig.LOCALMINUTE_GLOW);
+                dotMatrix.setOpacity(DEFAULT_MATRIX_OPACITY);
+                dotMatrix.setScaleX(DEFAULT_MATRIX_SCALE);
+                dotMatrix.setScaleY(DEFAULT_MATRIX_SCALE);
+                dotMatrix.setTranslateX(x - dotMatrix.getLayoutBounds().getWidth() / 2);
+                dotMatrix.setTranslateY(y - dotMatrix.getLayoutBounds().getHeight() / 2);
+                dotMatrix.rotateProperty().bind(Bindings.createDoubleBinding(() ->
+                        -rotate.angleProperty().get(), rotate.angleProperty()
+                ));
+
+                minutesMarkerMatrixGroup.getChildren().add(dotMatrix);
+            }
+
+            if (i % 5 == 0) {
+                double x = matrixRadius * Math.cos(Math.toRadians(i * 3 + 180));
+                double y = matrixRadius * Math.sin(Math.toRadians(i * 3 + 180));
+
+                DotMatrix dotMatrix = new DotMatrix(i + "", Color.WHITE);
+                dotMatrix.setStyle(Sunconfig.LOCALSECOND_GLOW);
+                dotMatrix.setOpacity(DEFAULT_MATRIX_OPACITY);
+                dotMatrix.setScaleX(DEFAULT_MATRIX_SCALE);
+                dotMatrix.setScaleY(DEFAULT_MATRIX_SCALE);
+                dotMatrix.setTranslateX(x - dotMatrix.getLayoutBounds().getWidth() / 2);
+                dotMatrix.setTranslateY(y - dotMatrix.getLayoutBounds().getHeight() / 2);
+                dotMatrix.rotateProperty().bind(Bindings.createDoubleBinding(() ->
+                        -rotate.angleProperty().get(), rotate.angleProperty()
+                ));
+
+                secondsMarkerMatrixGroup.getChildren().add(dotMatrix);
+            }
+        }
     }
 
     public void setWidth(double width) {
@@ -159,5 +224,10 @@ public class ArcHour extends Group {
     public void setTime(int minutes, int seconds) {
         arcSecondProgress.setLength(-(seconds / 60d) * 180);
         arcMinuteProgress.setLength(-(minutes / 60d) * 180 - (seconds / 3600d) * 180);
+    }
+
+    public void setMatrixOpacityBinding(DoubleProperty opacityProperty) {
+        minutesMarkerMatrixGroup.opacityProperty().bind(opacityProperty);
+        secondsMarkerMatrixGroup.opacityProperty().bind(opacityProperty);
     }
 }

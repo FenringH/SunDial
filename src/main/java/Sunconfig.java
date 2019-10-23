@@ -248,7 +248,7 @@ public class Sunconfig {
     public static final double LOCALTIME_HOUR_MID_WIDTH = 14.0d;
     public static final double LOCALTIME_MINUTE_WIDTH = 8.0d;
     public static final double HIGHNOON_DIAL_SHORT_LENGTH = CENTER_Y - DOT_RADIUS_BIGH;
-    public static final double DAYLENGTH_ARC_RADIUS = 125.0d;
+    public static final double DAYLENGTH_ARC_RADIUS = 117.0d;
     public static final double HIGHNOON_DIAL_WIDTH = 1.75d;
     public static final double HIGHNOON_DIAL_LENGTH = CENTER_Y - DAYLENGTH_ARC_RADIUS * 0.15;
     public static final double DAY_ARC_MARGIN = 11.0d;
@@ -287,7 +287,7 @@ public class Sunconfig {
     public static final double CETUS_ARC_LENGTH = CENTER_Y - DOT_RADIUS_SMOL;
     public static final double SUNHIGHNOON_RADIUS = 130;
     public static final double SUNDOT_RADIUS = 4.5;
-    public static final double SUPER_NICE_ARC_RADIUS_SMOL = 180;
+    public static final double SUPER_NICE_ARC_RADIUS_SMOL = 176;
     public static final double SUPER_NICE_ARC_END_EXTENSION = SUPER_NICE_ARC_RADIUS_SMOL - DOT_RADIUS_SMOL;
     public static final double SUPER_NICE_ARC_START_EXTENSION = 140;
     public static final double MINUTE_ARC_RADIUS = (SUPER_NICE_ARC_RADIUS_SMOL + (CENTER_Y - MARGIN_Y)) * 0.5;
@@ -364,12 +364,12 @@ public class Sunconfig {
     public static final double LOCAL_HOUR_MARKER_OPACITY = 0.65d;
     public static final double LOCAL_HOUR_MARKER_ON_OPACITY = 0.85d;
     public static final double LOCAL_HOUR_MARKER_OFF_OPACITY = 0.00d;
-    public static final double LOCAL_HOUR_MARKER_OFF_ON_OPACITY = 0.90d;
+    public static final double LOCAL_HOUR_MARKER_OFF_ON_OPACITY = 0.95d;
     public static final double DIAL_HIGH_NOON_OPACITY = 0.75d;
     public static final double DIAL_LOCAL_ARC_NORMAL_OPACITY = 1.00;
     public static final double DIAL_LOCAL_ARC_DOWN_OPACITY = 0.00;
     public static final double DIAL_LOCAL_ARC_FUTURE_OPACITY = 0.60;
-    public static final double DIAL_LOCAL_ARC_PAST_OPACITY = 0.75;
+    public static final double DIAL_LOCAL_ARC_PAST_OPACITY = 0.40;
     public static final double ARCHOUR_PROGRESS_OPACITY = 1.00;
     public static final double ARCHOUR_SHADOW_OPACITY = 0.50;
 
@@ -410,7 +410,7 @@ public class Sunconfig {
     public static final double ORBVALLIS_HORIZON_OFFSET = 40.0d;
     public static final double MATRIX_TIMEZONE_OFFSET = CENTER_Y - 48.0d;
     public static final double HELP_TEXT_OFFSET = 10.0d;
-    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 42;
+    public static final double MATRIX_LONGITUDE_OFFSET = MARGIN_Y + 50;
     public static final double MATRIX_LATITUDE_OFFSET = MATRIX_LONGITUDE_OFFSET + 25;
     public static final double CONTROL_DST_OFFSET_X = CENTER_X;
     public static final double CONTROL_DST_OFFSET_Y = CENTER_Y;

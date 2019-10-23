@@ -54,8 +54,12 @@ public class SunHighNoon extends Group {
 
         detailsVisible = false;
 
-        marginX = radius * 0.40;
-        marginY = radius * 0.05;
+        marginX = radius * 0.05;
+        marginY = radius * 0.04;
+
+        double matrixDayLengthScale = matrixScale * 1.00;
+        double matrixTimeScale      = matrixScale * 0.90;
+        double matrixAngleScale     = matrixScale * 0.70;
 
         this.centerX = centerX;
         this.centerY = centerY;
@@ -76,23 +80,26 @@ public class SunHighNoon extends Group {
         sunDot.setFill(SUNDOT_COLOR);
         sunDot.setStroke(Color.TRANSPARENT);
 
-        matrixTime = new DotMatrix("12:00:00", TIME_COLOR);
-        matrixTime.setScaleX(matrixScale * 0.85);
-        matrixTime.setScaleY(matrixScale * 0.85);
-        matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() / 2);
-        matrixTime.setTranslateY(centerY - radius * 1.02 + matrixTime.getLayoutBounds().getHeight());
+        matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
+        matrixAngle.setScaleX(matrixAngleScale);
+        matrixAngle.setScaleY(matrixAngleScale);
+        matrixAngle.setTranslateX(centerX - matrixAngle.getLayoutBounds().getWidth() / 2);
+//        matrixAngle.setTranslateY(matrixDayLength.getTranslateY() + matrixAngle.getLayoutBounds().getHeight() + marginY);
+        matrixAngle.setTranslateY(centerY - radius * 1.06 + matrixAngle.getLayoutBounds().getHeight());
 
         matrixDayLength = new DotMatrix("00h00m00s", DAYLENGTH_COLOR);
-        matrixDayLength.setScaleX(matrixScale);
-        matrixDayLength.setScaleY(matrixScale);
+        matrixDayLength.setScaleX(matrixDayLengthScale);
+        matrixDayLength.setScaleY(matrixDayLengthScale);
         matrixDayLength.setTranslateX(centerX - matrixDayLength.getLayoutBounds().getWidth() / 2);
-        matrixDayLength.setTranslateY(matrixTime.getTranslateY() + matrixDayLength.getLayoutBounds().getHeight() + marginY);
+        matrixDayLength.setTranslateY(matrixAngle.getTranslateY() + matrixDayLength.getLayoutBounds().getHeight() + marginY * matrixAngleScale);
+//        matrixDayLength.setTranslateY(centerY - radius * 0.95 + matrixDayLength.getLayoutBounds().getHeight());
 
-        matrixAngle = new DotMatrix("45.0^N", ANGLE_COLOR);
-        matrixAngle.setScaleX(matrixScale * 0.85);
-        matrixAngle.setScaleY(matrixScale * 0.85);
-        matrixAngle.setTranslateX(centerX - matrixAngle.getLayoutBounds().getWidth() / 2);
-        matrixAngle.setTranslateY(matrixDayLength.getTranslateY() + matrixAngle.getLayoutBounds().getHeight() + marginY);
+        matrixTime = new DotMatrix("12:00:00", TIME_COLOR);
+        matrixTime.setScaleX(matrixTimeScale);
+        matrixTime.setScaleY(matrixTimeScale);
+        matrixTime.setTranslateX(centerX - matrixTime.getLayoutBounds().getWidth() / 2);
+        matrixTime.setTranslateY(matrixDayLength.getTranslateY() + matrixTime.getLayoutBounds().getHeight() + marginY * matrixDayLengthScale);
+//        matrixTime.setTranslateY(centerY - radius * 1.02 + matrixTime.getLayoutBounds().getHeight());
 
         markerGroup = new Group();
 

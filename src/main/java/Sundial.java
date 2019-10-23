@@ -462,10 +462,12 @@ public class Sundial {
 
         dialLocalHourSuperNiceArc = Suncreator.createDialLocalHourSuperNiceArc();
 
+/*
         dialLocalHourSuperNiceArc.opacityProperty().bind(Bindings.createDoubleBinding(() ->
                         1 - globeMasterGroup.opacityProperty().get() * 0.5,
                 globeMasterGroup.opacityProperty()
         ));
+*/
 
         dialMidnightGroup = Suncreator.createDialMidnightGroup(Color.WHITE, Sunconfig.LOCALMIDNIGHT_DIAL_GLOW, 0);
 
@@ -473,7 +475,7 @@ public class Sundial {
         dialMiddayGroup.setBlendMode(BlendMode.OVERLAY);
         dialMiddayGroup.setOpacity(0.75);
 
-        arcHour = new ArcHour(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.MINUTE_ARC_RADIUS);
+        arcHour = new ArcHour(Sunconfig.CENTER_X, Sunconfig.CENTER_Y, Sunconfig.MINUTE_ARC_RADIUS, arcHourRotate);
         arcHour.setWidth(Sunconfig.ARCHOUR_STROKE_WIDTH);
         arcHour.setMinuteStroke(Sunconfig.Color_Of_Minutes);
         arcHour.setMinuteStyle(Sunconfig.LOCALMINUTE_GLOW);
@@ -486,18 +488,16 @@ public class Sundial {
         arcHour.setShadowOpacity(Sunconfig.ARCHOUR_SHADOW_OPACITY);
         arcHour.setMouseTransparent(true);
 
-        arcHourGroup = new Group(arcHour);
-        arcHourGroup.getTransforms().addAll(arcHourRotate);
-
-        arcHourGroup.opacityProperty().bind(Bindings.createDoubleBinding(() ->
+        arcHour.opacityProperty().bind(Bindings.createDoubleBinding(() ->
                         1 - globeMasterGroup.opacityProperty().get() * 0.5,
                 globeMasterGroup.opacityProperty()
         ));
 
+
         dialLocalHourArcPast = Suncreator.createDialLocalHourArc();
         dialLocalHourArcPast.setStroke(Color.WHITE);
-        dialLocalHourArcPast.setStyle(Sunconfig.LOCALHOUR_PAST_GLOW);
-        dialLocalHourArcPast.setBlendMode(BlendMode.LIGHTEN);
+//        dialLocalHourArcPast.setStyle(Sunconfig.LOCALHOUR_PAST_GLOW);
+        dialLocalHourArcPast.setBlendMode(BlendMode.OVERLAY);
         dialLocalHourArcPast.setOpacity(Sunconfig.DIAL_LOCAL_ARC_PAST_OPACITY);
 
         dialLocalHourArcFuture = Suncreator.createDialLocalHourArc();
@@ -672,9 +672,13 @@ public class Sundial {
         masterCoordinatesGroup.setOpacity(0);
 //        masterCoordinatesGroup.setVisible(false);
         masterCoordinatesGroup.setTranslateY(150);
+        masterCoordinatesGroup.setMouseTransparent(true);
 
         coordinatesMoveOutTimeline = Suncreator.createCoordinatesTimeline(Suncreator.TimelineDirection.OUT, masterCoordinatesGroup);
+        coordinatesMoveOutTimeline.setOnFinished(event -> masterCoordinatesGroup.setMouseTransparent(false) );
+
         coordinatesMoveInTimeline = Suncreator.createCoordinatesTimeline(Suncreator.TimelineDirection.IN, masterCoordinatesGroup);
+        coordinatesMoveInTimeline.setOnFinished(event -> masterCoordinatesGroup.setMouseTransparent(true) );
 
         // Other stuff
         dialMarginCircle = Suncreator.createDialMarginCircle();
@@ -703,6 +707,7 @@ public class Sundial {
                         0.25 + outerControlsGroup.opacityProperty().get() * 0.50,
                 outerControlsGroup.opacityProperty()
         ));
+        arcHour.setMatrixOpacityBinding(outerControlsGroup.opacityProperty());
 
         // Info overlay
         infoText = new Text();
@@ -768,9 +773,9 @@ public class Sundial {
                 ,sunHighNoon
                 ,horizonGroup
                 ,dialLocalHourArcFuture
-//                ,dialLocalHourArcPast
+                ,dialLocalHourArcPast
                 ,dialHourLineMarkerGroupB
-                ,arcHourGroup
+                ,arcHour
                 ,dialLocalHourSuperNiceArc
                 ,dialCircleCenterPoint
                 ,cetusTimer
