@@ -332,7 +332,10 @@ public class Sunface extends Application {
         sundial.getCetusMarkerGroup().setOnMouseReleased(event -> { frameActions(primaryStage, event); killMouse(); globeCheck(); });
         sundial.getCetusMarkerGroup().setOnMouseDragged(event -> frameDrag(primaryStage, event) );
 
-        sundial.getTinyGlobeGroup().setOnMouseClicked(event -> tinyGlobeActions(event));
+//        sundial.getTinyGlobeGroup().setOnMouseClicked(event -> tinyGlobeActions(event));
+        sundial.getTinyGlobeGroup().setOnMousePressed(event -> saveMouse(primaryStage, event));
+        sundial.getTinyGlobeGroup().setOnMouseReleased(event -> { tinyGlobeActions(event); killMouse(); });
+        sundial.getTinyGlobeGroup().setOnMouseDragged(event -> tinyGlobeDrag(event) );
         sundial.getTinyGlobeGroup().setOnDragOver(event -> checkDragAndDropString(event));
         sundial.getTinyGlobeGroup().setOnDragDropped(event -> rotateGlobe(PositionType.GOOGLE_MAPS, event));
 
@@ -1289,20 +1292,6 @@ public class Sunface extends Application {
             return;
         }
 
-/*
-        // RMB action (toggle Kriegsrahmen time)
-        if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-
-            if (mouseEvent.isShiftDown()) {
-                toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.ORB_VALLIS, mouseEvent);
-            } else {
-                toggleKriegsrahmenZeit(KriegsrahmenZeit.Location.CETUS, mouseEvent);
-            }
-
-            return;
-        }
-*/
-
         // MMB action (reset Coordinates)
         if (mouseEvent.getButton().equals(MouseButton.MIDDLE)) {
             resetGlobePosition(sundial, PositionType.BOTH);
@@ -1510,9 +1499,16 @@ public class Sunface extends Application {
     private void frameDrag(Stage stage, MouseEvent event) {
 
         if (sundial.getGlobeVisibleEh()) {
-            rotateGlobe(sundial, event);
+            rotateGlobe(sundial, event, 1.0d);
         } else {
             changeWindowPosition(stage, event);
+        }
+    }
+
+    private void tinyGlobeDrag(MouseEvent event) {
+
+        if (!mouseButtonList.isEmpty() && mouseButtonList.contains(MouseButton.SECONDARY)) {
+            rotateGlobe(sundial, event, Sunconfig.TINYGLOBE_ROTATE_MODIFIER);
         }
     }
 
@@ -1583,7 +1579,7 @@ public class Sunface extends Application {
         stage.setY(newPositionY);
     }
 
-    private void rotateGlobe(Sundial sundial, MouseEvent event) {
+    private void rotateGlobe(Sundial sundial, MouseEvent event, double precisionModifier) {
 
         if(getLastButton().equals(MouseButton.MIDDLE)) { return; }
 
@@ -1596,8 +1592,11 @@ public class Sunface extends Application {
         savedMouseX = mouseScreenX;
         savedMouseY = mouseScreenY;
 
-        double precision = 4;
-        if (event.isSecondaryButtonDown()) { precision = 100; }
+        double precision = Sunconfig.GLOBE_ROTATE_PRECISION_NORMAL * precisionModifier;
+
+        if (event.isSecondaryButtonDown()) {
+            precision = Sunconfig.GLOBE_ROTATE_PRECISION_FINE * precisionModifier;
+        }
 
         longitude += round((deltaLongitude / precision) * 100) / 100d;
         latitude -= round((deltaLatitude / precision) * 100) / 100d;

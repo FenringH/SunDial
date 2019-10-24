@@ -177,7 +177,7 @@ public class Sunconfig {
 
     public static final String HELPTEXT_TINYGLOBE = "TINY GLOBE" +
             "\n LMB : toggle Globe-mode\u2122" +
-            "\n RMB : toggle Cetus time" +
+            "\n RMB + drag : rotate Globe" +
             "\n MMB : reset Coordinates to DEFAULT" +
             "\n DRAG-DROP : drag and drop GoogleMaps url ..." +
             "\n  ... to set DEFAULT Coordinates";
@@ -189,8 +189,8 @@ public class Sunconfig {
             "\n LMB : toggle Equator, Tropic and Polar circles";
 
     public static final String HELPTEXT_GLOBE = "GLOBE" +
-            "\n LMB : rotate Globe (fast)" +
-            "\n RMB : rotate Globe (slow)" +
+            "\n LMB + drag : rotate Globe (fast)" +
+            "\n RMB + drag : rotate Globe (slow)" +
             "\n MMB : reset Coordinates";
 
     public static final String HELPTEXT_WINDOW = "WINDOW" +
@@ -262,7 +262,7 @@ public class Sunconfig {
     public static final double LOCALSECOND_POLY_WIDTH = 6;
     public static final double LOCALSECOND_POLY_HEIGHT = 20;
     public static final double LOCALSECOND_ROUND = 6;
-    public static final double TINYGLOBE_RADIUS = 40.0d;
+    public static final double TINYGLOBE_RADIUS = 45.0d;
     public static final double TINYGLOBE_DOT_RADIUS = 1.0d;
     public static final double CONTROL_HELP_SIZE = 20.0d;
     public static final double CONTROL_THINGY_RADIUS = 10.0d;
@@ -462,6 +462,12 @@ public class Sunconfig {
     public static final int ORBVALLIS_MARKER_DURATION = 150;        // ms
     public static final int OUTER_CONTROLS_HIDE_DURATION = 6000;    // ms
     public static final double OUTER_CONTROLS_QUICK_HIDE_DURATION = 1000;    // ms
+
+    public static final double GLOBE_ROTATE_PRECISION_NORMAL = 4.0d;
+    public static final double GLOBE_ROTATE_PRECISION_FINE = 100.0d;
+    public static final double TINYGLOBE_ROTATE_MODIFIER =
+            (GLOBE_ROTATE_PRECISION_NORMAL / GLOBE_ROTATE_PRECISION_FINE) *
+                    (TINYGLOBE_RADIUS / CENTER_X);
 
     public static final Color Color_Of_Window     = new Color(0.65, 0.85, 0.85, 1.00);
     public static final Color Color_Of_Earth      = new Color(0.85, 0.85, 0.65, 1.00);
