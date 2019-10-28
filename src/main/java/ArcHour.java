@@ -59,14 +59,14 @@ public class ArcHour extends Group {
 
     private void createArcHour() {
 
-        double secondsOffsetAngle = 90d / 75d;
-
-        double segmentLength = (radius * Math.PI) / 59d;
-        double dashLengthFull = segmentLength * (1d/20d);
-        double dashLengthEmpty = segmentLength - dashLengthFull;
-
         double arcMinuteRadius = radius;
         double arcSecondRadius = radius + DEFAULT_WIDTH * 0.5;
+
+        double secondsOffsetAngle = 90d / 60d;
+
+        double segmentLength = (arcSecondRadius * Math.PI) / 60d;
+        double dashLengthFull = segmentLength * (1d/20d);
+        double dashLengthEmpty = segmentLength - dashLengthFull;
 
         arcMinuteProgress = new Arc(0, 0, arcMinuteRadius, arcMinuteRadius, 0, -90);
         arcMinuteProgress.setType(ArcType.OPEN);

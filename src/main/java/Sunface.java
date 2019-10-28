@@ -655,22 +655,24 @@ public class Sunface extends Application {
             default: {}
         }
 
-        offsetLocalTime.set(
-                offsetLocalTime.get(Calendar.YEAR) + offsetYear,
-                offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
-                offsetLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
-                offsetLocalTime.get(Calendar.HOUR_OF_DAY),
-                offsetLocalTime.get(Calendar.MINUTE),
-                offsetLocalTime.get(Calendar.SECOND)
-        );
-
-        offsetLocalTime.setTimeInMillis(
-                offsetLocalTime.getTimeInMillis()
-                + offsetWeek * (7 * 24 * 60 * 60 * 1000)
-                + offsetHour * (60 * 60 * 1000)
-                + offsetMinute * (60 * 1000)
-                + offsetSecond * 1000
-        );
+        if (offsetType == OffsetType.YEAR || offsetType == OffsetType.MONTH || offsetType == OffsetType.DAY) {
+            offsetLocalTime.set(
+                    offsetLocalTime.get(Calendar.YEAR) + offsetYear,
+                    offsetLocalTime.get(Calendar.MONTH) + offsetMonth,
+                    offsetLocalTime.get(Calendar.DAY_OF_MONTH) + offsetDay,
+                    offsetLocalTime.get(Calendar.HOUR_OF_DAY),
+                    offsetLocalTime.get(Calendar.MINUTE),
+                    offsetLocalTime.get(Calendar.SECOND)
+            );
+        } else {
+            offsetLocalTime.setTimeInMillis(
+                    offsetLocalTime.getTimeInMillis()
+                            + offsetWeek * (7 * 24 * 60 * 60 * 1000)
+                            + offsetHour * (60 * 60 * 1000)
+                            + offsetMinute * (60 * 1000)
+                            + offsetSecond * 1000
+            );
+        }
 
         initCurrentTime();
     }
