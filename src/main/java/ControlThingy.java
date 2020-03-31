@@ -36,7 +36,6 @@ public class ControlThingy extends Group {
     private int cycles;
 
     private int cycle;
-    private boolean onEh;
 
     private Circle circle;
     private Circle overlayCircle;
@@ -81,10 +80,9 @@ public class ControlThingy extends Group {
         this.imageStyle = builder.imageStyle;
 
         this.cycle = 0;
-        this.onEh = false;
 
-        this.stateProperty = new SimpleBooleanProperty(this.onEh);
-        this.stateProperty.addListener((observable, oldValue, newValue) -> changeState(this.stateProperty.get()));
+        this.stateProperty = new SimpleBooleanProperty(false);
+        this.stateProperty.addListener((observable, oldValue, newValue) -> changeState());
 
         // LAYERS
         switch (type) {
@@ -362,16 +360,16 @@ public class ControlThingy extends Group {
     }
 
     // Methods
-    public void changeState(boolean state) {
-        onEh = state;
-        if (circle != null) { circle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
-        if (triangle != null) { triangle.setStroke(onEh ? strokeColorOn : strokeColorOff); }
-        if (dotMatrix != null) { dotMatrix.setFill(onEh ? matrixColorOn : matrixColorOff); }
+    public void changeState() {
+//        stateProperty.setValue(state);
+        if (circle != null) { circle.setStroke(stateProperty.getValue() ? strokeColorOn : strokeColorOff); }
+        if (triangle != null) { triangle.setStroke(stateProperty.getValue() ? strokeColorOn : strokeColorOff); }
+        if (dotMatrix != null) { dotMatrix.setFill(stateProperty.getValue() ? matrixColorOn : matrixColorOff); }
     }
 
     public void toggleState() {
-        onEh = !onEh;
-        changeState(onEh);
+        stateProperty.setValue(!stateProperty.getValue());
+//        changeState(invertedState);
     }
 
     public void setPosition(double x, double y) {
@@ -403,7 +401,7 @@ public class ControlThingy extends Group {
 
     // Getterers
     public boolean getState() {
-        return onEh;
+        return stateProperty.getValue();
     }
 
     public BooleanProperty stateProperty() {

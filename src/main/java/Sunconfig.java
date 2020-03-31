@@ -55,7 +55,20 @@ public class Sunconfig {
             "to form the Kwisatz Haderach, a super being.\n" +
             "They plan to control this super being and use his powers for their own selfish purposes.\n" +
             "The breeding plan has been carried out in a strict manner for 90 generations.\n" +
-            "The goal of the super being is in sight.";
+            "The goal of the super being is in sight."
+            ;
+
+    public final static String CLI_HELP_TEXT =
+            "Command line switches:\n" +
+            " -x <value> : set window X position in pixels\n" +
+            " -y <value> : set window Y position in pixels\n" +
+            " -w <value> : set window Width in pixels\n" +
+            " -h <value> : set window Height in pixels\n" +
+            " -a <value> : set custom Longitude {-180 .. 180}\n" +
+            " -b <value> : set custom Latitude {-90 .. 90}\n" +
+            " -z <value> : set Timezone {-11 .. 12}\n" +
+            " -d <value> : use Daylight Savings Time {true|false}\n"
+            ;
 
     public static final String ICON_APP_URL = "icons/sun1.png";
 

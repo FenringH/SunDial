@@ -1,6 +1,7 @@
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
@@ -26,10 +27,10 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Double.NaN;
 import static java.lang.Math.*;
 
 public class Sunface extends Application {
-
 
     private int fpsSetting = (int) floor(1000 / Sunconfig.DEFAULT_FPS);
 
@@ -37,8 +38,8 @@ public class Sunface extends Application {
     private GregorianCalendar offsetLocalTime;
     private GregorianCalendar timeZonedCalendar;
 
-    private double longitude = Sunconfig.DEFAULT_LONGITUDE;
-    private double latitude = Sunconfig.DEFAULT_LATITUDE;
+    private DoubleProperty longitude = new SimpleDoubleProperty(Sunconfig.DEFAULT_LONGITUDE);
+    private DoubleProperty latitude = new SimpleDoubleProperty(Sunconfig.DEFAULT_LATITUDE);
     private double customLongitude = Sunconfig.DEFAULT_LONGITUDE;
     private double customLatitude = Sunconfig.DEFAULT_LATITUDE;
 
@@ -60,7 +61,7 @@ public class Sunface extends Application {
     private HashMap<WindowType, Double> unmaximizedWindowSizeY;
     private Node savedNode;
 
-    private int timeZoneOffset;
+    private IntegerProperty timeZoneOffset;
     private int localTimeZoneOffset;
     private long timeZoneCorrection;
 
@@ -70,6 +71,7 @@ public class Sunface extends Application {
     private boolean firstShowPrimary = true;
 
     private TextArea debugTextArea;
+    private TextArea cliTextArea;
     private String debugErrorMessage;
 
     private Sundial sundial;
@@ -95,9 +97,92 @@ public class Sunface extends Application {
 
     private ArrayList<MouseButton> mouseButtonList = new ArrayList<>();
 
+    private DoubleProperty configX;
+    private DoubleProperty configY;
+    private DoubleProperty configW;
+    private DoubleProperty configH;
+    private DoubleProperty configA;
+    private DoubleProperty configB;
+    private LongProperty configZ;
+    private BooleanProperty configD;
+
+    private static Double inputX = null;
+    private static Double inputY = null;
+    private static Double inputW = null;
+    private static Double inputH = null;
+    private static Double inputA = null;
+    private static Double inputB = null;
+    private static Long inputZ = null;
+    private static Boolean inputD = null;
+    private static Boolean inputHelp = null;
 
     public static void main(String[] args) {
+        parseInput(args);
         launch(args);
+    }
+
+    private static void parseInput(String[] args) {
+
+        for (int i = 0; i < args.length; i++) {
+
+            String param = args[i];
+            String value = ((i + 1) < args.length) ? args[i + 1] : "";
+
+            if (value == "") { continue; }
+
+            switch (param.toLowerCase()) {
+                case "-x" : inputX = inputToDouble(value); break;
+                case "-y" : inputY = inputToDouble(value); break;
+                case "-w" : inputW = inputToDouble(value); break;
+                case "-h" : inputH = inputToDouble(value); break;
+                case "-a" : inputA = inputToDouble(value); break;
+                case "-b" : inputB = inputToDouble(value); break;
+                case "-z" : inputZ = inputToLong(value); break;
+                case "-d" : inputD = inputToBoolean(value); break;
+                case "-help" : inputHelp = true; break;
+                default: inputHelp = true;
+            }
+        }
+    }
+
+    private static Double inputToDouble(String value) {
+        Double number = null;
+        try { number = Double.parseDouble(value); } catch (NumberFormatException e) { }
+        return number;
+    }
+
+    private static Long inputToLong(String value) {
+        Long number = null;
+        try { number = Long.parseLong(value); } catch (NumberFormatException e) { }
+        return number;
+    }
+
+    private static Boolean inputToBoolean(String value) {
+
+        Boolean b = null;
+
+        ArrayList<String> falseList = new ArrayList<>();
+        falseList.add("false");
+        falseList.add("f");
+        falseList.add("0");
+        falseList.add("no");
+        falseList.add("nyet");
+        falseList.add("nein");
+        falseList.add("nope");
+
+        ArrayList<String> trueList = new ArrayList<>();
+        trueList.add("true");
+        trueList.add("t");
+        trueList.add("1");
+        trueList.add("yes");
+        trueList.add("da");
+        trueList.add("ja");
+        trueList.add("yep");
+
+        if (falseList.contains(value.toLowerCase().trim())) { b = false; }
+        if (trueList.contains(value.toLowerCase().trim())) { b = true; }
+
+        return b;
     }
 
 
@@ -111,34 +196,44 @@ public class Sunface extends Application {
         offsetLocalTime = new GregorianCalendar();
         timeZonedCalendar = new GregorianCalendar();
 
-        timeZoneOffset = currentLocalTime.getTimeZone().getRawOffset();
-        localTimeZoneOffset = timeZoneOffset;
+        timeZoneOffset = new SimpleIntegerProperty(currentLocalTime.getTimeZone().getRawOffset());
+        localTimeZoneOffset = timeZoneOffset.getValue();
+
+        // Init config
+        configX = new SimpleDoubleProperty(savedWindowPositionX);
+        configY = new SimpleDoubleProperty(savedWindowPositionY);
+        configW = new SimpleDoubleProperty(savedWindowSizeX);
+        configH = new SimpleDoubleProperty(savedWindowSizeY);
+        configA = new SimpleDoubleProperty(longitude.getValue());
+        configB = new SimpleDoubleProperty(latitude.getValue());
+        configZ = new SimpleLongProperty(timeZoneOffset.getValue() / (60 * 60 * 1000));
+        configD = new SimpleBooleanProperty(true);
 
         // Create 'sun' objects
         suntimeLocal = new Suntime.PleaseBuildSuntime()
                 .localTime(currentLocalTime)
-                .observerLongitude(longitude)
-                .observerLatitude(latitude)
+                .observerLongitude(longitude.getValue())
+                .observerLatitude(latitude.getValue())
                 .thankYou();
 
         suntimeGlobal = new Suntime.PleaseBuildSuntime()
                 .localTime(currentLocalTime)
-                .observerLongitude(longitude)
-                .observerLatitude(latitude)
+                .observerLongitude(longitude.getValue())
+                .observerLatitude(latitude.getValue())
                 .thankYou();
 
         sundial = new Sundial.PleaseBuildSundial()
                 .nightCompression(0)
                 .thankYou();
 
-        sundial.rotateGlobe(longitude, latitude);
+        sundial.rotateGlobe(longitude.getValue(), latitude.getValue());
         sundial.getControlThingyDst().toggleState();
 
         cetusTime = new KriegsrahmenZeit(KriegsrahmenZeit.Platform.PC, KriegsrahmenZeit.Location.CETUS);
         orbVallisTime = new KriegsrahmenZeit(KriegsrahmenZeit.Platform.PC, KriegsrahmenZeit.Location.ORB_VALLIS);
 
-        sunchart = new Sunchart(longitude, latitude, currentLocalTime.get(Calendar.YEAR));
-        sunyear = new Sunyear(longitude, latitude, currentLocalTime, timeZoneOffset);
+        sunchart = new Sunchart(longitude.getValue(), latitude.getValue(), currentLocalTime.get(Calendar.YEAR));
+        sunyear = new Sunyear(longitude.getValue(), latitude.getValue(), currentLocalTime, timeZoneOffset.getValue());
 
         unmaximizedWindowPositionX = new HashMap<>();
         unmaximizedWindowPositionY = new HashMap<>();
@@ -194,9 +289,33 @@ public class Sunface extends Application {
 
 
         // Debug window
-        Button copyButton = new Button("Copy text to clipboard");
-        copyButton.setMinHeight(26);
-        copyButton.setOnMouseClicked(event -> sendTextToClipboard(debugTextArea.getText()));
+        double scanline = 0;
+
+        Button copyCliButton = new Button("Copy command line switches to clipboard");
+        copyCliButton.setMinHeight(26);
+        copyCliButton.setOnMouseClicked(event -> sendTextToClipboard(cliTextArea.getText()));
+
+        scanline += copyCliButton.getMinHeight();
+
+        cliTextArea = new TextArea();
+        cliTextArea.setFont(Sunconfig.FONT_DEBUG);
+        cliTextArea.setMinWidth(600);
+        cliTextArea.setMaxWidth(600);
+        cliTextArea.setMinHeight(30);
+        cliTextArea.setMaxHeight(30);
+        cliTextArea.setEditable(false);
+        cliTextArea.setWrapText(false);
+        cliTextArea.setText("");
+        cliTextArea.setTranslateY(scanline);
+
+        scanline += cliTextArea.getMinHeight();
+
+        Button copyDebugButton = new Button("Copy data to clipboard");
+        copyDebugButton.setMinHeight(26);
+        copyDebugButton.setTranslateY(scanline);
+        copyDebugButton.setOnMouseClicked(event -> sendTextToClipboard(debugTextArea.getText()));
+
+        scanline += copyDebugButton.getMinHeight();
 
         debugTextArea = new TextArea();
         debugTextArea.setFont(Sunconfig.FONT_DEBUG);
@@ -205,10 +324,10 @@ public class Sunface extends Application {
         debugTextArea.setEditable(false);
         debugTextArea.setWrapText(true);
         debugTextArea.setText(Sunconfig.A_BEGINNING);
-        debugTextArea.setTranslateY(28);
+        debugTextArea.setTranslateY(scanline);
 
         Group debugGroup = new Group();
-        debugGroup.getChildren().addAll(debugTextArea, copyButton);
+        debugGroup.getChildren().addAll(copyCliButton, cliTextArea, copyDebugButton, debugTextArea);
 
         Scene debugScene = new Scene(debugGroup, debugGroup.getLayoutBounds().getWidth() + 6, debugGroup.getLayoutBounds().getHeight() + 2 + 28);
         debugScene.setFill(Color.LIGHTSKYBLUE);
@@ -285,7 +404,6 @@ public class Sunface extends Application {
 
         mainScene.setOnMouseEntered(event -> sundial.showOuterControlsGroup());
         mainScene.setOnMouseExited(event -> sundial.hideOuterControlsGroup());
-
 
         // SUNDIAL WINDOW
         sundial.getControlThingyClose().setOnMouseClicked(event -> System.exit(0));
@@ -406,6 +524,48 @@ public class Sunface extends Application {
         sunyear.getControlThingyMinimize().setOnMouseClicked(event -> { minimizeActions(sunchartWindow, event); killMouse(); });
 
 
+        // *** CONFIG ***
+        primaryStage.xProperty().addListener((observable, oldValue, newValue) -> configX.setValue(primaryStage.getX()));
+        primaryStage.yProperty().addListener((observable, oldValue, newValue) -> configY.setValue(primaryStage.getY()));
+        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> configW.setValue(primaryStage.getWidth()));
+        primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> configH.setValue(primaryStage.getHeight()));
+        longitude.addListener((observable, oldValue, newValue) -> configA.setValue(longitude.getValue()));
+        latitude.addListener((observable, oldValue, newValue) -> configB.setValue(latitude.getValue()));
+        timeZoneOffset.addListener((observable, oldValue, newValue) -> configZ.setValue(timeZoneOffset.getValue() / (60 * 60 * 1000)));
+        sundial.getControlThingyDst().stateProperty().addListener((observable, oldValue, newValue) -> configD.setValue(sundial.getControlThingyDst().stateProperty().getValue()));
+
+        configX.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configY.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configW.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configH.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configA.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configB.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configZ.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+        configD.addListener((observable, oldValue, newValue) -> generateCliSwitches(cliTextArea));
+
+        StringBuilder customConf = new StringBuilder();
+
+        if (inputX != null) { primaryStage.setX(inputX); customConf.append("X = ").append(inputX).append("\n"); }
+        if (inputY != null) { primaryStage.setY(inputY); customConf.append("Y = ").append(inputY).append("\n"); }
+        if (inputW != null) { primaryStage.setWidth(inputW); customConf.append("Width = ").append(inputW).append("\n"); }
+        if (inputH != null) { primaryStage.setHeight(inputH); customConf.append("Height = ").append(inputH).append("\n"); }
+        if (inputA != null) { longitude.setValue(inputA); customLongitude = inputA; customConf.append("Longitude = ").append(inputA).append("\n"); }
+        if (inputB != null) { latitude.setValue(inputB); customLatitude = inputB; customConf.append("Latitude = ").append(inputB).append("\n"); }
+        if (inputZ != null) { setTimeZone(inputZ * 60 * 60 * 1000); customConf.append("Timezone = ").append(inputZ).append("\n"); }
+        if (inputD != null) { setDst(inputD); customConf.append("DST = ").append(inputD).append("\n"); }
+
+        sundial.rotateGlobe(longitude.getValue(), latitude.getValue());
+
+        generateCliSwitches(cliTextArea);
+
+        if (!customConf.toString().isEmpty()) {
+            System.out.println("Starting with custom configuration:");
+            System.out.print(customConf.toString());
+        } else {
+            System.out.println(Sunconfig.CLI_HELP_TEXT);
+        }
+
+
         // *** SHOWTIME ***
 
         initCurrentTime();
@@ -441,6 +601,7 @@ public class Sunface extends Application {
             sunchartWindow.setX(currentScreen.getMinX());
             sunchartWindow.setY(currentScreen.getMinY());
         }
+
     }
 
 
@@ -504,8 +665,8 @@ public class Sunface extends Application {
         // Update daily data only if it's a new day, or forced initialization event
         if (newJulianDayNumber != oldJulianDayNumber || initialize) {
 
-            suntimeLocal.setObserverPosition(longitude, latitude);
-            suntimeGlobal.setObserverPosition(longitude, latitude);
+            suntimeLocal.setObserverPosition(longitude.getValue(), latitude.getValue());
+            suntimeGlobal.setObserverPosition(longitude.getValue(), latitude.getValue());
 
             cetusCycleList = cetusTime.getCycleList(timeZonedCalendar);
             orbVallisCycleList = orbVallisTime.getCycleList(timeZonedCalendar);
@@ -518,10 +679,10 @@ public class Sunface extends Application {
             GregorianCalendar sunriseDate = Suntime.getCalendarDate(sunriseJulianDate, offsetLocalTime.getTimeZone());
             GregorianCalendar sunsetDate = Suntime.getCalendarDate(sunsetJulianDate, offsetLocalTime.getTimeZone());
 
-            double noonAngle = latitude - suntimeGlobal.getRealTimeDeclinationOfTheSun(newJulianDayNumber - 0.5);
+            double noonAngle = latitude.getValue() - suntimeGlobal.getRealTimeDeclinationOfTheSun(newJulianDayNumber - 0.5);
 
             sundial.setHorizon(sunriseDate, sunsetDate);
-            sundial.setCoordinates(longitude, latitude);
+            sundial.setCoordinates(longitude.getValue(), latitude.getValue());
             sundial.setCetusTime(cetusCycleList, timeZonedCalendar, timeZoneCorrection);
             sundial.setOrbVallisTime(orbVallisCycleList, timeZonedCalendar, timeZoneCorrection);
             sundial.setTimeZone(offsetLocalTime.getTimeZone());
@@ -680,19 +841,19 @@ public class Sunface extends Application {
     private void resetGlobePosition(Sundial sundial, PositionType type) {
 
         if (type == PositionType.LONGITUDE) {
-            longitude = customLongitude;
+            longitude.setValue(customLongitude);
         } else if (type == PositionType.LATITUDE) {
-            latitude = customLatitude;
+            latitude.setValue(customLatitude);
         } else {
-            longitude = customLongitude;
-            latitude = customLatitude;
+            longitude.setValue(customLongitude);
+            latitude.setValue(customLatitude);
         }
 
         if (sundial.getGlobeAnimationEh()) {
             sundial.getLongitudeTimeline().setOnFinished(event -> initCurrentTime());
-            sundial.rotateGlobeAnimated(longitude, latitude);
+            sundial.rotateGlobeAnimated(longitude.getValue(), latitude.getValue());
         } else {
-            sundial.rotateGlobe(longitude, latitude);
+            sundial.rotateGlobe(longitude.getValue(), latitude.getValue());
             initCurrentTime();
         }
     }
@@ -789,7 +950,7 @@ public class Sunface extends Application {
         if (sunchartWindow.isShowing()) {
             sunchartWindow.close();
         } else {
-            sunyear.setSpaceTime(longitude, latitude, offsetLocalTime, timeZoneOffset);
+            sunyear.setSpaceTime(longitude.getValue(), latitude.getValue(), offsetLocalTime, timeZoneOffset.getValue());
             sunchartWindow.show();
         }
     }
@@ -915,25 +1076,26 @@ public class Sunface extends Application {
 
         if (sunchartWindow.isShowing() &&
                 (
-                        longitude != sunyear.getLongitude() ||
-                        latitude != sunyear.getLatitude() ||
+                        longitude.getValue() != sunyear.getLongitude() ||
+                        latitude.getValue() != sunyear.getLatitude() ||
                         offsetLocalTime.get(Calendar.YEAR) != sunyear.getYear() ||
-                        timeZoneOffset != sunyear.getTimeZoneOffset() ||
+                        timeZoneOffset.getValue() != sunyear.getTimeZoneOffset() ||
                         ! offsetLocalTime.getTimeZone().equals(sunyear.getTimeZone())
                 )
         ) {
 
             sunyear.setTimeZone(offsetLocalTime.getTimeZone());
-            sunyear.setSpaceTime(longitude, latitude, offsetLocalTime, timeZoneOffset);
+            sunyear.setSpaceTime(longitude.getValue(), latitude.getValue(), offsetLocalTime, timeZoneOffset.getValue());
         }
     }
 
     private void setWarnings() {
         sundial.setCustomTimeWarning(offsetLocalTime.getTimeInMillis() != currentLocalTime.getTimeInMillis());
-        sundial.setCustomTimezoneWarning(timeZoneOffset != localTimeZoneOffset);
-        sundial.setCustomLongitudeWarning(longitude != customLongitude);
-        sundial.setCustomLatitudeWarning(latitude != customLatitude);
+        sundial.setCustomTimezoneWarning(timeZoneOffset.getValue() != localTimeZoneOffset);
+        sundial.setCustomLongitudeWarning(longitude.getValue() != customLongitude);
+        sundial.setCustomLatitudeWarning(latitude.getValue() != customLatitude);
     }
+
 
     // ***************************************************************
     // *** DEBUG window contents ***
@@ -942,8 +1104,8 @@ public class Sunface extends Application {
 
         if (!debugWindow.isShowing()) { return; }
 
-        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude)) * sin(toRadians(suntimeLocal.getDeclinationOfTheSun()));
-        double divisor = cos(toRadians(latitude)) * cos(toRadians(suntimeLocal.getDeclinationOfTheSun()));
+        double dividend = sin(toRadians(-0.83d)) - sin(toRadians(latitude.getValue())) * sin(toRadians(suntimeLocal.getDeclinationOfTheSun()));
+        double divisor = cos(toRadians(latitude.getValue())) * cos(toRadians(suntimeLocal.getDeclinationOfTheSun()));
 
         double julianDate = suntimeLocal.getJulianDate();
         double julianDayNumber = suntimeLocal.getJulianDayNumber();
@@ -1042,6 +1204,29 @@ public class Sunface extends Application {
         }
 
         debugTextArea.setText(debugText);
+    }
+
+    private void generateCliSwitches(TextArea textArea) {
+
+        String x = String.format(Locale.ROOT, "%.0f", configX.getValue());
+        String y = String.format(Locale.ROOT, "%.0f", configY.getValue());
+        String w = String.format(Locale.ROOT, "%.0f", configW.getValue());
+        String h = String.format(Locale.ROOT, "%.0f", configH.getValue());
+        String a = String.format(Locale.ROOT, "%.3f", configA.getValue());
+        String b = String.format(Locale.ROOT, "%.3f", configB.getValue());
+        String z = String.format(Locale.ROOT, "%d", configZ.getValue());
+        String d = String.format(Locale.ROOT, "%s", configD.getValue());
+
+        textArea.setText(
+                " -x " + x +
+                " -y " + y +
+                " -w " + w +
+                " -h " + h +
+                " -a " + a +
+                " -b " + b +
+                " -z " + z +
+                " -d " + d
+        );
     }
 
 
@@ -1183,6 +1368,8 @@ public class Sunface extends Application {
         // MMB action -> reset time zone to local time zone
         if (getLastButton().equals(MouseButton.MIDDLE)) {
 
+            setTimeZone(new GregorianCalendar().getTimeZone().getRawOffset());
+/*
             TimeZone localTimeZone = (new GregorianCalendar()).getTimeZone();
 
             timeZoneOffset = localTimeZone.getRawOffset();
@@ -1190,7 +1377,18 @@ public class Sunface extends Application {
             offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
 
             initCurrentTime();
+*/
         }
+    }
+
+    private void setTimeZone(long offset) {
+
+        timeZoneOffset.setValue((int) Sunutil.rotateTimeZoneOffset(offset));
+
+        currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset.getValue());
+        offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset.getValue());
+
+        initCurrentTime();
     }
 
     private void coordinateActions(Stage stage, PositionType positionType, MouseEvent event) {
@@ -1234,10 +1432,14 @@ public class Sunface extends Application {
     // *** Mouse CLICK
 
     private void toggleDst() {
+        setDst(!sundial.getControlThingyDst().stateProperty().getValue());
+    }
+
+    private void setDst(boolean dst) {
 
         TimeZone timeZone;
 
-        sundial.getControlThingyDst().toggleState();
+        sundial.getControlThingyDst().stateProperty().setValue(dst);
 
         if (sundial.getControlThingyDst().getState()) {
             timeZone = (new GregorianCalendar()).getTimeZone();
@@ -1253,8 +1455,8 @@ public class Sunface extends Application {
 
 //        int rawOffset= timeZone.getRawOffset();
 
-        currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
-        offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
+        currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset.getValue());
+        offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset.getValue());
 
         initCurrentTime();
     }
@@ -1546,15 +1748,6 @@ public class Sunface extends Application {
         double screenCenterX = currentScreenMinX + (currentScreenMaxX - currentScreenMinX) / 2;
         double screenCenterY = currentScreenMinY + (currentScreenMaxY - currentScreenMinY) / 2;
 
-        debugTextArea.setText(""
-                + "\nnewPositionX = " + newPositionX
-                + "\nnewPositionY = " + newPositionY
-                + "\nscreenCenterX = " + screenCenterX
-                + "\nscreenCenterY = " + screenCenterY
-                + "\ncenterPositionX = " + centerPositionX
-                + "\ncenterPositionY = " + centerPositionY
-        );
-
         // snap to screen center
         if (snapToCenterEh) {
 
@@ -1600,16 +1793,16 @@ public class Sunface extends Application {
             precision = Sunconfig.GLOBE_ROTATE_PRECISION_FINE * precisionModifier;
         }
 
-        longitude += round((deltaLongitude / precision) * 100) / 100d;
-        latitude -= round((deltaLatitude / precision) * 100) / 100d;
+        longitude.setValue(longitude.getValue() + round((deltaLongitude / precision) * 100) / 100d);
+        latitude.setValue(latitude.getValue() - round((deltaLatitude / precision) * 100) / 100d);
 
-        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
-        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
-        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
-        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
+        if (longitude.getValue() < Suntime.MIN_LONGITUDE) { longitude.setValue(Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude.getValue())); }
+        if (longitude.getValue() > Suntime.MAX_LONGITUDE) { longitude.setValue(Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude.getValue())); }
+        if (latitude.getValue() < Suntime.MIN_LATITUDE) { latitude.setValue(Suntime.MIN_LATITUDE); }
+        if (latitude.getValue() > Suntime.MAX_LATITUDE) { latitude.setValue(Suntime.MAX_LATITUDE); }
 
         initCurrentTime();
-        sundial.rotateGlobe(longitude, latitude);
+        sundial.rotateGlobe(longitude.getValue(), latitude.getValue());
     }
 
     private void rotateGlobe(PositionType positionType, DragEvent dragEvent) {
@@ -1630,11 +1823,11 @@ public class Sunface extends Application {
         if (matcher.matches()) {
             try {
 
-                latitude = Double.parseDouble(matcher.group(1));
-                longitude = Double.parseDouble(matcher.group(2));
+                latitude.setValue(Double.parseDouble(matcher.group(1)));
+                longitude.setValue(Double.parseDouble(matcher.group(2)));
 
-                customLongitude = longitude;
-                customLatitude = latitude;
+                customLongitude = longitude.getValue();
+                customLatitude = latitude.getValue();
 
             } catch (NumberFormatException e) {
                 sundial.getInfoText().setText("Catasptrophic error while parsing coordinates!\nPlease don't try again.");
@@ -1651,7 +1844,7 @@ public class Sunface extends Application {
         hideInfoTextWithDelay();
 
         initCurrentTime();
-        sundial.rotateGlobeAnimated(longitude, latitude);
+        sundial.rotateGlobeAnimated(longitude.getValue(), latitude.getValue());
     }
 
     private void rotateGlobe(Sundial sundial, PositionType positionType, MouseEvent event) {
@@ -1677,18 +1870,18 @@ public class Sunface extends Application {
         double delta = round((deltaMouse / precision) * 100) / 100d;
 
         if (positionType == PositionType.LONGITUDE) {
-            longitude += delta;
+            longitude.setValue(longitude.getValue() + delta);
         } else {
-            latitude -= delta;
+            latitude.setValue(latitude.getValue() - delta);
         }
 
-        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
-        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
-        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
-        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
+        if (longitude.getValue() < Suntime.MIN_LONGITUDE) { longitude.setValue(Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude.getValue())); }
+        if (longitude.getValue() > Suntime.MAX_LONGITUDE) { longitude.setValue(Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude.getValue())); }
+        if (latitude.getValue() < Suntime.MIN_LATITUDE) { latitude.setValue(Suntime.MIN_LATITUDE); }
+        if (latitude.getValue() > Suntime.MAX_LATITUDE) { latitude.setValue(Suntime.MAX_LATITUDE); }
 
         initCurrentTime();
-        sundial.rotateGlobe(longitude, latitude);
+        sundial.rotateGlobe(longitude.getValue(), latitude.getValue());
     }
 
 
@@ -1714,19 +1907,22 @@ public class Sunface extends Application {
         if (!mouseButtonList.isEmpty()) { return; }
 
         if (event.getDeltaY() < 0) {
-            timeZoneOffset -= (60 * 60 * 1000);
+            timeZoneOffset.setValue(timeZoneOffset.getValue() - (60 * 60 * 1000));
         }
         else if (event.getDeltaY() > 0) {
-            timeZoneOffset += (60 * 60 * 1000);
+            timeZoneOffset.setValue(timeZoneOffset.getValue() + (60 * 60 * 1000));
         }
         else { return; }
 
-        timeZoneOffset = (int) Sunutil.rotateTimeZoneOffset(timeZoneOffset);
+        setTimeZone(timeZoneOffset.getValue());
+/*
+        timeZoneOffset.setValue((int) Sunutil.rotateTimeZoneOffset(timeZoneOffset.getValue()));
 
-        currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
-        offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset);
+        currentLocalTime.getTimeZone().setRawOffset(timeZoneOffset.getValue());
+        offsetLocalTime.getTimeZone().setRawOffset(timeZoneOffset.getValue());
 
         initCurrentTime();
+*/
     }
 
     private void rotateGlobe(Sundial sundial, PositionType type, ScrollEvent event) {
@@ -1741,15 +1937,15 @@ public class Sunface extends Application {
         if (event.getDeltaY() < 0) { step = -0.01; }
         if (event.getDeltaY() > 0) { step = 0.01; }
 
-        if (type == PositionType.LONGITUDE) { longitude += step; }
-        else { latitude += step; }
+        if (type == PositionType.LONGITUDE) { longitude.setValue(longitude.getValue() + step); }
+        else { latitude.setValue(latitude.getValue() + step); }
 
-        if (longitude < Suntime.MIN_LONGITUDE) { longitude = Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude); }
-        if (longitude > Suntime.MAX_LONGITUDE) { longitude = Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude); }
-        if (latitude < Suntime.MIN_LATITUDE) { latitude = Suntime.MIN_LATITUDE; }
-        if (latitude > Suntime.MAX_LATITUDE) { latitude = Suntime.MAX_LATITUDE; }
+        if (longitude.getValue() < Suntime.MIN_LONGITUDE) { longitude.setValue(Suntime.MAX_LONGITUDE - (Suntime.MIN_LONGITUDE - longitude.getValue())); }
+        if (longitude.getValue() > Suntime.MAX_LONGITUDE) { longitude.setValue(Suntime.MIN_LONGITUDE - (Suntime.MAX_LONGITUDE - longitude.getValue())); }
+        if (latitude.getValue() < Suntime.MIN_LATITUDE) { latitude.setValue(Suntime.MIN_LATITUDE); }
+        if (latitude.getValue() > Suntime.MAX_LATITUDE) { latitude.setValue(Suntime.MAX_LATITUDE); }
 
         initCurrentTime();
-        sundial.rotateGlobe(longitude, latitude);
+        sundial.rotateGlobe(longitude.getValue(), latitude.getValue());
     }
 }
